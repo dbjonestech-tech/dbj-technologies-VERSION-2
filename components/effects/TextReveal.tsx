@@ -20,7 +20,7 @@ export function TextReveal({
   return (
     <Tag className={className}>
       {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden pb-1">
+        <span key={i} className="inline-block overflow-hidden pb-2">
           <motion.span
             className="inline-block"
             initial={{ y: "100%", opacity: 0 }}

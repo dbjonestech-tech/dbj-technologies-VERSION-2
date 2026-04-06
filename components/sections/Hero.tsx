@@ -96,7 +96,7 @@ export function Hero() {
             transition={{ duration: 0.3 }}
           >
             {["We", "Build", "the"].map((word, i) => (
-              <span key={i} className="inline-block overflow-hidden pb-2 mr-[0.25em]">
+              <span key={i} className="inline-block overflow-hidden pb-3 mr-[0.25em]">
                 <motion.span
                   className="inline-block"
                   initial={{ y: "110%" }}
@@ -112,7 +112,7 @@ export function Hero() {
               </span>
             ))}
             <br />
-            <span className="inline-block overflow-hidden pb-2">
+            <span className="inline-block overflow-hidden pb-4">
               <motion.span
                 className="inline-block text-gradient"
                 initial={{ y: "110%" }}

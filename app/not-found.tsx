@@ -22,7 +22,7 @@ export default function NotFound() {
           transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
           className="mb-8"
         >
-          <span className="font-display text-[8rem] font-bold leading-none text-gradient md:text-[10rem]">
+          <span className="font-display text-[8rem] font-bold leading-tight text-gradient md:text-[10rem]">
             404
           </span>
         </motion.div>
