@@ -99,12 +99,8 @@ body {
   }
 
   .text-gradient {
-    @apply inline-block bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #3b82f6, #0891b2, #7c3aed);
-    padding-top: 0.2em;
-    padding-bottom: 0.2em;
-    margin-top: -0.2em;
-    margin-bottom: -0.2em;
+    @apply inline-block;
+    color: #2563eb;
   }
 
   .btn-primary {

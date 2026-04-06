@@ -3,51 +3,36 @@
 import { useEffect, useRef, useCallback } from "react";
 
 export function CustomCursor() {
-  const outerRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: 0, y: 0 });
-  const outerPos = useRef({ x: 0, y: 0 });
+  const renderPos = useRef({ x: 0, y: 0 });
   const rafRef = useRef<number>(0);
   const hoveringRef = useRef(false);
-  const clickingRef = useRef(false);
   const visibleRef = useRef(false);
 
   const updateStyles = useCallback(() => {
-    const outer = outerRef.current;
-    const inner = innerRef.current;
-    if (!outer || !inner) return;
+    const glow = glowRef.current;
+    if (!glow) return;
 
-    // Smooth follow for outer ring (lerp)
-    outerPos.current.x += (posRef.current.x - outerPos.current.x) * 0.15;
-    outerPos.current.y += (posRef.current.y - outerPos.current.y) * 0.15;
+    // Smooth follow (lerp)
+    renderPos.current.x += (posRef.current.x - renderPos.current.x) * 0.12;
+    renderPos.current.y += (posRef.current.y - renderPos.current.y) * 0.12;
 
-    const size = hoveringRef.current ? 48 : clickingRef.current ? 16 : 32;
+    const size = hoveringRef.current ? 56 : 40;
+    const half = size / 2;
 
-    outer.style.transform = `translate(${outerPos.current.x - size / 2}px, ${outerPos.current.y - size / 2}px)`;
-    outer.style.width = `${size}px`;
-    outer.style.height = `${size}px`;
-    outer.style.opacity = visibleRef.current ? "1" : "0";
-    outer.style.borderColor = hoveringRef.current
-      ? "rgba(59, 130, 246, 0.8)"
-      : "rgba(15, 23, 42, 0.3)";
-    outer.style.backgroundColor = hoveringRef.current
-      ? "rgba(59, 130, 246, 0.05)"
-      : "transparent";
-
-    inner.style.transform = `translate(${posRef.current.x - 2}px, ${posRef.current.y - 2}px)`;
-    inner.style.opacity = visibleRef.current ? "1" : "0";
-    inner.style.width = hoveringRef.current ? "6px" : "4px";
-    inner.style.height = hoveringRef.current ? "6px" : "4px";
+    glow.style.transform = `translate(${renderPos.current.x - half}px, ${renderPos.current.y - half}px)`;
+    glow.style.width = `${size}px`;
+    glow.style.height = `${size}px`;
+    glow.style.opacity = visibleRef.current ? (hoveringRef.current ? "0.6" : "0.4") : "0";
 
     rafRef.current = requestAnimationFrame(updateStyles);
   }, []);
 
   useEffect(() => {
-    // Only show on non-touch devices
     const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     if (isTouchDevice) return;
 
-    // Activate cursor: none on body
     document.body.classList.add("custom-cursor-active");
 
     const handleMove = (e: MouseEvent) => {
@@ -58,8 +43,6 @@ export function CustomCursor() {
 
     const handleEnter = () => { visibleRef.current = true; };
     const handleLeave = () => { visibleRef.current = false; };
-    const handleDown = () => { clickingRef.current = true; };
-    const handleUp = () => { clickingRef.current = false; };
 
     const handleHoverStart = (e: Event) => {
       const target = e.target as HTMLElement;
@@ -80,8 +63,6 @@ export function CustomCursor() {
     document.addEventListener("mousemove", handleMove, { passive: true });
     document.addEventListener("mouseenter", handleEnter);
     document.addEventListener("mouseleave", handleLeave);
-    document.addEventListener("mousedown", handleDown);
-    document.addEventListener("mouseup", handleUp);
     document.addEventListener("mouseover", handleHoverStart, { passive: true });
     document.addEventListener("mouseout", handleHoverEnd, { passive: true });
 
@@ -93,34 +74,21 @@ export function CustomCursor() {
       document.removeEventListener("mousemove", handleMove);
       document.removeEventListener("mouseenter", handleEnter);
       document.removeEventListener("mouseleave", handleLeave);
-      document.removeEventListener("mousedown", handleDown);
-      document.removeEventListener("mouseup", handleUp);
       document.removeEventListener("mouseover", handleHoverStart);
       document.removeEventListener("mouseout", handleHoverEnd);
     };
   }, [updateStyles]);
 
   return (
-    <>
-      {/* Outer ring */}
-      <div
-        ref={outerRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9998] hidden md:block mix-blend-difference"
-        style={{ willChange: "transform", transition: "width 0.2s, height 0.2s, border-color 0.2s, background-color 0.2s" }}
-        aria-hidden="true"
-      >
-        <div className="h-full w-full rounded-full border" />
-      </div>
-
-      {/* Inner dot */}
-      <div
-        ref={innerRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9998] hidden md:block"
-        style={{ willChange: "transform" }}
-        aria-hidden="true"
-      >
-        <div className="h-full w-full rounded-full bg-gray-900" />
-      </div>
-    </>
+    <div
+      ref={glowRef}
+      className="pointer-events-none fixed top-0 left-0 z-[9998] hidden md:block rounded-full blur-2xl"
+      style={{
+        willChange: "transform",
+        transition: "width 0.3s, height 0.3s, opacity 0.3s",
+        background: "linear-gradient(135deg, #22d3ee, #3b82f6, #8b5cf6)",
+      }}
+      aria-hidden="true"
+    />
   );
 }
