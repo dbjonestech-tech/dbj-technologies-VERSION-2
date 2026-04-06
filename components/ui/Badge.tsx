@@ -7,7 +7,7 @@ interface BadgeProps {
 }
 
 const colorMap = {
-  default: "border-white/10 bg-white/5 text-text-secondary",
+  default: "border-gray-200 bg-gray-50 text-text-secondary",
   blue: "border-accent-blue/20 bg-accent-blue/10 text-accent-blue",
   cyan: "border-accent-cyan/20 bg-accent-cyan/10 text-accent-cyan",
   violet: "border-accent-violet/20 bg-accent-violet/10 text-accent-violet",

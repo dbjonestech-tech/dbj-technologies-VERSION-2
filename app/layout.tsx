@@ -103,7 +103,7 @@ export default function RootLayout({
         <JsonLd type="website" />
         <JsonLd type="localBusiness" />
       </head>
-      <body className="font-body bg-bg-primary text-text-primary antialiased">
+      <body className="font-body bg-bg-primary text-text-primary antialiased selection:bg-accent-blue/20">
         {/* A11Y: Skip to content */}
         <a href="#main-content" className="skip-to-content">
           Skip to content

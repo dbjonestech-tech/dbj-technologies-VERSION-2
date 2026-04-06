@@ -34,7 +34,7 @@ export function Hero() {
         <div className="gradient-mesh-bg absolute inset-0 opacity-30">
           <span className="gradient-mesh-layer" />
         </div>
-        <div className="absolute inset-0 bg-bg-primary/60" />
+        <div className="absolute inset-0 bg-bg-primary/40" />
       </div>
 
       {/* Background layers */}
@@ -199,7 +199,7 @@ export function Hero() {
       </motion.div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bg-primary to-transparent z-10" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bg-primary/80 to-transparent z-10" />
     </section>
   );
 }

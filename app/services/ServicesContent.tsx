@@ -71,7 +71,7 @@ export default function ServicesContent() {
                     <Link href={`/services/${service.slug}`} className="inline-flex items-center gap-2 text-sm font-medium text-accent-blue hover:gap-3 transition-all">
                       Learn More <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
-                    <Link href="/contact" className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-white transition-all">
+                    <Link href="/contact" className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-gray-900 transition-all">
                       Discuss Your Project <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
                   </div>
@@ -80,7 +80,7 @@ export default function ServicesContent() {
                   {service.features.map((f) => (
                     <div
                       key={f}
-                      className="flex items-start gap-3 rounded-xl border border-white/[0.04] bg-white/[0.02] p-4"
+                      className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4"
                     >
                       <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-accent-cyan" aria-hidden="true" />
                       <span className="text-sm text-text-secondary">{f}</span>

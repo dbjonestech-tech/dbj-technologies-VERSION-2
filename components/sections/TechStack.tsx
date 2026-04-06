@@ -25,7 +25,7 @@ export function TechStackSection() {
               whileHover={{ scale: 1.1, y: -4 }}
               className="glass-card px-6 py-3 cursor-default group"
             >
-              <span className="font-mono text-sm text-text-secondary group-hover:text-white transition-colors duration-300">
+              <span className="font-mono text-sm text-text-secondary group-hover:text-gray-900 transition-colors duration-300">
                 {tech}
               </span>
             </motion.div>

@@ -23,7 +23,7 @@ export default function Loading() {
         </motion.div>
 
         {/* Loading bar */}
-        <div className="h-0.5 w-48 overflow-hidden rounded-full bg-white/[0.06]">
+        <div className="h-0.5 w-48 overflow-hidden rounded-full bg-gray-200">
           <motion.div
             className="h-full rounded-full bg-gradient-to-r from-accent-blue to-accent-cyan"
             initial={{ x: "-100%" }}

@@ -173,14 +173,14 @@ export default function MaintenanceSupportContent() {
                   href="/contact"
                   className={`block w-full text-center rounded-xl py-3.5 font-semibold text-sm transition-all duration-300 ${
                     plan.popular
-                      ? "bg-accent-blue text-white shadow-glow-blue hover:shadow-[0_0_50px_rgba(59,130,246,0.5)]"
-                      : "border border-white/[0.1] bg-white/[0.03] text-white hover:bg-white/[0.06] hover:border-white/[0.15]"
+                      ? "bg-accent-blue text-white shadow-glow-blue hover:shadow-[0_0_50px_rgba(59,130,246,0.4)]"
+                      : "border border-gray-200 bg-white text-gray-900 hover:bg-gray-50 hover:border-gray-300"
                   }`}
                 >
                   Get Started
                 </Link>
 
-                <div className="mt-8 pt-8 border-t border-white/[0.06] space-y-3">
+                <div className="mt-8 pt-8 border-t border-gray-200 space-y-3">
                   {plan.features.map((feature) => (
                     <div key={feature} className="flex items-center gap-3">
                       <Check className="h-4 w-4 shrink-0 text-accent-cyan" aria-hidden="true" />

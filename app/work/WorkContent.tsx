@@ -76,7 +76,7 @@ export default function WorkContent() {
                 className={`rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
                   active === cat
                     ? "bg-accent-blue text-white shadow-glow-blue"
-                    : "border border-white/[0.08] bg-white/[0.02] text-text-secondary hover:text-white hover:border-white/[0.15]"
+                    : "border border-gray-200 bg-white text-text-secondary hover:text-gray-900 hover:border-gray-300"
                 }`}
               >
                 {cat}
@@ -109,8 +109,8 @@ export default function WorkContent() {
                       role="img"
                       aria-label={`${project.title} project preview`}
                     >
-                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                        <span className="flex items-center gap-2 rounded-full bg-white/20 backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-white border border-white/20">
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                        <span className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-gray-900 border border-gray-200 shadow-sm">
                           View Details{" "}
                           <ExternalLink
                             className="h-3.5 w-3.5"
@@ -130,7 +130,7 @@ export default function WorkContent() {
                         <p className="text-xs font-mono uppercase tracking-widest text-accent-blue">
                           {project.category}
                         </p>
-                        <span className="inline-flex items-center gap-1 rounded-full border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-xs text-text-muted">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-text-muted">
                           <Info className="h-3 w-3" aria-hidden="true" />{" "}
                           {project.typeLabel}
                         </span>

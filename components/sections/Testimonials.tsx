@@ -6,6 +6,8 @@ import { TESTIMONIALS } from "@/lib/constants";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 export function TestimonialsSection() {
+  if (TESTIMONIALS.length === 0) return null;
+
   return (
     <section className="relative py-32">
       <SectionHeading
@@ -29,7 +31,7 @@ export function TestimonialsSection() {
               <p className="flex-1 text-text-secondary leading-relaxed text-sm">
                 &ldquo;{t.quote}&rdquo;
               </p>
-              <div className="mt-6 flex items-center gap-4 pt-6 border-t border-white/[0.06]">
+              <div className="mt-6 flex items-center gap-4 pt-6 border-t border-gray-200">
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-accent-blue to-accent-cyan text-white text-sm font-bold"
                   role="img"
@@ -38,7 +40,7 @@ export function TestimonialsSection() {
                   <span aria-hidden="true">{t.name.charAt(0)}</span>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">{t.name}</p>
+                  <p className="text-sm font-semibold text-gray-900">{t.name}</p>
                   <p className="text-xs text-text-muted">{t.role}</p>
                 </div>
               </div>

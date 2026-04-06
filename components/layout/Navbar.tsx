@@ -37,7 +37,7 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-bg-primary/80 backdrop-blur-2xl border-b border-white/[0.06] shadow-lg shadow-black/20"
+          ? "bg-white/80 backdrop-blur-2xl border-b border-gray-200 shadow-sm"
           : "bg-transparent"
       }`}
     >
@@ -74,15 +74,15 @@ export function Navbar() {
                 href={link.href}
                 className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 ${
                   isActive
-                    ? "text-white"
-                    : "text-text-secondary hover:text-white"
+                    ? "text-gray-900"
+                    : "text-text-secondary hover:text-gray-900"
                 }`}
               >
                 {link.label}
                 {isActive && (
                   <motion.div
                     layoutId="nav-indicator"
-                    className="absolute inset-0 rounded-lg bg-white/[0.06] border border-white/[0.08]"
+                    className="absolute inset-0 rounded-lg bg-gray-100 border border-gray-200"
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}
@@ -102,7 +102,7 @@ export function Navbar() {
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="relative z-10 flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] lg:hidden"
+            className="relative z-10 flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white lg:hidden"
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
@@ -143,7 +143,7 @@ export function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             id="mobile-menu"
-            className="overflow-hidden border-t border-white/[0.06] bg-bg-primary/95 backdrop-blur-2xl lg:hidden"
+            className="overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-2xl lg:hidden"
           >
             <div className="mx-auto max-w-7xl px-6 py-6">
               {NAV_LINKS.map((link, i) => (
@@ -157,8 +157,8 @@ export function Navbar() {
                     href={link.href}
                     className={`block rounded-lg px-4 py-3 text-lg font-medium transition-colors ${
                       pathname === link.href
-                        ? "text-accent-blue bg-white/[0.04]"
-                        : "text-text-secondary hover:text-white hover:bg-white/[0.02]"
+                        ? "text-accent-blue bg-accent-blue/5"
+                        : "text-text-secondary hover:text-gray-900 hover:bg-gray-50"
                     }`}
                   >
                     {link.label}
@@ -169,7 +169,7 @@ export function Navbar() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="mt-4 pt-4 border-t border-white/[0.06]"
+                className="mt-4 pt-4 border-t border-gray-200"
               >
                 <Link href="/contact" className="btn-primary w-full justify-center text-center">
                   Start a Project

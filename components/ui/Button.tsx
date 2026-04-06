@@ -17,7 +17,7 @@ interface ButtonProps {
 const variants = {
   primary: "btn-primary",
   outline: "btn-outline",
-  ghost: "text-text-secondary hover:text-white hover:bg-white/[0.04] rounded-lg px-4 py-2 transition-all",
+  ghost: "text-text-secondary hover:text-gray-900 hover:bg-gray-100 rounded-lg px-4 py-2 transition-all",
 };
 
 const sizes = {

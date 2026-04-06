@@ -5,7 +5,7 @@ import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 
 export function StatsSection() {
   return (
-    <section className="relative py-20 border-y border-white/[0.04]">
+    <section className="relative py-20 border-y border-gray-200">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-secondary to-bg-primary" />
 

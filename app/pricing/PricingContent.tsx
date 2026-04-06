@@ -105,14 +105,14 @@ export default function PricingContent() {
                   href={`/pricing/${tier.name.toLowerCase()}`}
                   className={`block w-full text-center rounded-xl py-3.5 font-semibold text-sm transition-all duration-300 ${
                     tier.popular
-                      ? "bg-accent-blue text-white shadow-glow-blue hover:shadow-[0_0_50px_rgba(59,130,246,0.5)]"
-                      : "border border-white/[0.1] bg-white/[0.03] text-white hover:bg-white/[0.06] hover:border-white/[0.15]"
+                      ? "bg-accent-blue text-white shadow-glow-blue hover:shadow-[0_0_50px_rgba(59,130,246,0.4)]"
+                      : "border border-gray-200 bg-white text-gray-900 hover:bg-gray-50 hover:border-gray-300"
                   }`}
                 >
                   {tier.cta}
                 </Link>
 
-                <div className="mt-8 pt-8 border-t border-white/[0.06] space-y-3">
+                <div className="mt-8 pt-8 border-t border-gray-200 space-y-3">
                   {tier.features.map((f) => (
                     <div key={f.text} className="flex items-center gap-3">
                       {f.included ? (

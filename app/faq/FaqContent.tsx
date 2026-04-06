@@ -83,7 +83,7 @@ export default function FaqContent() {
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search questions..."
               aria-label="Search frequently asked questions"
-              className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] pl-11 pr-4 py-3.5 text-sm text-white placeholder:text-text-muted outline-none transition-colors focus:border-accent-blue/50"
+              className="w-full rounded-xl border border-gray-200 bg-white pl-11 pr-4 py-3.5 text-sm text-gray-900 placeholder:text-text-muted outline-none transition-colors focus:border-accent-blue/50"
             />
           </motion.div>
 
@@ -101,7 +101,7 @@ export default function FaqContent() {
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
                   activeCategory === cat
                     ? "bg-accent-blue/10 text-accent-blue border border-accent-blue/30"
-                    : "border border-white/[0.06] text-text-secondary hover:text-white hover:border-white/[0.12]"
+                    : "border border-gray-200 text-text-secondary hover:text-gray-900 hover:border-gray-300"
                 }`}
               >
                 {cat}

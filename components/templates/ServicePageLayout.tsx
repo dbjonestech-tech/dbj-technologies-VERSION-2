@@ -147,7 +147,7 @@ export function ServicePageLayout({ service, relatedServices }: ServicePageLayou
           description="A proven process refined over hundreds of projects."
         />
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
-          <div className="relative border-l border-white/[0.08] pl-8 ml-4 space-y-12">
+          <div className="relative border-l border-gray-200 pl-8 ml-4 space-y-12">
             {service.process.map((step, i) => (
               <motion.div
                 key={step.step}
@@ -157,7 +157,7 @@ export function ServicePageLayout({ service, relatedServices }: ServicePageLayou
                 transition={{ delay: i * 0.1 }}
                 className="relative"
               >
-                <div className="absolute -left-[41px] top-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-accent-blue/40 bg-bg-primary">
+                <div className="absolute -left-[41px] top-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-accent-blue/40 bg-white">
                   <div className="h-2 w-2 rounded-full bg-accent-blue" />
                 </div>
                 <span className="font-mono text-xs text-accent-blue uppercase tracking-widest">

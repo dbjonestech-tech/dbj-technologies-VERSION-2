@@ -4,6 +4,7 @@ import { CLIENT_LOGOS } from "@/lib/constants";
 import { useEffect, useRef, useState } from "react";
 
 export function ClientLogos() {
+  if (CLIENT_LOGOS.length === 0) return null;
   const doubled = [...CLIENT_LOGOS, ...CLIENT_LOGOS];
   const labelRef = useRef<HTMLParagraphElement>(null);
   const [visible, setVisible] = useState(false);
@@ -20,7 +21,7 @@ export function ClientLogos() {
   }, []);
 
   return (
-    <section className="relative min-h-[200px] py-20 overflow-hidden border-y border-white/[0.04]">
+    <section className="relative min-h-[200px] py-20 overflow-hidden border-y border-gray-200">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <p
           ref={labelRef}
@@ -41,9 +42,9 @@ export function ClientLogos() {
           {doubled.map((name, i) => (
             <div
               key={i}
-              className="mx-8 flex shrink-0 items-center justify-center rounded-xl border border-white/[0.04] bg-white/[0.02] px-8 py-4 min-h-[60px] min-w-[160px] transition-all duration-500 hover:border-white/[0.1] hover:bg-white/[0.04] group"
+              className="mx-8 flex shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white px-8 py-4 min-h-[60px] min-w-[160px] shadow-sm transition-all duration-500 hover:border-gray-300 hover:shadow-md group"
             >
-              <span className="font-display text-lg font-bold text-text-muted transition-colors duration-500 group-hover:text-white whitespace-nowrap">
+              <span className="font-display text-lg font-bold text-text-muted transition-colors duration-500 group-hover:text-gray-900 whitespace-nowrap">
                 {name}
               </span>
             </div>
@@ -55,9 +56,9 @@ export function ClientLogos() {
           {doubled.map((name, i) => (
             <div
               key={`rev-${i}`}
-              className="mx-8 flex shrink-0 items-center justify-center rounded-xl border border-white/[0.04] bg-white/[0.02] px-8 py-4 min-h-[60px] min-w-[160px] transition-all duration-500 hover:border-white/[0.1] hover:bg-white/[0.04] group"
+              className="mx-8 flex shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white px-8 py-4 min-h-[60px] min-w-[160px] shadow-sm transition-all duration-500 hover:border-gray-300 hover:shadow-md group"
             >
-              <span className="font-display text-lg font-bold text-text-muted transition-colors duration-500 group-hover:text-white whitespace-nowrap">
+              <span className="font-display text-lg font-bold text-text-muted transition-colors duration-500 group-hover:text-gray-900 whitespace-nowrap">
                 {name}
               </span>
             </div>

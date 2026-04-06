@@ -71,7 +71,7 @@ export default function AboutContent() {
           title="Our Operating Principles"
         />
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
-          <div className="relative border-l border-white/[0.08] pl-8 ml-4 space-y-12">
+          <div className="relative border-l border-gray-200 pl-8 ml-4 space-y-12">
             {principles.map((item, i) => (
               <motion.div
                 key={item.title}
@@ -82,7 +82,7 @@ export default function AboutContent() {
                 className="relative"
               >
                 {/* Dot */}
-                <div className="absolute -left-[41px] top-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-accent-blue/40 bg-bg-primary">
+                <div className="absolute -left-[41px] top-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-accent-blue/40 bg-white">
                   <div className="h-2 w-2 rounded-full bg-accent-blue" />
                 </div>
                 <h3 className="font-display text-xl font-bold">{item.title}</h3>
@@ -137,7 +137,7 @@ export default function AboutContent() {
                   className="glass-card-hover p-6 text-center group"
                 >
                   <div
-                    className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-blue/20 to-accent-violet/20 border border-white/[0.06] transition-all duration-500 group-hover:border-accent-blue/30"
+                    className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-blue/10 to-accent-violet/10 border border-gray-200 transition-all duration-500 group-hover:border-accent-blue/30"
                     role="img"
                     aria-label={`Avatar for ${m.name}`}
                   >

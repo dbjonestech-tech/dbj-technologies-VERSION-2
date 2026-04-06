@@ -29,7 +29,7 @@ export function CustomCursor() {
     outer.style.opacity = visibleRef.current ? "1" : "0";
     outer.style.borderColor = hoveringRef.current
       ? "rgba(59, 130, 246, 0.8)"
-      : "rgba(255, 255, 255, 0.5)";
+      : "rgba(15, 23, 42, 0.3)";
     outer.style.backgroundColor = hoveringRef.current
       ? "rgba(59, 130, 246, 0.05)"
       : "transparent";
@@ -119,7 +119,7 @@ export function CustomCursor() {
         style={{ willChange: "transform" }}
         aria-hidden="true"
       >
-        <div className="h-full w-full rounded-full bg-white" />
+        <div className="h-full w-full rounded-full bg-gray-900" />
       </div>
     </>
   );

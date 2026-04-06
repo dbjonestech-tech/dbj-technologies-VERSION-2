@@ -171,11 +171,11 @@ export default function ContactContent() {
                         {...register("budget")}
                         aria-invalid={!!errors.budget}
                         aria-describedby={errors.budget ? "budget-error" : undefined}
-                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition-colors focus:border-accent-blue/50 appearance-none"
+                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-colors focus:border-accent-blue/50 appearance-none"
                       >
-                        <option value="" className="bg-bg-primary">Select budget</option>
+                        <option value="" className="bg-white">Select budget</option>
                         {BUDGET_OPTIONS.map((b) => (
-                          <option key={b} value={b} className="bg-bg-primary">{b}</option>
+                          <option key={b} value={b} className="bg-white">{b}</option>
                         ))}
                       </select>
                       {errors.budget && (
@@ -191,11 +191,11 @@ export default function ContactContent() {
                         {...register("projectType")}
                         aria-invalid={!!errors.projectType}
                         aria-describedby={errors.projectType ? "projectType-error" : undefined}
-                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition-colors focus:border-accent-blue/50 appearance-none"
+                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-colors focus:border-accent-blue/50 appearance-none"
                       >
-                        <option value="" className="bg-bg-primary">Select type</option>
+                        <option value="" className="bg-white">Select type</option>
                         {PROJECT_TYPE_OPTIONS.map((t) => (
-                          <option key={t} value={t} className="bg-bg-primary">{t}</option>
+                          <option key={t} value={t} className="bg-white">{t}</option>
                         ))}
                       </select>
                       {errors.projectType && (
@@ -255,7 +255,7 @@ export default function ContactContent() {
                     </div>
                     <div>
                       <p className="text-xs uppercase tracking-widest text-text-muted mb-1">Email</p>
-                      <p className="text-sm text-text-secondary group-hover:text-white transition-colors">
+                      <p className="text-sm text-text-secondary group-hover:text-gray-900 transition-colors">
                         {SITE.email}
                       </p>
                     </div>
@@ -292,7 +292,7 @@ export default function ContactContent() {
                         href={s.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02] text-text-secondary hover:text-white hover:border-accent-blue/30 transition-all"
+                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-text-secondary hover:text-accent-blue hover:border-accent-blue/30 transition-all"
                         aria-label={s.label}
                       >
                         <span className="text-xs font-bold">{s.label.charAt(0)}</span>

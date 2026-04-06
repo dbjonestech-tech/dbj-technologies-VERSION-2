@@ -10,25 +10,25 @@ const config: Config = {
     extend: {
       colors: {
         bg: {
-          primary: "#06060a",
-          secondary: "#0c0c14",
-          tertiary: "#12121e",
-          card: "rgba(255,255,255,0.03)",
+          primary: "#FAFAFA",
+          secondary: "#F1F5F9",
+          tertiary: "#E2E8F0",
+          card: "rgba(255,255,255,1)",
         },
         accent: {
-          blue: "#60a5fa",
-          cyan: "#22d3ee",
-          violet: "#a78bfa",
-          glow: "rgba(96,165,250,0.15)",
+          blue: "#3b82f6",
+          cyan: "#0891b2",
+          violet: "#7c3aed",
+          glow: "rgba(59,130,246,0.12)",
         },
         text: {
-          primary: "#f0f0f5",
-          secondary: "#a0a0b2",
-          muted: "#7b7b92",
+          primary: "#0f172a",
+          secondary: "#475569",
+          muted: "#94a3b8",
         },
         border: {
-          subtle: "rgba(255,255,255,0.06)",
-          hover: "rgba(255,255,255,0.12)",
+          subtle: "rgba(0,0,0,0.06)",
+          hover: "rgba(0,0,0,0.12)",
         },
       },
       fontFamily: {
@@ -91,10 +91,10 @@ const config: Config = {
         "300%": "300% 300%",
       },
       boxShadow: {
-        "glow-blue": "0 0 30px rgba(96,165,250,0.3), 0 0 60px rgba(96,165,250,0.1)",
-        "glow-cyan": "0 0 30px rgba(34,211,238,0.3), 0 0 60px rgba(34,211,238,0.1)",
-        "glow-violet": "0 0 30px rgba(167,139,250,0.3)",
-        "card": "0 4px 30px rgba(0,0,0,0.4)",
+        "glow-blue": "0 0 30px rgba(59,130,246,0.25), 0 0 60px rgba(59,130,246,0.08)",
+        "glow-cyan": "0 0 30px rgba(8,145,178,0.25), 0 0 60px rgba(8,145,178,0.08)",
+        "glow-violet": "0 0 30px rgba(124,58,237,0.25)",
+        "card": "0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04)",
       },
     },
   },

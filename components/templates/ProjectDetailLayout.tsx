@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowLeft, CheckCircle2, Info } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Info } from "lucide-react";
 import Link from "next/link";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GridBackground } from "@/components/effects/GridBackground";
@@ -30,7 +30,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
           >
             <Link
               href="/work"
-              className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-gray-900 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               Back to All Work
@@ -46,7 +46,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
             <span className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue">
               {project.category}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 px-3 py-1 text-xs font-medium text-amber-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 px-3 py-1 text-xs font-medium text-amber-600">
               <Info className="h-3 w-3" aria-hidden="true" />
               {project.typeLabel}
             </span>
@@ -93,7 +93,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
             aria-label={`${project.title} project preview`}
           >
             <div className="absolute inset-0 dot-grid opacity-20" aria-hidden="true" />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/40 to-transparent" />
           </motion.div>
         </div>
       </section>
@@ -142,7 +142,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
       {/* Results */}
       {project.results.length > 0 && (
         <section className="py-20">
-          <SectionHeading label="Results" title="By the Numbers" />
+          <SectionHeading label="Tech Stack" title="Built With" />
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid gap-6 sm:grid-cols-3">
               {project.results.map((result, i) => (
@@ -177,61 +177,13 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
-                className="flex items-start gap-3 rounded-xl border border-white/[0.04] bg-white/[0.02] p-4"
+                className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4"
               >
                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-accent-cyan" aria-hidden="true" />
                 <span className="text-text-secondary">{feature}</span>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Testimonial (if exists) */}
-      {project.testimonial && (
-        <section className="py-20">
-          <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
-            <motion.blockquote
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="glass-card p-8 md:p-12"
-            >
-              <p className="text-lg text-text-primary leading-relaxed italic">
-                &ldquo;{project.testimonial.quote}&rdquo;
-              </p>
-              <footer className="mt-6">
-                <p className="font-display font-bold">{project.testimonial.name}</p>
-                <p className="text-sm text-text-secondary">{project.testimonial.role}</p>
-              </footer>
-            </motion.blockquote>
-          </div>
-        </section>
-      )}
-
-      {/* CTA to start project */}
-      <section className="py-20 bg-bg-secondary/50">
-        <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="font-display text-3xl font-bold mb-4">
-              Want Something Like This?
-            </h2>
-            <p className="text-text-secondary mb-8">
-              Every project starts with a conversation. Tell us about your goals and we&apos;ll show you what&apos;s possible.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link href="/contact" className="btn-primary">
-                Start a Project <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link href="/work" className="btn-outline">
-                View More Work
-              </Link>
-            </div>
-          </motion.div>
         </div>
       </section>
 

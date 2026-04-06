@@ -7,9 +7,9 @@ import { SITE, FOOTER_NAV_LINKS, SUPPORT_LINKS, SOCIALS, SERVICES } from "@/lib/
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-white/[0.06] bg-bg-secondary">
+    <footer className="relative border-t border-gray-200 bg-white">
       {/* Top glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-3/4 bg-gradient-to-r from-transparent via-accent-blue/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-3/4 bg-gradient-to-r from-transparent via-accent-blue/20 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-6 pt-20 pb-10 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-4">
@@ -35,7 +35,7 @@ export function Footer() {
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02] text-text-secondary transition-all duration-300 hover:border-accent-blue/40 hover:text-white hover:bg-accent-blue/10"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-text-secondary transition-all duration-300 hover:border-accent-blue/40 hover:text-accent-blue hover:bg-accent-blue/5"
                     aria-label={s.label}
                   >
                     <SocialIcon name={s.icon} />
@@ -55,7 +55,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-text-secondary transition-colors hover:text-white"
+                    className="text-sm text-text-secondary transition-colors hover:text-gray-900"
                   >
                     {link.label}
                   </Link>
@@ -74,7 +74,7 @@ export function Footer() {
                 <li key={s.title}>
                   <Link
                     href={`/services/${s.slug}`}
-                    className="text-sm text-text-secondary transition-colors hover:text-white"
+                    className="text-sm text-text-secondary transition-colors hover:text-gray-900"
                   >
                     {s.title}
                   </Link>
@@ -89,7 +89,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-text-secondary transition-colors hover:text-white"
+                    className="text-sm text-text-secondary transition-colors hover:text-gray-900"
                   >
                     {link.label}
                   </Link>
@@ -106,7 +106,7 @@ export function Footer() {
             <ul className="mt-4 space-y-4">
               <li className="flex items-start gap-3 text-sm text-text-secondary">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent-blue" aria-hidden="true" />
-                <a href={`mailto:${SITE.email}`} className="hover:text-white transition-colors">
+                <a href={`mailto:${SITE.email}`} className="hover:text-gray-900 transition-colors">
                   {SITE.email}
                 </a>
               </li>
@@ -134,15 +134,15 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row">
+        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-8 sm:flex-row">
           <p className="text-xs text-text-muted">
             &copy; {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
           <div className="flex gap-6 text-xs text-text-muted">
-            <Link href="/privacy" className="hover:text-white transition-colors">
+            <Link href="/privacy" className="hover:text-gray-900 transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="hover:text-white transition-colors">
+            <Link href="/terms" className="hover:text-gray-900 transition-colors">
               Terms of Service
             </Link>
           </div>

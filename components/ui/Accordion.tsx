@@ -25,7 +25,7 @@ export function AccordionItem({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.05 }}
-      className="border-b border-white/[0.06]"
+      className="border-b border-gray-200"
     >
       <button
         onClick={onToggle}
@@ -34,7 +34,7 @@ export function AccordionItem({
         aria-controls={`accordion-panel-${index}`}
         id={`accordion-header-${index}`}
       >
-        <span className="pr-8 text-base font-medium text-text-primary group-hover:text-white transition-colors md:text-lg">
+        <span className="pr-8 text-base font-medium text-text-primary group-hover:text-gray-900 transition-colors md:text-lg">
           {question}
         </span>
         <motion.div
