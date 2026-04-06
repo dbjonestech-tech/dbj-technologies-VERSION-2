@@ -90,12 +90,12 @@ export function Hero() {
         {/* Heading */}
         <div className="mt-8">
           <motion.h1
-            className="font-display text-hero font-bold leading-tight tracking-tight"
+            className="font-display text-hero font-extrabold leading-tight tracking-tighter text-slate-900"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {["We", "Build", "the"].map((word, i) => (
+            {["We", "Engineer", "The"].map((word, i) => (
               <span key={i} className="inline-block overflow-hidden pb-3 mr-[0.25em]">
                 <motion.span
                   className="inline-block"
@@ -123,7 +123,7 @@ export function Hero() {
                   ease: [0.33, 1, 0.68, 1],
                 }}
               >
-                Future.
+                Impossible<span className="animate-pulse">.</span>
               </motion.span>
             </span>
           </motion.h1>

@@ -32,7 +32,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["var(--font-syne)", "sans-serif"],
+        display: ["var(--font-display)", "sans-serif"],
         body: ["var(--font-outfit)", "sans-serif"],
         mono: ["var(--font-jetbrains)", "monospace"],
       },

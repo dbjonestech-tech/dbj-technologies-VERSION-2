@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Syne, Outfit, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Outfit, JetBrains_Mono } from "next/font/google";
 import { CursorWrapper } from "@/components/layout/CursorWrapper";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -8,9 +8,9 @@ import { PageTransition } from "@/components/layout/PageTransition";
 import "./globals.css";
 
 /* ─── FONTS ─────────────────────────────────────────── */
-const syne = Syne({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-syne",
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -96,7 +96,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${outfit.variable} ${jetbrains.variable}`}
+      className={`${jakarta.variable} ${outfit.variable} ${jetbrains.variable}`}
     >
       <head>
         <JsonLd type="organization" />
