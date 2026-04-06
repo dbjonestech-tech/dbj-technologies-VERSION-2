@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, Mail, MapPin } from "lucide-react";
 import { SITE, FOOTER_NAV_LINKS, SUPPORT_LINKS, SOCIALS, SERVICES } from "@/lib/constants";
 
@@ -14,11 +15,14 @@ export function Footer() {
         <div className="grid gap-12 lg:grid-cols-4">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent-blue to-accent-cyan">
-                <span className="font-display text-lg font-bold text-white">D</span>
-              </div>
-              <span className="font-display text-xl font-bold">{SITE.name}</span>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/brand/dbj_logo_horizontal.svg"
+                alt="DBJ Technologies Logo"
+                width={175}
+                height={60}
+                className="h-9 w-auto"
+              />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-text-secondary">
               Web development studio in Dallas, TX. High-performance sites and applications built with modern tooling.

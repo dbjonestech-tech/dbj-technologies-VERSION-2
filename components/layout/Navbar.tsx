@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { NAV_LINKS, SITE } from "@/lib/constants";
+import { NAV_LINKS } from "@/lib/constants";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,14 +43,25 @@ export function Navbar() {
     >
       <nav aria-label="Main navigation" className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="group relative z-10 flex items-center gap-3">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent-blue to-accent-cyan">
-            <span className="font-display text-lg font-bold text-white">D</span>
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-accent-blue to-accent-cyan opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-60" />
-          </div>
-          <span className="font-display text-xl font-bold tracking-tight">
-            {SITE.name}
-          </span>
+        <Link href="/" className="relative z-10 flex items-center">
+          {/* Full horizontal logo — desktop */}
+          <Image
+            src="/brand/dbj_logo_horizontal.svg"
+            alt="DBJ Technologies Logo"
+            width={175}
+            height={60}
+            priority
+            className="hidden sm:block h-9 w-auto"
+          />
+          {/* Icon mark — mobile */}
+          <Image
+            src="/brand/dbj_mark.svg"
+            alt="DBJ Technologies Logo"
+            width={35}
+            height={43}
+            priority
+            className="block sm:hidden h-9 w-auto"
+          />
         </Link>
 
         {/* Desktop nav */}

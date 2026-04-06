@@ -1,0 +1,5 @@
+Use dbj_logo_horizontal.svg in the header and footer on dark backgrounds.
+Use dbj_mark.svg for favicon, loading state, and compact UI.
+Use dbj_logo_horizontal_white.svg or dbj_mark_white.svg only where an all white treatment is needed.
+Use apple_touch_icon.png for Apple touch icon.
+Use dbj_mark_192.png and dbj_mark_512.png for web app manifest icons.
