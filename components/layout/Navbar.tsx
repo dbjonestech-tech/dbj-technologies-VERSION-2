@@ -74,15 +74,15 @@ export function Navbar() {
                 href={link.href}
                 className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 ${
                   isActive
-                    ? "text-gray-900"
-                    : "text-text-secondary hover:text-gray-900"
+                    ? "text-gray-900 font-semibold"
+                    : "text-gray-500 hover:text-gray-900"
                 }`}
               >
-                {link.label}
+                <span className="relative z-10">{link.label}</span>
                 {isActive && (
                   <motion.div
                     layoutId="nav-indicator"
-                    className="absolute inset-0 rounded-lg bg-gray-100 border border-gray-200"
+                    className="absolute inset-0 rounded-lg bg-gray-100 border border-gray-200/80"
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}
