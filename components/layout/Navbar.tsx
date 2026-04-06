@@ -43,7 +43,16 @@ export function Navbar() {
     >
       <nav aria-label="Main navigation" className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="relative z-10 flex items-center">
+        <Link
+          href="/"
+          className="relative z-10 flex items-center"
+          onClick={(e) => {
+            if (window.location.pathname === "/") {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+        >
           {/* Full horizontal logo — desktop */}
           <Image
             src="/brand/dbj_logo_horizontal.svg"
@@ -54,14 +63,16 @@ export function Navbar() {
             className="hidden sm:block h-9 w-auto"
           />
           {/* Icon mark — mobile */}
-          <Image
-            src="/brand/dbj_mark.svg"
-            alt="DBJ Technologies Logo"
-            width={35}
-            height={43}
-            priority
-            className="block sm:hidden h-9 w-auto"
-          />
+          <div className="h-8 w-auto sm:hidden md:h-10">
+            <Image
+              src="/brand/dbj_mark.svg"
+              alt="DBJ Technologies Logo"
+              width={35}
+              height={43}
+              priority
+              className="h-full w-auto object-contain"
+            />
+          </div>
         </Link>
 
         {/* Desktop nav */}
@@ -155,6 +166,7 @@ export function Navbar() {
                 >
                   <Link
                     href={link.href}
+                    onClick={() => setIsOpen(false)}
                     className={`block rounded-lg px-4 py-3 text-lg font-medium transition-colors ${
                       pathname === link.href
                         ? "text-accent-blue bg-accent-blue/5"
@@ -171,7 +183,7 @@ export function Navbar() {
                 transition={{ delay: 0.3 }}
                 className="mt-4 pt-4 border-t border-gray-200"
               >
-                <Link href="/contact" className="btn-primary w-full justify-center text-center">
+                <Link href="/contact" onClick={() => setIsOpen(false)} className="btn-primary w-full justify-center text-center">
                   Start a Project
                 </Link>
               </motion.div>

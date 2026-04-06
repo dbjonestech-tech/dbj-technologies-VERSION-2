@@ -15,7 +15,16 @@ export function Footer() {
         <div className="grid gap-12 lg:grid-cols-4">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center">
+            <Link
+              href="/"
+              className="flex items-center"
+              onClick={(e) => {
+                if (window.location.pathname === "/") {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+            >
               <Image
                 src="/brand/dbj_logo_horizontal.svg"
                 alt="DBJ Technologies Logo"
@@ -55,6 +64,16 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
+                    onClick={
+                      link.href === "/"
+                        ? (e) => {
+                            if (window.location.pathname === "/") {
+                              e.preventDefault();
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }
+                          }
+                        : undefined
+                    }
                     className="text-sm text-text-secondary transition-colors hover:text-gray-900"
                   >
                     {link.label}
