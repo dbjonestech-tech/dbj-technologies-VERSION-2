@@ -88,15 +88,15 @@ export function Hero() {
         </motion.div>
 
         {/* Heading */}
-        <div className="mt-8 overflow-hidden">
+        <div className="mt-8">
           <motion.h1
-            className="font-display text-hero font-bold leading-[0.95] tracking-tight"
+            className="font-display text-hero font-bold leading-tight tracking-tight"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
             {["We", "Build", "the"].map((word, i) => (
-              <span key={i} className="inline-block overflow-hidden mr-[0.25em]">
+              <span key={i} className="inline-block overflow-hidden pb-2 mr-[0.25em]">
                 <motion.span
                   className="inline-block"
                   initial={{ y: "110%" }}
@@ -112,7 +112,7 @@ export function Hero() {
               </span>
             ))}
             <br />
-            <span className="inline-block overflow-hidden">
+            <span className="inline-block overflow-hidden pb-2">
               <motion.span
                 className="inline-block text-gradient"
                 initial={{ y: "110%" }}
