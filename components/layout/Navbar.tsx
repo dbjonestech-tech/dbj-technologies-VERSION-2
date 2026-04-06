@@ -53,26 +53,14 @@ export function Navbar() {
             }
           }}
         >
-          {/* Full horizontal logo — desktop */}
           <Image
             src="/brand/dbj_logo_horizontal.svg"
-            alt="DBJ Technologies Logo"
+            alt="DBJ Technologies"
             width={175}
             height={60}
             priority
-            className="hidden sm:block h-9 w-auto"
+            className="h-7 w-auto sm:h-9"
           />
-          {/* Icon mark — mobile */}
-          <div className="h-8 w-auto sm:hidden md:h-10">
-            <Image
-              src="/brand/dbj_mark.svg"
-              alt="DBJ Technologies Logo"
-              width={35}
-              height={43}
-              priority
-              className="h-full w-auto object-contain"
-            />
-          </div>
         </Link>
 
         {/* Desktop nav */}

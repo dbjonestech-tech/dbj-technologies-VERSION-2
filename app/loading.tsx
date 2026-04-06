@@ -4,8 +4,7 @@ import { motion } from "framer-motion";
 
 export default function Loading() {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-bg-primary" role="status" aria-label="Loading page">
-      {/* Central loader */}
+    <div className="flex min-h-[60vh] items-center justify-center" role="status" aria-label="Loading page">
       <div className="flex flex-col items-center gap-6">
         {/* Animated logo mark */}
         <motion.div
