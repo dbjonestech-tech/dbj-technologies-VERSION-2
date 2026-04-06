@@ -12,6 +12,35 @@ function escapeHtml(unsafe: string): string {
     .replace(/'/g, "&#039;");
 }
 
+/* ─── IN-MEMORY RATE LIMITER ────────────────────── */
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 3; // 3 requests per window
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return false;
+  }
+
+  entry.count++;
+  return entry.count > RATE_LIMIT_MAX;
+}
+
+// Periodic cleanup to prevent memory leaks
+if (typeof globalThis !== "undefined") {
+  const cleanup = () => {
+    const now = Date.now();
+    for (const [key, entry] of rateLimitMap) {
+      if (now > entry.resetAt) rateLimitMap.delete(key);
+    }
+  };
+  setInterval(cleanup, 60_000);
+}
+
 /* ─── SERVER-SIDE VALIDATION (defense in depth) ──── */
 const contactSchema = z.object({
   name: z.string().min(2).max(200),
@@ -21,11 +50,43 @@ const contactSchema = z.object({
   budget: z.string().min(1).max(100),
   projectType: z.string().min(1).max(100),
   message: z.string().min(10).max(5000),
+  // Honeypot field — should always be empty
+  website: z.string().max(0, "Bot detected").optional().default(""),
 });
 
 export async function POST(request: Request) {
   try {
+    /* ─── ORIGIN VALIDATION ───────────────────── */
+    const origin = request.headers.get("origin");
+    const allowedOrigins = [
+      "https://dbjtechnologies.com",
+      "https://www.dbjtechnologies.com",
+    ];
+    // Allow localhost in development
+    if (process.env.NODE_ENV === "development") {
+      allowedOrigins.push("http://localhost:3000", "http://localhost:3001");
+    }
+    if (origin && !allowedOrigins.includes(origin)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    /* ─── RATE LIMITING ───────────────────────── */
+    const forwarded = request.headers.get("x-forwarded-for");
+    const ip = forwarded?.split(",")[0]?.trim() || "unknown";
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
+
+    /* ─── HONEYPOT CHECK ──────────────────────── */
+    if (body.website && body.website.length > 0) {
+      // Silently accept to not alert bots, but don't process
+      return NextResponse.json({ success: true });
+    }
 
     // Server-side validation
     const result = contactSchema.safeParse(body);

@@ -20,6 +20,7 @@ const schema = z.object({
   budget: z.string().min(1, "Please select a budget range"),
   projectType: z.string().min(1, "Please select a project type"),
   message: z.string().min(10, "Message must be at least 10 characters"),
+  website: z.string().optional(), // honeypot
 });
 
 type FormData = z.infer<typeof schema>;
@@ -121,6 +122,17 @@ export default function ContactContent() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+                  {/* Honeypot — hidden from real users, catches bots */}
+                  <div className="absolute -left-[9999px]" aria-hidden="true">
+                    <label htmlFor="website">Website</label>
+                    <input
+                      type="text"
+                      id="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      {...register("website" as keyof FormData)}
+                    />
+                  </div>
                   <div className="grid gap-5 sm:grid-cols-2">
                     <Input
                       label="Name *"

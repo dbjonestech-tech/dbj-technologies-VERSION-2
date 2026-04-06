@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { SITE, NAV_LINKS, SOCIALS, SERVICES } from "@/lib/constants";
 
@@ -102,25 +101,19 @@ export function Footer() {
               </li>
             </ul>
 
-            {/* Newsletter */}
+            {/* CTA */}
             <div className="mt-8">
               <h3 className="font-display text-sm font-bold uppercase tracking-widest text-text-muted">
-                Newsletter
+                Ready to Start?
               </h3>
-              <div className="mt-3 flex gap-2">
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  aria-label="Email address for newsletter"
-                  className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-text-muted outline-none transition-colors focus:border-accent-blue/50"
-                />
-                <button
-                  aria-label="Subscribe to newsletter"
-                  className="rounded-lg bg-accent-blue px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-accent-blue/80"
-                >
-                  <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                </button>
-              </div>
+              <p className="mt-3 text-sm text-text-secondary mb-3">Let&apos;s discuss your next project.</p>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 rounded-lg bg-accent-blue px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-accent-blue/80"
+              >
+                Get in Touch
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </div>
@@ -131,10 +124,10 @@ export function Footer() {
             &copy; {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
           <div className="flex gap-6 text-xs text-text-muted">
-            <Link href="/faq" className="hover:text-white transition-colors">
+            <Link href="/privacy" className="hover:text-white transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/faq" className="hover:text-white transition-colors">
+            <Link href="/terms" className="hover:text-white transition-colors">
               Terms of Service
             </Link>
           </div>

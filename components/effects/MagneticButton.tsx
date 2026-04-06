@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState, useCallback } from "react";
 
 interface MagneticButtonProps {
   children: React.ReactNode;
@@ -17,30 +16,37 @@ export function MagneticButton({
   onClick,
 }: MagneticButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [transform, setTransform] = useState("translate(0px, 0px)");
 
-  const handleMouse = (e: React.MouseEvent) => {
+  const handleMouse = useCallback((e: React.MouseEvent) => {
+    // Disable on touch devices
+    if ("ontouchstart" in window) return;
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const x = (e.clientX - rect.left - rect.width / 2) * strength;
     const y = (e.clientY - rect.top - rect.height / 2) * strength;
-    setPosition({ x, y });
-  };
+    setTransform(`translate(${x}px, ${y}px)`);
+  }, [strength]);
 
-  const handleLeave = () => setPosition({ x: 0, y: 0 });
+  const handleLeave = useCallback(() => {
+    setTransform("translate(0px, 0px)");
+  }, []);
 
   return (
-    <motion.button
+    <button
       ref={ref}
       className={className}
       onClick={onClick}
       onMouseMove={handleMouse}
       onMouseLeave={handleLeave}
-      animate={{ x: position.x, y: position.y }}
-      transition={{ type: "spring", stiffness: 150, damping: 15 }}
+      style={{
+        transform,
+        transition: "transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)",
+        willChange: "transform",
+      }}
     >
       {children}
-    </motion.button>
+    </button>
   );
 }

@@ -50,6 +50,7 @@ const config: Config = {
         "spin-slow": "spin 20s linear infinite",
         "gradient-shift": "gradient-shift 8s ease infinite",
         "grid-fade": "grid-fade 3s ease-in-out infinite",
+        "blob-drift": "blob-drift 20s ease-in-out infinite",
       },
       keyframes: {
         marquee: {
@@ -75,6 +76,11 @@ const config: Config = {
         "grid-fade": {
           "0%, 100%": { opacity: "0.3" },
           "50%": { opacity: "0.6" },
+        },
+        "blob-drift": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1) rotate(0deg)" },
+          "33%": { transform: "translate(30px, -20px) scale(1.1) rotate(120deg)" },
+          "66%": { transform: "translate(-20px, 15px) scale(0.95) rotate(240deg)" },
         },
       },
       backgroundImage: {

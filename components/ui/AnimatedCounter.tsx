@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 
 interface AnimatedCounterProps {
   value: number;
@@ -18,10 +18,13 @@ export function AnimatedCounter({
 }: AnimatedCounterProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
-  const [count, setCount] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
+  const [count, setCount] = useState(value); // Start at real value to avoid hydration flash
 
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || prefersReducedMotion) return;
+    // Reset to 0 and animate up only after in-view
+    setCount(0);
     let start = 0;
     const increment = value / (duration * 60);
     const isDecimal = value % 1 !== 0;
@@ -37,7 +40,7 @@ export function AnimatedCounter({
     }, 1000 / 60);
 
     return () => clearInterval(timer);
-  }, [inView, value, duration]);
+  }, [inView, value, duration, prefersReducedMotion]);
 
   return (
     <motion.div

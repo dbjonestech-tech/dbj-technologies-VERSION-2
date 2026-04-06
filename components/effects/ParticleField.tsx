@@ -22,14 +22,18 @@ export function ParticleField() {
     if (!canvas) return;
     const w = canvas.width = canvas.offsetWidth;
     const h = canvas.height = canvas.offsetHeight;
-    const count = Math.min(Math.floor((w * h) / 12000), 120);
+    // Cap particles more aggressively on mobile
+    const isMobile = w < 768;
+    const count = isMobile
+      ? Math.min(Math.floor((w * h) / 25000), 40)
+      : Math.min(Math.floor((w * h) / 15000), 80);
     const particles: Particle[] = [];
     for (let i = 0; i < count; i++) {
       particles.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
         radius: Math.random() * 1.5 + 0.5,
         opacity: Math.random() * 0.5 + 0.1,
       });
@@ -38,6 +42,10 @@ export function ParticleField() {
   }, []);
 
   useEffect(() => {
+    // Respect reduced motion preference
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
     init();
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -51,7 +59,11 @@ export function ParticleField() {
     };
 
     window.addEventListener("resize", handleResize);
-    canvas.addEventListener("mousemove", handleMouse);
+    canvas.addEventListener("mousemove", handleMouse, { passive: true });
+
+    // Use squared distance to avoid Math.sqrt in hot loop
+    const CONNECT_DIST_SQ = 120 * 120;
+    const MOUSE_DIST_SQ = 150 * 150;
 
     const draw = () => {
       const w = canvas.width;
@@ -72,13 +84,14 @@ export function ParticleField() {
         ctx.fillStyle = `rgba(59, 130, 246, ${p.opacity})`;
         ctx.fill();
 
-        // Connect nearby particles
+        // Connect nearby particles (squared distance, no sqrt)
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x;
           const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
+          const distSq = dx * dx + dy * dy;
+          if (distSq < CONNECT_DIST_SQ) {
+            const dist = Math.sqrt(distSq);
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
@@ -91,8 +104,9 @@ export function ParticleField() {
         // Mouse interaction
         const mdx = p.x - mouse.x;
         const mdy = p.y - mouse.y;
-        const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mDist < 150) {
+        const mDistSq = mdx * mdx + mdy * mdy;
+        if (mDistSq < MOUSE_DIST_SQ) {
+          const mDist = Math.sqrt(mDistSq);
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(mouse.x, mouse.y);

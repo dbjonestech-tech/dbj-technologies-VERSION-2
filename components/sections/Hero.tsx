@@ -31,7 +31,9 @@ export function Hero() {
     <section ref={sectionRef} className="relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* Morphing gradient mesh background */}
       <div className="absolute inset-0 z-0">
-        <div className="gradient-mesh-bg absolute inset-0 opacity-30" />
+        <div className="gradient-mesh-bg absolute inset-0 opacity-30">
+          <span className="gradient-mesh-layer" />
+        </div>
         <div className="absolute inset-0 bg-bg-primary/60" />
       </div>
 
