@@ -99,6 +99,8 @@ export default function RootLayout({
       className={`${jakarta.variable} ${outfit.variable} ${jetbrains.variable}`}
     >
       <head>
+        {/* Critical inline cursor rule — prevents native arrow flash before external CSS loads */}
+        <style dangerouslySetInnerHTML={{ __html: '@media(pointer:fine){*,*::before,*::after{cursor:none!important}input:not([type="submit"]):not([type="button"]):not([type="reset"]),textarea,select,[contenteditable="true"]{cursor:auto!important}}' }} />
         <JsonLd type="organization" />
         <JsonLd type="website" />
         <JsonLd type="localBusiness" />

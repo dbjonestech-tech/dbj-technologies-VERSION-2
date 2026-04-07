@@ -17,7 +17,7 @@ export function CustomCursor() {
     const halo = haloRef.current;
     if (!core || !halo) return;
 
-    // Halo: smooth trailing lerp — slower = more visible trail
+    // Halo: smooth trailing lerp
     haloPos.current.x += (posRef.current.x - haloPos.current.x) * 0.12;
     haloPos.current.y += (posRef.current.y - haloPos.current.y) * 0.12;
 
@@ -25,7 +25,7 @@ export function CustomCursor() {
     const visible = visibleRef.current;
     const pressed = pressedRef.current;
 
-    // ── Core: instant tracking, luminous charged point ──
+    // ── Core: dark metallic charged tip ──
     const coreSize = pressed ? 6 : hovering ? 10 : 8;
     const coreHalf = coreSize / 2;
     core.style.transform = `translate3d(${posRef.current.x - coreHalf}px, ${posRef.current.y - coreHalf}px, 0)`;
@@ -33,29 +33,30 @@ export function CustomCursor() {
     core.style.height = `${coreSize}px`;
     core.style.opacity = visible ? "1" : "0";
 
+    // Blue energy aura around dark core — intensifies on hover/press
     if (pressed) {
       core.style.boxShadow =
-        "0 0 8px 3px rgba(147,197,253,0.9), 0 0 20px 6px rgba(59,130,246,0.5), 0 0 40px 10px rgba(59,130,246,0.2)";
+        "0 0 6px 2px rgba(147,197,253,0.85), 0 0 18px 5px rgba(59,130,246,0.5), 0 0 36px 8px rgba(59,130,246,0.2)";
     } else if (hovering) {
       core.style.boxShadow =
-        "0 0 10px 4px rgba(147,197,253,0.8), 0 0 24px 8px rgba(59,130,246,0.4), 0 0 48px 12px rgba(59,130,246,0.15)";
+        "0 0 8px 2px rgba(96,165,250,0.7), 0 0 20px 6px rgba(59,130,246,0.35), 0 0 44px 12px rgba(59,130,246,0.15)";
     } else {
       core.style.boxShadow =
-        "0 0 6px 2px rgba(186,220,255,0.6), 0 0 14px 4px rgba(96,165,250,0.25), 0 0 28px 8px rgba(59,130,246,0.08)";
+        "0 0 4px 1px rgba(96,165,250,0.35), 0 0 12px 3px rgba(59,130,246,0.15), 0 0 24px 6px rgba(59,130,246,0.06)";
     }
 
     // ── Halo: soft trailing energy field ──
-    const haloSize = pressed ? 20 : hovering ? 28 : 36;
+    const haloSize = pressed ? 18 : hovering ? 26 : 34;
     const haloHalf = haloSize / 2;
     halo.style.transform = `translate3d(${haloPos.current.x - haloHalf}px, ${haloPos.current.y - haloHalf}px, 0)`;
     halo.style.width = `${haloSize}px`;
     halo.style.height = `${haloSize}px`;
     halo.style.opacity = visible
       ? pressed
-        ? "0.5"
+        ? "0.45"
         : hovering
-          ? "0.4"
-          : "0.2"
+          ? "0.35"
+          : "0.15"
       : "0";
 
     rafRef.current = requestAnimationFrame(updateStyles);
@@ -135,11 +136,11 @@ export function CustomCursor() {
           transition:
             "width 0.3s cubic-bezier(0.4,0,0.2,1), height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease",
           background:
-            "radial-gradient(circle, rgba(96,165,250,0.5) 0%, rgba(59,130,246,0.15) 40%, transparent 70%)",
+            "radial-gradient(circle, rgba(96,165,250,0.6) 0%, rgba(59,130,246,0.2) 40%, transparent 70%)",
         }}
         aria-hidden="true"
       />
-      {/* Core: luminous charged point */}
+      {/* Core: dark metallic charged tip with blue edge energy */}
       <div
         ref={coreRef}
         className="pointer-events-none fixed top-0 left-0 z-[9999] hidden md:block rounded-full"
@@ -148,7 +149,7 @@ export function CustomCursor() {
           transition:
             "width 0.2s cubic-bezier(0.4,0,0.2,1), height 0.2s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, box-shadow 0.3s ease",
           background:
-            "radial-gradient(circle, #ffffff 0%, #bfdbfe 50%, #60a5fa 100%)",
+            "radial-gradient(circle, #1c2028 0%, #2d3748 60%, #4b5563 100%)",
         }}
         aria-hidden="true"
       />
