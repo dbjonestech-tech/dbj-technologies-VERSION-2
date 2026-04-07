@@ -100,7 +100,7 @@ export default function RootLayout({
     >
       <head>
         {/* Critical inline cursor rule — prevents native arrow flash before external CSS loads */}
-        <style dangerouslySetInnerHTML={{ __html: '@media(pointer:fine) and (prefers-reduced-motion:no-preference){*,*::before,*::after{cursor:none!important}input:not([type="submit"]):not([type="button"]):not([type="reset"]),textarea,select,[contenteditable="true"]{cursor:auto!important}}' }} />
+        <style dangerouslySetInnerHTML={{ __html: '@media(pointer:fine) and (prefers-reduced-motion:no-preference){*,*::before,*::after{cursor:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=") 0 0,none!important}input:not([type="submit"]):not([type="button"]):not([type="reset"]),textarea,select,[contenteditable="true"]{cursor:auto!important}}' }} />
         <JsonLd type="organization" />
         <JsonLd type="website" />
         <JsonLd type="localBusiness" />
