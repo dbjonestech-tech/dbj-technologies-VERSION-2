@@ -1,261 +1,151 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 
-/* ─── CONSTANTS ─────────────────────────────────────── */
-// Native arrow hotspot is at top-left (0,0). Offset the
-// charge effect to sit right at the visible tip point.
-const TIP_OFFSET_X = 1;
-const TIP_OFFSET_Y = 3;
+// Native arrow hotspot offset to align with the visible tip.
+const TIP_X = 1;
+const TIP_Y = 3;
+const DOT_HALF = 1.5; // half of 3px idle size
 
-// Arc constants
-const ARC_COUNT_MIN = 2;
-const ARC_COUNT_MAX = 4;
-const ARC_MAX_LENGTH = 14;
-const ARC_SEGMENTS = 4;
-const ARC_DECAY_MS = 180;
-
-/* ─── TYPES ─────────────────────────────────────────── */
-interface Arc {
-  segments: { x: number; y: number }[];
-  birth: number;
-}
-
-/* ─── COMPONENT ─────────────────────────────────────── */
 export function CursorCharge() {
-  const emberRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
+  const pulseRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef(0);
   const posRef = useRef({ x: -100, y: -100 });
-  const rafRef = useRef<number>(0);
   const hoveringRef = useRef(false);
   const visibleRef = useRef(false);
   const inTextRef = useRef(false);
-  const arcsRef = useRef<Arc[]>([]);
-  const reducedMotionRef = useRef(false);
-
-  /* ── Generate branching micro arcs from the tip ── */
-  const spawnArcs = useCallback((cx: number, cy: number) => {
-    if (reducedMotionRef.current) return;
-    const count = ARC_COUNT_MIN + Math.floor(Math.random() * (ARC_COUNT_MAX - ARC_COUNT_MIN + 1));
-    const now = performance.now();
-    for (let i = 0; i < count; i++) {
-      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 1.2;
-      const segments: { x: number; y: number }[] = [{ x: cx, y: cy }];
-      let x = cx;
-      let y = cy;
-      for (let s = 0; s < ARC_SEGMENTS; s++) {
-        const len = (ARC_MAX_LENGTH / ARC_SEGMENTS) * (0.6 + Math.random() * 0.8);
-        const jitter = (Math.random() - 0.5) * 0.8;
-        x += Math.cos(angle + jitter) * len;
-        y += Math.sin(angle + jitter) * len;
-        segments.push({ x, y });
-      }
-      arcsRef.current.push({ segments, birth: now });
-    }
-  }, []);
-
-  /* ── Main render loop ── */
-  const tick = useCallback(() => {
-    const ember = emberRef.current;
-    const canvas = canvasRef.current;
-    if (!ember || !canvas) return;
-
-    const { x, y } = posRef.current;
-    const tipX = x + TIP_OFFSET_X;
-    const tipY = y + TIP_OFFSET_Y;
-    const visible = visibleRef.current;
-    const hovering = hoveringRef.current;
-    const inText = inTextRef.current;
-    const reduced = reducedMotionRef.current;
-
-    /* ── Ember positioning ── */
-    ember.style.transform = `translate3d(${tipX - 3}px, ${tipY - 3}px, 0)`;
-
-    if (!visible || inText) {
-      ember.style.opacity = "0";
-    } else if (reduced) {
-      // Reduced motion: ultra-dim static presence, no animation
-      ember.style.opacity = "0.2";
-      ember.style.width = "4px";
-      ember.style.height = "4px";
-      ember.style.boxShadow = "0 0 2px rgba(180,180,185,0.3)";
-    } else if (hovering) {
-      ember.style.opacity = "0.85";
-      ember.style.width = "5px";
-      ember.style.height = "5px";
-      ember.style.boxShadow =
-        "0 0 3px 1px rgba(200,200,210,0.6), 0 0 8px 2px rgba(160,160,170,0.2)";
-    } else {
-      ember.style.opacity = "0.55";
-      ember.style.width = "4px";
-      ember.style.height = "4px";
-      ember.style.boxShadow =
-        "0 0 2px 1px rgba(180,180,185,0.4), 0 0 5px 1px rgba(140,140,150,0.12)";
-    }
-
-    /* ── Canvas: draw and decay arcs ── */
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      const dpr = window.devicePixelRatio || 1;
-      if (canvas.width !== window.innerWidth * dpr || canvas.height !== window.innerHeight * dpr) {
-        canvas.width = window.innerWidth * dpr;
-        canvas.height = window.innerHeight * dpr;
-        canvas.style.width = window.innerWidth + "px";
-        canvas.style.height = window.innerHeight + "px";
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const now = performance.now();
-      const alive: Arc[] = [];
-
-      for (const arc of arcsRef.current) {
-        const age = now - arc.birth;
-        if (age > ARC_DECAY_MS) continue;
-        alive.push(arc);
-
-        const progress = age / ARC_DECAY_MS;
-        const alpha = 1 - progress;
-        // Monochrome: silver-white to charcoal
-        const brightness = Math.round(200 - progress * 120);
-
-        ctx.beginPath();
-        ctx.moveTo(arc.segments[0].x, arc.segments[0].y);
-        for (let i = 1; i < arc.segments.length; i++) {
-          ctx.lineTo(arc.segments[i].x, arc.segments[i].y);
-        }
-        ctx.strokeStyle = `rgba(${brightness},${brightness},${Math.min(brightness + 10, 255)},${alpha * 0.9})`;
-        ctx.lineWidth = 1.2 - progress * 0.6;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.stroke();
-
-        // Tiny tip flash at origin
-        if (progress < 0.3) {
-          ctx.beginPath();
-          ctx.arc(arc.segments[0].x, arc.segments[0].y, 1.5 * (1 - progress), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(240,240,245,${alpha * 0.5})`;
-          ctx.fill();
-        }
-      }
-      arcsRef.current = alive;
-    }
-
-    rafRef.current = requestAnimationFrame(tick);
-  }, []);
 
   useEffect(() => {
-    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    reducedMotionRef.current = motionQuery.matches;
+    // Reduced motion — bail entirely, native cursor is enough
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Touch device — bail
+    if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
+    // Not a fine pointer — bail
+    if (!window.matchMedia("(pointer: fine)").matches) return;
 
-    // Listen for changes
-    const onMotionChange = (e: MediaQueryListEvent) => {
-      reducedMotionRef.current = e.matches;
+    const dot = dotRef.current;
+    const pulse = pulseRef.current;
+    if (!dot || !pulse) return;
+
+    /* ── rAF position loop — zero React re-renders ── */
+    const frame = () => {
+      const tx = posRef.current.x + TIP_X - DOT_HALF;
+      const ty = posRef.current.y + TIP_Y - DOT_HALF;
+      dot.style.transform = `translate3d(${tx}px,${ty}px,0)`;
+      pulse.style.transform = `translate3d(${tx - 6}px,${ty - 6}px,0)`;
+      rafRef.current = requestAnimationFrame(frame);
     };
-    motionQuery.addEventListener("change", onMotionChange);
+    rafRef.current = requestAnimationFrame(frame);
 
-    // Touch device gate
-    const isTouchDevice =
-      "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    if (isTouchDevice) return () => motionQuery.removeEventListener("change", onMotionChange);
-
-    // Fine pointer gate
-    const pointerQuery = window.matchMedia("(pointer: fine)");
-    if (!pointerQuery.matches) return () => motionQuery.removeEventListener("change", onMotionChange);
-
-    const handleMove = (e: MouseEvent) => {
-      visibleRef.current = true;
+    /* ── Mouse tracking ── */
+    const onMove = (e: MouseEvent) => {
       posRef.current.x = e.clientX;
       posRef.current.y = e.clientY;
+      if (!visibleRef.current) {
+        visibleRef.current = true;
+        dot.classList.remove("opacity-0");
+        dot.classList.add("opacity-100");
+      }
+    };
+    const onEnter = () => {
+      visibleRef.current = true;
+      dot.classList.remove("opacity-0");
+      dot.classList.add("opacity-100");
+    };
+    const onLeave = () => {
+      visibleRef.current = false;
+      dot.classList.remove("opacity-100");
+      dot.classList.add("opacity-0");
     };
 
-    const handleEnter = () => { visibleRef.current = true; };
-    const handleLeave = () => { visibleRef.current = false; };
-
+    /* ── Interactive element detection ── */
     const isInteractive = (el: HTMLElement) =>
-      el.closest("a") ||
-      el.closest("button") ||
-      el.closest("[role='button']") ||
-      el.closest("[data-cursor-hover]") ||
-      el.closest("summary") ||
-      el.closest("label[for]") ||
-      el.closest(".glass-card-hover") ||
-      el.closest(".btn-primary") ||
-      el.closest(".btn-outline");
+      el.closest("a,button,[role='button'],[data-cursor-hover],summary,label[for],.glass-card-hover,.btn-primary,.btn-outline");
 
-    const isTextContext = (el: HTMLElement) =>
-      el.closest("input:not([type='submit']):not([type='button']):not([type='reset'])") ||
-      el.closest("textarea") ||
-      el.closest("select") ||
-      el.closest("[contenteditable='true']");
+    const isText = (el: HTMLElement) =>
+      el.closest("input:not([type='submit']):not([type='button']):not([type='reset']),textarea,select,[contenteditable='true']");
 
-    const handleHoverStart = (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (isTextContext(target)) {
+    const onOver = (e: Event) => {
+      const t = e.target as HTMLElement;
+      if (isText(t)) {
         inTextRef.current = true;
         hoveringRef.current = false;
+        dot.classList.add("opacity-0");
+        dot.classList.remove("opacity-100");
       } else {
         inTextRef.current = false;
-        if (isInteractive(target)) hoveringRef.current = true;
+        if (isInteractive(t)) {
+          hoveringRef.current = true;
+          dot.classList.add("cursor-dot-hover");
+        }
+      }
+    };
+    const onOut = (e: Event) => {
+      const rel = (e as MouseEvent).relatedTarget as HTMLElement | null;
+      if (!rel || !isInteractive(rel)) {
+        hoveringRef.current = false;
+        dot.classList.remove("cursor-dot-hover");
+      }
+      if (!rel || !isText(rel)) {
+        inTextRef.current = false;
+        if (visibleRef.current) {
+          dot.classList.remove("opacity-0");
+          dot.classList.add("opacity-100");
+        }
       }
     };
 
-    const handleHoverEnd = (e: Event) => {
-      const related = (e as MouseEvent).relatedTarget as HTMLElement | null;
-      if (!related || !isInteractive(related)) hoveringRef.current = false;
-      if (!related || !isTextContext(related)) inTextRef.current = false;
-    };
-
-    const handleDown = (e: MouseEvent) => {
+    /* ── Click pulse — pure CSS animation, no drawing ── */
+    const onDown = () => {
       if (inTextRef.current) return;
-      const tipX = e.clientX + TIP_OFFSET_X;
-      const tipY = e.clientY + TIP_OFFSET_Y;
-      spawnArcs(tipX, tipY);
+      // Restart the CSS animation by removing then re-adding class
+      pulse.classList.remove("cursor-pulse-active");
+      // Force reflow so the browser recognises the re-add
+      void pulse.offsetWidth;
+      pulse.classList.add("cursor-pulse-active");
     };
 
-    document.addEventListener("mousemove", handleMove, { passive: true });
-    document.addEventListener("mouseenter", handleEnter);
-    document.addEventListener("mouseleave", handleLeave);
-    document.addEventListener("mouseover", handleHoverStart, { passive: true });
-    document.addEventListener("mouseout", handleHoverEnd, { passive: true });
-    document.addEventListener("mousedown", handleDown);
-
-    rafRef.current = requestAnimationFrame(tick);
+    document.addEventListener("mousemove", onMove, { passive: true });
+    document.addEventListener("mouseenter", onEnter);
+    document.addEventListener("mouseleave", onLeave);
+    document.addEventListener("mouseover", onOver, { passive: true });
+    document.addEventListener("mouseout", onOut, { passive: true });
+    document.addEventListener("mousedown", onDown);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      document.removeEventListener("mousemove", handleMove);
-      document.removeEventListener("mouseenter", handleEnter);
-      document.removeEventListener("mouseleave", handleLeave);
-      document.removeEventListener("mouseover", handleHoverStart);
-      document.removeEventListener("mouseout", handleHoverEnd);
-      document.removeEventListener("mousedown", handleDown);
-      motionQuery.removeEventListener("change", onMotionChange);
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseenter", onEnter);
+      document.removeEventListener("mouseleave", onLeave);
+      document.removeEventListener("mouseover", onOver);
+      document.removeEventListener("mouseout", onOut);
+      document.removeEventListener("mousedown", onDown);
     };
-  }, [tick, spawnArcs]);
+  }, []);
 
   return (
     <>
-      {/* Arc canvas — full viewport, pointer-events-none */}
-      <canvas
-        ref={canvasRef}
-        className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
-        aria-hidden="true"
-      />
-      {/* Ember — tiny charge point at cursor tip */}
+      {/* Dot — 3px solid charcoal at cursor tip */}
       <div
-        ref={emberRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9999] hidden md:block rounded-full"
-        style={{
-          width: "4px",
-          height: "4px",
-          willChange: "transform, opacity",
-          transition:
-            "width 0.2s ease, height 0.2s ease, opacity 0.15s ease, box-shadow 0.25s ease",
-          background:
-            "radial-gradient(circle, rgba(220,220,225,0.9) 0%, rgba(160,160,168,0.6) 60%, rgba(100,100,110,0.2) 100%)",
-        }}
+        ref={dotRef}
         aria-hidden="true"
+        className="pointer-events-none fixed top-0 left-0 z-[9999] hidden md:block
+                   h-[3px] w-[3px] rounded-full bg-[#3a3a40] opacity-0
+                   shadow-[0_0_1.5px_0.5px_rgba(190,190,195,0.35)]
+                   transition-[width,height,box-shadow] duration-200 ease-out
+                   [will-change:transform]"
+        style={{ /* idle size set via className; hover overrides via .cursor-dot-hover */ }}
+      />
+      {/* Pulse ring — hidden until click triggers .cursor-pulse-active */}
+      <div
+        ref={pulseRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed top-0 left-0 z-[9998] hidden md:block
+                   h-[15px] w-[15px] rounded-full
+                   border border-[rgba(180,180,185,0.5)]
+                   opacity-0
+                   [will-change:transform,scale,opacity]"
       />
     </>
   );
