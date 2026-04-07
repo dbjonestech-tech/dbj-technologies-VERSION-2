@@ -15,7 +15,7 @@ export interface ProjectDetail {
   results: { label: string; value: string }[];
   tags: string[];
   features: string[];
-  testimonial?: { quote: string; name: string; role: string };
+  /* testimonial field reserved for real client projects only */
 }
 
 export const PROJECT_DETAILS: ProjectDetail[] = [
@@ -35,9 +35,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     solution:
       "We designed a content-driven architecture with animated data visualizations, a gated investor section, and seamless CMS integration. The result is a site that's as functional as it is visually impressive.",
     results: [
-      { label: "Lighthouse Performance", value: "96" },
+      { label: "Stack", value: "Next.js" },
       { label: "Pages", value: "12" },
-      { label: "Load Time", value: "0.8s" },
+      { label: "CMS", value: "Sanity" },
     ],
     tags: ["Next.js", "Framer Motion", "Vercel", "Sanity"],
     features: [
@@ -63,9 +63,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     solution:
       "We built a headless Shopify storefront with Next.js, leveraging static generation for product pages and edge functions for personalization. AI recommendations drive cross-sells, and the checkout is streamlined to three steps.",
     results: [
-      { label: "Page Load", value: "<1s" },
-      { label: "Products", value: "500+" },
-      { label: "Checkout Steps", value: "3" },
+      { label: "Platform", value: "Shopify" },
+      { label: "Frontend", value: "Next.js" },
+      { label: "Checkout", value: "3-Step" },
     ],
     tags: ["React", "Shopify", "Node.js", "Stripe"],
     features: [
@@ -91,9 +91,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     solution:
       "We architected a streaming data pipeline with server-side aggregation, client-side virtualization for large datasets, and a modular dashboard builder that lets users customize their views. The result handles 10M+ daily events without breaking a sweat.",
     results: [
-      { label: "Daily Events", value: "10M+" },
-      { label: "Render Time", value: "<200ms" },
-      { label: "Custom Widgets", value: "15+" },
+      { label: "Stack", value: "TypeScript" },
+      { label: "Charts", value: "D3.js" },
+      { label: "Infra", value: "AWS" },
     ],
     tags: ["TypeScript", "D3.js", "AWS", "PostgreSQL"],
     features: [
@@ -119,9 +119,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     solution:
       "We stripped the page to its essentials: a clear value proposition above the fold, social proof, a feature showcase, and a single, repeated CTA. The page loads in under 0.5 seconds and was A/B tested across three variations.",
     results: [
-      { label: "Signup Rate", value: "12%" },
-      { label: "Load Time", value: "0.4s" },
-      { label: "A/B Variants", value: "3" },
+      { label: "Framework", value: "Next.js" },
+      { label: "Deploy", value: "Vercel" },
+      { label: "Testing", value: "A/B" },
     ],
     tags: ["Next.js", "Tailwind", "A/B Testing", "Vercel"],
     features: [
@@ -147,9 +147,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     solution:
       "We designed a visual workflow builder that lets users chain models, data sources, and transformations with drag-and-drop simplicity. Under the hood, it generates production-grade pipeline configurations with version control and rollback.",
     results: [
-      { label: "Pipeline Steps", value: "20+" },
-      { label: "Model Registry", value: "Unlimited" },
-      { label: "Deploy Time", value: "<2min" },
+      { label: "Frontend", value: "React" },
+      { label: "Backend", value: "Python" },
+      { label: "Infra", value: "Docker" },
     ],
     tags: ["React", "Python", "Docker", "AWS"],
     features: [
@@ -175,9 +175,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     solution:
       "We built a comprehensive design system in Figma and Storybook that serves as the single source of truth. The marketing site and internal portal both consume the same component library, guaranteeing visual consistency.",
     results: [
-      { label: "Components", value: "60+" },
-      { label: "Design Tokens", value: "200+" },
-      { label: "Platforms Covered", value: "3" },
+      { label: "System", value: "Figma" },
+      { label: "Frontend", value: "Next.js" },
+      { label: "Components", value: "Storybook" },
     ],
     tags: ["Figma", "Next.js", "Storybook", "Tailwind"],
     features: [
@@ -203,9 +203,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     solution:
       "We built a real-time architecture with WebSocket connections for live inventory and driver tracking, route optimization for efficient deliveries, and an operations dashboard that gives managers a bird's-eye view of everything in motion.",
     results: [
-      { label: "Real-Time Sync", value: "<500ms" },
-      { label: "Route Optimization", value: "AI-Powered" },
-      { label: "Apps Built", value: "3" },
+      { label: "Mobile", value: "React Native" },
+      { label: "Backend", value: "Node.js" },
+      { label: "Apps", value: "3" },
     ],
     tags: ["React Native", "Node.js", "PostgreSQL", "Redis"],
     features: [
@@ -231,9 +231,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     solution:
       "We created an immersive experience with Three.js-powered 3D models, GSAP scroll animations, and interactive hotspots that let users explore features at their own pace. The experience is impressive without sacrificing load performance.",
     results: [
-      { label: "3D Models", value: "4" },
-      { label: "Interactions", value: "12+" },
-      { label: "Avg. Time on Page", value: "4.2min" },
+      { label: "3D Engine", value: "Three.js" },
+      { label: "Animation", value: "GSAP" },
+      { label: "Deploy", value: "Vercel" },
     ],
     tags: ["Three.js", "GSAP", "Vercel", "WebGL"],
     features: [

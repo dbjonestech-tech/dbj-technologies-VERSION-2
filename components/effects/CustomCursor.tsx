@@ -3,38 +3,44 @@
 import { useEffect, useRef, useCallback } from "react";
 
 export function CustomCursor() {
-  const glowRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
-  const posRef = useRef({ x: 0, y: 0 });
-  const renderPos = useRef({ x: 0, y: 0 });
+  const coreRef = useRef<HTMLDivElement>(null);
+  const haloRef = useRef<HTMLDivElement>(null);
+  const posRef = useRef({ x: -100, y: -100 });
+  const haloPos = useRef({ x: -100, y: -100 });
   const rafRef = useRef<number>(0);
   const hoveringRef = useRef(false);
   const visibleRef = useRef(false);
 
   const updateStyles = useCallback(() => {
-    const glow = glowRef.current;
-    const dot = dotRef.current;
-    if (!glow || !dot) return;
+    const core = coreRef.current;
+    const halo = haloRef.current;
+    if (!core || !halo) return;
 
-    // Glow: smooth lerp follow
-    renderPos.current.x += (posRef.current.x - renderPos.current.x) * 0.12;
-    renderPos.current.y += (posRef.current.y - renderPos.current.y) * 0.12;
+    // Halo: gentle trailing lerp
+    haloPos.current.x += (posRef.current.x - haloPos.current.x) * 0.18;
+    haloPos.current.y += (posRef.current.y - haloPos.current.y) * 0.18;
 
-    const glowSize = hoveringRef.current ? 56 : 40;
-    const glowHalf = glowSize / 2;
+    const hovering = hoveringRef.current;
+    const visible = visibleRef.current;
 
-    glow.style.transform = `translate(${renderPos.current.x - glowHalf}px, ${renderPos.current.y - glowHalf}px)`;
-    glow.style.width = `${glowSize}px`;
-    glow.style.height = `${glowSize}px`;
-    glow.style.opacity = visibleRef.current ? (hoveringRef.current ? "0.6" : "0.4") : "0";
+    // Core: instant tracking, 5px default, 4px on hover (tighter)
+    const coreSize = hovering ? 4 : 5;
+    const coreHalf = coreSize / 2;
+    core.style.transform = `translate(${posRef.current.x - coreHalf}px, ${posRef.current.y - coreHalf}px)`;
+    core.style.width = `${coreSize}px`;
+    core.style.height = `${coreSize}px`;
+    core.style.opacity = visible ? "1" : "0";
+    core.style.boxShadow = hovering
+      ? "0 0 6px 2px rgba(191, 207, 232, 0.7), 0 0 12px 4px rgba(147, 175, 220, 0.3)"
+      : "0 0 4px 1px rgba(191, 207, 232, 0.5), 0 0 8px 2px rgba(147, 175, 220, 0.15)";
 
-    // Dot: instant tracking, no lerp
-    const dotSize = hoveringRef.current ? 24 : 12;
-
-    dot.style.transform = `translate(${posRef.current.x - dotSize / 2}px, ${posRef.current.y - dotSize / 2}px)`;
-    dot.style.width = `${dotSize}px`;
-    dot.style.height = `${dotSize}px`;
-    dot.style.opacity = visibleRef.current ? "1" : "0";
+    // Halo: soft trailing presence, 18px default, 14px on hover (tighter)
+    const haloSize = hovering ? 14 : 18;
+    const haloHalf = haloSize / 2;
+    halo.style.transform = `translate(${haloPos.current.x - haloHalf}px, ${haloPos.current.y - haloHalf}px)`;
+    halo.style.width = `${haloSize}px`;
+    halo.style.height = `${haloSize}px`;
+    halo.style.opacity = visible ? (hovering ? "0.35" : "0.2") : "0";
 
     rafRef.current = requestAnimationFrame(updateStyles);
   }, []);
@@ -57,10 +63,7 @@ export function CustomCursor() {
       if (
         target.closest("a") ||
         target.closest("button") ||
-        target.closest("[role='button']") ||
-        target.closest("input") ||
-        target.closest("textarea") ||
-        target.closest("select")
+        target.closest("[role='button']")
       ) {
         hoveringRef.current = true;
       }
@@ -88,25 +91,25 @@ export function CustomCursor() {
 
   return (
     <>
-      {/* Layer 1: Trailing glow haze */}
+      {/* Halo: soft trailing presence */}
       <div
-        ref={glowRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9998] hidden md:block rounded-full blur-2xl"
+        ref={haloRef}
+        className="pointer-events-none fixed top-0 left-0 z-[9998] hidden md:block rounded-full"
         style={{
-          willChange: "transform",
-          transition: "width 0.3s, height 0.3s, opacity 0.3s",
-          background: "linear-gradient(135deg, #22d3ee, #3b82f6, #8b5cf6)",
+          willChange: "transform, opacity",
+          transition: "width 0.25s ease, height 0.25s ease, opacity 0.3s ease",
+          background: "radial-gradient(circle, rgba(186, 203, 230, 0.5) 0%, rgba(147, 175, 220, 0.12) 50%, transparent 70%)",
         }}
         aria-hidden="true"
       />
-      {/* Layer 2: Precise morphing liquid blob */}
+      {/* Core: precise bright point */}
       <div
-        ref={dotRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9999] hidden md:block animate-blob"
+        ref={coreRef}
+        className="pointer-events-none fixed top-0 left-0 z-[9999] hidden md:block rounded-full"
         style={{
-          willChange: "transform",
-          transition: "width 0.2s, height 0.2s, opacity 0.3s",
-          background: "#2563eb",
+          willChange: "transform, opacity",
+          transition: "width 0.15s ease, height 0.15s ease, opacity 0.2s ease, box-shadow 0.25s ease",
+          background: "radial-gradient(circle, #e8edf5 0%, #c7d2e0 60%, #a8b8cc 100%)",
         }}
         aria-hidden="true"
       />

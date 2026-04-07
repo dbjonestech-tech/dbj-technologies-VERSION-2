@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
+  "redirects": [
+    { "source": "/websites", "destination": "/work", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/(.*)",

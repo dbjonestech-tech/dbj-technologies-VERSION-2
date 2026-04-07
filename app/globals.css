@@ -201,19 +201,16 @@ body {
 
 /* ─── CUSTOM CURSOR (desktop only) ────────────────── */
 @media (pointer: fine) {
-  * {
+  body,
+  a, button, [role="button"],
+  div, span, section, header, footer, main, nav, p, h1, h2, h3, h4, h5, h6,
+  ul, ol, li, img, svg, figure {
     cursor: none !important;
   }
-}
-
-/* ─── MORPHING BLOB CURSOR ───────────────────────── */
-@keyframes morphing-blob {
-  0%   { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-  50%  { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
-  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-}
-.animate-blob {
-  animation: morphing-blob 3s ease-in-out infinite;
+  /* Preserve native cursor for text inputs and editable fields */
+  input, textarea, select, [contenteditable="true"] {
+    cursor: auto !important;
+  }
 }
 
 /* ─── SKIP TO CONTENT (A11Y) ──────────────────────── */
