@@ -212,33 +212,6 @@ body {
   pointer-events: none;
 }
 
-/* ─── CUSTOM CURSOR (desktop only, motion OK) ────── */
-/* Use a 1×1 transparent PNG as the cursor image instead of cursor:none.
-   cursor:none asks the OS to hide the pointer, which can fail for single
-   frames during React re-renders, route changes, and Suspense swaps.
-   A transparent image is always rendered by the OS — no gap possible. */
-@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  *,
-  *::before,
-  *::after {
-    cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=") 0 0, none !important;
-  }
-  /* Cover custom-styled scrollbar areas as well */
-  ::-webkit-scrollbar,
-  ::-webkit-scrollbar-track,
-  ::-webkit-scrollbar-thumb,
-  ::-webkit-scrollbar-corner {
-    cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=") 0 0, none !important;
-  }
-  /* Preserve native cursor for text inputs and editable fields */
-  input:not([type="submit"]):not([type="button"]):not([type="reset"]),
-  textarea,
-  select,
-  [contenteditable="true"] {
-    cursor: auto !important;
-  }
-}
-
 /* ─── SKIP TO CONTENT (A11Y) ──────────────────────── */
 .skip-to-content {
   position: absolute;

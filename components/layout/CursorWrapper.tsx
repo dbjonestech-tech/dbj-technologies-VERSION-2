@@ -2,12 +2,12 @@
 
 import dynamic from "next/dynamic";
 
-const CustomCursor = dynamic(
+const CursorCharge = dynamic(
   () =>
-    import("@/components/effects/CustomCursor").then((m) => m.CustomCursor),
+    import("@/components/effects/CursorCharge").then((m) => m.CursorCharge),
   { ssr: false }
 );
 
 export function CursorWrapper() {
-  return <CustomCursor />;
+  return <CursorCharge />;
 }
