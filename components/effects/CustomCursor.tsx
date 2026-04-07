@@ -10,43 +10,60 @@ export function CustomCursor() {
   const rafRef = useRef<number>(0);
   const hoveringRef = useRef(false);
   const visibleRef = useRef(false);
+  const pressedRef = useRef(false);
 
   const updateStyles = useCallback(() => {
     const core = coreRef.current;
     const halo = haloRef.current;
     if (!core || !halo) return;
 
-    // Halo: gentle trailing lerp
-    haloPos.current.x += (posRef.current.x - haloPos.current.x) * 0.18;
-    haloPos.current.y += (posRef.current.y - haloPos.current.y) * 0.18;
+    // Halo: smooth trailing lerp — slower = more visible trail
+    haloPos.current.x += (posRef.current.x - haloPos.current.x) * 0.12;
+    haloPos.current.y += (posRef.current.y - haloPos.current.y) * 0.12;
 
     const hovering = hoveringRef.current;
     const visible = visibleRef.current;
+    const pressed = pressedRef.current;
 
-    // Core: instant tracking, 5px default, 4px on hover (tighter)
-    const coreSize = hovering ? 4 : 5;
+    // ── Core: instant tracking, luminous charged point ──
+    const coreSize = pressed ? 6 : hovering ? 10 : 8;
     const coreHalf = coreSize / 2;
-    core.style.transform = `translate(${posRef.current.x - coreHalf}px, ${posRef.current.y - coreHalf}px)`;
+    core.style.transform = `translate3d(${posRef.current.x - coreHalf}px, ${posRef.current.y - coreHalf}px, 0)`;
     core.style.width = `${coreSize}px`;
     core.style.height = `${coreSize}px`;
     core.style.opacity = visible ? "1" : "0";
-    core.style.boxShadow = hovering
-      ? "0 0 6px 2px rgba(191, 207, 232, 0.7), 0 0 12px 4px rgba(147, 175, 220, 0.3)"
-      : "0 0 4px 1px rgba(191, 207, 232, 0.5), 0 0 8px 2px rgba(147, 175, 220, 0.15)";
 
-    // Halo: soft trailing presence, 18px default, 14px on hover (tighter)
-    const haloSize = hovering ? 14 : 18;
+    if (pressed) {
+      core.style.boxShadow =
+        "0 0 8px 3px rgba(147,197,253,0.9), 0 0 20px 6px rgba(59,130,246,0.5), 0 0 40px 10px rgba(59,130,246,0.2)";
+    } else if (hovering) {
+      core.style.boxShadow =
+        "0 0 10px 4px rgba(147,197,253,0.8), 0 0 24px 8px rgba(59,130,246,0.4), 0 0 48px 12px rgba(59,130,246,0.15)";
+    } else {
+      core.style.boxShadow =
+        "0 0 6px 2px rgba(186,220,255,0.6), 0 0 14px 4px rgba(96,165,250,0.25), 0 0 28px 8px rgba(59,130,246,0.08)";
+    }
+
+    // ── Halo: soft trailing energy field ──
+    const haloSize = pressed ? 20 : hovering ? 28 : 36;
     const haloHalf = haloSize / 2;
-    halo.style.transform = `translate(${haloPos.current.x - haloHalf}px, ${haloPos.current.y - haloHalf}px)`;
+    halo.style.transform = `translate3d(${haloPos.current.x - haloHalf}px, ${haloPos.current.y - haloHalf}px, 0)`;
     halo.style.width = `${haloSize}px`;
     halo.style.height = `${haloSize}px`;
-    halo.style.opacity = visible ? (hovering ? "0.35" : "0.2") : "0";
+    halo.style.opacity = visible
+      ? pressed
+        ? "0.5"
+        : hovering
+          ? "0.4"
+          : "0.2"
+      : "0";
 
     rafRef.current = requestAnimationFrame(updateStyles);
   }, []);
 
   useEffect(() => {
-    const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    const isTouchDevice =
+      "ontouchstart" in window || navigator.maxTouchPoints > 0;
     if (isTouchDevice) return;
 
     const handleMove = (e: MouseEvent) => {
@@ -55,27 +72,43 @@ export function CustomCursor() {
       posRef.current.y = e.clientY;
     };
 
-    const handleEnter = () => { visibleRef.current = true; };
-    const handleLeave = () => { visibleRef.current = false; };
+    const handleEnter = () => {
+      visibleRef.current = true;
+    };
+    const handleLeave = () => {
+      visibleRef.current = false;
+    };
+
+    const isInteractive = (el: HTMLElement) =>
+      el.closest("a") ||
+      el.closest("button") ||
+      el.closest("[role='button']") ||
+      el.closest("[data-cursor-hover]");
 
     const handleHoverStart = (e: Event) => {
       const target = e.target as HTMLElement;
-      if (
-        target.closest("a") ||
-        target.closest("button") ||
-        target.closest("[role='button']")
-      ) {
-        hoveringRef.current = true;
-      }
+      if (isInteractive(target)) hoveringRef.current = true;
     };
 
-    const handleHoverEnd = () => { hoveringRef.current = false; };
+    const handleHoverEnd = (e: Event) => {
+      const related = (e as MouseEvent).relatedTarget as HTMLElement | null;
+      if (!related || !isInteractive(related)) hoveringRef.current = false;
+    };
+
+    const handleDown = () => {
+      pressedRef.current = true;
+    };
+    const handleUp = () => {
+      pressedRef.current = false;
+    };
 
     document.addEventListener("mousemove", handleMove, { passive: true });
     document.addEventListener("mouseenter", handleEnter);
     document.addEventListener("mouseleave", handleLeave);
     document.addEventListener("mouseover", handleHoverStart, { passive: true });
     document.addEventListener("mouseout", handleHoverEnd, { passive: true });
+    document.addEventListener("mousedown", handleDown);
+    document.addEventListener("mouseup", handleUp);
 
     rafRef.current = requestAnimationFrame(updateStyles);
 
@@ -86,30 +119,36 @@ export function CustomCursor() {
       document.removeEventListener("mouseleave", handleLeave);
       document.removeEventListener("mouseover", handleHoverStart);
       document.removeEventListener("mouseout", handleHoverEnd);
+      document.removeEventListener("mousedown", handleDown);
+      document.removeEventListener("mouseup", handleUp);
     };
   }, [updateStyles]);
 
   return (
     <>
-      {/* Halo: soft trailing presence */}
+      {/* Halo: soft trailing energy field */}
       <div
         ref={haloRef}
         className="pointer-events-none fixed top-0 left-0 z-[9998] hidden md:block rounded-full"
         style={{
-          willChange: "transform, opacity",
-          transition: "width 0.25s ease, height 0.25s ease, opacity 0.3s ease",
-          background: "radial-gradient(circle, rgba(186, 203, 230, 0.5) 0%, rgba(147, 175, 220, 0.12) 50%, transparent 70%)",
+          willChange: "transform, opacity, width, height",
+          transition:
+            "width 0.3s cubic-bezier(0.4,0,0.2,1), height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease",
+          background:
+            "radial-gradient(circle, rgba(96,165,250,0.5) 0%, rgba(59,130,246,0.15) 40%, transparent 70%)",
         }}
         aria-hidden="true"
       />
-      {/* Core: precise bright point */}
+      {/* Core: luminous charged point */}
       <div
         ref={coreRef}
         className="pointer-events-none fixed top-0 left-0 z-[9999] hidden md:block rounded-full"
         style={{
-          willChange: "transform, opacity",
-          transition: "width 0.15s ease, height 0.15s ease, opacity 0.2s ease, box-shadow 0.25s ease",
-          background: "radial-gradient(circle, #e8edf5 0%, #c7d2e0 60%, #a8b8cc 100%)",
+          willChange: "transform, opacity, width, height, box-shadow",
+          transition:
+            "width 0.2s cubic-bezier(0.4,0,0.2,1), height 0.2s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, box-shadow 0.3s ease",
+          background:
+            "radial-gradient(circle, #ffffff 0%, #bfdbfe 50%, #60a5fa 100%)",
         }}
         aria-hidden="true"
       />

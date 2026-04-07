@@ -1,10 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
-import { useRef } from "react";
 import { GradientBlob } from "@/components/effects/GradientBlob";
 import { Spotlight } from "@/components/effects/Spotlight";
 import { MagneticButton } from "@/components/effects/MagneticButton";
@@ -16,19 +15,8 @@ const ParticleField = dynamic(
 );
 
 export function Hero() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-
-  const parallax1 = useTransform(scrollYProgress, [0, 1], [0, -120]);
-  const parallax2 = useTransform(scrollYProgress, [0, 1], [0, -80]);
-  const parallax3 = useTransform(scrollYProgress, [0, 1], [0, -200]);
-  const parallax4 = useTransform(scrollYProgress, [0, 1], [0, -60]);
-
   return (
-    <section ref={sectionRef} className="relative flex min-h-screen items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* Morphing gradient mesh background */}
       <div className="absolute inset-0 z-0">
         <div className="gradient-mesh-bg absolute inset-0 opacity-30">
@@ -42,36 +30,6 @@ export function Hero() {
       <Spotlight />
       <GradientBlob className="-top-40 -left-40" colors={["#3b82f6", "#1e40af", "#06b6d4"]} />
       <GradientBlob className="-bottom-40 -right-40" colors={["#8b5cf6", "#6d28d9", "#3b82f6"]} />
-
-      {/* Floating geometric shapes with scroll parallax */}
-      <motion.div
-        className="absolute top-1/4 right-[15%] h-20 w-20 border border-accent-blue/20 rounded-xl"
-        animate={{ rotate: 360, y: [-10, 10, -10] }}
-        transition={{ rotate: { duration: 20, repeat: Infinity, ease: "linear" }, y: { duration: 6, repeat: Infinity } }}
-        aria-hidden="true"
-        style={{ perspective: "800px", translateY: parallax1 }}
-      />
-      <motion.div
-        className="absolute bottom-1/3 left-[10%] h-16 w-16 border border-accent-cyan/15 rounded-full"
-        animate={{ rotate: -360, scale: [1, 1.2, 1] }}
-        transition={{ rotate: { duration: 25, repeat: Infinity, ease: "linear" }, scale: { duration: 8, repeat: Infinity } }}
-        aria-hidden="true"
-        style={{ translateY: parallax2 }}
-      />
-      <motion.div
-        className="absolute top-[40%] left-[20%] h-2 w-2 rounded-full bg-accent-violet/40"
-        animate={{ opacity: [0.4, 1, 0.4] }}
-        transition={{ duration: 4, repeat: Infinity }}
-        aria-hidden="true"
-        style={{ translateY: parallax3 }}
-      />
-      <motion.div
-        className="absolute top-[30%] right-[25%] h-3 w-3 rounded-full bg-accent-blue/30"
-        animate={{ opacity: [0.3, 0.8, 0.3] }}
-        transition={{ duration: 5, repeat: Infinity }}
-        aria-hidden="true"
-        style={{ translateY: parallax4 }}
-      />
 
       {/* Content */}
       <div className="relative z-20 mx-auto max-w-6xl px-6 text-center lg:px-8">

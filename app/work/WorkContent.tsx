@@ -105,13 +105,13 @@ export default function WorkContent() {
                   >
                     {/* Gradient placeholder image */}
                     <div
-                      className={`relative h-52 bg-gradient-to-br ${project.gradient} overflow-hidden`}
+                      className={`relative h-56 bg-gradient-to-br ${project.gradient} overflow-hidden`}
                       role="img"
                       aria-label={`${project.title} project preview`}
                     >
-                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                        <span className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-gray-900 border border-gray-200 shadow-sm">
-                          View Details{" "}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-5">
+                        <span className="flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-md px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-lg translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                          View Project
                           <ExternalLink
                             className="h-3.5 w-3.5"
                             aria-hidden="true"

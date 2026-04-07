@@ -74,10 +74,11 @@ body {
     @apply glass-card transition-all duration-500;
   }
   .glass-card-hover:hover {
-    @apply border-gray-300 bg-white;
+    @apply border-gray-300/80;
     box-shadow:
-      0 4px 20px rgba(0, 0, 0, 0.06),
-      0 0 40px rgba(59, 130, 246, 0.06);
+      0 8px 30px rgba(0, 0, 0, 0.07),
+      0 2px 8px rgba(0, 0, 0, 0.04),
+      0 0 0 1px rgba(59, 130, 246, 0.05);
     transform: translateY(-4px);
   }
 
@@ -106,22 +107,34 @@ body {
   .btn-primary {
     @apply relative inline-flex items-center gap-2 rounded-full px-8 py-3.5 font-body font-semibold text-white transition-all duration-300;
     background: linear-gradient(135deg, #3b82f6, #2563eb);
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25), 0 1px 2px rgba(0, 0, 0, 0.06);
   }
   .btn-primary:hover {
-    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4), 0 2px 6px rgba(0, 0, 0, 0.08);
     transform: translateY(-2px);
+  }
+  .btn-primary:active {
+    transform: translateY(0px);
+    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.3);
+    transition-duration: 100ms;
   }
 
   .btn-outline {
     @apply relative inline-flex items-center gap-2 rounded-full px-8 py-3.5 font-body font-semibold text-gray-900 transition-all duration-300;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
   }
   .btn-outline:hover {
-    border-color: rgba(59, 130, 246, 0.4);
-    background: rgba(59, 130, 246, 0.05);
+    border-color: rgba(59, 130, 246, 0.5);
+    background: rgba(59, 130, 246, 0.04);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1), 0 0 0 1px rgba(59, 130, 246, 0.08);
     transform: translateY(-2px);
+  }
+  .btn-outline:active {
+    transform: translateY(0px);
+    box-shadow: none;
+    transition-duration: 100ms;
   }
 }
 
@@ -201,14 +214,16 @@ body {
 
 /* ─── CUSTOM CURSOR (desktop only) ────────────────── */
 @media (pointer: fine) {
-  body,
-  a, button, [role="button"],
-  div, span, section, header, footer, main, nav, p, h1, h2, h3, h4, h5, h6,
-  ul, ol, li, img, svg, figure {
+  *,
+  *::before,
+  *::after {
     cursor: none !important;
   }
   /* Preserve native cursor for text inputs and editable fields */
-  input, textarea, select, [contenteditable="true"] {
+  input:not([type="submit"]):not([type="button"]):not([type="reset"]),
+  textarea,
+  select,
+  [contenteditable="true"] {
     cursor: auto !important;
   }
 }
