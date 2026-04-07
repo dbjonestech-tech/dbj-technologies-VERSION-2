@@ -212,22 +212,6 @@ body {
   pointer-events: none;
 }
 
-/* ─── CURSOR DOT ENHANCEMENT ─────────────────────── */
-.cursor-dot-hover {
-  width: 5px !important;
-  height: 5px !important;
-  box-shadow: 0 0 2.5px 1px rgba(200,200,210,0.55), 0 0 6px 1.5px rgba(160,160,170,0.15) !important;
-}
-
-@keyframes cursor-pulse {
-  0%   { opacity: 0.7; scale: 0.3; }
-  100% { opacity: 0;   scale: 1;   }
-}
-
-.cursor-pulse-active {
-  animation: cursor-pulse 150ms ease-out forwards;
-}
-
 /* ─── SKIP TO CONTENT (A11Y) ──────────────────────── */
 .skip-to-content {
   position: absolute;
