@@ -39,14 +39,14 @@ export function Hero() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-accent-blue/20 bg-accent-blue/5 px-5 py-2 text-xs font-mono uppercase tracking-widest text-accent-blue backdrop-blur-sm">
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent-blue/20 bg-accent-blue/5 px-3.5 py-1.5 text-[10px] font-mono uppercase tracking-widest text-accent-blue backdrop-blur-sm sm:px-5 sm:py-2 sm:text-xs">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-blue animate-pulse-glow" />
             Accepting New Projects
           </span>
         </motion.div>
 
         {/* Heading */}
-        <div className="mt-8">
+        <div className="mt-6 sm:mt-8">
           <motion.h1
             className="font-display text-hero font-extrabold leading-tight tracking-tighter text-slate-900"
             initial={{ opacity: 0 }}
@@ -54,7 +54,7 @@ export function Hero() {
             transition={{ duration: 0.3 }}
           >
             {["We", "Engineer", "The"].map((word, i) => (
-              <span key={i} className="inline-block overflow-hidden pb-3 mr-[0.25em]">
+              <span key={i} className="inline-block overflow-hidden pb-2 mr-[0.2em] sm:pb-3 sm:mr-[0.25em]">
                 <motion.span
                   className="inline-block"
                   initial={{ y: "110%" }}
@@ -70,7 +70,7 @@ export function Hero() {
               </span>
             ))}
             <br />
-            <span className="inline-block overflow-hidden pb-4">
+            <span className="inline-block overflow-hidden pb-2 sm:pb-4">
               <motion.span
                 className="inline-block text-gradient"
                 initial={{ y: "110%" }}
@@ -89,7 +89,7 @@ export function Hero() {
 
         {/* Subheading */}
         <motion.p
-          className="mx-auto mt-8 max-w-2xl text-hero-sub leading-relaxed text-text-secondary"
+          className="mx-auto mt-5 max-w-2xl text-hero-sub leading-relaxed text-text-secondary sm:mt-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1 }}
@@ -99,7 +99,7 @@ export function Hero() {
 
         {/* CTAs */}
         <motion.div
-          className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+          className="mt-7 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.2 }}
@@ -120,7 +120,7 @@ export function Hero() {
 
         {/* Tech ticker */}
         <motion.div
-          className="mt-16 flex items-center justify-center gap-6 text-xs font-mono uppercase tracking-widest text-text-muted"
+          className="mt-10 flex items-center justify-center gap-4 text-[10px] font-mono uppercase tracking-widest text-text-muted sm:mt-16 sm:gap-6 sm:text-xs"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.5 }}

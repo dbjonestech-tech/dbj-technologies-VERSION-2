@@ -37,7 +37,7 @@ const config: Config = {
         mono: ["var(--font-jetbrains)", "monospace"],
       },
       fontSize: {
-        "hero": "clamp(3rem, 8vw, 7.5rem)",
+        "hero": "clamp(2.5rem, 8vw, 7.5rem)",
         "hero-sub": "clamp(1rem, 2vw, 1.35rem)",
         "section": "clamp(2rem, 5vw, 3.75rem)",
       },
