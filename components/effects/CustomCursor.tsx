@@ -4,8 +4,10 @@ import { useEffect, useRef, useCallback } from "react";
 
 export function CustomCursor() {
   const coreRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
   const haloRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: -100, y: -100 });
+  const ringPos = useRef({ x: -100, y: -100 });
   const haloPos = useRef({ x: -100, y: -100 });
   const rafRef = useRef<number>(0);
   const hoveringRef = useRef(false);
@@ -14,55 +16,84 @@ export function CustomCursor() {
 
   const updateStyles = useCallback(() => {
     const core = coreRef.current;
+    const ring = ringRef.current;
     const halo = haloRef.current;
-    if (!core || !halo) return;
+    if (!core || !ring || !halo) return;
 
-    // Halo: smooth trailing lerp
-    haloPos.current.x += (posRef.current.x - haloPos.current.x) * 0.12;
-    haloPos.current.y += (posRef.current.y - haloPos.current.y) * 0.12;
+    // Ring: slightly trailing lerp
+    ringPos.current.x += (posRef.current.x - ringPos.current.x) * 0.18;
+    ringPos.current.y += (posRef.current.y - ringPos.current.y) * 0.18;
+
+    // Halo: softer trailing lerp
+    haloPos.current.x += (posRef.current.x - haloPos.current.x) * 0.1;
+    haloPos.current.y += (posRef.current.y - haloPos.current.y) * 0.1;
 
     const hovering = hoveringRef.current;
     const visible = visibleRef.current;
     const pressed = pressedRef.current;
 
     // ── Core: dark metallic charged tip ──
-    const coreSize = pressed ? 6 : hovering ? 10 : 8;
+    // Larger base size so the dark center is unmistakable
+    const coreSize = pressed ? 8 : hovering ? 14 : 10;
     const coreHalf = coreSize / 2;
     core.style.transform = `translate3d(${posRef.current.x - coreHalf}px, ${posRef.current.y - coreHalf}px, 0)`;
     core.style.width = `${coreSize}px`;
     core.style.height = `${coreSize}px`;
     core.style.opacity = visible ? "1" : "0";
 
-    // Blue energy aura around dark core — intensifies on hover/press
+    // Subtle blue edge energy — sits outside the dark core, not over it
     if (pressed) {
       core.style.boxShadow =
-        "0 0 6px 2px rgba(147,197,253,0.85), 0 0 18px 5px rgba(59,130,246,0.5), 0 0 36px 8px rgba(59,130,246,0.2)";
+        "inset 0 0 2px rgba(0,0,0,0.6), 0 0 3px 1px rgba(30,41,59,0.8), 0 0 8px 3px rgba(96,165,250,0.7), 0 0 20px 6px rgba(59,130,246,0.4), 0 0 40px 10px rgba(59,130,246,0.15)";
     } else if (hovering) {
       core.style.boxShadow =
-        "0 0 8px 2px rgba(96,165,250,0.7), 0 0 20px 6px rgba(59,130,246,0.35), 0 0 44px 12px rgba(59,130,246,0.15)";
+        "inset 0 0 2px rgba(0,0,0,0.5), 0 0 3px 1px rgba(30,41,59,0.7), 0 0 10px 4px rgba(96,165,250,0.55), 0 0 24px 8px rgba(59,130,246,0.3), 0 0 48px 14px rgba(59,130,246,0.12)";
     } else {
       core.style.boxShadow =
-        "0 0 4px 1px rgba(96,165,250,0.35), 0 0 12px 3px rgba(59,130,246,0.15), 0 0 24px 6px rgba(59,130,246,0.06)";
+        "inset 0 0 2px rgba(0,0,0,0.4), 0 0 2px 1px rgba(30,41,59,0.5), 0 0 6px 2px rgba(96,165,250,0.25), 0 0 14px 4px rgba(59,130,246,0.1)";
     }
 
-    // ── Halo: soft trailing energy field ──
-    const haloSize = pressed ? 18 : hovering ? 26 : 34;
+    // ── Ring: electrical charge boundary — expands on hover ──
+    const ringSize = pressed ? 20 : hovering ? 36 : 26;
+    const ringHalf = ringSize / 2;
+    ring.style.transform = `translate3d(${ringPos.current.x - ringHalf}px, ${ringPos.current.y - ringHalf}px, 0)`;
+    ring.style.width = `${ringSize}px`;
+    ring.style.height = `${ringSize}px`;
+    ring.style.opacity = visible
+      ? pressed
+        ? "0.7"
+        : hovering
+          ? "0.55"
+          : "0.2"
+      : "0";
+    ring.style.borderColor = pressed
+      ? "rgba(96,165,250,0.8)"
+      : hovering
+        ? "rgba(96,165,250,0.5)"
+        : "rgba(96,165,250,0.2)";
+
+    // ── Halo: ambient energy field — expands on hover ──
+    const haloSize = pressed ? 28 : hovering ? 52 : 38;
     const haloHalf = haloSize / 2;
     halo.style.transform = `translate3d(${haloPos.current.x - haloHalf}px, ${haloPos.current.y - haloHalf}px, 0)`;
     halo.style.width = `${haloSize}px`;
     halo.style.height = `${haloSize}px`;
     halo.style.opacity = visible
       ? pressed
-        ? "0.45"
+        ? "0.4"
         : hovering
-          ? "0.35"
-          : "0.15"
+          ? "0.3"
+          : "0.1"
       : "0";
 
     rafRef.current = requestAnimationFrame(updateStyles);
   }, []);
 
   useEffect(() => {
+    // Respect reduced motion
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (motionQuery.matches) return;
+
     const isTouchDevice =
       "ontouchstart" in window || navigator.maxTouchPoints > 0;
     if (isTouchDevice) return;
@@ -84,7 +115,12 @@ export function CustomCursor() {
       el.closest("a") ||
       el.closest("button") ||
       el.closest("[role='button']") ||
-      el.closest("[data-cursor-hover]");
+      el.closest("[data-cursor-hover]") ||
+      el.closest("summary") ||
+      el.closest("label[for]") ||
+      el.closest(".glass-card-hover") ||
+      el.closest(".btn-primary") ||
+      el.closest(".btn-outline");
 
     const handleHoverStart = (e: Event) => {
       const target = e.target as HTMLElement;
@@ -127,29 +163,42 @@ export function CustomCursor() {
 
   return (
     <>
-      {/* Halo: soft trailing energy field */}
+      {/* Halo: ambient energy field */}
       <div
         ref={haloRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9998] hidden md:block rounded-full"
+        className="pointer-events-none fixed top-0 left-0 z-[10001] hidden md:block rounded-full"
         style={{
           willChange: "transform, opacity, width, height",
           transition:
-            "width 0.3s cubic-bezier(0.4,0,0.2,1), height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease",
+            "width 0.35s cubic-bezier(0.4,0,0.2,1), height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease",
           background:
-            "radial-gradient(circle, rgba(96,165,250,0.6) 0%, rgba(59,130,246,0.2) 40%, transparent 70%)",
+            "radial-gradient(circle, rgba(96,165,250,0.5) 0%, rgba(59,130,246,0.15) 40%, transparent 70%)",
         }}
         aria-hidden="true"
       />
-      {/* Core: dark metallic charged tip with blue edge energy */}
+      {/* Ring: electrical charge boundary */}
+      <div
+        ref={ringRef}
+        className="pointer-events-none fixed top-0 left-0 z-[10002] hidden md:block rounded-full"
+        style={{
+          willChange: "transform, opacity, width, height",
+          transition:
+            "width 0.25s cubic-bezier(0.4,0,0.2,1), height 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease, border-color 0.25s ease",
+          background: "transparent",
+          border: "1px solid rgba(96,165,250,0.2)",
+        }}
+        aria-hidden="true"
+      />
+      {/* Core: dark metallic charged tip */}
       <div
         ref={coreRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9999] hidden md:block rounded-full"
+        className="pointer-events-none fixed top-0 left-0 z-[10003] hidden md:block rounded-full"
         style={{
           willChange: "transform, opacity, width, height, box-shadow",
           transition:
-            "width 0.2s cubic-bezier(0.4,0,0.2,1), height 0.2s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, box-shadow 0.3s ease",
+            "width 0.2s cubic-bezier(0.4,0,0.2,1), height 0.2s cubic-bezier(0.4,0,0.2,1), opacity 0.15s ease, box-shadow 0.3s ease",
           background:
-            "radial-gradient(circle, #1c2028 0%, #2d3748 60%, #4b5563 100%)",
+            "radial-gradient(circle, #0f1318 0%, #1a1f28 50%, #2a3040 100%)",
         }}
         aria-hidden="true"
       />
