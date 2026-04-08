@@ -66,6 +66,9 @@ export function CursorCharge() {
   const isHovering = useRef(false);
   const inText = useRef(false);
   const strikes = useRef<PlasmaStrike[]>([]);
+  const filterMapRef = useRef<SVGFEDisplacementMapElement>(null);
+  const activeEl = useRef<HTMLElement | null>(null);
+  const currentWarp = useRef(0);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -105,19 +108,30 @@ export function CursorCharge() {
         isHovering.current = false;
       } else {
         inText.current = false;
-        if (isInteractive(target)) isHovering.current = true;
+        const interactive = isInteractive(target);
+        if (interactive) {
+          isHovering.current = true;
+          activeEl.current = interactive as HTMLElement;
+        }
       }
     };
 
     const onOut = (e: MouseEvent) => {
       const related = e.relatedTarget as HTMLElement | null;
-      if (!related || !isInteractive(related)) isHovering.current = false;
+      if (!related || !isInteractive(related)) {
+        isHovering.current = false;
+        if (activeEl.current) {
+          activeEl.current.style.filter = "none";
+          activeEl.current = null;
+        }
+      }
       if (!related || !isTextEl(related)) inText.current = false;
     };
 
     /* ─── CLICK: METAPHYSICAL DISCHARGE ─── */
     const onDown = () => {
       if (inText.current) return;
+      currentWarp.current = 55; // Massive instant plasma melt
       const now = performance.now();
       const count = Math.floor(Math.random() * 2) + 4; // 4 to 5 main trunks
 
@@ -147,6 +161,24 @@ export function CursorCharge() {
     /* ─── RENDER ENGINE ─── */
     const frame = (now: number) => {
       ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+
+      // --- DOM MELT PHYSICS ---
+      if (activeEl.current) {
+        // Smoothly interpolate warp back to absolute 0
+        currentWarp.current += (0 - currentWarp.current) * 0.08;
+
+        if (filterMapRef.current) {
+          filterMapRef.current.setAttribute("scale", currentWarp.current.toString());
+        }
+
+        // GPU KILLSWITCH: Only apply the CSS filter when the distortion is visually noticeable
+        if (currentWarp.current > 0.5) {
+          activeEl.current.style.filter = "url(#lightning-warp)";
+        } else {
+          activeEl.current.style.filter = "none";
+        }
+      }
+
       const { x, y } = pos.current;
 
       /* ─── IDLE & HOVER: THE TRITIUM SINGULARITY ─── */
@@ -251,10 +283,25 @@ export function CursorCharge() {
   }, []);
 
   return (
-    <canvas
+    <>
+      <svg style={{ width: 0, height: 0, position: "absolute", pointerEvents: "none" }} aria-hidden="true">
+        <filter id="lightning-warp" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.03 0.08" numOctaves={2} result="noise" />
+          <feDisplacementMap
+            ref={filterMapRef}
+            in="SourceGraphic"
+            in2="noise"
+            scale="0"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </svg>
+      <canvas
       ref={canvasRef}
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
     />
+    </>
   );
 }
