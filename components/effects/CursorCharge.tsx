@@ -3,19 +3,19 @@
 import { useEffect, useRef } from "react";
 
 /* ─── CONSTANTS & CONFIG ────────────────────────────────────── */
-const TIP_OFFSET_X = 1;
-const TIP_OFFSET_Y = 3;
+const TIP_OFFSET_X = 0; // Centered
+const TIP_OFFSET_Y = 0;
 
 // Arc (Lightning) Config
-const ARC_LIFE = 150; // ms
-const ARC_COUNT_MIN = 3;
-const ARC_COUNT_MAX = 5;
-const ARC_BASE_LENGTH = 16;
-const ARC_SEGMENTS = 4;
+const ARC_LIFE = 200; // slightly longer linger for electric feel
+const ARC_COUNT_MIN = 4;
+const ARC_COUNT_MAX = 7;
+const ARC_BASE_LENGTH = 20;
+const ARC_SEGMENTS = 5;
 
 // Pulse (Idle) Config
-const PULSE_SPEED = 0.005; // Base rotation/pulse speed
-const HOVER_MULTIPLIER = 2.5; // Speed multiplier on hover
+const PULSE_SPEED = 0.008;
+const HOVER_MULTIPLIER = 3.5;
 
 /* ─── TYPES ─────────────────────────────────────────────────── */
 interface Point {
@@ -32,7 +32,6 @@ export function CursorCharge() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
 
-  // State refs to prevent React re-renders
   const pos = useRef({ x: -100, y: -100 });
   const isVisible = useRef(false);
   const isHovering = useRef(false);
@@ -98,11 +97,10 @@ export function CursorCharge() {
       const count = Math.floor(Math.random() * (ARC_COUNT_MAX - ARC_COUNT_MIN + 1)) + ARC_COUNT_MIN;
 
       for (let i = 0; i < count; i++) {
-        // Distribute angles roughly evenly, with some jitter
-        const baseAngle = (Math.PI * 2 * (i / count)) + (Math.random() - 0.5) * 0.8;
-        const length = ARC_BASE_LENGTH * (0.6 + Math.random() * 0.8);
+        // More erratic angular distribution for real static crackle
+        const baseAngle = (Math.PI * 2 * (i / count)) + (Math.random() - 0.5) * 1.5;
+        const length = ARC_BASE_LENGTH * (0.8 + Math.random() * 1.2);
 
-        // Generate constrained jagged path
         const points: Point[] = [{ x: pos.current.x, y: pos.current.y }];
         let currX = pos.current.x;
         let currY = pos.current.y;
@@ -110,8 +108,8 @@ export function CursorCharge() {
 
         for (let s = 1; s <= ARC_SEGMENTS; s++) {
           const segLen = length / ARC_SEGMENTS;
-          // Sharp angular shifts for static feel
-          currentAngle += (Math.random() - 0.5) * 1.2;
+          // Extremely sharp angular shifts
+          currentAngle += (Math.random() - 0.5) * 2.5;
           currX += Math.cos(currentAngle) * segLen;
           currY += Math.sin(currentAngle) * segLen;
           points.push({ x: currX, y: currY });
@@ -139,35 +137,36 @@ export function CursorCharge() {
       time.current += PULSE_SPEED * (1 + hoverScale * HOVER_MULTIPLIER);
       const t = time.current;
 
+      // Enable Plasma Bloom overlay
+      ctx.globalCompositeOperation = "screen";
+
       if (isVisible.current && !inText.current) {
-        // 1. Outer Glow (Graphite/Silver mix)
-        const glowRadius = 4 + Math.sin(t * 3) * 1 + hoverScale * 2;
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
-        gradient.addColorStop(0, `rgba(200, 200, 220, ${0.4 + hoverScale * 0.3})`);
-        gradient.addColorStop(1, "rgba(50, 50, 55, 0)");
 
+        // 1. Electric Cyan Bloom (Shadow)
+        ctx.shadowBlur = 20 + hoverScale * 10;
+        ctx.shadowColor = "#00e5ff";
+
+        // 2. Core Plasma Ember (Pure White)
         ctx.beginPath();
-        ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
+        ctx.arc(x, y, 2 + hoverScale * 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
         ctx.fill();
 
-        // 2. Core Ember (Intense Silver/White)
-        ctx.beginPath();
-        ctx.arc(x, y, 1.2 + hoverScale * 0.5, 0, Math.PI * 2);
-        ctx.fillStyle = isHovering.current ? "rgba(255, 255, 255, 0.95)" : "rgba(180, 180, 190, 0.85)";
-        ctx.fill();
+        // Turn off shadow blur for orbiters to save performance
+        ctx.shadowBlur = 0;
 
-        // 3. Orbiting "Energy" specs (Creates the current effect)
-        const orbiters = isHovering.current ? 3 : 2;
+        // 3. Orbiting "Current" electrons
+        const orbiters = isHovering.current ? 4 : 2;
         for(let i = 0; i < orbiters; i++) {
-          const angle = t * 5 + (i * Math.PI * 2 / orbiters);
-          const orbitRadius = 2.5 + Math.sin(t * 8 + i) * 1;
+          const angle = t * 6 + (i * Math.PI * 2 / orbiters);
+          const orbitRadius = 4 + Math.sin(t * 10 + i) * 2 + hoverScale * 3;
           const ox = x + Math.cos(angle) * orbitRadius;
           const oy = y + Math.sin(angle) * orbitRadius;
 
           ctx.beginPath();
-          ctx.arc(ox, oy, 0.6, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + hoverScale * 0.4})`;
+          ctx.arc(ox, oy, 1 + hoverScale * 0.5, 0, Math.PI * 2);
+          // Bright cyan orbiters
+          ctx.fillStyle = `rgba(0, 229, 255, ${0.7 + hoverScale * 0.3})`;
           ctx.fill();
         }
       }
@@ -181,8 +180,11 @@ export function CursorCharge() {
         aliveArcs.push(arc);
 
         const progress = age / ARC_LIFE;
-        // Quadratic fade out (stays bright, fades fast at the end)
-        const opacity = 1 - (progress * progress);
+        const opacity = 1 - Math.pow(progress, 3); // Faster snap fade out
+
+        // Lightning Bloom
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "#00e5ff";
 
         ctx.beginPath();
         ctx.moveTo(arc.points[0].x, arc.points[0].y);
@@ -190,21 +192,19 @@ export function CursorCharge() {
           ctx.lineTo(arc.points[j].x, arc.points[j].y);
         }
 
-        ctx.strokeStyle = `rgba(230, 230, 240, ${opacity})`;
-        ctx.lineWidth = 1.2 * (1 - progress);
+        // Pure white core for the lightning
+        ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.lineWidth = 2 * (1 - progress);
         ctx.lineCap = "round";
         ctx.lineJoin = "miter";
         ctx.stroke();
 
-        // Flash at origin
-        if (progress < 0.3) {
-            ctx.beginPath();
-            ctx.arc(x, y, 2.5 * (1 - progress/0.3), 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 255, 255, ${1 - progress/0.3})`;
-            ctx.fill();
-        }
+        ctx.shadowBlur = 0; // reset
       }
       arcs.current = aliveArcs;
+
+      // Reset composite operation
+      ctx.globalCompositeOperation = "source-over";
 
       rafRef.current = requestAnimationFrame(frame);
     };
@@ -225,10 +225,19 @@ export function CursorCharge() {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
-    />
+    <>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (pointer: fine) {
+          body, a, button, input, select, textarea, [role="button"], .btn-primary, .btn-outline {
+            cursor: none !important;
+          }
+        }
+      `}} />
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
+      />
+    </>
   );
 }
