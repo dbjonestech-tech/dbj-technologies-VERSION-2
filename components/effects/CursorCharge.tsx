@@ -228,7 +228,7 @@ export function CursorCharge() {
     <>
       <style dangerouslySetInnerHTML={{ __html: `
         @media (pointer: fine) {
-          body, a, button, input, select, textarea, [role="button"], .btn-primary, .btn-outline {
+          *, *::before, *::after {
             cursor: none !important;
           }
         }
