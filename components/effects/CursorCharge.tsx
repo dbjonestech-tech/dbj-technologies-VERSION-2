@@ -149,24 +149,41 @@ export function CursorCharge() {
       ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
       const { x, y } = pos.current;
 
-      /* ─── HOVER: WAND-TIP ENERGY GLOW ─── */
-      if (isVisible.current && !inText.current && isHovering.current) {
-        // White-hot core at cursor tip
-        ctx.beginPath();
-        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = "#FFF";
-        ctx.fill();
+      /* ─── IDLE & HOVER: THE TRITIUM SINGULARITY ─── */
+      if (isVisible.current && !inText.current) {
+        const isVolatile = isHovering.current;
 
-        // Spawn 1-2 tiny fractal sparks from cursor center to nearby points
-        const sparks = Math.floor(Math.random() * 2) + 1;
-        for (let i = 0; i < sparks; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          const r = HOVER_RADIUS * (0.8 + Math.random() * 0.4);
-          const endX = x + Math.cos(angle) * r;
-          const endY = y + Math.sin(angle) * r;
+        // 1. The Core (Stable vs Unstable)
+        ctx.globalCompositeOperation = "screen";
+        ctx.beginPath();
+        ctx.arc(x, y, isVolatile ? 2.5 : 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = isVolatile ? '#FFFFFF' : 'rgba(220, 240, 255, 0.9)';
+        ctx.shadowBlur = isVolatile ? 15 : 8;
+        ctx.shadowColor = '#00e5ff';
+        ctx.fill();
+        ctx.shadowBlur = 0; // Reset shadow
+
+        // 2. The Containment Field Sparks
+        // Idle: 1 stable spark. Hover: 2-4 violent sparks.
+        const sparks = isVolatile ? Math.floor(Math.random() * 3) + 2 : 1;
+        const currentRadius = isVolatile ? 7 : 2; // Radius expands when unstable
+        const currentDisplace = isVolatile ? 14 : 3; // High erratic jitter when unstable
+
+        for(let i=0; i<sparks; i++) {
+          const angle1 = Math.random() * Math.PI * 2;
+          const angle2 = angle1 + (Math.random() - 0.5) * 2.0;
+
+          const r1 = currentRadius * (0.5 + Math.random() * 0.5);
+          const r2 = currentRadius * (0.5 + Math.random() * 0.5);
+
+          const startX = x + Math.cos(angle1) * r1;
+          const startY = y + Math.sin(angle1) * r1;
+          const endX = x + Math.cos(angle2) * r2;
+          const endY = y + Math.sin(angle2) * r2;
 
           const segments: BoltSegment[] = [];
-          generateFractalBolt(x, y, endX, endY, 8, 3, 0.6, 0.8, segments);
+          // minLength set to 8 to maintain optimal 60fps performance
+          generateFractalBolt(startX, startY, endX, endY, currentDisplace, 8, 0.6, 0.8, segments);
           strikes.current.push({ segments, birth: now, life: HOVER_LIFE, isHover: true });
         }
       }
