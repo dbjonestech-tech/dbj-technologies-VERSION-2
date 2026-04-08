@@ -276,7 +276,7 @@ export default function ContactContent() {
               <div className="glass-card p-8">
                 <h3 className="font-display text-lg font-bold mb-3">Response Time</h3>
                 <p className="text-sm text-text-secondary leading-relaxed">
-                  We respond to all inquiries within one business day. Most
+                  I respond to all inquiries within one business day. Most
                   responses are same-day.
                 </p>
               </div>
@@ -284,7 +284,7 @@ export default function ContactContent() {
               {/* Social — only shown when there are verified profiles */}
               {SOCIALS.length > 0 && (
                 <div className="glass-card p-8">
-                  <h3 className="font-display text-lg font-bold mb-4">Find Us Online</h3>
+                  <h3 className="font-display text-lg font-bold mb-4">Find Me Online</h3>
                   <div className="flex gap-3">
                     {SOCIALS.map((s) => (
                       <a

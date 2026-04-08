@@ -117,7 +117,7 @@ export default function FaqContent() {
               <p className="text-text-muted">
                 No questions match your search. Try a different term or{" "}
                 <a href="/contact" className="text-accent-blue hover:underline">
-                  contact us
+                  reach out
                 </a>
                 .
               </p>
@@ -128,9 +128,9 @@ export default function FaqContent() {
 
       <CTASection
         heading="Still Have Questions?"
-        highlight="Ask Us Directly."
-        description="We're happy to answer anything not covered here. Reach out and we'll get back to you within one business day."
-        buttonText="Contact Us"
+        highlight="Ask Me Directly."
+        description="I'm happy to answer anything not covered here. Reach out and I'll get back to you within one business day."
+        buttonText="Get in Touch"
       />
     </>
   );

@@ -41,7 +41,7 @@ export default function NotFound() {
             Back to Home
           </Link>
           <Link href="/contact" className="btn-outline inline-flex items-center gap-2">
-            Contact Us
+            Get in Touch
           </Link>
         </div>
       </motion.div>
