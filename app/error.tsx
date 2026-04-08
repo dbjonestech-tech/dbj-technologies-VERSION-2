@@ -31,8 +31,8 @@ export default function Error({
           Something Went Wrong
         </h1>
         <p className="text-text-secondary leading-relaxed mb-8">
-          An unexpected error occurred. Our team has been notified and is
-          working on a fix. Please try again.
+          An unexpected error occurred. The issue has been logged and is
+          being investigated. Please try again.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

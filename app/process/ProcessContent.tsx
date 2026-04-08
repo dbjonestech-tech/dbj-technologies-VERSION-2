@@ -247,7 +247,7 @@ export default function ProcessContent() {
       <CTASection
         heading="Ready to Get Started?"
         highlight="Phase One Awaits."
-        description="The first step is a conversation. Tell me about your project and I'll outline how I'd approach it — timeline, scope, and cost."
+        description="The first step is a conversation. Tell me about your project and I'll outline how I'd approach it, including timeline, scope, and cost."
         buttonText="Start Discovery"
       />
     </>

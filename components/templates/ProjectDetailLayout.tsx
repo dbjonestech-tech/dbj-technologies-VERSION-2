@@ -167,7 +167,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
 
       {/* Features */}
       <section className="py-20 bg-bg-secondary/50">
-        <SectionHeading label="Key Features" title="What We Built" />
+        <SectionHeading label="Key Features" title="What I Built" />
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
           <div className="space-y-3">
             {project.features.map((feature, i) => (

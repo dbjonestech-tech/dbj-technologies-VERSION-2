@@ -43,7 +43,7 @@ export default function PricingContent() {
             className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto"
           >
             Engineering-phase engagements with transparent pricing. Know exactly
-            what you&apos;re getting — and what it costs — before I write a
+            what you&apos;re getting, and what it costs, before I write a
             single line of code.
           </motion.p>
         </div>

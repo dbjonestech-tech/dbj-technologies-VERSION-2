@@ -61,7 +61,7 @@ export default function FaqContent() {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto"
           >
-            Everything you need to know about working with us. Can&apos;t find
+            Everything you need to know about working with me. Can&apos;t find
             what you&apos;re looking for? Reach out directly.
           </motion.p>
         </div>

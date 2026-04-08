@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import WorkContent from "./WorkContent";
 
 export const metadata: Metadata = {
-  title: "Our Work",
+  title: "Core Disciplines",
   description:
-    "Explore our portfolio of concept projects and case studies. Web development, mobile apps, e-commerce, SaaS dashboards, and more.",
+    "Three core engineering disciplines that define my practice: Frontend Architecture, Backend Infrastructure, and Performance Engineering.",
   openGraph: {
-    title: "Our Work | DBJ Technologies",
+    title: "Core Disciplines | DBJ Technologies",
     description:
-      "Concept projects and case studies showcasing our web development, design, and engineering capabilities.",
+      "Frontend architecture, backend infrastructure, and performance engineering. The disciplines behind every engagement.",
   },
 };
 

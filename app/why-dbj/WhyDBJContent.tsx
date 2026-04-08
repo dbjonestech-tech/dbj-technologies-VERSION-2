@@ -11,7 +11,7 @@ const guarantees = [
   {
     icon: Award,
     title: "90+ Lighthouse Scores",
-    description: "Every engagement ships with verified 90+ scores in Performance, Accessibility, Best Practices, and SEO. I test before delivery — you can verify after.",
+    description: "Every engagement ships with verified 90+ scores in Performance, Accessibility, Best Practices, and SEO. I test before delivery. You can verify after.",
   },
   {
     icon: Code2,
@@ -26,7 +26,7 @@ const guarantees = [
   {
     icon: Headphones,
     title: "30-Day Post-Launch Support",
-    description: "Every project includes 30 days of complimentary support after launch. Bug fixes, questions, minor adjustments — included in the project price.",
+    description: "Every engagement includes 30 days of complimentary support after launch. Bug fixes, questions, and minor adjustments are included in the engagement price.",
   },
 ];
 
@@ -44,7 +44,7 @@ const differentiators = [
   {
     icon: Layers,
     title: "Modern Stack",
-    description: "I use the same technologies as top product companies — Next.js, React, TypeScript, Vercel, AWS. Your engagement gets production-grade tooling.",
+    description: "I use the same technologies as top product companies: Next.js, React, TypeScript, Vercel, AWS. Your engagement gets production-grade tooling.",
   },
   {
     icon: ShieldCheck,
@@ -54,7 +54,7 @@ const differentiators = [
   {
     icon: Zap,
     title: "Performance as a Standard",
-    description: "Speed isn't a feature — it's a baseline. Every project is optimized for Core Web Vitals, because your users and search rankings depend on it.",
+    description: "Speed isn't a feature. It's a baseline. Every project is optimized for Core Web Vitals because your users and search rankings depend on it.",
   },
   {
     icon: Eye,
@@ -139,7 +139,7 @@ export default function WhyDBJContent() {
         <SectionHeading
           label="The DBJ Difference"
           title="How I Work Differently"
-          description="I'm not the cheapest option — I'm the one you won't need to redo."
+          description="I'm not the cheapest option. I'm the one you won't need to redo."
         />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

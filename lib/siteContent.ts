@@ -110,7 +110,7 @@ export const HERO_CONTENT: HeroContent = {
   headlineWords: ["I", "Architect", "The"],
   headlineAccent: "Impossible.",
   subheading:
-    "Sub-millisecond frontends, bulletproof infrastructure, and production-grade systems — engineered by a solo principal architect in Dallas, TX.",
+    "Sub-second frontends, reliable infrastructure, and production-grade systems. Engineered by a solo principal architect in Dallas, TX.",
   primaryCta: { label: "Start Your Engagement", href: "/contact" },
   secondaryCta: { label: "View My Work", href: "/work" },
   techTicker: ["React", "Next.js", "TypeScript", "Node.js", "Vercel"],
@@ -134,7 +134,7 @@ export const SERVICES: ServiceItem[] = [
     title: "Frontend Architecture",
     tagline: "Component systems built for scale",
     description:
-      "I design and implement component-driven frontend architectures using Next.js, React, and TypeScript. Every system ships with strict type safety, server-side rendering strategies, and sub-second load times — not as goals, but as baseline requirements.",
+      "I design and implement component-driven frontend architectures using Next.js, React, and TypeScript. Every system ships with strict type safety, server-side rendering strategies, and sub-second load times as baseline requirements.",
     features: [
       "Next.js App Router & Server Components",
       "Design system & component library engineering",
@@ -176,7 +176,7 @@ export const SERVICES: ServiceItem[] = [
     title: "Interface & Interaction Engineering",
     tagline: "Precision motion and pixel-level craft",
     description:
-      "I engineer interfaces where every animation serves a purpose, every transition communicates state, and every interaction feels instantaneous. Design systems, micro-interactions, and scroll-driven narratives — all built with production-grade motion libraries.",
+      "I engineer interfaces where every animation serves a purpose, every transition communicates state, and every interaction feels instantaneous. Design systems, micro-interactions, and scroll-driven narratives built with production-grade motion libraries.",
     features: [
       "Framer Motion & GSAP animation systems",
       "Interactive prototypes & design QA",
@@ -204,7 +204,7 @@ export const SERVICES: ServiceItem[] = [
     title: "Web Performance & Core Web Vitals",
     tagline: "Measurable speed, not vague promises",
     description:
-      "I audit, diagnose, and resolve performance bottlenecks at every layer — from render-blocking resources and layout shifts to slow server responses and unoptimized assets. Every engagement delivers measurable, auditable improvements to Core Web Vitals.",
+      "I audit, diagnose, and resolve performance bottlenecks at every layer, from render-blocking resources and layout shifts to slow server responses and unoptimized assets. Every engagement delivers measurable, auditable improvements to Core Web Vitals.",
     features: [
       "Core Web Vitals optimization (LCP, CLS, INP)",
       "Bundle analysis & code splitting",
@@ -227,7 +227,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
     step: "02",
     title: "Architect",
     description:
-      "System design, data modeling, and interface prototyping — validated against your requirements before development begins.",
+      "System design, data modeling, and interface prototyping, all validated against your requirements before development begins.",
   },
   {
     step: "03",
@@ -262,7 +262,7 @@ export const VALUES: ValueItem[] = [
   {
     title: "Radical Transparency",
     description:
-      "No black boxes. You see every architectural decision, every timeline update, and every line of code — in real time.",
+      "No black boxes. You see every architectural decision, every timeline update, and every line of code in real time.",
   },
   {
     title: "Performance as a Discipline",
@@ -283,11 +283,11 @@ export const ABOUT_CONTENT = {
   headline: "The Anti-Agency",
   headlineAccent: "Model.",
   description:
-    "DBJ Technologies exists because most businesses get sold agency overhead, junior developers, and template sites — when what they actually need is a senior architect who builds the system right the first time.",
+    "DBJ Technologies exists because most businesses get sold agency overhead, junior developers, and template sites when what they actually need is one experienced architect who builds the system right the first time.",
   principles: [
     {
       title: "I build with the tools I'd choose for my own products",
-      text: "Next.js, React, TypeScript, Tailwind, Vercel — the same stack powering the best product teams in the world. Your project benefits from the exact same tooling, not a watered-down agency version.",
+      text: "Next.js, React, TypeScript, Tailwind, Vercel. The same stack powering the best product teams in the world. Your project benefits from the exact same tooling, not a watered-down agency version.",
     },
     {
       title: "Every engagement ships with full source code and documentation",
@@ -312,7 +312,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     title: "Frontend Architecture",
     category: "Core Discipline",
     description:
-      "Component-driven systems with Next.js, React, and TypeScript — engineered for sub-second renders and long-term maintainability.",
+      "Component-driven systems with Next.js, React, and TypeScript, engineered for sub-second renders and long-term maintainability.",
     tags: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
     gradient: "from-blue-600 to-cyan-500",
   },
@@ -320,7 +320,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     title: "Backend Infrastructure",
     category: "Core Discipline",
     description:
-      "API design, database architecture, and cloud-native services — typed end-to-end and built for zero-downtime deployments.",
+      "API design, database architecture, and cloud-native services, typed end-to-end and built for zero-downtime deployments.",
     tags: ["Node.js", "PostgreSQL", "AWS", "Docker"],
     gradient: "from-violet-600 to-pink-500",
   },
@@ -328,7 +328,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     title: "Performance Engineering",
     category: "Core Discipline",
     description:
-      "Core Web Vitals optimization, bundle analysis, and rendering strategy — turning measurable audits into measurable speed gains.",
+      "Core Web Vitals optimization, bundle analysis, and rendering strategy. Turning measurable audits into measurable speed gains.",
     tags: ["Lighthouse", "WebPageTest", "Vercel", "Edge"],
     gradient: "from-emerald-600 to-teal-500",
   },
@@ -390,7 +390,7 @@ export const PRICING_TIERS: PricingTier[] = [
       { text: "CI/CD pipeline & staging environments", included: true },
       { text: "Dedicated architectural oversight", included: true },
       { text: "SLA & uptime guarantees", included: true },
-      { text: "24/7 priority support", included: true },
+      { text: "Priority support with guaranteed response times", included: true },
     ],
     cta: "Schedule Discovery",
   },
@@ -403,13 +403,13 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "General",
     question: "What kind of clients does DBJ Technologies work with?",
     answer:
-      "I work with growth-stage companies, funded startups, and established businesses that need technology built correctly the first time. My minimum engagement starts at $2,500 — this filters for clients who value engineering quality over the cheapest bid.",
+      "I work with growth-stage companies, funded startups, and established businesses that need technology built correctly the first time. My minimum engagement starts at $2,500, which filters for clients who value engineering quality over the cheapest bid.",
   },
   {
     category: "General",
     question: "How long does a typical engagement take?",
     answer:
-      "A 5–10 page production site ships in 4–6 weeks. Complex applications with custom backends typically run 8–16 weeks. I provide a detailed timeline during the paid discovery phase before any commitment.",
+      "A 5 to 10 page production site ships in 4 to 6 weeks. Complex applications with custom backends typically run 8 to 16 weeks. I provide a detailed timeline during the paid discovery phase before any commitment.",
   },
   {
     category: "General",
@@ -427,7 +427,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "Technical",
     question: "Will my site be fully responsive?",
     answer:
-      "Every build is engineered mobile-first and tested on real devices — not just browser emulators. I test across iOS, Android, tablets, and desktop at every breakpoint.",
+      "Every build is engineered mobile-first and tested on real devices, not just browser emulators. I test across iOS, Android, tablets, and desktop at every breakpoint.",
   },
   {
     category: "Technical",
@@ -457,7 +457,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "Billing",
     question: "Are there ongoing costs after launch?",
     answer:
-      "Hosting and domain fees are minimal (typically $20–50/month). I also offer optional maintenance retainers starting at $299/month that include updates, monitoring, backups, and priority support.",
+      "Hosting and domain fees are minimal (typically $20 to $50/month). I also offer optional maintenance retainers starting at $299/month that include updates, monitoring, backups, and priority support.",
   },
   {
     category: "Support",
@@ -469,7 +469,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "Support",
     question: "How do I request changes after launch?",
     answer:
-      "Retainer clients submit requests through a dedicated support channel and receive responses within 24–48 hours. I also accept ad-hoc requests via email for one-off updates.",
+      "Retainer clients submit requests through a dedicated support channel and receive responses within 24 to 48 hours. I also accept ad-hoc requests via email for one-off updates.",
   },
 ];
 
@@ -479,17 +479,16 @@ export const CTA_DEFAULTS: CTADefaults = {
   heading: "Ready to Build",
   highlight: "Something Exceptional?",
   description:
-    "Tell me about your project. No pitch deck, no pressure — just a direct conversation about what you need and how I can engineer it.",
+    "Tell me about your project. No pitch deck, no pressure. Just a direct conversation about what you need and how I can engineer it.",
   buttonText: "Start a Conversation",
 };
 
 /* ─── BUDGET OPTIONS (CONTACT FORM) ────────────────── */
 
 export const BUDGET_OPTIONS = [
-  "Under $2,500",
-  "$2,500 – $5,000",
-  "$5,000 – $10,000",
-  "$10,000 – $25,000",
+  "$2,500 to $5,000",
+  "$5,000 to $10,000",
+  "$10,000 to $25,000",
   "$25,000+",
   "Not sure yet",
 ];

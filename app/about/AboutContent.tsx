@@ -47,10 +47,10 @@ export default function AboutContent() {
         </div>
       </section>
 
-      {/* How We Work */}
+      {/* How I Work */}
       <section className="py-32">
         <SectionHeading
-          label="How We Work"
+          label="How I Work"
           title="Our Operating Principles"
         />
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
@@ -106,7 +106,7 @@ export default function AboutContent() {
           <SectionHeading
             label="The Team"
             title="Meet the People Behind the Code"
-            description="A small, senior team that delivers above its weight."
+            description="The people behind the work."
           />
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

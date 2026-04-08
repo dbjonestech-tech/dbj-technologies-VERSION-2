@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import ContactContent from "./ContactContent";
 
 export const metadata: Metadata = {
-  title: "Contact Us",
+  title: "Contact",
   description:
-    "Start your next web project with DBJ Technologies. Tell us about your goals and we will respond within 24 hours with a plan.",
+    "Start your next engagement with DBJ Technologies. Share your goals and I will respond within 24 hours with a plan.",
   openGraph: {
-    title: "Contact Us | DBJ Technologies",
+    title: "Contact | DBJ Technologies",
     description:
-      "Get in touch with DBJ Technologies. We respond to all inquiries within 24 hours.",
+      "Get in touch with DBJ Technologies. I respond to all inquiries within 24 hours.",
   },
 };
 

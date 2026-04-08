@@ -5,11 +5,11 @@ import { JsonLd } from "@/components/layout/JsonLd";
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Web development, mobile apps, cloud infrastructure, UI/UX design, e-commerce, and SEO — scoped, priced, and delivered by senior engineers.",
+    "Frontend architecture, backend systems, cloud infrastructure, interface engineering, e-commerce platforms, and performance optimization. Scoped, priced, and delivered with production-grade precision.",
   openGraph: {
     title: "Services | DBJ Technologies",
     description:
-      "Web development, mobile apps, cloud infrastructure, UI/UX design, e-commerce, and SEO — fixed pricing, clear deliverables.",
+      "Six core engineering disciplines. Fixed pricing, clear deliverables, production-grade results.",
   },
 };
 

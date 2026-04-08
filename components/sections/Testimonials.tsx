@@ -13,7 +13,7 @@ export function TestimonialsSection() {
       <SectionHeading
         label="Testimonials"
         title="What Clients Say"
-        description="Don't take my word for it — here's what clients have to say."
+        description="Don't take my word for it. Here's what clients have to say."
       />
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

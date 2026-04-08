@@ -6,7 +6,7 @@ import { FAQ_ITEMS } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "Answers to common questions about working with DBJ Technologies — project timelines, pricing, technologies, post-launch support, and more.",
+    "Answers to common questions about working with DBJ Technologies. Project timelines, pricing, technologies, post-launch support, and more.",
   openGraph: {
     title: "FAQ | DBJ Technologies",
     description:

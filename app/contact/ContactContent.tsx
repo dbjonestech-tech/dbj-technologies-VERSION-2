@@ -86,7 +86,7 @@ export default function ContactContent() {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto"
           >
-            Tell us about your project and we&apos;ll get back to you within
+            Tell me about your project and I&apos;ll get back to you within
             one business day.
           </motion.p>
         </div>
@@ -205,7 +205,7 @@ export default function ContactContent() {
                   </div>
                   <Textarea
                     label="Message *"
-                    placeholder="Tell us about your project, goals, and timeline..."
+                    placeholder="Tell me about your project, goals, and timeline..."
                     error={errors.message?.message}
                     {...register("message")}
                   />
@@ -213,7 +213,7 @@ export default function ContactContent() {
                   {status === "error" && (
                     <div role="alert" className="flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
                       <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      Something went wrong. Please try again or email us directly.
+                      Something went wrong. Please try again or email me directly.
                     </div>
                   )}
 
@@ -248,7 +248,7 @@ export default function ContactContent() {
                   <a
                     href={`mailto:${SITE.email}`}
                     className="flex items-start gap-4 group"
-                    aria-label={`Email us at ${SITE.email}`}
+                    aria-label={`Email ${SITE.email}`}
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue group-hover:bg-accent-blue/20 transition-colors">
                       <Mail className="h-5 w-5" aria-hidden="true" />

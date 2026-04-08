@@ -112,7 +112,7 @@ export function ServicePageLayout({ service, relatedServices }: ServicePageLayou
       <section className="py-20 bg-bg-secondary/50">
         <SectionHeading
           label="Why Choose Us"
-          title="What Sets Our Approach Apart"
+          title="What Sets This Approach Apart"
         />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-6 sm:grid-cols-2">
@@ -143,7 +143,7 @@ export function ServicePageLayout({ service, relatedServices }: ServicePageLayou
       <section className="py-32">
         <SectionHeading
           label="Our Process"
-          title="How We Deliver"
+          title="How I Deliver"
           description="A proven process refined over hundreds of projects."
         />
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
@@ -181,7 +181,7 @@ export function ServicePageLayout({ service, relatedServices }: ServicePageLayou
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="font-display text-2xl font-bold mb-6">Technologies We Use</h2>
+              <h2 className="font-display text-2xl font-bold mb-6">Technologies I Use</h2>
               <div className="flex flex-wrap gap-2">
                 {service.technologies.map((tech) => (
                   <Badge key={tech} variant="blue">{tech}</Badge>

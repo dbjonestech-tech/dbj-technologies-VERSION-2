@@ -140,7 +140,7 @@ export function Footer() {
               <h3 className="font-display text-sm font-bold uppercase tracking-widest text-text-muted">
                 Ready to Start?
               </h3>
-              <p className="mt-3 text-sm text-text-secondary mb-3">Tell us about your next project.</p>
+              <p className="mt-3 text-sm text-text-secondary mb-3">Tell me about your next project.</p>
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 rounded-lg bg-accent-blue px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-accent-blue/80"

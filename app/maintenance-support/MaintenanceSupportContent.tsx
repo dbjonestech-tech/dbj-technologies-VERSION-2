@@ -45,12 +45,12 @@ const plans = [
     description: "White-glove service for mission-critical sites and applications.",
     features: [
       "Everything in Growth",
-      "24/7 uptime monitoring with alerting",
+      "Continuous uptime monitoring with alerting",
       "Real-time backups",
       "Quarterly performance audits",
       "10 hours of development & improvements",
       "Priority support (4h response)",
-      "Dedicated account manager",
+      "Direct access to your architect",
     ],
   },
 ];
@@ -74,7 +74,7 @@ const coverageItems = [
   {
     icon: Eye,
     title: "Uptime Monitoring",
-    description: "24/7 monitoring with instant alerts. I know about downtime before you do.",
+    description: "Continuous monitoring with instant alerts. I know about downtime before you do.",
   },
   {
     icon: PenTool,

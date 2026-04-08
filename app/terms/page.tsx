@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "DBJ Technologies terms of service — the terms governing use of our website and services.",
+  description: "DBJ Technologies terms of service. The terms governing use of the website and services.",
   openGraph: { title: "Terms of Service | DBJ Technologies" },
 };
 
@@ -18,7 +18,7 @@ export default function TermsPage() {
         <div className="space-y-8 text-text-secondary text-sm leading-relaxed">
           <section>
             <h2 className="font-display text-lg font-bold text-gray-900 mb-3">1. Acceptance of Terms</h2>
-            <p>By accessing or using the DBJ Technologies website and services, you agree to be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
+            <p>By accessing or using the DBJ Technologies website and services, you agree to be bound by these Terms of Service. If you do not agree, please do not use the services.</p>
           </section>
 
           <section>
@@ -43,7 +43,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-gray-900 mb-3">6. Limitation of Liability</h2>
-            <p>DBJ Technologies shall not be liable for any indirect, incidental, or consequential damages arising from the use of our services. Our total liability shall not exceed the amount paid by the client for the specific service in question.</p>
+            <p>DBJ Technologies shall not be liable for any indirect, incidental, or consequential damages arising from the use of its services. Total liability shall not exceed the amount paid by the client for the specific service in question.</p>
           </section>
 
           <section>

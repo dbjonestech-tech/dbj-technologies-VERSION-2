@@ -141,7 +141,7 @@ export async function POST(request: Request) {
         from: `"DBJ Technologies Website" <${process.env.SMTP_USER}>`,
         to: process.env.CONTACT_EMAIL || "hello@dbjtechnologies.com",
         replyTo: email,
-        subject: `New Project Inquiry: ${safe.projectType} — ${safe.name}`,
+        subject: `New Project Inquiry: ${safe.projectType} | ${safe.name}`,
         html: htmlBody,
       });
     } else {

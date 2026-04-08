@@ -59,7 +59,7 @@ export function ProcessSteps() {
             href="/process"
             className="inline-flex items-center gap-2 text-sm font-medium text-accent-blue hover:gap-3 transition-all"
           >
-            See Our Full Process <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            See the Full Process <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </motion.div>
       </div>

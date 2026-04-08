@@ -30,7 +30,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://dbjtechnologies.com"),
   title: {
-    default: "DBJ Technologies — Web Development Studio in Dallas, TX",
+    default: "DBJ Technologies | Digital Engineering Studio in Dallas, TX",
     template: "%s | DBJ Technologies",
   },
   description:
@@ -54,14 +54,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://dbjtechnologies.com",
     siteName: "DBJ Technologies",
-    title: "DBJ Technologies — Web Development Studio in Dallas, TX",
+    title: "DBJ Technologies | Digital Engineering Studio in Dallas, TX",
     description:
-      "High-performance websites, modern applications, and cloud infrastructure. Built by senior engineers in Dallas, TX.",
+      "High-performance websites, modern applications, and cloud infrastructure. Engineered by a solo principal architect in Dallas, TX.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DBJ Technologies — Web Development Studio",
-    description: "High-performance websites and applications built by senior engineers in Dallas, TX.",
+    title: "DBJ Technologies | Digital Engineering Studio",
+    description: "High-performance websites and applications engineered by a solo principal architect in Dallas, TX.",
   },
   icons: {
     icon: [

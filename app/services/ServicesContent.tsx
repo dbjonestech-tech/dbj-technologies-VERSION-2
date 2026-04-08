@@ -39,7 +39,7 @@ export default function ServicesContent() {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto"
           >
-            From frontend architecture to cloud infrastructure — every
+            From frontend architecture to cloud infrastructure, every
             discipline is scoped, priced, and delivered to the same
             production-grade standard.
           </motion.p>

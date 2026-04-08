@@ -31,10 +31,10 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
     heroDescription:
       "I design and implement component-driven frontend architectures using Next.js, React, and TypeScript. Every system ships with strict type safety, server-side rendering strategies, and sub-second load times.",
     longDescription:
-      "Your frontend is the surface area of your entire business. I build component architectures that load in under a second, render on the server where it matters, and scale from a landing page to a full application without rewrites. No templates, no page builders — just clean, hand-crafted TypeScript built for your specific goals. Every project ships with responsive engineering, SEO foundations, accessibility compliance, and performance scores that set you apart from competitors.",
+      "Your frontend is the surface area of your entire business. I build component architectures that load in under a second, render on the server where it matters, and scale from a landing page to a full application without rewrites. No templates, no page builders. Just clean, hand-crafted TypeScript built for your specific goals. Every project ships with responsive engineering, SEO foundations, accessibility compliance, and performance scores that set you apart from competitors.",
     benefits: [
       { iconName: "Zap", title: "Sub-Second Load Times", description: "Server Components, static generation, and aggressive optimization deliver pages that load before users blink." },
-      { iconName: "Code2", title: "Modern Architecture", description: "Built on Next.js App Router with TypeScript — the same patterns used by Vercel, Stripe, and high-growth startups." },
+      { iconName: "Code2", title: "Modern Architecture", description: "Built on Next.js App Router with TypeScript. The same patterns used by Vercel, Stripe, and high-growth startups." },
       { iconName: "Monitor", title: "Responsive on Every Device", description: "Engineered mobile-first and tested on real devices. Your site works perfectly on phones, tablets, and desktops." },
       { iconName: "Shield", title: "SEO & Accessibility Built-In", description: "Semantic HTML, structured data, meta optimization, and WCAG AA+ compliance are standard on every build." },
     ],
@@ -54,7 +54,7 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
       "Full source code and deployment documentation",
     ],
     faq: [
-      { question: "How long does a typical frontend project take?", answer: "A standard 5–10 page production site ships in 4–6 weeks from kickoff. More complex applications with CMS integration or custom features typically run 6–10 weeks." },
+      { question: "How long does a typical frontend project take?", answer: "A standard 5 to 10 page production site ships in 4 to 6 weeks from kickoff. More complex applications with CMS integration or custom features typically run 6 to 10 weeks." },
       { question: "Do you work with headless CMS platforms?", answer: "Yes. I integrate with Sanity, Strapi, Contentful, and headless WordPress. The frontend is always built with Next.js for dramatically better performance, security, and SEO." },
       { question: "What happens after launch?", answer: "Every engagement includes 30 days of complimentary post-launch support. After that, I offer monthly maintenance retainers starting at $299/month or ad-hoc support at my standard rate." },
     ],
@@ -71,7 +71,7 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
     heroDescription:
       "I build backend systems that are typed end-to-end, rigorously tested, and designed for zero-downtime deployments. From RESTful APIs to real-time WebSocket services, every endpoint is production-ready.",
     longDescription:
-      "Your backend is the engine behind every feature your users interact with. I build API systems and microservices that are typed from database to client, tested at every boundary, and deployed with zero-downtime strategies. Whether you need a REST API, GraphQL layer, real-time WebSocket service, or background job processor — every system is instrumented, documented, and designed to scale horizontally without rewrites.",
+      "Your backend is the engine behind every feature your users interact with. I build API systems and microservices that are typed from database to client, tested at every boundary, and deployed with zero-downtime strategies. Whether you need a REST API, GraphQL layer, real-time WebSocket service, or background job processor, every system is instrumented, documented, and designed to scale horizontally without rewrites.",
     benefits: [
       { iconName: "Server", title: "Type-Safe End-to-End", description: "TypeScript from database schema to API response. Catch errors at compile time, not in production." },
       { iconName: "GitBranch", title: "Zero-Downtime Deploys", description: "Blue-green deployments, health checks, and automated rollback ensure your API never goes dark during updates." },
@@ -80,7 +80,7 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
     ],
     process: [
       { step: "01", title: "API Specification", description: "I define endpoints, data models, authentication flows, and integration points before writing any code." },
-      { step: "02", title: "Architecture Design", description: "Database schema, service boundaries, and infrastructure architecture — validated against your scale requirements." },
+      { step: "02", title: "Architecture Design", description: "Database schema, service boundaries, and infrastructure architecture, validated against your scale requirements." },
       { step: "03", title: "Build & Test", description: "Type-safe implementation with comprehensive test coverage. Integration tests, load tests, and security scans." },
       { step: "04", title: "Deploy & Monitor", description: "Production deployment with CI/CD, structured logging, error tracking, and performance monitoring." },
     ],
@@ -94,9 +94,9 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
       "Full source code and deployment documentation",
     ],
     faq: [
-      { question: "What languages and frameworks do you use?", answer: "My primary backend stack is Node.js with TypeScript (Express, Fastify, or Hono). For data-heavy services, I use Python. Every project is chosen based on what's best for the problem — not personal preference." },
+      { question: "What languages and frameworks do you use?", answer: "My primary backend stack is Node.js with TypeScript (Express, Fastify, or Hono). For data-heavy services, I use Python. Every project is chosen based on what's best for the problem, not personal preference." },
       { question: "Can you work with my existing database?", answer: "Yes. I work with PostgreSQL, MongoDB, Redis, and most major databases. I can design from scratch or extend existing schemas with proper migration strategies." },
-      { question: "Do you build microservices or monoliths?", answer: "It depends on your scale. Most projects start as a well-structured monolith — it's simpler and cheaper. I design with clear service boundaries so extraction to microservices is straightforward when you actually need it." },
+      { question: "Do you build microservices or monoliths?", answer: "It depends on your scale. Most projects start as a well-structured monolith because it's simpler and cheaper. I design with clear service boundaries so extraction to microservices is straightforward when you actually need it." },
     ],
     relatedSlugs: ["frontend-architecture", "cloud-infrastructure", "ecommerce-platforms"],
     ctaText: "Let's Engineer Your Backend",
@@ -116,7 +116,7 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
       { iconName: "Server", title: "Auto-Scaling Architecture", description: "Infrastructure that grows and shrinks with your traffic automatically. Pay for what you use, handle any spike." },
       { iconName: "GitBranch", title: "CI/CD Automation", description: "Automated build, test, and deployment pipelines. Push code, and it's live in minutes with zero manual intervention." },
       { iconName: "Shield", title: "Security & Compliance", description: "Network isolation, secrets management, WAF configuration, and compliance-ready infrastructure from day one." },
-      { iconName: "Cpu", title: "24/7 Monitoring", description: "Real-time dashboards, automated alerts, and incident response runbooks. Problems are detected before users notice." },
+      { iconName: "Cpu", title: "Always-On Monitoring", description: "Real-time dashboards, automated alerts, and incident response runbooks. Problems are detected before users notice." },
     ],
     process: [
       { step: "01", title: "Infrastructure Audit", description: "I assess your current setup, identify bottlenecks, security gaps, and cost inefficiencies." },
@@ -131,11 +131,11 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
       "CI/CD pipeline configuration",
       "Monitoring and alerting setup",
       "Security hardening and compliance audit",
-      "Runbook and documentation for your team",
+      "Runbook and operational documentation",
     ],
     faq: [
       { question: "Which cloud provider should I use?", answer: "It depends on your needs. For most web applications, I recommend Vercel or AWS for the best balance of developer experience and scale. GCP excels at data workloads, and Azure integrates best with Microsoft ecosystems." },
-      { question: "Can you manage infrastructure ongoing?", answer: "Yes. I offer managed infrastructure retainers that include 24/7 monitoring, patching, scaling optimization, and incident response." },
+      { question: "Can you manage infrastructure ongoing?", answer: "Yes. I offer managed infrastructure retainers that include continuous monitoring, patching, scaling optimization, and incident response." },
       { question: "How do you handle migrations?", answer: "I plan zero-downtime migrations with rollback strategies at every step. I migrate in phases, validate each stage, and only cut over when everything is verified." },
     ],
     relatedSlugs: ["backend-systems", "frontend-architecture", "ecommerce-platforms"],
@@ -149,7 +149,7 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
     heroTitle: "Interfaces Engineered for",
     heroHighlight: "Precision & Delight.",
     heroDescription:
-      "I engineer interfaces where every animation serves a purpose, every transition communicates state, and every interaction feels instantaneous. Design systems, micro-interactions, and scroll-driven narratives — all production-grade.",
+      "I engineer interfaces where every animation serves a purpose, every transition communicates state, and every interaction feels instantaneous. Design systems, micro-interactions, and scroll-driven narratives, all production-grade.",
     longDescription:
       "Beautiful design that nobody can use is a waste. I start every design engagement with a clear understanding of your users, their goals, and the friction points in their journey. Then I engineer interfaces that feel intuitive, guide users toward action, and make your brand impossible to forget. Every interaction is intentional, every animation serves a purpose, and every pixel is placed with architectural precision.",
     benefits: [
@@ -174,9 +174,9 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
       "Production animation implementation",
     ],
     faq: [
-      { question: "Do you do design-only engagements?", answer: "Yes. I offer design-only engagements with clean handoff documentation. However, most clients engage me for design and engineering together — it eliminates the translation gap entirely." },
+      { question: "Do you do design-only engagements?", answer: "Yes. I offer design-only engagements with clean handoff documentation. However, most clients engage me for design and engineering together because it eliminates the translation gap entirely." },
       { question: "What design tools do you use?", answer: "Figma is my primary tool for UI design, prototyping, and design systems. For production motion, I use Framer Motion and GSAP." },
-      { question: "How many review cycles are included?", answer: "Standard engagements include 2–3 collaborative design review cycles per phase. Starting with research and prototyping drastically reduces revision cycles because I validate early." },
+      { question: "How many review cycles are included?", answer: "Standard engagements include 2 to 3 collaborative design review cycles per phase. Starting with research and prototyping drastically reduces revision cycles because I validate early." },
     ],
     relatedSlugs: ["frontend-architecture", "ecommerce-platforms", "web-performance"],
     ctaText: "Let's Engineer Your Interface",
@@ -191,9 +191,9 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
     heroDescription:
       "I build commerce platforms where every millisecond of load time impacts revenue. From headless Shopify storefronts to custom checkout flows, every element is optimized for conversion.",
     longDescription:
-      "E-commerce is not just about listing products — it's about engineering a buying experience that removes friction at every step. I build stores that load instantly, search intuitively, and check out seamlessly. Whether you need a Shopify storefront, a headless commerce setup, or a fully custom platform, I optimize every element for conversion rate, average order value, and customer lifetime value.",
+      "E-commerce is not just about listing products. It's about engineering a buying experience that removes friction at every step. I build stores that load instantly, search intuitively, and check out seamlessly. Whether you need a Shopify storefront, a headless commerce setup, or a fully custom platform, I optimize every element for conversion rate, average order value, and customer lifetime value.",
     benefits: [
-      { iconName: "Store", title: "Platform-Agnostic", description: "Shopify, WooCommerce, headless commerce, or fully custom — I build on whatever platform fits your business model and scale." },
+      { iconName: "Store", title: "Platform-Agnostic", description: "Shopify, WooCommerce, headless commerce, or fully custom. I build on whatever platform fits your business model and scale." },
       { iconName: "CreditCard", title: "Frictionless Checkout", description: "One-click payments, guest checkout, saved carts, and multiple payment options. Every step is optimized to reduce abandonment." },
       { iconName: "TrendingUp", title: "Conversion Optimization", description: "A/B tested product pages, smart upsells, and analytics-driven improvements that increase revenue per visitor." },
       { iconName: "Database", title: "Inventory & Operations", description: "Real-time inventory sync, automated order management, shipping integrations, and back-office tools that scale." },
@@ -229,9 +229,9 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
     heroTitle: "Performance Engineering That",
     heroHighlight: "Delivers Measurable Results.",
     heroDescription:
-      "I audit, diagnose, and resolve performance bottlenecks at every layer — from render-blocking resources to slow server responses. Every engagement delivers auditable improvements to Core Web Vitals.",
+      "I audit, diagnose, and resolve performance bottlenecks at every layer, from render-blocking resources to slow server responses. Every engagement delivers auditable improvements to Core Web Vitals.",
     longDescription:
-      "Speed is not a feature — it's the foundation that every other feature depends on. I diagnose performance issues at every layer of the stack: render-blocking resources, layout shifts, unoptimized images, slow database queries, and misconfigured caching. Every engagement produces a detailed audit with prioritized fixes, and I implement them with measurable before/after Lighthouse and WebPageTest data. No vague promises — only auditable results.",
+      "Speed is not a feature. It's the foundation that every other feature depends on. I diagnose performance issues at every layer of the stack: render-blocking resources, layout shifts, unoptimized images, slow database queries, and misconfigured caching. Every engagement produces a detailed audit with prioritized fixes, and I implement them with measurable before/after Lighthouse and WebPageTest data. No vague promises, only auditable results.",
     benefits: [
       { iconName: "Gauge", title: "Core Web Vitals Mastery", description: "LCP, CLS, and INP diagnosed and optimized with surgical precision. Every fix is measured and documented." },
       { iconName: "FileSearch", title: "Bundle Analysis", description: "Dependency audits, tree-shaking verification, and code splitting strategies that cut your JavaScript payload." },
@@ -254,9 +254,9 @@ export const SERVICE_DETAILS: ServiceDetail[] = [
       "Documentation and regression prevention guide",
     ],
     faq: [
-      { question: "How much can you improve my Lighthouse score?", answer: "Results depend on your starting point, but most engagements deliver 20–40+ point improvements. I provide projected scores during the audit phase so you know what to expect before committing." },
+      { question: "How much can you improve my Lighthouse score?", answer: "Results depend on your starting point, but most engagements deliver 20 to 40+ point improvements. I provide projected scores during the audit phase so you know what to expect before committing." },
       { question: "Do you only work with Next.js sites?", answer: "No. I audit and optimize any web application regardless of framework. Next.js is my preferred stack for new builds, but performance engineering is framework-agnostic." },
-      { question: "How long does a performance engagement take?", answer: "A standard audit and implementation cycle runs 2–4 weeks. The audit itself takes 3–5 days, followed by prioritized implementation sprints." },
+      { question: "How long does a performance engagement take?", answer: "A standard audit and implementation cycle runs 2 to 4 weeks. The audit itself takes 3 to 5 days, followed by prioritized implementation sprints." },
     ],
     relatedSlugs: ["frontend-architecture", "cloud-infrastructure", "backend-systems"],
     ctaText: "Let's Optimize Your Performance",
