@@ -255,6 +255,128 @@ select:focus-visible {
   outline: none;
 }
 
+/* ─── HERO CINEMATIC REVEAL ──────────────────────── */
+
+@property --hero-reveal-r {
+  syntax: "<percentage>";
+  initial-value: 0%;
+  inherits: false;
+}
+
+/* Dark overlay — covers everything during Acts 1 & 2 */
+.hero-cinema-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #06060a;
+  -webkit-mask-image: radial-gradient(
+    circle at 50% 50%,
+    transparent var(--hero-reveal-r),
+    #000 var(--hero-reveal-r)
+  );
+  mask-image: radial-gradient(
+    circle at 50% 50%,
+    transparent var(--hero-reveal-r),
+    #000 var(--hero-reveal-r)
+  );
+}
+
+/* Act 3: radial wipe + opacity fallback */
+.hero-cinema-overlay-reveal {
+  --hero-reveal-r: 150%;
+  opacity: 0;
+  transition:
+    --hero-reveal-r 800ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 800ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* SVG text layer — sits above overlay */
+.hero-cinema-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(1.3);
+}
+
+.hero-cinema-svg {
+  width: 90%;
+  max-width: 1100px;
+}
+
+/* Act 1: wireframe stroke draw-in */
+.hero-cinema-line {
+  animation: hero-stroke-draw 2s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+}
+
+.hero-cinema-word {
+  fill-opacity: 0;
+}
+
+@keyframes hero-stroke-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Act 2: zoom-out + wireframe-to-solid */
+.hero-cinema-build {
+  transform: scale(1);
+  transition: transform 1500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-cinema-build .hero-cinema-line {
+  stroke-width: 0;
+  transition: stroke-width 500ms ease-out;
+}
+
+.hero-cinema-build .hero-cinema-accent {
+  transition-delay: 750ms;
+}
+
+.hero-cinema-build .hero-cinema-word {
+  fill-opacity: 1;
+  transition: fill-opacity 500ms ease-out;
+  transition-delay: var(--word-delay);
+}
+
+/* Act 3: SVG layer fade-out */
+.hero-cinema-reveal {
+  opacity: 0;
+  transition:
+    transform 1500ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 400ms ease-out;
+}
+
+/* Light sweep across text during build */
+.hero-cinema-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: hero-sweep 1s ease-out 0.4s both;
+}
+
+@keyframes hero-sweep {
+  from {
+    transform: translateX(-200px);
+  }
+  to {
+    transform: translateX(100vw);
+  }
+}
+
 /* ─── REDUCED MOTION ──────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
