@@ -3,19 +3,18 @@
 import { useEffect, useRef } from "react";
 
 /* ─── CONSTANTS & CONFIG ────────────────────────────────────── */
-const TIP_OFFSET_X = 0; // Centered
-const TIP_OFFSET_Y = 0;
 
-// Arc (Lightning) Config
-const ARC_LIFE = 200;
-const ARC_COUNT_MIN = 4;
-const ARC_COUNT_MAX = 7;
-const ARC_BASE_LENGTH = 20;
-const ARC_SEGMENTS = 5;
+// Hover (Coil) Config
+const HOVER_ARC_LENGTH = 8;
+const HOVER_ARC_SEGMENTS = 4;
+const HOVER_ARC_LIFE = 150;
 
-// Pulse (Idle) Config
-const PULSE_SPEED = 0.008;
-const HOVER_MULTIPLIER = 3.5;
+// Click (Discharge) Config
+const CLICK_ARC_COUNT_MIN = 6;
+const CLICK_ARC_COUNT_MAX = 10;
+const CLICK_ARC_LENGTH = 30;
+const CLICK_ARC_SEGMENTS = 6;
+const CLICK_ARC_LIFE = 250;
 
 /* ─── TYPES ─────────────────────────────────────────────────── */
 interface Point {
@@ -26,6 +25,33 @@ interface Point {
 interface Arc {
   points: Point[];
   birth: number;
+  life: number;
+}
+
+function spawnArc(
+  cx: number,
+  cy: number,
+  angle: number,
+  length: number,
+  segments: number,
+  jitter: number,
+  life: number,
+  now: number
+): Arc {
+  const points: Point[] = [{ x: cx, y: cy }];
+  let x = cx;
+  let y = cy;
+  let a = angle;
+
+  for (let s = 1; s <= segments; s++) {
+    const segLen = length / segments;
+    a += (Math.random() - 0.5) * jitter;
+    x += Math.cos(a) * segLen;
+    y += Math.sin(a) * segLen;
+    points.push({ x, y });
+  }
+
+  return { points, birth: now, life };
 }
 
 export function CursorCharge() {
@@ -37,24 +63,11 @@ export function CursorCharge() {
   const isHovering = useRef(false);
   const inText = useRef(false);
   const arcs = useRef<Arc[]>([]);
-  const time = useRef(0);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
     if (!window.matchMedia("(pointer: fine)").matches) return;
-
-    /* ─── HEAD INJECTION: IMMUTABLE CURSOR LOCK ─── */
-    const styleEl = document.createElement("style");
-    styleEl.setAttribute("data-cursor-lock", "true");
-    styleEl.innerHTML = `
-      @media (pointer: fine) {
-        html, body, *, *::before, *::after {
-          cursor: none !important;
-        }
-      }
-    `;
-    document.head.appendChild(styleEl);
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -76,13 +89,15 @@ export function CursorCharge() {
 
     /* ─── EVENT LISTENERS ─── */
     const isInteractive = (el: HTMLElement) =>
-      el.closest("a, button, [role='button'], summary, label, .btn-primary, .btn-outline");
+      el.closest(
+        "a, button, [role='button'], summary, label, .btn-primary, .btn-outline"
+      );
     const isTextEl = (el: HTMLElement) =>
       el.closest("input, textarea, select, [contenteditable='true']");
 
     const onMove = (e: MouseEvent) => {
-      pos.current.x = e.clientX + TIP_OFFSET_X;
-      pos.current.y = e.clientY + TIP_OFFSET_Y;
+      pos.current.x = e.clientX;
+      pos.current.y = e.clientY;
       isVisible.current = true;
     };
 
@@ -103,33 +118,40 @@ export function CursorCharge() {
       if (!related || !isTextEl(related)) inText.current = false;
     };
 
+    /* ─── CLICK: DISCHARGE (360-degree explosion) ─── */
     const onDown = () => {
       if (inText.current) return;
       const now = performance.now();
-      const count = Math.floor(Math.random() * (ARC_COUNT_MAX - ARC_COUNT_MIN + 1)) + ARC_COUNT_MIN;
+      const count =
+        Math.floor(
+          Math.random() * (CLICK_ARC_COUNT_MAX - CLICK_ARC_COUNT_MIN + 1)
+        ) + CLICK_ARC_COUNT_MIN;
 
       for (let i = 0; i < count; i++) {
-        const baseAngle = (Math.PI * 2 * (i / count)) + (Math.random() - 0.5) * 1.5;
-        const length = ARC_BASE_LENGTH * (0.8 + Math.random() * 1.2);
-
-        const points: Point[] = [{ x: pos.current.x, y: pos.current.y }];
-        let currX = pos.current.x;
-        let currY = pos.current.y;
-        let currentAngle = baseAngle;
-
-        for (let s = 1; s <= ARC_SEGMENTS; s++) {
-          const segLen = length / ARC_SEGMENTS;
-          currentAngle += (Math.random() - 0.5) * 2.5;
-          currX += Math.cos(currentAngle) * segLen;
-          currY += Math.sin(currentAngle) * segLen;
-          points.push({ x: currX, y: currY });
-        }
-        arcs.current.push({ points, birth: now });
+        const baseAngle =
+          (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.8;
+        const length = CLICK_ARC_LENGTH * (0.7 + Math.random() * 0.6);
+        arcs.current.push(
+          spawnArc(
+            pos.current.x,
+            pos.current.y,
+            baseAngle,
+            length,
+            CLICK_ARC_SEGMENTS,
+            2.8, // high jitter for jagged look
+            CLICK_ARC_LIFE,
+            now
+          )
+        );
       }
     };
 
-    const onLeaveWindow = () => { isVisible.current = false; };
-    const onEnterWindow = () => { isVisible.current = true; };
+    const onLeaveWindow = () => {
+      isVisible.current = false;
+    };
+    const onEnterWindow = () => {
+      isVisible.current = true;
+    };
 
     document.addEventListener("mousemove", onMove, { passive: true });
     document.addEventListener("mouseover", onOver, { passive: true });
@@ -143,51 +165,45 @@ export function CursorCharge() {
       ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
 
       const { x, y } = pos.current;
-      const hoverScale = isHovering.current ? 1 : 0;
-      time.current += PULSE_SPEED * (1 + hoverScale * HOVER_MULTIPLIER);
-      const t = time.current;
 
       ctx.globalCompositeOperation = "screen";
 
-      if (isVisible.current && !inText.current) {
-
-        ctx.shadowBlur = 20 + hoverScale * 10;
-        ctx.shadowColor = "#00e5ff";
-
-        ctx.beginPath();
-        ctx.arc(x, y, 2 + hoverScale * 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
-
-        ctx.shadowBlur = 0;
-
-        const orbiters = isHovering.current ? 4 : 2;
-        for(let i = 0; i < orbiters; i++) {
-          const angle = t * 6 + (i * Math.PI * 2 / orbiters);
-          const orbitRadius = 4 + Math.sin(t * 10 + i) * 2 + hoverScale * 3;
-          const ox = x + Math.cos(angle) * orbitRadius;
-          const oy = y + Math.sin(angle) * orbitRadius;
-
-          ctx.beginPath();
-          ctx.arc(ox, oy, 1 + hoverScale * 0.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(0, 229, 255, ${0.7 + hoverScale * 0.3})`;
-          ctx.fill();
+      /* ─── HOVER: COIL (tight static at cursor tip) ─── */
+      if (isVisible.current && !inText.current && isHovering.current) {
+        const hoverCount = 1 + Math.floor(Math.random() * 2); // 1-2 arcs
+        for (let i = 0; i < hoverCount; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const length =
+            HOVER_ARC_LENGTH * (0.6 + Math.random() * 0.8);
+          arcs.current.push(
+            spawnArc(
+              x,
+              y,
+              angle,
+              length,
+              HOVER_ARC_SEGMENTS,
+              3.0, // tight jitter
+              HOVER_ARC_LIFE,
+              now
+            )
+          );
         }
       }
 
-      /* ─── DRAW ARCS (LIGHTNING) ─── */
+      /* ─── DRAW ALL ARCS ─── */
       const aliveArcs: Arc[] = [];
       for (let i = 0; i < arcs.current.length; i++) {
         const arc = arcs.current[i];
         const age = now - arc.birth;
-        if (age >= ARC_LIFE) continue;
+        if (age >= arc.life) continue;
         aliveArcs.push(arc);
 
-        const progress = age / ARC_LIFE;
-        const opacity = 1 - Math.pow(progress, 3);
+        // Quadratic ease-out for clean fade
+        const progress = age / arc.life;
+        const opacity = 1 - progress * progress;
 
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = "#00e5ff";
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = "rgba(200, 240, 255, 0.6)";
 
         ctx.beginPath();
         ctx.moveTo(arc.points[0].x, arc.points[0].y);
@@ -195,10 +211,10 @@ export function CursorCharge() {
           ctx.lineTo(arc.points[j].x, arc.points[j].y);
         }
 
-        ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-        ctx.lineWidth = 2 * (1 - progress);
+        ctx.strokeStyle = `rgba(200, 240, 255, ${opacity})`;
+        ctx.lineWidth = 1.5 * (1 - progress * 0.6);
         ctx.lineCap = "round";
-        ctx.lineJoin = "miter";
+        ctx.lineJoin = "round";
         ctx.stroke();
 
         ctx.shadowBlur = 0;
@@ -222,9 +238,6 @@ export function CursorCharge() {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("mouseleave", onLeaveWindow);
       document.removeEventListener("mouseenter", onEnterWindow);
-      if (styleEl.parentNode) {
-        styleEl.parentNode.removeChild(styleEl);
-      }
     };
   }, []);
 

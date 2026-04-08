@@ -11,6 +11,12 @@
   --accent-violet: #7c3aed;
 }
 
+/* ─── PRECISION CURSOR CONTROL ───────────────────── */
+/* Force native arrow, prevent pointer (glove) hand */
+a, button, [role="button"], summary, label { cursor: default !important; }
+/* Preserve I-beam for text elements */
+input, select, textarea, [contenteditable="true"] { cursor: text !important; }
+
 /* ─── BASE RESET ──────────────────────────────────── */
 * {
   margin: 0;
