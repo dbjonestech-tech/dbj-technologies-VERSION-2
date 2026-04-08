@@ -7,7 +7,7 @@ const TIP_OFFSET_X = 0; // Centered
 const TIP_OFFSET_Y = 0;
 
 // Arc (Lightning) Config
-const ARC_LIFE = 200; // slightly longer linger for electric feel
+const ARC_LIFE = 200;
 const ARC_COUNT_MIN = 4;
 const ARC_COUNT_MAX = 7;
 const ARC_BASE_LENGTH = 20;
@@ -43,6 +43,18 @@ export function CursorCharge() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
     if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    /* ─── HEAD INJECTION: IMMUTABLE CURSOR LOCK ─── */
+    const styleEl = document.createElement("style");
+    styleEl.setAttribute("data-cursor-lock", "true");
+    styleEl.innerHTML = `
+      @media (pointer: fine) {
+        html, body, *, *::before, *::after {
+          cursor: none !important;
+        }
+      }
+    `;
+    document.head.appendChild(styleEl);
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -97,7 +109,6 @@ export function CursorCharge() {
       const count = Math.floor(Math.random() * (ARC_COUNT_MAX - ARC_COUNT_MIN + 1)) + ARC_COUNT_MIN;
 
       for (let i = 0; i < count; i++) {
-        // More erratic angular distribution for real static crackle
         const baseAngle = (Math.PI * 2 * (i / count)) + (Math.random() - 0.5) * 1.5;
         const length = ARC_BASE_LENGTH * (0.8 + Math.random() * 1.2);
 
@@ -108,7 +119,6 @@ export function CursorCharge() {
 
         for (let s = 1; s <= ARC_SEGMENTS; s++) {
           const segLen = length / ARC_SEGMENTS;
-          // Extremely sharp angular shifts
           currentAngle += (Math.random() - 0.5) * 2.5;
           currX += Math.cos(currentAngle) * segLen;
           currY += Math.sin(currentAngle) * segLen;
@@ -137,25 +147,20 @@ export function CursorCharge() {
       time.current += PULSE_SPEED * (1 + hoverScale * HOVER_MULTIPLIER);
       const t = time.current;
 
-      // Enable Plasma Bloom overlay
       ctx.globalCompositeOperation = "screen";
 
       if (isVisible.current && !inText.current) {
 
-        // 1. Electric Cyan Bloom (Shadow)
         ctx.shadowBlur = 20 + hoverScale * 10;
         ctx.shadowColor = "#00e5ff";
 
-        // 2. Core Plasma Ember (Pure White)
         ctx.beginPath();
         ctx.arc(x, y, 2 + hoverScale * 1.5, 0, Math.PI * 2);
         ctx.fillStyle = "#ffffff";
         ctx.fill();
 
-        // Turn off shadow blur for orbiters to save performance
         ctx.shadowBlur = 0;
 
-        // 3. Orbiting "Current" electrons
         const orbiters = isHovering.current ? 4 : 2;
         for(let i = 0; i < orbiters; i++) {
           const angle = t * 6 + (i * Math.PI * 2 / orbiters);
@@ -165,7 +170,6 @@ export function CursorCharge() {
 
           ctx.beginPath();
           ctx.arc(ox, oy, 1 + hoverScale * 0.5, 0, Math.PI * 2);
-          // Bright cyan orbiters
           ctx.fillStyle = `rgba(0, 229, 255, ${0.7 + hoverScale * 0.3})`;
           ctx.fill();
         }
@@ -180,9 +184,8 @@ export function CursorCharge() {
         aliveArcs.push(arc);
 
         const progress = age / ARC_LIFE;
-        const opacity = 1 - Math.pow(progress, 3); // Faster snap fade out
+        const opacity = 1 - Math.pow(progress, 3);
 
-        // Lightning Bloom
         ctx.shadowBlur = 15;
         ctx.shadowColor = "#00e5ff";
 
@@ -192,18 +195,16 @@ export function CursorCharge() {
           ctx.lineTo(arc.points[j].x, arc.points[j].y);
         }
 
-        // Pure white core for the lightning
         ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
         ctx.lineWidth = 2 * (1 - progress);
         ctx.lineCap = "round";
         ctx.lineJoin = "miter";
         ctx.stroke();
 
-        ctx.shadowBlur = 0; // reset
+        ctx.shadowBlur = 0;
       }
       arcs.current = aliveArcs;
 
-      // Reset composite operation
       ctx.globalCompositeOperation = "source-over";
 
       rafRef.current = requestAnimationFrame(frame);
@@ -221,23 +222,17 @@ export function CursorCharge() {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("mouseleave", onLeaveWindow);
       document.removeEventListener("mouseenter", onEnterWindow);
+      if (styleEl.parentNode) {
+        styleEl.parentNode.removeChild(styleEl);
+      }
     };
   }, []);
 
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media (pointer: fine) {
-          :root, html, body, *, *::before, *::after {
-            cursor: none !important;
-          }
-        }
-      `}} />
-      <canvas
-        ref={canvasRef}
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
-      />
-    </>
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
+    />
   );
 }
