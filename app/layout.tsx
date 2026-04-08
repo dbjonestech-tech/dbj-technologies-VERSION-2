@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     template: "%s | DBJ Technologies",
   },
   description:
-    "DBJ Technologies is a web development studio in Dallas, TX. We build high-performance websites, modern web applications, and cloud infrastructure using Next.js, React, and TypeScript.",
+    "DBJ Technologies is a bespoke digital engineering studio in Dallas, TX. I build high-performance websites, production-grade web applications, and cloud infrastructure using Next.js, React, and TypeScript.",
   keywords: [
     "web development",
     "web design",

@@ -10,9 +10,9 @@ export function ServicesSection() {
   return (
     <section className="relative py-32">
       <SectionHeading
-        label="What We Do"
-        title="Services Built for Growth"
-        description="From concept to deployment, we deliver end-to-end digital solutions that drive real business outcomes."
+        label="Capabilities"
+        title="Engineering Disciplines"
+        description="Six core disciplines, one architectural standard. Every engagement is scoped, engineered, and delivered with production-grade precision."
       />
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

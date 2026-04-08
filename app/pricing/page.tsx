@@ -4,11 +4,11 @@ import PricingContent from "./PricingContent";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Fixed-price project packages: Starter, Professional, and Enterprise. Scope and cost agreed before development begins.",
+    "Fixed-price engineering phases: Foundation, Scale, and Enterprise. Scope and cost agreed before development begins.",
   openGraph: {
     title: "Pricing | DBJ Technologies",
     description:
-      "Fixed-price project packages with clear scope. Know exactly what you're getting before we start.",
+      "Fixed-price engineering engagements with clear scope. Know exactly what you're getting before I write a single line of code.",
   },
 };
 

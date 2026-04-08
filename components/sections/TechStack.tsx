@@ -10,7 +10,7 @@ export function TechStackSection() {
       <SectionHeading
         label="Tech Stack"
         title="Modern Tools, Proven Results"
-        description="We use industry-leading technologies to build solutions that are fast, secure, and built to scale."
+        description="I use industry-leading technologies to build systems that are fast, secure, and built to scale."
       />
 
       <div className="mx-auto max-w-5xl px-6 lg:px-8">

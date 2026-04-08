@@ -12,8 +12,8 @@ export function TestimonialsSection() {
     <section className="relative py-32">
       <SectionHeading
         label="Testimonials"
-        title="What Our Clients Say"
-        description="Don't take our word for it — here's what the people we've worked with have to say."
+        title="What Clients Say"
+        description="Don't take my word for it — here's what clients have to say."
       />
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

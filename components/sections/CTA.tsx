@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { MagneticButton } from "@/components/effects/MagneticButton";
+import { CTA_DEFAULTS } from "@/lib/constants";
 
 interface CTAProps {
   heading?: string;
@@ -14,10 +15,10 @@ interface CTAProps {
 }
 
 export function CTASection({
-  heading = "Ready to Build",
-  highlight = "Something Great?",
-  description = "Tell us about your project. No pressure, no commitment — just a conversation about what you need and how we can help.",
-  buttonText = "Start a Conversation",
+  heading = CTA_DEFAULTS.heading,
+  highlight = CTA_DEFAULTS.highlight,
+  description = CTA_DEFAULTS.description,
+  buttonText = CTA_DEFAULTS.buttonText,
   buttonHref = "/contact",
 }: CTAProps) {
   return (

@@ -10,9 +10,9 @@ export function ProcessSteps() {
   return (
     <section className="relative py-32 overflow-hidden">
       <SectionHeading
-        label="Our Process"
-        title="From Idea to Launch"
-        description="A battle-tested workflow that eliminates guesswork and delivers results on time, every time."
+        label="My Process"
+        title="From Diagnosis to Deployment"
+        description="A four-phase engineering framework that eliminates guesswork and delivers production-grade results on time, every time."
       />
 
       <div className="mx-auto max-w-6xl px-6 lg:px-8">

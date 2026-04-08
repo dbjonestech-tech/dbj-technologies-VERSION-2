@@ -24,7 +24,7 @@ export default function PricingContent() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue mb-6"
           >
-            Pricing
+            Engagement Tiers
           </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -42,8 +42,9 @@ export default function PricingContent() {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto"
           >
-            Project-based packages with transparent pricing. Know exactly what
-            you&apos;re getting — and what it costs — before we start.
+            Engineering-phase engagements with transparent pricing. Know exactly
+            what you&apos;re getting — and what it costs — before I write a
+            single line of code.
           </motion.p>
         </div>
       </section>
@@ -52,7 +53,7 @@ export default function PricingContent() {
       <section className="pb-8">
         <div className="flex items-center justify-center">
           <span className="text-sm text-text-muted">
-            All prices are per-project, fixed before development begins
+            All prices are per-engagement, fixed before development begins
           </span>
         </div>
       </section>

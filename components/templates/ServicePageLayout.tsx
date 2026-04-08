@@ -7,7 +7,7 @@ import {
   Code2, Server, Shield, Zap, BarChart3, Monitor, Cpu,
   Database, GitBranch, PenTool, Users, MousePointer,
   Accessibility, Store, CreditCard, TrendingUp, FileSearch,
-  Target, Megaphone,
+  Target, Megaphone, Gauge, Image,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -24,7 +24,7 @@ const iconMap: Record<string, LucideIcon> = {
   Code2, Server, Shield, Zap, BarChart3, Monitor, Cpu,
   Database, GitBranch, PenTool, Users, MousePointer,
   Accessibility, Store, CreditCard, TrendingUp, FileSearch,
-  Target, Megaphone,
+  Target, Megaphone, Gauge, Image,
 };
 
 function getIcon(name: string): LucideIcon {

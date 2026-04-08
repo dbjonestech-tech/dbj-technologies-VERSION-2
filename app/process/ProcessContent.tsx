@@ -11,22 +11,22 @@ import { Badge } from "@/components/ui/Badge";
 const phases = [
   {
     step: "01",
-    title: "Discovery & Strategy",
+    title: "Diagnose & Strategize",
     description:
-      "Every project starts with understanding. We learn your business, interview stakeholders, analyze competitors, and define measurable goals. The output is a clear project brief that aligns everyone on scope, timeline, and success criteria.",
+      "Every engagement starts with understanding. I learn your business, audit the current state, analyze the competitive landscape, and define measurable goals. The output is a clear project brief that aligns on scope, timeline, and success criteria.",
     activities: [
       "Stakeholder interviews and goal alignment",
       "Competitive landscape analysis",
       "User persona and journey mapping",
       "Technical requirements definition",
-      "Project scope, timeline, and budget agreement",
+      "Engagement scope, timeline, and budget agreement",
     ],
   },
   {
     step: "02",
-    title: "Design & Prototyping",
+    title: "Architect & Prototype",
     description:
-      "We translate strategy into screens. Starting with wireframes and information architecture, we progress to high-fidelity visual designs and interactive prototypes. Every design is reviewed with you and tested before development begins.",
+      "I translate strategy into systems. Starting with information architecture and wireframes, I progress to high-fidelity visual designs and interactive prototypes. Every design is reviewed with you and validated before development begins.",
     activities: [
       "Information architecture and sitemap",
       "Wireframes for all key pages and flows",
@@ -37,27 +37,27 @@ const phases = [
   },
   {
     step: "03",
-    title: "Development & Testing",
+    title: "Engineer & Test",
     description:
-      "We build with clean, maintainable code on modern frameworks. We work in two-week sprints with regular demos so you see progress in real time. Every feature is tested for performance, accessibility, and cross-browser compatibility.",
+      "I build with clean, typed, maintainable code on production-grade frameworks. I work in focused sprints with regular demos so you see progress in real time. Every feature is tested for performance, accessibility, and cross-browser compatibility.",
     activities: [
       "Architecture setup and development environment",
-      "Two-week sprint cycles with progress demos",
-      "Performance optimization (90+ Lighthouse target)",
+      "Focused sprint cycles with progress demos",
+      "Performance optimization (90+ Lighthouse baseline)",
       "Accessibility testing (WCAG AA+ compliance)",
-      "Cross-browser and device testing",
+      "Cross-browser and real-device testing",
     ],
   },
   {
     step: "04",
-    title: "Launch & Support",
+    title: "Harden & Launch",
     description:
-      "We handle deployment, DNS, SSL, monitoring, and analytics setup. After launch, you get 30 days of complimentary support and a detailed handoff package with full source code and documentation.",
+      "I handle deployment, DNS, SSL, monitoring, and analytics setup. After launch, you get 30 days of complimentary support and a detailed handoff package with full source code and documentation.",
     activities: [
       "Production deployment and DNS configuration",
       "SSL, CDN, and caching setup",
       "Analytics and conversion tracking",
-      "Team training and documentation handoff",
+      "Training and documentation handoff",
       "30 days of post-launch support included",
     ],
   },
@@ -66,9 +66,9 @@ const phases = [
 const expectations = [
   {
     icon: MessageSquare,
-    title: "Clear Communication",
+    title: "Direct Communication",
     description:
-      "Regular updates, shared project boards, and direct access to your project team. No black boxes.",
+      "Regular updates, shared project boards, and direct access to the architect building your system. No layers, no black boxes.",
   },
   {
     icon: DollarSign,
@@ -78,9 +78,9 @@ const expectations = [
   },
   {
     icon: ShieldCheck,
-    title: "Quality Standards",
+    title: "Engineering Standards",
     description:
-      "90+ Lighthouse scores, WCAG AA+ accessibility, and code reviews on every pull request. We don\u2019t ship anything we wouldn\u2019t put our name on.",
+      "90+ Lighthouse scores, WCAG AA+ accessibility, and code reviews on every pull request. I don\u2019t ship anything I wouldn\u2019t stake my reputation on.",
   },
 ];
 
@@ -99,7 +99,7 @@ export default function ProcessContent() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue mb-6"
           >
-            Our Process
+            My Process
           </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -127,7 +127,7 @@ export default function ProcessContent() {
       <section className="py-32">
         <SectionHeading
           label="The 4 Phases"
-          title="From Concept to Launch"
+          title="From Diagnosis to Deployment"
           description="Each phase has clear deliverables and sign-offs so nothing moves forward without your approval."
         />
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
@@ -182,7 +182,7 @@ export default function ProcessContent() {
         <SectionHeading
           label="What to Expect"
           title="The Client Experience"
-          description="Working with us should feel structured, not stressful."
+          description="Working with me should feel structured, not stressful."
         />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -216,8 +216,8 @@ export default function ProcessContent() {
       {/* Tools We Use */}
       <section className="py-20">
         <SectionHeading
-          label="Our Toolkit"
-          title="Tools We Use"
+          label="My Toolkit"
+          title="Tools I Use"
           description="Best-in-class tools for project management, design, and communication."
         />
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
@@ -247,7 +247,7 @@ export default function ProcessContent() {
       <CTASection
         heading="Ready to Get Started?"
         highlight="Phase One Awaits."
-        description="The first step is a conversation. Tell us about your project and we'll outline how we'd approach it — timeline, scope, and cost."
+        description="The first step is a conversation. Tell me about your project and I'll outline how I'd approach it — timeline, scope, and cost."
         buttonText="Start Discovery"
       />
     </>

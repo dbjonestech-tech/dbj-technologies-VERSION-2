@@ -21,7 +21,7 @@ export default function ServicesContent() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue mb-6"
           >
-            Services
+            Capabilities
           </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -29,7 +29,7 @@ export default function ServicesContent() {
             transition={{ delay: 0.1 }}
             className="font-display text-section font-bold leading-tight"
           >
-            What We Build
+            What I Engineer
             <br />
             <span className="text-gradient">and How.</span>
           </motion.h1>
@@ -39,8 +39,9 @@ export default function ServicesContent() {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto"
           >
-            From front-end engineering to cloud infrastructure — every service
-            is scoped, priced, and delivered with the same standards.
+            From frontend architecture to cloud infrastructure — every
+            discipline is scoped, priced, and delivered to the same
+            production-grade standard.
           </motion.p>
         </div>
       </section>
@@ -96,7 +97,7 @@ export default function ServicesContent() {
       <CTASection
         heading="Need Something Specific?"
         highlight="Let's Scope It."
-        description="Every project starts with a clear scope and fixed price. Tell us what you need and we'll tell you exactly what it takes."
+        description="Every engagement starts with a clear scope and fixed price. Tell me what you need and I'll define exactly what it takes."
         buttonText="Start a Conversation"
       />
     </>

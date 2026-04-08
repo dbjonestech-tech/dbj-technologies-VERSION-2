@@ -7,6 +7,7 @@ import Link from "next/link";
 import { GradientBlob } from "@/components/effects/GradientBlob";
 import { Spotlight } from "@/components/effects/Spotlight";
 import { MagneticButton } from "@/components/effects/MagneticButton";
+import { HERO_CONTENT } from "@/lib/constants";
 
 /* Heavy canvas component — load after first paint */
 const ParticleField = dynamic(
@@ -41,7 +42,7 @@ export function Hero() {
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-accent-blue/20 bg-accent-blue/5 px-3.5 py-1.5 text-[10px] font-mono uppercase tracking-widest text-accent-blue backdrop-blur-sm sm:px-5 sm:py-2 sm:text-xs">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-blue animate-pulse-glow" />
-            Accepting New Projects
+            {HERO_CONTENT.badge}
           </span>
         </motion.div>
 
@@ -53,7 +54,7 @@ export function Hero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {["We", "Engineer", "The"].map((word, i) => (
+            {HERO_CONTENT.headlineWords.map((word, i) => (
               <span key={i} className="inline-block overflow-hidden pb-2 mr-[0.2em] sm:pb-3 sm:mr-[0.25em]">
                 <motion.span
                   className="inline-block"
@@ -81,7 +82,7 @@ export function Hero() {
                   ease: [0.33, 1, 0.68, 1],
                 }}
               >
-                Impossible<span className="animate-pulse">.</span>
+                {HERO_CONTENT.headlineAccent.replace(".", "")}<span className="animate-pulse">.</span>
               </motion.span>
             </span>
           </motion.h1>
@@ -94,7 +95,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1 }}
         >
-          High-performance websites, scalable applications, and cloud infrastructure — built by senior engineers in Dallas, TX.
+          {HERO_CONTENT.subheading}
         </motion.p>
 
         {/* CTAs */}
@@ -104,15 +105,15 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.2 }}
         >
-          <Link href="/contact">
+          <Link href={HERO_CONTENT.primaryCta.href}>
             <MagneticButton className="btn-primary text-base" strength={0.2}>
-              Start Your Project
+              {HERO_CONTENT.primaryCta.label}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </MagneticButton>
           </Link>
-          <Link href="/work">
+          <Link href={HERO_CONTENT.secondaryCta.href}>
             <MagneticButton className="btn-outline text-base group" strength={0.2}>
-              View Our Work
+              {HERO_CONTENT.secondaryCta.label}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </MagneticButton>
           </Link>
@@ -125,15 +126,12 @@ export function Hero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.5 }}
         >
-          <span>React</span>
-          <span className="h-1 w-1 rounded-full bg-text-muted" />
-          <span>Next.js</span>
-          <span className="h-1 w-1 rounded-full bg-text-muted" />
-          <span>TypeScript</span>
-          <span className="h-1 w-1 rounded-full bg-text-muted" />
-          <span>Node.js</span>
-          <span className="h-1 w-1 rounded-full bg-text-muted hidden sm:block" />
-          <span className="hidden sm:block">AWS</span>
+          {HERO_CONTENT.techTicker.map((tech, i) => (
+            <span key={tech}>
+              {i > 0 && <span className={`inline-block h-1 w-1 rounded-full bg-text-muted mr-4 sm:mr-6${i >= 4 ? " hidden sm:inline-block" : ""}`} />}
+              <span className={i >= 4 ? "hidden sm:inline" : ""}>{tech}</span>
+            </span>
+          ))}
         </motion.div>
       </div>
 

@@ -35,7 +35,7 @@ export default function WorkContent() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue mb-6"
           >
-            Our Work
+            Core Disciplines
           </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -43,9 +43,9 @@ export default function WorkContent() {
             transition={{ delay: 0.1 }}
             className="font-display text-section font-bold leading-tight"
           >
-            What We&apos;re
+            How I
             <br />
-            <span className="text-gradient">Capable Of.</span>
+            <span className="text-gradient">Engineer.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -53,9 +53,9 @@ export default function WorkContent() {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto"
           >
-            Concept projects and technical demonstrations that showcase our
-            engineering, design, and problem-solving approach. Each project
-            represents real capabilities applied to realistic scenarios.
+            Three core engineering disciplines that define my practice. Each
+            represents a deep area of expertise with a rigorous, repeatable
+            process applied to every engagement.
           </motion.p>
         </div>
       </section>
@@ -158,7 +158,7 @@ export default function WorkContent() {
       <CTASection
         heading="Like What You See?"
         highlight="Let's Build Yours."
-        description="These projects demonstrate our capabilities. Your project gets the same engineering standards, applied to your specific goals."
+        description="These disciplines define my engineering practice. Your engagement gets the same architectural rigor, applied to your specific goals."
         buttonText="Discuss Your Project"
       />
     </>

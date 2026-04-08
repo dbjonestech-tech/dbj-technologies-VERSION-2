@@ -74,17 +74,17 @@ const coverageItems = [
   {
     icon: Eye,
     title: "Uptime Monitoring",
-    description: "24/7 monitoring with instant alerts. We know about downtime before you do.",
+    description: "24/7 monitoring with instant alerts. I know about downtime before you do.",
   },
   {
     icon: PenTool,
     title: "Content Updates",
-    description: "Text, image, and layout changes handled by our team so you can focus on your business.",
+    description: "Text, image, and layout changes handled directly so you can focus on your business.",
   },
   {
     icon: Headphones,
     title: "Priority Support",
-    description: "Direct access to our engineering team with guaranteed response times.",
+    description: "Direct access to your principal architect with guaranteed response times.",
   },
 ];
 
@@ -130,7 +130,7 @@ export default function MaintenanceSupportContent() {
         <SectionHeading
           label="Plans"
           title="Maintenance Plans"
-          description="Choose the level of care that fits your business. All plans include monthly reporting and direct communication with our team."
+          description="Choose the level of care that fits your business. All plans include monthly reporting and direct communication with your architect."
         />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-3 items-start">
@@ -230,8 +230,8 @@ export default function MaintenanceSupportContent() {
 
       <CTASection
         heading="Need Ongoing Support?"
-        highlight="We've Got You Covered."
-        description="Every plan includes direct communication with our engineering team. No ticket queues, no outsourced support."
+        highlight="I've Got You Covered."
+        description="Every plan includes direct communication with your principal architect. No ticket queues, no outsourced support."
         buttonText="Choose a Plan"
       />
     </>

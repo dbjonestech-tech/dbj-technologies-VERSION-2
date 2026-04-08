@@ -7,24 +7,9 @@ import { Card } from "@/components/ui/Card";
 import { GridBackground } from "@/components/effects/GridBackground";
 import { GradientBlob } from "@/components/effects/GradientBlob";
 import { CTASection } from "@/components/sections/CTA";
-import { TEAM_MEMBERS, VALUES, SITE } from "@/lib/constants";
+import { TEAM_MEMBERS, VALUES, SITE, ABOUT_CONTENT } from "@/lib/constants";
 
 const valueIcons = [Zap, Eye, Target, Heart];
-
-const principles = [
-  {
-    title: "We build with the tools we'd choose for ourselves",
-    text: "Next.js, React, TypeScript, Tailwind, Vercel — the same stack used by the best product teams in the world. Your project benefits from the same tooling, not a watered-down agency version.",
-  },
-  {
-    title: "Every project ships with source code and documentation",
-    text: "You own everything we build. Full source code, deployment guides, environment configs, and handoff documentation. No lock-in, no hostage situations, no proprietary platforms you can't leave.",
-  },
-  {
-    title: "We scope before we sell",
-    text: "Every engagement starts with a paid discovery phase that produces a clear scope, timeline, and fixed price. We don't start billing until you've approved the plan. No hourly surprises.",
-  },
-];
 
 export default function AboutContent() {
   return (
@@ -39,7 +24,7 @@ export default function AboutContent() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue mb-6"
           >
-            About Us
+            {ABOUT_CONTENT.badge}
           </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -47,9 +32,9 @@ export default function AboutContent() {
             transition={{ delay: 0.1 }}
             className="font-display text-section font-bold leading-tight"
           >
-            A Studio Built on
+            {ABOUT_CONTENT.headline}
             <br />
-            <span className="text-gradient">Engineering Standards.</span>
+            <span className="text-gradient">{ABOUT_CONTENT.headlineAccent}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -57,9 +42,7 @@ export default function AboutContent() {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed"
           >
-            {SITE.name} is a web development studio in Dallas, TX. We exist because
-            too many businesses get sold template sites and agency overhead when what
-            they need is real engineering.
+            {ABOUT_CONTENT.description}
           </motion.p>
         </div>
       </section>
@@ -72,7 +55,7 @@ export default function AboutContent() {
         />
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
           <div className="relative border-l border-gray-200 pl-8 ml-4 space-y-12">
-            {principles.map((item, i) => (
+            {ABOUT_CONTENT.principles.map((item, i) => (
               <motion.div
                 key={item.title}
                 initial={{ opacity: 0, x: -20 }}
@@ -156,10 +139,10 @@ export default function AboutContent() {
       )}
 
       <CTASection
-        heading="Want to Know More?"
-        highlight="Let's Talk."
-        description="We're happy to walk through our process, show you relevant work, or just answer questions. No pitch deck required."
-        buttonText="Get in Touch"
+        heading={ABOUT_CONTENT.ctaHeading}
+        highlight={ABOUT_CONTENT.ctaHighlight}
+        description={ABOUT_CONTENT.ctaDescription}
+        buttonText={ABOUT_CONTENT.ctaButton}
       />
     </>
   );

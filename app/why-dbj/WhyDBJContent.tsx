@@ -11,7 +11,7 @@ const guarantees = [
   {
     icon: Award,
     title: "90+ Lighthouse Scores",
-    description: "Every project ships with verified 90+ scores in Performance, Accessibility, Best Practices, and SEO. We test before delivery — you can verify after.",
+    description: "Every engagement ships with verified 90+ scores in Performance, Accessibility, Best Practices, and SEO. I test before delivery — you can verify after.",
   },
   {
     icon: Code2,
@@ -21,7 +21,7 @@ const guarantees = [
   {
     icon: DollarSign,
     title: "Fixed-Price Projects",
-    description: "Your project cost is agreed before development begins. No hourly billing, no scope creep, no surprise invoices. The price we quote is the price you pay.",
+    description: "Your engagement cost is agreed before development begins. No hourly billing, no scope creep, no surprise invoices. The price I quote is the price you pay.",
   },
   {
     icon: Headphones,
@@ -33,23 +33,23 @@ const guarantees = [
 const differentiators = [
   {
     icon: Users,
-    title: "Senior Engineers Only",
-    description: "No juniors learning on your project. Every team member has years of production experience across real products and real traffic.",
+    title: "Principal-Level Expertise",
+    description: "No juniors learning on your project. You get a solo principal architect with years of production experience across real products and real traffic.",
   },
   {
     icon: Target,
     title: "Direct Access",
-    description: "You work directly with the people building your product. No layers of account managers or project coordinators between you and the engineers.",
+    description: "You work directly with the person building your product. No layers of account managers or project coordinators between you and the engineer.",
   },
   {
     icon: Layers,
     title: "Modern Stack",
-    description: "We use the same technologies as top product companies — Next.js, React, TypeScript, Vercel, AWS. Your project gets production-grade tooling.",
+    description: "I use the same technologies as top product companies — Next.js, React, TypeScript, Vercel, AWS. Your engagement gets production-grade tooling.",
   },
   {
     icon: ShieldCheck,
     title: "Built for the Long Run",
-    description: "We don't disappear after launch. We offer ongoing maintenance plans and architect every project for long-term maintainability.",
+    description: "I don't disappear after launch. I offer ongoing maintenance retainers and architect every system for long-term maintainability.",
   },
   {
     icon: Zap,
@@ -104,8 +104,8 @@ export default function WhyDBJContent() {
       <section className="py-32">
         <SectionHeading
           label="Contractual Commitments"
-          title="Our Guarantees"
-          description="These aren't aspirational values. They're written into every project agreement."
+          title="My Guarantees"
+          description="These aren't aspirational values. They're written into every engagement agreement."
         />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-6 sm:grid-cols-2">
@@ -138,8 +138,8 @@ export default function WhyDBJContent() {
       <section className="py-32 bg-bg-secondary/50">
         <SectionHeading
           label="The DBJ Difference"
-          title="How We Work Differently"
-          description="We're not the cheapest option — we're the one you won't need to redo."
+          title="How I Work Differently"
+          description="I'm not the cheapest option — I'm the one you won't need to redo."
         />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -171,7 +171,7 @@ export default function WhyDBJContent() {
       <CTASection
         heading="See the Difference"
         highlight="In Your Project."
-        description="We'd rather show you than tell you. Let's talk about what you're building and how we'd approach it."
+        description="I'd rather show you than tell you. Let's talk about what you're building and how I'd approach it."
         buttonText="Discuss Your Project"
       />
     </>

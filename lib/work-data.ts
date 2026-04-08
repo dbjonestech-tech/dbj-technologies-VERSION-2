@@ -1,4 +1,4 @@
-/* ─── WORK / PORTFOLIO EXTENDED DATA ──────────────── */
+/* ─── WORK / CORE ENGINEERING DISCIPLINES ────────── */
 
 export interface ProjectDetail {
   slug: string;
@@ -15,232 +15,94 @@ export interface ProjectDetail {
   results: { label: string; value: string }[];
   tags: string[];
   features: string[];
-  /* testimonial field reserved for real client projects only */
 }
 
 export const PROJECT_DETAILS: ProjectDetail[] = [
   {
-    slug: "apex-ventures-corporate-hub",
-    title: "Apex Ventures Corporate Hub",
-    category: "Corporate",
-    type: "concept",
-    typeLabel: "Concept Project",
+    slug: "frontend-architecture",
+    title: "Frontend Architecture",
+    category: "Core Discipline",
+    type: "internal",
+    typeLabel: "Engineering Discipline",
     gradient: "from-blue-600 to-cyan-500",
-    tagline: "A modern corporate site built for credibility and investor engagement.",
-    description: "A sleek corporate site with animated data visualizations and investor portal integration.",
+    tagline: "Component-driven systems engineered for scale, speed, and long-term maintainability.",
+    description:
+      "Component-driven systems with Next.js, React, and TypeScript — engineered for sub-second renders and long-term maintainability.",
     longDescription:
-      "This concept project demonstrates our approach to corporate web design — combining premium visual design with functional depth. The site features animated data visualizations, a gated investor portal, and a content-managed newsroom. Every page is optimized for credibility, SEO, and lead generation.",
+      "Every frontend I build starts with a system-level architecture decision: rendering strategy, component boundaries, data flow, and state management — all defined before a single component is created. The result is a codebase that ships fast, stays maintainable, and scales from a marketing site to a full application without rewrites. I use Next.js App Router with Server Components by default, implement strict TypeScript throughout, and enforce performance budgets that guarantee 90+ Lighthouse scores on every page.",
     challenge:
-      "Corporate sites often feel generic or dated. The goal was to create a corporate presence that feels modern and dynamic while maintaining the professionalism and trust signals that enterprise audiences expect.",
+      "Most frontends accumulate technical debt because they're built component-by-component without an architectural plan. The result is performance regressions, inconsistent patterns, and codebases that become harder to change over time.",
     solution:
-      "We designed a content-driven architecture with animated data visualizations, a gated investor section, and seamless CMS integration. The result is a site that's as functional as it is visually impressive.",
+      "I start with architecture: define the rendering strategy per route, establish a typed component library with Storybook documentation, implement automated performance budgets in CI, and enforce consistent patterns that make the codebase easier to maintain as it grows — not harder.",
     results: [
-      { label: "Stack", value: "Next.js" },
-      { label: "Pages", value: "12" },
-      { label: "CMS", value: "Sanity" },
+      { label: "Stack", value: "Next.js + TypeScript" },
+      { label: "Baseline", value: "90+ Lighthouse" },
+      { label: "Standard", value: "WCAG AA+" },
     ],
-    tags: ["Next.js", "Framer Motion", "Vercel", "Sanity"],
+    tags: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
     features: [
-      "Animated data visualizations with D3.js",
-      "Gated investor portal with authentication",
-      "CMS-managed newsroom and press releases",
-      "SEO-optimized with structured data",
+      "Server Components & App Router architecture",
+      "Typed component library with Storybook",
+      "Automated performance budgets in CI",
+      "Accessibility-first with automated testing",
     ],
   },
   {
-    slug: "luxethread-ecommerce-platform",
-    title: "LuxeThread E-Commerce Platform",
-    category: "E-Commerce",
-    type: "concept",
-    typeLabel: "Concept Project",
+    slug: "backend-infrastructure",
+    title: "Backend Infrastructure",
+    category: "Core Discipline",
+    type: "internal",
+    typeLabel: "Engineering Discipline",
     gradient: "from-violet-600 to-pink-500",
-    tagline: "High-end fashion marketplace engineered for conversion and speed.",
-    description: "High-end fashion marketplace with AI-powered recommendations and sub-second page loads.",
+    tagline: "API design, database architecture, and cloud-native services — typed end-to-end.",
+    description:
+      "API design, database architecture, and cloud-native services — typed end-to-end and built for zero-downtime deployments.",
     longDescription:
-      "This concept showcases our e-commerce capabilities at the premium end of the market. The platform features a headless Shopify backend, AI-powered product recommendations, a custom wishlist system, and checkout optimization that reduces abandonment. Every product page loads in under a second.",
+      "Every backend system I build is typed from database schema to API response, tested at every boundary, and deployed with zero-downtime strategies. I design APIs that are self-documenting, databases that are properly indexed and migrated, and cloud infrastructure that auto-scales without manual intervention. Whether it's a REST API, GraphQL layer, or real-time WebSocket service — every system is instrumented with structured logging, error tracking, and performance monitoring from the first deployment.",
     challenge:
-      "Luxury e-commerce requires a delicate balance: the site must feel exclusive and premium while removing all friction from the buying process. Speed and aesthetics had to coexist at the highest level.",
+      "Backend systems fail when they're treated as an afterthought — untyped APIs, manual deployments, missing monitoring, and database schemas that weren't designed for the queries they actually serve.",
     solution:
-      "We built a headless Shopify storefront with Next.js, leveraging static generation for product pages and edge functions for personalization. AI recommendations drive cross-sells, and the checkout is streamlined to three steps.",
+      "I treat the backend as a first-class architectural concern. Type-safe API contracts, database schema design with migration strategies, automated CI/CD pipelines, and comprehensive monitoring are not add-ons — they're the foundation every endpoint is built on.",
     results: [
-      { label: "Platform", value: "Shopify" },
-      { label: "Frontend", value: "Next.js" },
-      { label: "Checkout", value: "3-Step" },
+      { label: "Stack", value: "Node.js + PostgreSQL" },
+      { label: "Deploy", value: "Zero-Downtime" },
+      { label: "Coverage", value: "End-to-End Types" },
     ],
-    tags: ["React", "Shopify", "Node.js", "Stripe"],
+    tags: ["Node.js", "PostgreSQL", "AWS", "Docker"],
     features: [
-      "Headless Shopify with Next.js storefront",
-      "AI-powered product recommendations",
-      "Optimized 3-step checkout flow",
-      "Real-time inventory management",
+      "Type-safe APIs with end-to-end TypeScript",
+      "Database design with migration strategies",
+      "CI/CD with automated testing and deploys",
+      "Structured logging and error tracking",
     ],
   },
   {
-    slug: "novabridge-saas-dashboard",
-    title: "NovaBridge SaaS Dashboard",
-    category: "SaaS",
-    type: "concept",
-    typeLabel: "Concept Project",
+    slug: "performance-engineering",
+    title: "Performance Engineering",
+    category: "Core Discipline",
+    type: "internal",
+    typeLabel: "Engineering Discipline",
     gradient: "from-emerald-600 to-teal-500",
-    tagline: "Enterprise analytics dashboard built for scale and real-time insights.",
-    description: "Enterprise analytics dashboard processing 10M+ events daily with real-time visualizations.",
+    tagline: "Core Web Vitals optimization with measurable, auditable results.",
+    description:
+      "Core Web Vitals optimization, bundle analysis, and rendering strategy — turning measurable audits into measurable speed gains.",
     longDescription:
-      "This concept demonstrates our full-stack capability for data-intensive SaaS applications. The dashboard processes millions of events daily, rendering them as real-time charts, tables, and custom visualizations. Built with a focus on performance under load and intuitive data exploration.",
+      "Performance engineering is not about running Lighthouse once and tweaking a few images. I diagnose bottlenecks at every layer of the stack — render-blocking resources, layout shifts, JavaScript payload, server response times, and caching strategies. Every fix is measured with before/after data, and every engagement produces a detailed audit report with prioritized recommendations ranked by impact. The goal is not a perfect score — it's a measurably faster experience that impacts your conversion rate, search rankings, and user satisfaction.",
     challenge:
-      "Analytics dashboards often buckle under data volume — slow queries, laggy charts, and confusing navigation. The goal was to build a dashboard that stays fast and intuitive regardless of data scale.",
+      "Performance degradation is invisible until it's catastrophic. Most teams don't have the tooling or expertise to diagnose where the bottlenecks are, which fixes will have the highest impact, or how to prevent regressions after optimization.",
     solution:
-      "We architected a streaming data pipeline with server-side aggregation, client-side virtualization for large datasets, and a modular dashboard builder that lets users customize their views. The result handles 10M+ daily events without breaking a sweat.",
+      "I apply a systematic audit methodology: measure Core Web Vitals in the field and in the lab, identify the highest-impact bottlenecks, implement fixes with before/after measurements, and configure monitoring to catch regressions before they ship to production.",
     results: [
-      { label: "Stack", value: "TypeScript" },
-      { label: "Charts", value: "D3.js" },
-      { label: "Infra", value: "AWS" },
+      { label: "Tooling", value: "Lighthouse + WebPageTest" },
+      { label: "Focus", value: "LCP, CLS, INP" },
+      { label: "Standard", value: "Auditable Results" },
     ],
-    tags: ["TypeScript", "D3.js", "AWS", "PostgreSQL"],
+    tags: ["Lighthouse", "WebPageTest", "Vercel", "Edge"],
     features: [
-      "Real-time data streaming and aggregation",
-      "Drag-and-drop dashboard builder",
-      "Custom D3.js visualizations",
-      "Role-based access control",
-    ],
-  },
-  {
-    slug: "catalyst-corp-landing-page",
-    title: "Catalyst Corp Landing Page",
-    category: "Landing Pages",
-    type: "concept",
-    typeLabel: "Concept Project",
-    gradient: "from-orange-500 to-red-500",
-    tagline: "Conversion-optimized product launch page built for maximum signup rate.",
-    description: "Conversion-optimized product launch page that achieved a 12% signup rate in week one.",
-    longDescription:
-      "This concept project showcases our approach to high-conversion landing pages. Every element — from the headline hierarchy to the CTA placement to the social proof structure — was designed using conversion rate optimization principles and validated through our A/B testing framework.",
-    challenge:
-      "Product launch pages have one job: convert visitors into signups. Most landing pages lose visitors to slow loads, unclear value propositions, or too many distractions.",
-    solution:
-      "We stripped the page to its essentials: a clear value proposition above the fold, social proof, a feature showcase, and a single, repeated CTA. The page loads in under 0.5 seconds and was A/B tested across three variations.",
-    results: [
-      { label: "Framework", value: "Next.js" },
-      { label: "Deploy", value: "Vercel" },
-      { label: "Testing", value: "A/B" },
-    ],
-    tags: ["Next.js", "Tailwind", "A/B Testing", "Vercel"],
-    features: [
-      "A/B testing framework built in",
-      "Conversion-optimized layout and copy",
-      "Sub-half-second load times",
-      "Full analytics and funnel tracking",
-    ],
-  },
-  {
-    slug: "pinnacle-ai-platform",
-    title: "Pinnacle AI Platform",
-    category: "SaaS",
-    type: "concept",
-    typeLabel: "Concept Project",
-    gradient: "from-blue-500 to-violet-600",
-    tagline: "AI model management platform with visual workflow builder.",
-    description: "AI model management platform with drag-and-drop workflow builder and real-time inference monitoring.",
-    longDescription:
-      "This concept demonstrates our capability for complex, technical SaaS applications. The platform lets teams manage AI models, build inference pipelines with a drag-and-drop visual editor, and monitor performance in real time. Built for technical users who need power without complexity.",
-    challenge:
-      "AI teams juggle multiple models, datasets, and deployment targets. Existing tools are either too simple for production use or too complex for rapid experimentation.",
-    solution:
-      "We designed a visual workflow builder that lets users chain models, data sources, and transformations with drag-and-drop simplicity. Under the hood, it generates production-grade pipeline configurations with version control and rollback.",
-    results: [
-      { label: "Frontend", value: "React" },
-      { label: "Backend", value: "Python" },
-      { label: "Infra", value: "Docker" },
-    ],
-    tags: ["React", "Python", "Docker", "AWS"],
-    features: [
-      "Drag-and-drop pipeline builder",
-      "Model version control and registry",
-      "Real-time inference monitoring",
-      "One-click deployment to production",
-    ],
-  },
-  {
-    slug: "meridian-group-rebrand",
-    title: "Meridian Group Rebrand",
-    category: "Corporate",
-    type: "concept",
-    typeLabel: "Concept Project",
-    gradient: "from-cyan-500 to-blue-600",
-    tagline: "Complete digital rebrand from identity to implementation.",
-    description: "Complete digital rebrand including website, design system, and internal documentation portal.",
-    longDescription:
-      "This concept showcases our full-service rebrand capability. Starting from brand strategy, we developed a new visual identity, design system, and component library, then implemented everything across a new marketing site and internal documentation portal. The design system ensures brand consistency as the company scales.",
-    challenge:
-      "Rebrands often result in a new logo and website that slowly drift apart from internal tools and collateral. The goal was a systematic approach that ensures consistency across every touchpoint.",
-    solution:
-      "We built a comprehensive design system in Figma and Storybook that serves as the single source of truth. The marketing site and internal portal both consume the same component library, guaranteeing visual consistency.",
-    results: [
-      { label: "System", value: "Figma" },
-      { label: "Frontend", value: "Next.js" },
-      { label: "Components", value: "Storybook" },
-    ],
-    tags: ["Figma", "Next.js", "Storybook", "Tailwind"],
-    features: [
-      "Brand strategy and visual identity",
-      "Design system with 60+ components",
-      "Marketing website rebuild",
-      "Internal documentation portal",
-    ],
-  },
-  {
-    slug: "freshcart-grocery-delivery",
-    title: "FreshCart Grocery Delivery",
-    category: "E-Commerce",
-    type: "concept",
-    typeLabel: "Concept Project",
-    gradient: "from-green-500 to-emerald-600",
-    tagline: "Real-time grocery delivery app with route optimization.",
-    description: "Real-time inventory grocery delivery app with route optimization and driver tracking.",
-    longDescription:
-      "This concept demonstrates our mobile app and real-time infrastructure capabilities. The platform includes a customer-facing app for browsing and ordering, a driver app for deliveries, and an admin dashboard for operations. Real-time inventory and driver tracking keep everything in sync.",
-    challenge:
-      "Grocery delivery requires real-time coordination between inventory, orders, routes, and drivers. Stale data means wrong orders, missed deliveries, and frustrated customers.",
-    solution:
-      "We built a real-time architecture with WebSocket connections for live inventory and driver tracking, route optimization for efficient deliveries, and an operations dashboard that gives managers a bird's-eye view of everything in motion.",
-    results: [
-      { label: "Mobile", value: "React Native" },
-      { label: "Backend", value: "Node.js" },
-      { label: "Apps", value: "3" },
-    ],
-    tags: ["React Native", "Node.js", "PostgreSQL", "Redis"],
-    features: [
-      "Customer ordering app (iOS + Android)",
-      "Driver delivery app with navigation",
-      "Real-time inventory and tracking",
-      "Route optimization engine",
-    ],
-  },
-  {
-    slug: "vertex-labs-product-launch",
-    title: "Vertex Labs Product Launch",
-    category: "Landing Pages",
-    type: "concept",
-    typeLabel: "Concept Project",
-    gradient: "from-pink-500 to-violet-600",
-    tagline: "Immersive 3D product showcase with WebGL animations.",
-    description: "Immersive 3D product showcase with WebGL animations and interactive feature explorer.",
-    longDescription:
-      "This concept pushes the boundaries of what a product launch page can be. Instead of static images and bullet points, visitors explore the product through interactive 3D models, animated feature breakdowns, and a guided tour that tells the product story through scroll-driven animation.",
-    challenge:
-      "Hardware and deep-tech product launches need to communicate complex features in an engaging way. Traditional pages with specs and screenshots fail to create the excitement these products deserve.",
-    solution:
-      "We created an immersive experience with Three.js-powered 3D models, GSAP scroll animations, and interactive hotspots that let users explore features at their own pace. The experience is impressive without sacrificing load performance.",
-    results: [
-      { label: "3D Engine", value: "Three.js" },
-      { label: "Animation", value: "GSAP" },
-      { label: "Deploy", value: "Vercel" },
-    ],
-    tags: ["Three.js", "GSAP", "Vercel", "WebGL"],
-    features: [
-      "Interactive 3D product models",
-      "Scroll-driven storytelling animations",
-      "Interactive feature hotspots",
-      "Optimized for performance despite 3D assets",
+      "Core Web Vitals diagnosis and optimization",
+      "Bundle analysis and JavaScript payload reduction",
+      "Image, font, and asset optimization pipeline",
+      "Performance monitoring and regression prevention",
     ],
   },
 ];

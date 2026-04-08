@@ -34,7 +34,7 @@ export function Footer() {
               />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-text-secondary">
-              Web development studio in Dallas, TX. High-performance sites and applications built with modern tooling.
+              Bespoke digital engineering studio in Dallas, TX. Production-grade sites and applications built by a solo principal architect.
             </p>
             {SOCIALS.length > 0 && (
               <div className="mt-6 flex gap-3">
