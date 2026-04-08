@@ -5,16 +5,16 @@ import { useEffect, useRef } from "react";
 /* ─── CONSTANTS & CONFIG ────────────────────────────────────── */
 
 // Hover (Coil) Config
-const HOVER_ARC_LENGTH = 8;
-const HOVER_ARC_SEGMENTS = 4;
+const HOVER_ARC_LENGTH = 16;
+const HOVER_ARC_SEGMENTS = 5;
 const HOVER_ARC_LIFE = 150;
 
 // Click (Discharge) Config
 const CLICK_ARC_COUNT_MIN = 6;
 const CLICK_ARC_COUNT_MAX = 10;
-const CLICK_ARC_LENGTH = 30;
+const CLICK_ARC_LENGTH = 38;
 const CLICK_ARC_SEGMENTS = 6;
-const CLICK_ARC_LIFE = 250;
+const CLICK_ARC_LIFE = 350;
 
 /* ─── TYPES ─────────────────────────────────────────────────── */
 interface Point {
@@ -170,7 +170,7 @@ export function CursorCharge() {
 
       /* ─── HOVER: COIL (tight static at cursor tip) ─── */
       if (isVisible.current && !inText.current && isHovering.current) {
-        const hoverCount = 1 + Math.floor(Math.random() * 2); // 1-2 arcs
+        const hoverCount = 2 + Math.floor(Math.random() * 2); // 2-3 arcs
         for (let i = 0; i < hoverCount; i++) {
           const angle = Math.random() * Math.PI * 2;
           const length =
@@ -182,7 +182,7 @@ export function CursorCharge() {
               angle,
               length,
               HOVER_ARC_SEGMENTS,
-              3.0, // tight jitter
+              2.2, // contained current jitter
               HOVER_ARC_LIFE,
               now
             )
@@ -202,8 +202,8 @@ export function CursorCharge() {
         const progress = age / arc.life;
         const opacity = 1 - progress * progress;
 
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = "rgba(200, 240, 255, 0.6)";
+        ctx.shadowBlur = 18;
+        ctx.shadowColor = "rgba(150, 230, 255, 0.8)";
 
         ctx.beginPath();
         ctx.moveTo(arc.points[0].x, arc.points[0].y);
@@ -211,8 +211,8 @@ export function CursorCharge() {
           ctx.lineTo(arc.points[j].x, arc.points[j].y);
         }
 
-        ctx.strokeStyle = `rgba(200, 240, 255, ${opacity})`;
-        ctx.lineWidth = 1.5 * (1 - progress * 0.6);
+        ctx.strokeStyle = `rgba(220, 250, 255, ${opacity})`;
+        ctx.lineWidth = 2.8 * (1 - progress * 0.4);
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
         ctx.stroke();
