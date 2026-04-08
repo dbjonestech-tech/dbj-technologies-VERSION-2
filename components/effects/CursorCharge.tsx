@@ -228,7 +228,7 @@ export function CursorCharge() {
     <>
       <style dangerouslySetInnerHTML={{ __html: `
         @media (pointer: fine) {
-          *, *::before, *::after {
+          :root, html, body, *, *::before, *::after {
             cursor: none !important;
           }
         }
