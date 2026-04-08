@@ -3,11 +3,11 @@
 import { useEffect, useRef } from "react";
 
 /* ─── CONSTANTS & CONFIG ─── */
-const HOVER_RADIUS = 12; // Tighter, contained circular plasma
+const HOVER_RADIUS = 3; // Concentrated wand-tip glow
 const HOVER_LIFE = 120; // Hyper-fast sizzle
-const CLICK_LENGTH = 70; // Long, striking distance
-const CLICK_LIFE = 400; // Lingers slightly to show the strobe
-const BRANCH_PROBABILITY = 0.35; // 35% chance a bolt splits
+const CLICK_LENGTH = 42; // Tight, punchy discharge
+const CLICK_LIFE = 300; // Crisp strobe
+const BRANCH_PROBABILITY = 0.25; // Optimized branch rate
 
 /* ─── TYPES ─── */
 interface Point { x: number; y: number; }
@@ -119,7 +119,7 @@ export function CursorCharge() {
     const onDown = () => {
       if (inText.current) return;
       const now = performance.now();
-      const count = Math.floor(Math.random() * 3) + 4; // 4 to 6 main trunks
+      const count = Math.floor(Math.random() * 2) + 4; // 4 to 5 main trunks
 
       for (let i = 0; i < count; i++) {
         const angle = (Math.PI * 2 * (i / count)) + (Math.random() - 0.5) * 0.8;
@@ -129,7 +129,7 @@ export function CursorCharge() {
 
         const segments: BoltSegment[] = [];
         // Heavy displacement for violent strike
-        generateFractalBolt(pos.current.x, pos.current.y, endX, endY, 35, 4, 1.0, 1.0, segments);
+        generateFractalBolt(pos.current.x, pos.current.y, endX, endY, 35, 8, 1.0, 1.0, segments);
         strikes.current.push({ segments, birth: now, life: CLICK_LIFE, isHover: false });
       }
     };
@@ -149,25 +149,24 @@ export function CursorCharge() {
       ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
       const { x, y } = pos.current;
 
-      /* ─── HOVER: FRACTAL PLASMA RING ─── */
+      /* ─── HOVER: WAND-TIP ENERGY GLOW ─── */
       if (isVisible.current && !inText.current && isHovering.current) {
-        // Spawn 1-2 tiny contained fractal sparks per frame
+        // White-hot core at cursor tip
+        ctx.beginPath();
+        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#FFF";
+        ctx.fill();
+
+        // Spawn 1-2 tiny fractal sparks from cursor center to nearby points
         const sparks = Math.floor(Math.random() * 2) + 1;
-        for(let i=0; i<sparks; i++) {
-          const angle1 = Math.random() * Math.PI * 2;
-          const angle2 = angle1 + (Math.random() - 0.5) * 1.5; // Connects to a nearby point on the circle
-
-          const r1 = HOVER_RADIUS * (0.8 + Math.random() * 0.4);
-          const r2 = HOVER_RADIUS * (0.8 + Math.random() * 0.4);
-
-          const startX = x + Math.cos(angle1) * r1;
-          const startY = y + Math.sin(angle1) * r1;
-          const endX = x + Math.cos(angle2) * r2;
-          const endY = y + Math.sin(angle2) * r2;
+        for (let i = 0; i < sparks; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const r = HOVER_RADIUS * (0.8 + Math.random() * 0.4);
+          const endX = x + Math.cos(angle) * r;
+          const endY = y + Math.sin(angle) * r;
 
           const segments: BoltSegment[] = [];
-          // Tight displacement for a sizzling coil effect
-          generateFractalBolt(startX, startY, endX, endY, 8, 3, 0.6, 0.8, segments);
+          generateFractalBolt(x, y, endX, endY, 8, 3, 0.6, 0.8, segments);
           strikes.current.push({ segments, birth: now, life: HOVER_LIFE, isHover: true });
         }
       }
