@@ -334,10 +334,11 @@ export function Hero() {
 
       {/* ════ SVG TEXT LAYER (z-[110]) ════ */}
       <div ref={svgLayerRef} className={svgClasses} style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'scale(1.3)' }} aria-hidden="true">
+        <div style={{ position: 'relative', width: '90%', maxWidth: 1100, aspectRatio: '11 / 4' }}>
         <svg
           viewBox="0 0 1100 400"
           className="hero-cinema-svg"
-          style={{ width: '90%', maxWidth: 1100, height: 'auto', aspectRatio: '1100 / 400' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -434,6 +435,7 @@ export function Hero() {
             </tspan>
           </text>
         </svg>
+        </div>
 
         {/* Light sweep during build phase */}
         <div className="hero-cinema-sweep" style={{ opacity: phase === "build" ? 1 : 0 }} />
