@@ -68,11 +68,13 @@ export function CursorCharge() {
   const inText = useRef(false);
   const strikes = useRef<PlasmaStrike[]>([]);
   const activeEl = useRef<HTMLElement | null>(null);
+  const lastStrike = useRef(0);
+  const isTouchDevice = useRef(false);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
-    if (!window.matchMedia("(pointer: fine)").matches) return;
+    const isTouch = window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    isTouchDevice.current = isTouch;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -130,24 +132,29 @@ export function CursorCharge() {
     /* ─── CLICK: METAPHYSICAL DISCHARGE ─── */
     const onDown = () => {
       if (inText.current) return;
+      const now = performance.now();
+      if (now - lastStrike.current < 100) return;
+      lastStrike.current = now;
+
       if (activeEl.current) {
         activeEl.current.style.animation = "none";
-        void activeEl.current.offsetWidth; // Trigger reflow to restart animation
+        void activeEl.current.offsetWidth;
         activeEl.current.style.animation = "plasma-crack 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards";
       }
-      const now = performance.now();
-      const count = Math.floor(Math.random() * 2) + 4; // 4 to 5 main trunks
+
+      const trunkCount = isTouch ? Math.floor(Math.random() * 2) + 3 : Math.floor(Math.random() * 2) + 4;
+      const baseLength = isTouch ? 24 : CLICK_LENGTH;
+      const baseDisplace = isTouch ? 20 : 35;
 
       Sentry.startSpan({ name: "Fractal Lightning Discharge", op: "ui.interaction" }, () => {
-        for (let i = 0; i < count; i++) {
-          const angle = (Math.PI * 2 * (i / count)) + (Math.random() - 0.5) * 0.8;
-          const length = CLICK_LENGTH * (0.8 + Math.random() * 0.5);
+        for (let i = 0; i < trunkCount; i++) {
+          const angle = (Math.PI * 2 * (i / trunkCount)) + (Math.random() - 0.5) * 0.8;
+          const length = baseLength * (0.8 + Math.random() * 0.5);
           const endX = pos.current.x + Math.cos(angle) * length;
           const endY = pos.current.y + Math.sin(angle) * length;
 
           const segments: BoltSegment[] = [];
-          // Heavy displacement for violent strike
-          generateFractalBolt(pos.current.x, pos.current.y, endX, endY, 35, 8, 1.0, 1.0, segments);
+          generateFractalBolt(pos.current.x, pos.current.y, endX, endY, baseDisplace, 8, 1.0, 1.0, segments);
           strikes.current.push({ segments, birth: now, life: CLICK_LIFE, isHover: false });
         }
       });
@@ -156,6 +163,33 @@ export function CursorCharge() {
     const onLeaveWindow = () => { isVisible.current = false; };
     const onEnterWindow = () => { isVisible.current = true; };
 
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        pos.current.x = e.touches[0].clientX;
+        pos.current.y = e.touches[0].clientY;
+        isVisible.current = true;
+        const target = e.target as HTMLElement;
+        if (isTextEl(target)) {
+          inText.current = true;
+          isHovering.current = false;
+        } else {
+          inText.current = false;
+          const interactive = isInteractive(target);
+          if (interactive) {
+            activeEl.current = interactive as HTMLElement;
+          } else {
+            activeEl.current = null;
+          }
+        }
+        onDown();
+      }
+    };
+
+    const onTouchEnd = () => {
+      isVisible.current = false;
+      activeEl.current = null;
+    };
+
     document.addEventListener("mousemove", onMove, { passive: true });
     document.addEventListener("mouseover", onOver, { passive: true });
     document.addEventListener("mouseout", onOut, { passive: true });
@@ -163,13 +197,18 @@ export function CursorCharge() {
     document.addEventListener("mouseleave", onLeaveWindow);
     document.addEventListener("mouseenter", onEnterWindow);
 
+    if (isTouch) {
+      document.addEventListener("touchstart", onTouchStart, { passive: true });
+      document.addEventListener("touchend", onTouchEnd, { passive: true });
+    }
+
     /* ─── RENDER ENGINE ─── */
     const frame = (now: number) => {
       ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
       const { x, y } = pos.current;
 
       /* ─── IDLE & HOVER: THE TRITIUM SINGULARITY ─── */
-      if (isVisible.current && !inText.current) {
+      if (isVisible.current && !inText.current && !isTouchDevice.current) {
         const isVolatile = isHovering.current;
 
         // 1. The Core (Stable vs Unstable)
@@ -266,6 +305,8 @@ export function CursorCharge() {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("mouseleave", onLeaveWindow);
       document.removeEventListener("mouseenter", onEnterWindow);
+      document.removeEventListener("touchstart", onTouchStart);
+      document.removeEventListener("touchend", onTouchEnd);
     };
   }, []);
 
@@ -285,7 +326,7 @@ export function CursorCharge() {
       <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
+      className="pointer-events-none fixed inset-0 z-[9999]"
     />
     </>
   );
