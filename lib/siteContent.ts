@@ -107,7 +107,7 @@ export interface CTADefaults {
 
 export const HERO_CONTENT: HeroContent = {
   badge: "Accepting New Engagements",
-  headlineWords: ["I", "Architect", "The"],
+  headlineWords: ["Architect", "The"] /* no-cache */,
   headlineAccent: "Impossible.",
   subheading:
     "Sub-second frontends, reliable infrastructure, and production-grade systems. Engineered by a solo principal architect in Dallas, TX.",
