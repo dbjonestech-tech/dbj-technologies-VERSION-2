@@ -333,6 +333,8 @@ export function Hero() {
       <div ref={svgLayerRef} className={svgClasses} aria-hidden="true">
         <svg
           viewBox="0 0 1100 400"
+          width={1100}
+          height={400}
           className="hero-cinema-svg"
           xmlns="http://www.w3.org/2000/svg"
         >
