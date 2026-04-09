@@ -33,16 +33,16 @@ export function Hero() {
     if (reducedMotion) {
       setMode("skip");
       setPhase("complete");
-      if (overlayRef.current) { overlayRef.current.style.opacity = "0"; overlayRef.current.style.visibility = "hidden"; }
-      if (svgLayerRef.current) { svgLayerRef.current.style.opacity = "0"; svgLayerRef.current.style.visibility = "hidden"; }
+      if (overlayRef.current) { overlayRef.current.style.opacity = "0"; overlayRef.current.style.pointerEvents = "none"; }
+      if (svgLayerRef.current) { svgLayerRef.current.style.opacity = "0"; svgLayerRef.current.style.pointerEvents = "none"; }
       return;
     }
     try {
       if (sessionStorage.getItem("hero-revealed") === "true") {
         setMode("fade");
         setPhase("complete");
-        if (overlayRef.current) { overlayRef.current.style.opacity = "0"; overlayRef.current.style.visibility = "hidden"; }
-        if (svgLayerRef.current) { svgLayerRef.current.style.opacity = "0"; svgLayerRef.current.style.visibility = "hidden"; }
+        if (overlayRef.current) { overlayRef.current.style.opacity = "0"; overlayRef.current.style.pointerEvents = "none"; }
+        if (svgLayerRef.current) { svgLayerRef.current.style.opacity = "0"; svgLayerRef.current.style.pointerEvents = "none"; }
         return;
       }
     } catch {
@@ -81,12 +81,12 @@ export function Hero() {
 
           if (overlayRef.current) {
             overlayRef.current.style.opacity = "0";
-            overlayRef.current.style.visibility = "hidden";
+            overlayRef.current.style.pointerEvents = "none";
             overlayRef.current.style.willChange = "auto";
           }
           if (svgLayerRef.current) {
             svgLayerRef.current.style.opacity = "0";
-            svgLayerRef.current.style.visibility = "hidden";
+            svgLayerRef.current.style.pointerEvents = "none";
             svgLayerRef.current.style.willChange = "auto";
           }
         }, 800);
@@ -326,14 +326,14 @@ export function Hero() {
         className={`hero-cinema-overlay${
           phase === "reveal" ? " hero-cinema-overlay-reveal" : ""
         }`}
-        style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
+        style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 100 }}
         aria-hidden="true"
       >
         <div className="dot-grid absolute inset-0" style={{ opacity: 0.15 }} />
       </div>
 
       {/* ════ SVG TEXT LAYER (z-[110]) ════ */}
-      <div ref={svgLayerRef} className={svgClasses} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }} aria-hidden="true">
+      <div ref={svgLayerRef} className={svgClasses} style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'scale(1.3)' }} aria-hidden="true">
         <svg
           viewBox="0 0 1100 400"
           width={1100}
