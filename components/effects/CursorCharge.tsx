@@ -165,22 +165,15 @@ export function CursorCharge() {
 
     const onTouchStart = (e: TouchEvent) => {
       if (e.touches.length > 0) {
+        const target = e.target as HTMLElement;
+        const interactive = isInteractive(target);
+        if (!interactive) return;
+
         pos.current.x = e.touches[0].clientX;
         pos.current.y = e.touches[0].clientY;
         isVisible.current = true;
-        const target = e.target as HTMLElement;
-        if (isTextEl(target)) {
-          inText.current = true;
-          isHovering.current = false;
-        } else {
-          inText.current = false;
-          const interactive = isInteractive(target);
-          if (interactive) {
-            activeEl.current = interactive as HTMLElement;
-          } else {
-            activeEl.current = null;
-          }
-        }
+        inText.current = false;
+        activeEl.current = interactive as HTMLElement;
         onDown();
       }
     };
