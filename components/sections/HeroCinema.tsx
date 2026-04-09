@@ -9,7 +9,6 @@ interface HeroCinemaProps {
 }
 
 export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
   const [phase, setPhase] = useState<Phase>("blueprint");
   const [active, setActive] = useState(true);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -37,14 +36,9 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ─── Wait for custom fonts to prevent FOUT CLS ─── */
-  useEffect(() => {
-    document.fonts.ready.then(() => setFontsLoaded(true));
-  }, []);
-
   /* ─── Scroll / Touch / Key trigger (Act 1 → Act 2) ─── */
   useEffect(() => {
-    if (!active || !fontsLoaded || phase !== "blueprint") return;
+    if (!active || phase !== "blueprint") return;
 
     const trigger = () => {
       document.body.style.overflow = "hidden";
@@ -109,7 +103,7 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
       window.removeEventListener("keydown", onKey);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, fontsLoaded, phase]);
+  }, [active, phase]);
 
   if (!active) return null;
 
@@ -160,8 +154,6 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
           alignItems: "center",
           justifyContent: "center",
           transform: "scale(1.3)",
-          opacity: fontsLoaded ? 1 : 0,
-          transition: "opacity 0.15s ease-out",
         }}
         aria-hidden="true"
       >
@@ -170,7 +162,9 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
             position: "relative",
             width: "90%",
             maxWidth: 1100,
-            aspectRatio: "11 / 4",
+            margin: "0 auto",
+            height: 0,
+            paddingBottom: "36.36%",
           }}
         >
           <svg
@@ -178,7 +172,8 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
             className="hero-cinema-svg"
             style={{
               position: "absolute",
-              inset: 0,
+              top: 0,
+              left: 0,
               width: "100%",
               height: "100%",
             }}

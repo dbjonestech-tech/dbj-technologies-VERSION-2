@@ -16,7 +16,7 @@ const ParticleField = dynamic(
   { ssr: false }
 );
 
-const HeroCinema = dynamic(() => import("./HeroCinema"), { ssr: false });
+import HeroCinema from "./HeroCinema";
 
 type Mode = "cinematic" | "skip" | "fade";
 
