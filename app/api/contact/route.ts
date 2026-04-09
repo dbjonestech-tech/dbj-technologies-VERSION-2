@@ -16,9 +16,18 @@ function escapeHtml(unsafe: string): string {
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW = 60_000; // 1 minute
 const RATE_LIMIT_MAX = 3; // 3 requests per window
+const CLEANUP_THRESHOLD = 1000; // Clean up when map gets large
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+
+  // Inline cleanup when map grows too large (replaces setInterval)
+  if (rateLimitMap.size > CLEANUP_THRESHOLD) {
+    for (const [key, entry] of rateLimitMap) {
+      if (now > entry.resetAt) rateLimitMap.delete(key);
+    }
+  }
+
   const entry = rateLimitMap.get(ip);
 
   if (!entry || now > entry.resetAt) {
@@ -28,17 +37,6 @@ function isRateLimited(ip: string): boolean {
 
   entry.count++;
   return entry.count > RATE_LIMIT_MAX;
-}
-
-// Periodic cleanup to prevent memory leaks
-if (typeof globalThis !== "undefined") {
-  const cleanup = () => {
-    const now = Date.now();
-    for (const [key, entry] of rateLimitMap) {
-      if (now > entry.resetAt) rateLimitMap.delete(key);
-    }
-  };
-  setInterval(cleanup, 60_000);
 }
 
 /* ─── SERVER-SIDE VALIDATION (defense in depth) ──── */
@@ -66,8 +64,14 @@ export async function POST(request: Request) {
     if (process.env.NODE_ENV === "development") {
       allowedOrigins.push("http://localhost:3000", "http://localhost:3001");
     }
-    if (origin && !allowedOrigins.includes(origin)) {
+    if (!origin || !allowedOrigins.includes(origin)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    /* ─── CONTENT-TYPE CHECK ──────────────────── */
+    const contentType = request.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      return NextResponse.json({ error: "Invalid content type" }, { status: 415 });
     }
 
     /* ─── RATE LIMITING ───────────────────────── */
@@ -78,6 +82,12 @@ export async function POST(request: Request) {
         { error: "Too many requests. Please try again later." },
         { status: 429 }
       );
+    }
+
+    /* ─── REQUEST SIZE CHECK ──────────────────── */
+    const contentLength = request.headers.get("content-length");
+    if (contentLength && parseInt(contentLength, 10) > 10_000) {
+      return NextResponse.json({ error: "Request too large" }, { status: 413 });
     }
 
     const body = await request.json();
@@ -141,7 +151,7 @@ export async function POST(request: Request) {
         from: `"DBJ Technologies Website" <${process.env.SMTP_USER}>`,
         to: process.env.CONTACT_EMAIL || "hello@dbjtechnologies.com",
         replyTo: email,
-        subject: `New Project Inquiry: ${safe.projectType} | ${safe.name}`,
+        subject: `New Project Inquiry: ${safe.projectType} — ${safe.name}`,
         html: htmlBody,
       });
     } else {
