@@ -372,7 +372,7 @@ export function Hero() {
             </linearGradient>
           </defs>
 
-          {/* Line 1: "I Architect The" */}
+          {/* Line 1: "Architect The" */}
           <text
             x="550"
             y="165"
@@ -394,17 +394,11 @@ export function Hero() {
               className="hero-cinema-word"
               style={{ "--word-delay": "0ms" } as React.CSSProperties}
             >
-              {"I "}
-            </tspan>
-            <tspan
-              className="hero-cinema-word"
-              style={{ "--word-delay": "250ms" } as React.CSSProperties}
-            >
               {"Architect "}
             </tspan>
             <tspan
               className="hero-cinema-word"
-              style={{ "--word-delay": "500ms" } as React.CSSProperties}
+              style={{ "--word-delay": "250ms" } as React.CSSProperties}
             >
               The
             </tspan>
