@@ -138,17 +138,19 @@ export function CursorCharge() {
       const now = performance.now();
       const count = Math.floor(Math.random() * 2) + 4; // 4 to 5 main trunks
 
-      for (let i = 0; i < count; i++) {
-        const angle = (Math.PI * 2 * (i / count)) + (Math.random() - 0.5) * 0.8;
-        const length = CLICK_LENGTH * (0.8 + Math.random() * 0.5);
-        const endX = pos.current.x + Math.cos(angle) * length;
-        const endY = pos.current.y + Math.sin(angle) * length;
+      Sentry.startSpan({ name: "Fractal Lightning Discharge", op: "ui.interaction" }, () => {
+        for (let i = 0; i < count; i++) {
+          const angle = (Math.PI * 2 * (i / count)) + (Math.random() - 0.5) * 0.8;
+          const length = CLICK_LENGTH * (0.8 + Math.random() * 0.5);
+          const endX = pos.current.x + Math.cos(angle) * length;
+          const endY = pos.current.y + Math.sin(angle) * length;
 
-        const segments: BoltSegment[] = [];
-        // Heavy displacement for violent strike
-        generateFractalBolt(pos.current.x, pos.current.y, endX, endY, 35, 8, 1.0, 1.0, segments);
-        strikes.current.push({ segments, birth: now, life: CLICK_LIFE, isHover: false });
-      }
+          const segments: BoltSegment[] = [];
+          // Heavy displacement for violent strike
+          generateFractalBolt(pos.current.x, pos.current.y, endX, endY, 35, 8, 1.0, 1.0, segments);
+          strikes.current.push({ segments, birth: now, life: CLICK_LIFE, isHover: false });
+        }
+      });
     };
 
     const onLeaveWindow = () => { isVisible.current = false; };
@@ -206,50 +208,48 @@ export function CursorCharge() {
       }
 
       /* ─── DUAL-PASS RENDER LOOP ─── */
-      Sentry.startSpan({ name: "Fractal Lightning Discharge", op: "ui.interaction" }, () => {
-        ctx.globalCompositeOperation = "screen";
-        const aliveStrikes: PlasmaStrike[] = [];
+      ctx.globalCompositeOperation = "screen";
+      const aliveStrikes: PlasmaStrike[] = [];
 
-        for (let i = 0; i < strikes.current.length; i++) {
-          const strike = strikes.current[i];
-          const age = now - strike.birth;
-          if (age >= strike.life) continue;
-          aliveStrikes.push(strike);
+      for (let i = 0; i < strikes.current.length; i++) {
+        const strike = strikes.current[i];
+        const age = now - strike.birth;
+        if (age >= strike.life) continue;
+        aliveStrikes.push(strike);
 
-          const progress = age / strike.life;
+        const progress = age / strike.life;
 
-          // Stroboscopic Decay (Flickers violently before dying)
-          const strobe = strike.isHover ? 1 : (Math.random() > 0.3 ? 1 : 0.4);
-          const opacity = (1 - progress * progress) * strobe;
+        // Stroboscopic Decay (Flickers violently before dying)
+        const strobe = strike.isHover ? 1 : (Math.random() > 0.3 ? 1 : 0.4);
+        const opacity = (1 - progress * progress) * strobe;
 
-          if (opacity <= 0.01) continue;
+        if (opacity <= 0.01) continue;
 
-          // Draw all segments for this strike
-          for (let j = 0; j < strike.segments.length; j++) {
-            const seg = strike.segments[j];
-            const segOpacity = opacity * seg.alpha;
+        // Draw all segments for this strike
+        for (let j = 0; j < strike.segments.length; j++) {
+          const seg = strike.segments[j];
+          const segOpacity = opacity * seg.alpha;
 
-            ctx.beginPath();
-            ctx.moveTo(seg.start.x, seg.start.y);
-            ctx.lineTo(seg.end.x, seg.end.y);
+          ctx.beginPath();
+          ctx.moveTo(seg.start.x, seg.start.y);
+          ctx.lineTo(seg.end.x, seg.end.y);
 
-            // PASS 1: The Corona (Cyan Plasma Glow)
-            ctx.strokeStyle = `rgba(0, 229, 255, ${segOpacity * 0.7})`;
-            ctx.lineWidth = (strike.isHover ? 3 : 5) * seg.thickness * (1 - progress * 0.3);
-            ctx.shadowBlur = strike.isHover ? 10 : 25;
-            ctx.shadowColor = "#00e5ff";
-            ctx.lineCap = "round";
-            ctx.stroke();
+          // PASS 1: The Corona (Cyan Plasma Glow)
+          ctx.strokeStyle = `rgba(0, 229, 255, ${segOpacity * 0.7})`;
+          ctx.lineWidth = (strike.isHover ? 3 : 5) * seg.thickness * (1 - progress * 0.3);
+          ctx.shadowBlur = strike.isHover ? 10 : 25;
+          ctx.shadowColor = "#00e5ff";
+          ctx.lineCap = "round";
+          ctx.stroke();
 
-            // PASS 2: The Hot Core (Pure White)
-            ctx.strokeStyle = `rgba(255, 255, 255, ${segOpacity})`;
-            ctx.lineWidth = (strike.isHover ? 0.8 : 1.5) * seg.thickness;
-            ctx.shadowBlur = 0;
-            ctx.stroke();
-          }
+          // PASS 2: The Hot Core (Pure White)
+          ctx.strokeStyle = `rgba(255, 255, 255, ${segOpacity})`;
+          ctx.lineWidth = (strike.isHover ? 0.8 : 1.5) * seg.thickness;
+          ctx.shadowBlur = 0;
+          ctx.stroke();
         }
-        strikes.current = aliveStrikes;
-      });
+      }
+      strikes.current = aliveStrikes;
       ctx.globalCompositeOperation = "source-over";
 
       rafRef.current = requestAnimationFrame(frame);
