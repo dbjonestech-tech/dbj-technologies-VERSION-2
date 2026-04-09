@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useCallback, useLayoutEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
@@ -16,14 +16,13 @@ const ParticleField = dynamic(
   { ssr: false }
 );
 
-type Phase = "blueprint" | "build" | "reveal" | "complete";
+const HeroCinema = dynamic(() => import("./HeroCinema"), { ssr: false });
+
 type Mode = "cinematic" | "skip" | "fade";
 
 export function Hero() {
+  const [lightRevealed, setLightRevealed] = useState(false);
   const [mode, setMode] = useState<Mode>("cinematic");
-  const [phase, setPhase] = useState<Phase>("blueprint");
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const svgLayerRef = useRef<HTMLDivElement>(null);
 
   /* ─── SKIP DETECTION (runs before paint) ─── */
   useLayoutEffect(() => {
@@ -32,97 +31,24 @@ export function Hero() {
     ).matches;
     if (reducedMotion) {
       setMode("skip");
-      setPhase("complete");
-      if (overlayRef.current) { overlayRef.current.style.opacity = "0"; overlayRef.current.style.pointerEvents = "none"; }
-      if (svgLayerRef.current) { svgLayerRef.current.style.opacity = "0"; svgLayerRef.current.style.pointerEvents = "none"; }
+      setLightRevealed(true);
       return;
     }
     try {
       if (sessionStorage.getItem("hero-revealed") === "true") {
         setMode("fade");
-        setPhase("complete");
-        if (overlayRef.current) { overlayRef.current.style.opacity = "0"; overlayRef.current.style.pointerEvents = "none"; }
-        if (svgLayerRef.current) { svgLayerRef.current.style.opacity = "0"; svgLayerRef.current.style.pointerEvents = "none"; }
-        return;
+        setLightRevealed(true);
       }
     } catch {
       /* sessionStorage blocked (private browsing) */
     }
   }, []);
 
-  /* ─── SCROLL / TOUCH / KEY TRIGGER (Act 1 → Act 2) ─── */
-  useEffect(() => {
-    if (mode !== "cinematic" || phase !== "blueprint") return;
-
-    const trigger = () => {
-      document.body.style.overflow = "hidden";
-      window.scrollTo(0, 0);
-
-      if (overlayRef.current)
-        overlayRef.current.style.willChange = "opacity";
-      if (svgLayerRef.current)
-        svgLayerRef.current.style.willChange = "transform, opacity";
-
-      setPhase("build");
-
-      // Act 2 → Act 3 (after 1.5s build)
-      setTimeout(() => {
-        setPhase("reveal");
-
-        // Act 3 complete (after 0.8s reveal)
-        setTimeout(() => {
-          setPhase("complete");
-          document.body.style.overflow = "";
-          try {
-            sessionStorage.setItem("hero-revealed", "true");
-          } catch {
-            /* noop */
-          }
-
-          if (overlayRef.current) {
-            overlayRef.current.style.opacity = "0";
-            overlayRef.current.style.pointerEvents = "none";
-            overlayRef.current.style.willChange = "auto";
-          }
-          if (svgLayerRef.current) {
-            svgLayerRef.current.style.opacity = "0";
-            svgLayerRef.current.style.pointerEvents = "none";
-            svgLayerRef.current.style.willChange = "auto";
-          }
-        }, 800);
-      }, 1500);
-    };
-
-    const onWheel = () => trigger();
-    const onTouch = () => trigger();
-    const onKey = (e: KeyboardEvent) => {
-      if (["ArrowDown", " ", "PageDown"].includes(e.key)) {
-        e.preventDefault();
-        trigger();
-      }
-    };
-
-    window.addEventListener("wheel", onWheel, { once: true, passive: true });
-    window.addEventListener("touchstart", onTouch, {
-      once: true,
-      passive: true,
-    });
-    window.addEventListener("keydown", onKey);
-
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", onTouch);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [mode, phase]);
+  const handleRevealComplete = useCallback(() => setLightRevealed(true), []);
 
   /* ─── DERIVED STATE ─── */
-  const lightRevealed =
-    mode !== "cinematic" || phase === "reveal" || phase === "complete";
-
   const getDelay = (cinematicDelay: number) => {
-    if (mode === "skip") return 0;
-    if (mode === "fade") return 0;
+    if (mode === "skip" || mode === "fade") return 0;
     return cinematicDelay;
   };
 
@@ -131,14 +57,6 @@ export function Hero() {
     if (mode === "fade") return 0.6;
     return 0.5;
   };
-
-  const svgClasses = [
-    "hero-cinema-layer",
-    phase === "build" || phase === "reveal" ? "hero-cinema-build" : "",
-    phase === "reveal" ? "hero-cinema-reveal" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
@@ -320,126 +238,8 @@ export function Hero() {
       {/* Bottom gradient fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bg-primary/80 to-transparent z-10" />
 
-      {/* ════ DARK OVERLAY (z-[100]) ════ */}
-      <div
-        ref={overlayRef}
-        className={`hero-cinema-overlay${
-          phase === "reveal" ? " hero-cinema-overlay-reveal" : ""
-        }`}
-        style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 100 }}
-        aria-hidden="true"
-      >
-        <div className="dot-grid absolute inset-0" style={{ opacity: 0.15 }} />
-      </div>
-
-      {/* ════ SVG TEXT LAYER (z-[110]) ════ */}
-      <div ref={svgLayerRef} className={svgClasses} style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'scale(1.3)' }} aria-hidden="true">
-        <div style={{ position: 'relative', width: '90%', maxWidth: 1100, aspectRatio: '11 / 4' }}>
-        <svg
-          viewBox="0 0 1100 400"
-          className="hero-cinema-svg"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            {/* Shimmer gradient for wireframe stroke on "Impossible." */}
-            <linearGradient
-              id="hero-shimmer"
-              gradientUnits="userSpaceOnUse"
-              x1="0"
-              y1="0"
-              x2="400"
-              y2="0"
-            >
-              <stop offset="0" stopColor="#60a5fa" />
-              <stop offset="0.5" stopColor="#22d3ee" />
-              <stop offset="1" stopColor="#a78bfa" />
-              <animateTransform
-                attributeName="gradientTransform"
-                type="translate"
-                values="-600;600"
-                dur="3s"
-                repeatCount="indefinite"
-              />
-            </linearGradient>
-
-            {/* Accent fill gradient for "Impossible." solid state */}
-            <linearGradient
-              id="hero-accent-fill"
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="0%"
-            >
-              <stop offset="0%" stopColor="#60a5fa" />
-              <stop offset="50%" stopColor="#22d3ee" />
-              <stop offset="100%" stopColor="#a78bfa" />
-            </linearGradient>
-          </defs>
-
-          {/* Line 1: "Architect The" */}
-          <text
-            x="550"
-            y="165"
-            textAnchor="middle"
-            className="hero-cinema-line"
-            style={{
-              fontFamily: "var(--font-display), sans-serif",
-              fontSize: 120,
-              fontWeight: 800,
-              letterSpacing: "-0.04em",
-            }}
-            stroke="#60a5fa"
-            strokeWidth="1"
-            fill="#f0f0f5"
-            strokeDasharray="2000"
-            strokeDashoffset="2000"
-          >
-            <tspan
-              className="hero-cinema-word"
-              style={{ "--word-delay": "0ms" } as React.CSSProperties}
-            >
-              {"Architect "}
-            </tspan>
-            <tspan
-              className="hero-cinema-word"
-              style={{ "--word-delay": "250ms" } as React.CSSProperties}
-            >
-              The
-            </tspan>
-          </text>
-
-          {/* Line 2: "Impossible." */}
-          <text
-            x="550"
-            y="315"
-            textAnchor="middle"
-            className="hero-cinema-line hero-cinema-accent"
-            style={{
-              fontFamily: "var(--font-display), sans-serif",
-              fontSize: 120,
-              fontWeight: 800,
-              letterSpacing: "-0.04em",
-            }}
-            stroke="url(#hero-shimmer)"
-            strokeWidth="1"
-            fill="url(#hero-accent-fill)"
-            strokeDasharray="2000"
-            strokeDashoffset="2000"
-          >
-            <tspan
-              className="hero-cinema-word"
-              style={{ "--word-delay": "750ms" } as React.CSSProperties}
-            >
-              Impossible.
-            </tspan>
-          </text>
-        </svg>
-        </div>
-
-        {/* Light sweep during build phase */}
-        <div className="hero-cinema-sweep" style={{ opacity: phase === "build" ? 1 : 0 }} />
-      </div>
+      {/* ════ CINEMATIC LAYER (deferred, no SSR) ════ */}
+      <HeroCinema onRevealComplete={handleRevealComplete} />
     </section>
   );
 }
