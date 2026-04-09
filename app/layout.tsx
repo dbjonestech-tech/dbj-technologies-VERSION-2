@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/layout/JsonLd";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 /* ─── FONTS ─────────────────────────────────────────── */
@@ -120,6 +121,7 @@ export default function RootLayout({
           <PageTransition>{children}</PageTransition>
         </main>
         <Footer />
+        <SpeedInsights />
       </body>
     </html>
   );
