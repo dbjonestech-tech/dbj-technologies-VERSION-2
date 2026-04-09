@@ -143,7 +143,7 @@ export function Footer() {
               <p className="mt-3 text-sm text-gray-600 mb-3">Tell me about your next project.</p>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 rounded-lg bg-accent-blue px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-accent-blue/80"
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-blue-700"
               >
                 Get in Touch
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
