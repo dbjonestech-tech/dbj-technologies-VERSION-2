@@ -14,7 +14,7 @@ export function JsonLd({ type = "organization", faqItems }: JsonLdProps) {
       "@type": "Organization",
       name: SITE.name,
       url: SITE.url,
-      logo: `${SITE.url}/og-image.png`,
+      logo: `${SITE.url}/brand/dbj_logo_horizontal.svg`,
       description: SITE.description,
       address: {
         "@type": "PostalAddress",

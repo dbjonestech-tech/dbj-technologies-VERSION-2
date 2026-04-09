@@ -1,7 +1,7 @@
 # DBJ Technologies — Official Website
 
-> **We Build the Future.**
-> Full-service web development and technology company website built with Next.js 14, TypeScript, Tailwind CSS, and Framer Motion.
+> **Architect The Impossible.**
+> Bespoke digital engineering studio website built with Next.js 16, TypeScript, Tailwind CSS, and Framer Motion.
 
 ---
 

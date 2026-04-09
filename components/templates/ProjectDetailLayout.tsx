@@ -142,7 +142,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
       {/* Results */}
       {project.results.length > 0 && (
         <section className="py-20">
-          <SectionHeading label="Tech Stack" title="Built With" />
+          <SectionHeading label="Results" title="By the Numbers" />
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid gap-6 sm:grid-cols-3">
               {project.results.map((result, i) => (

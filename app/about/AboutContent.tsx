@@ -51,7 +51,7 @@ export default function AboutContent() {
       <section className="py-32">
         <SectionHeading
           label="How I Work"
-          title="Our Operating Principles"
+          title="Operating Principles"
         />
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
           <div className="relative border-l border-gray-200 pl-8 ml-4 space-y-12">
@@ -79,7 +79,7 @@ export default function AboutContent() {
       {/* Values */}
       <section className="py-32 bg-bg-secondary/50">
         <SectionHeading
-          label="Our Values"
+          label="Core Values"
           title="What Drives Every Decision"
         />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">

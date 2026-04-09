@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "DBJ Technologies | Engineering That Ships";
+export const alt = "DBJ Technologies | Architect The Impossible";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -100,7 +100,7 @@ export default async function OGImage() {
               textTransform: "uppercase",
             }}
           >
-            Engineering That Ships
+            Architect The Impossible
           </span>
         </div>
 
@@ -118,11 +118,11 @@ export default async function OGImage() {
             letterSpacing: "0.15em",
           }}
         >
-          <span>Web Development</span>
+          <span>Frontend Architecture</span>
           <span>•</span>
-          <span>Cloud & DevOps</span>
+          <span>Backend Systems</span>
           <span>•</span>
-          <span>UI/UX Design</span>
+          <span>Cloud Infrastructure</span>
           <span>•</span>
           <span>Dallas, TX</span>
         </div>

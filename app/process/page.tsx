@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "A structured 4-phase delivery framework: Diagnose, Architect, Engineer, Harden. Clear milestones and deliverables at every stage.",
   openGraph: {
     title: "My Process | DBJ Technologies",
-    description: "Four phases, clear milestones, and full transparency. Discovery, Design, Develop, Deploy.",
+    description: "Four phases, clear milestones, and full transparency. Diagnose, Architect, Engineer, Harden.",
   },
 };
 

@@ -41,7 +41,7 @@ export {
 /* ─── SITE META ─────────────────────────────────────── */
 export const SITE = {
   name: "DBJ Technologies",
-  tagline: "Engineering that ships.",
+  tagline: "Architect The Impossible.",
   description:
     "DBJ Technologies is a bespoke digital engineering studio in Dallas, TX. I build high-performance websites, production-grade web applications, and cloud infrastructure using Next.js, React, and TypeScript.",
   url: "https://dbjtechnologies.com",

@@ -31,7 +31,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://dbjtechnologies.com"),
   title: {
-    default: "DBJ Technologies | Digital Engineering Studio in Dallas, TX",
+    default: "DBJ Technologies | Architect The Impossible",
     template: "%s | DBJ Technologies",
   },
   description:
@@ -55,13 +55,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://dbjtechnologies.com",
     siteName: "DBJ Technologies",
-    title: "DBJ Technologies | Digital Engineering Studio in Dallas, TX",
+    title: "DBJ Technologies | Architect The Impossible",
     description:
       "High-performance websites, modern applications, and cloud infrastructure. Engineered by a solo principal architect in Dallas, TX.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DBJ Technologies | Digital Engineering Studio",
+    title: "DBJ Technologies | Architect The Impossible",
     description: "High-performance websites and applications engineered by a solo principal architect in Dallas, TX.",
   },
   icons: {

@@ -110,7 +110,7 @@ export default function ContactContent() {
                   </div>
                   <h3 className="font-display text-2xl font-bold mb-2">Message Sent</h3>
                   <p className="text-text-secondary max-w-sm">
-                    We&apos;ll review your project details and get back to you
+                    I&apos;ll review your project details and get back to you
                     within one business day.
                   </p>
                   <button
