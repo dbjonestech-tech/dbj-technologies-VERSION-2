@@ -33,7 +33,7 @@ export function Footer() {
                 className="h-9 w-auto"
               />
             </Link>
-            <p className="mt-4 text-sm leading-relaxed text-text-secondary">
+            <p className="mt-4 text-sm leading-relaxed text-gray-600">
               Bespoke digital engineering studio in Dallas, TX. Production-grade sites and applications built by a solo principal architect.
             </p>
             {SOCIALS.length > 0 && (
@@ -44,7 +44,7 @@ export function Footer() {
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-text-secondary transition-all duration-300 hover:border-accent-blue/40 hover:text-accent-blue hover:bg-accent-blue/5"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-600 transition-all duration-300 hover:border-accent-blue/40 hover:text-accent-blue hover:bg-accent-blue/5"
                     aria-label={s.label}
                   >
                     <SocialIcon name={s.icon} />
@@ -56,7 +56,7 @@ export function Footer() {
 
           {/* Links */}
           <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-widest text-text-muted">
+            <h3 className="font-display text-sm font-bold uppercase tracking-widest text-gray-500">
               Navigation
             </h3>
             <ul className="mt-4 space-y-3">
@@ -74,7 +74,7 @@ export function Footer() {
                           }
                         : undefined
                     }
-                    className="text-sm text-text-secondary transition-colors hover:text-gray-900"
+                    className="text-sm text-gray-600 transition-colors hover:text-gray-900"
                   >
                     {link.label}
                   </Link>
@@ -85,7 +85,7 @@ export function Footer() {
 
           {/* Services + Support */}
           <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-widest text-text-muted">
+            <h3 className="font-display text-sm font-bold uppercase tracking-widest text-gray-500">
               Services
             </h3>
             <ul className="mt-4 space-y-3">
@@ -93,14 +93,14 @@ export function Footer() {
                 <li key={s.title}>
                   <Link
                     href={`/services/${s.slug}`}
-                    className="text-sm text-text-secondary transition-colors hover:text-gray-900"
+                    className="text-sm text-gray-600 transition-colors hover:text-gray-900"
                   >
                     {s.title}
                   </Link>
                 </li>
               ))}
             </ul>
-            <h3 className="mt-6 font-display text-sm font-bold uppercase tracking-widest text-text-muted">
+            <h3 className="mt-6 font-display text-sm font-bold uppercase tracking-widest text-gray-500">
               Support
             </h3>
             <ul className="mt-4 space-y-3">
@@ -108,7 +108,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-text-secondary transition-colors hover:text-gray-900"
+                    className="text-sm text-gray-600 transition-colors hover:text-gray-900"
                   >
                     {link.label}
                   </Link>
@@ -119,17 +119,17 @@ export function Footer() {
 
           {/* Contact info */}
           <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-widest text-text-muted">
+            <h3 className="font-display text-sm font-bold uppercase tracking-widest text-gray-500">
               Get In Touch
             </h3>
             <ul className="mt-4 space-y-4">
-              <li className="flex items-start gap-3 text-sm text-text-secondary">
+              <li className="flex items-start gap-3 text-sm text-gray-600">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent-blue" aria-hidden="true" />
                 <a href={`mailto:${SITE.email}`} className="hover:text-gray-900 transition-colors">
                   {SITE.email}
                 </a>
               </li>
-              <li className="flex items-start gap-3 text-sm text-text-secondary">
+              <li className="flex items-start gap-3 text-sm text-gray-600">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-blue" aria-hidden="true" />
                 <span>{SITE.address}</span>
               </li>
@@ -137,10 +137,10 @@ export function Footer() {
 
             {/* CTA */}
             <div className="mt-8">
-              <h3 className="font-display text-sm font-bold uppercase tracking-widest text-text-muted">
+              <h3 className="font-display text-sm font-bold uppercase tracking-widest text-gray-500">
                 Ready to Start?
               </h3>
-              <p className="mt-3 text-sm text-text-secondary mb-3">Tell me about your next project.</p>
+              <p className="mt-3 text-sm text-gray-600 mb-3">Tell me about your next project.</p>
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 rounded-lg bg-accent-blue px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-accent-blue/80"
@@ -154,10 +154,10 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-8 sm:flex-row">
-          <p className="text-xs text-text-muted">
+          <p className="text-xs text-gray-500">
             &copy; {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
-          <div className="flex gap-6 text-xs text-text-muted">
+          <div className="flex gap-6 text-xs text-gray-500">
             <Link href="/privacy" className="hover:text-gray-900 transition-colors">
               Privacy Policy
             </Link>
