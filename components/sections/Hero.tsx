@@ -33,16 +33,16 @@ export function Hero() {
     if (reducedMotion) {
       setMode("skip");
       setPhase("complete");
-      if (overlayRef.current) overlayRef.current.style.display = "none";
-      if (svgLayerRef.current) svgLayerRef.current.style.display = "none";
+      if (overlayRef.current) { overlayRef.current.style.opacity = "0"; overlayRef.current.style.visibility = "hidden"; }
+      if (svgLayerRef.current) { svgLayerRef.current.style.opacity = "0"; svgLayerRef.current.style.visibility = "hidden"; }
       return;
     }
     try {
       if (sessionStorage.getItem("hero-revealed") === "true") {
         setMode("fade");
         setPhase("complete");
-        if (overlayRef.current) overlayRef.current.style.display = "none";
-        if (svgLayerRef.current) svgLayerRef.current.style.display = "none";
+        if (overlayRef.current) { overlayRef.current.style.opacity = "0"; overlayRef.current.style.visibility = "hidden"; }
+        if (svgLayerRef.current) { svgLayerRef.current.style.opacity = "0"; svgLayerRef.current.style.visibility = "hidden"; }
         return;
       }
     } catch {
@@ -80,11 +80,13 @@ export function Hero() {
           }
 
           if (overlayRef.current) {
-            overlayRef.current.style.display = "none";
+            overlayRef.current.style.opacity = "0";
+            overlayRef.current.style.visibility = "hidden";
             overlayRef.current.style.willChange = "auto";
           }
           if (svgLayerRef.current) {
-            svgLayerRef.current.style.display = "none";
+            svgLayerRef.current.style.opacity = "0";
+            svgLayerRef.current.style.visibility = "hidden";
             svgLayerRef.current.style.willChange = "auto";
           }
         }, 800);
@@ -435,7 +437,7 @@ export function Hero() {
         </svg>
 
         {/* Light sweep during build phase */}
-        {phase === "build" && <div className="hero-cinema-sweep" />}
+        <div className="hero-cinema-sweep" style={{ opacity: phase === "build" ? 1 : 0 }} />
       </div>
     </section>
   );
