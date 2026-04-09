@@ -21,12 +21,6 @@
     "react-hook-form": "^7.54.2",
     "zod": "^3.24.1"
   },
-  "browserslist": [
-    "Chrome >= 90",
-    "Firefox >= 90",
-    "Safari >= 15",
-    "Edge >= 90"
-  ],
   "engines": {
     "node": ">=20.x"
   },
