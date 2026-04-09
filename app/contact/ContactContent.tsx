@@ -152,7 +152,7 @@ export default function ContactContent() {
                     <Input
                       label="Phone (optional)"
                       type="tel"
-                      placeholder="+1 (555) 000-0000"
+                      placeholder="+1 (214) 304-9779"
                       {...register("phone")}
                     />
                     <Input

@@ -58,7 +58,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-gray-900 mb-3">9. Contact</h2>
-            <p>Questions about these terms can be directed to <a href="mailto:hello@dbjtechnologies.com" className="text-accent-blue hover:underline">hello@dbjtechnologies.com</a>.</p>
+            <p>Questions about these terms can be directed to <a href="mailto:dbjonestech@gmail.com" className="text-accent-blue hover:underline">dbjonestech@gmail.com</a>.</p>
           </section>
         </div>
       </div>

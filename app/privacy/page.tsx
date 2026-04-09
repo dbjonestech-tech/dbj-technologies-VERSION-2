@@ -43,7 +43,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-gray-900 mb-3">6. Your Rights</h2>
-            <p>You may request access to, correction of, or deletion of your personal information at any time by contacting hello@dbjtechnologies.com. A response will be provided within 30 days.</p>
+            <p>You may request access to, correction of, or deletion of your personal information at any time by contacting dbjonestech@gmail.com. A response will be provided within 30 days.</p>
           </section>
 
           <section>
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-gray-900 mb-3">8. Contact</h2>
-            <p>If you have questions about this privacy policy, contact <a href="mailto:hello@dbjtechnologies.com" className="text-accent-blue hover:underline">hello@dbjtechnologies.com</a>.</p>
+            <p>If you have questions about this privacy policy, contact <a href="mailto:dbjonestech@gmail.com" className="text-accent-blue hover:underline">dbjonestech@gmail.com</a>.</p>
           </section>
         </div>
       </div>
