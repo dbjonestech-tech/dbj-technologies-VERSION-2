@@ -324,13 +324,14 @@ export function Hero() {
         className={`hero-cinema-overlay${
           phase === "reveal" ? " hero-cinema-overlay-reveal" : ""
         }`}
+        style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
         aria-hidden="true"
       >
         <div className="dot-grid absolute inset-0" style={{ opacity: 0.15 }} />
       </div>
 
       {/* ════ SVG TEXT LAYER (z-[110]) ════ */}
-      <div ref={svgLayerRef} className={svgClasses} aria-hidden="true">
+      <div ref={svgLayerRef} className={svgClasses} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }} aria-hidden="true">
         <svg
           viewBox="0 0 1100 400"
           width={1100}
