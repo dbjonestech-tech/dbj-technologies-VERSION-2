@@ -57,7 +57,7 @@ export default function HeroCinema({
     };
   }, []);
 
-  /* ─── Ambient blueprint flashes (subtle distant storm) ─── */
+  /* ─── Ambient blueprint flashes (irregular distant storm) ─── */
   useEffect(() => {
     if (!active || !fontsLoaded || phase !== "blueprint") return;
 
@@ -66,13 +66,22 @@ export default function HeroCinema({
       ambientTimersRef.current.push(id);
     };
 
-    // ~1s after mount, three 150ms flashes at 0→0.3→0, ~400ms spacing
-    schedule(1000, () => setFlashOpacity(0.3));
-    schedule(1150, () => setFlashOpacity(0));
-    schedule(1400, () => setFlashOpacity(0.3));
-    schedule(1550, () => setFlashOpacity(0));
-    schedule(1800, () => setFlashOpacity(0.3));
-    schedule(1950, () => setFlashOpacity(0));
+    // 6 sharp irregular flashes of varying intensity (distant → closer → distant)
+    // Each flash is 60-80ms of light, gaps vary between 50-600ms.
+    // [startMs, duration, intensity]
+    const flashes: Array<[number, number, number]> = [
+      [1000, 70, 0.15], // distant opener
+      [1080, 60, 0.4],  // near-instant double
+      [1400, 80, 0.15], // pause, distant
+      [2000, 65, 0.6],  // bright close strike
+      [2070, 60, 0.4],  // stutter right after
+      [2550, 75, 0.6],  // final dramatic flash
+    ];
+
+    for (const [start, duration, intensity] of flashes) {
+      schedule(start, () => setFlashOpacity(intensity));
+      schedule(start + duration, () => setFlashOpacity(0));
+    }
 
     return () => {
       ambientTimersRef.current.forEach((id) => window.clearTimeout(id));
@@ -106,11 +115,14 @@ export default function HeroCinema({
       setPhase("build");
       onPhaseChange?.("build");
 
-      // Intense lightning flash pulses: 0→0.7→0 twice, 200ms apart
-      setFlashOpacity(0.7);
-      scheduleTrigger(100, () => setFlashOpacity(0));
-      scheduleTrigger(200, () => setFlashOpacity(0.7));
-      scheduleTrigger(300, () => setFlashOpacity(0));
+      // Three sharp 60ms flashes at 0.85 peak with irregular spacing:
+      // flash 1 at 0ms, flash 2 at 80ms (near-back-to-back), flash 3 at 250ms.
+      setFlashOpacity(0.85);
+      scheduleTrigger(60, () => setFlashOpacity(0));
+      scheduleTrigger(80, () => setFlashOpacity(0.85));
+      scheduleTrigger(140, () => setFlashOpacity(0));
+      scheduleTrigger(250, () => setFlashOpacity(0.85));
+      scheduleTrigger(310, () => setFlashOpacity(0));
 
       // Screen shake on .hero-cinema-viewport (no conflict with layer scale)
       scheduleTrigger(400, () => setShaking(true));

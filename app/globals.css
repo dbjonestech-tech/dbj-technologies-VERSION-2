@@ -464,7 +464,7 @@ select:focus-visible {
 .hero-storm-flash {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8), transparent 70%);
+  background: rgba(255, 255, 255, 1);
   pointer-events: none;
   z-index: 1;
 }

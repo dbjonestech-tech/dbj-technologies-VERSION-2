@@ -100,6 +100,14 @@ export function LightningCrackle({ active, fadeOut }: LightningCrackleProps) {
       const w = rect.width;
       const h = rect.height;
 
+      // Inner bounding box = the text area (center 50% of the oversized canvas)
+      const innerLeft = w * 0.25;
+      const innerRight = w * 0.75;
+      const innerTop = h * 0.25;
+      const innerBottom = h * 0.75;
+      const innerW = innerRight - innerLeft;
+      const innerH = innerBottom - innerTop;
+
       // Trailing phosphor fade
       ctx.globalCompositeOperation = "destination-out";
       ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
@@ -109,25 +117,74 @@ export function LightningCrackle({ active, fadeOut }: LightningCrackleProps) {
         ctx.globalCompositeOperation = "lighter";
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 1.5;
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 18;
         ctx.shadowColor = "#4facfe";
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
 
-        const edges = [
-          (): Point => ({ x: Math.random() * w, y: 0 }),
-          (): Point => ({ x: w, y: Math.random() * h }),
-          (): Point => ({ x: Math.random() * w, y: h }),
-          (): Point => ({ x: 0, y: Math.random() * h }),
-        ];
-        const startEdge = Math.floor(Math.random() * 4);
-        let endEdge = Math.floor(Math.random() * 4);
-        if (endEdge === startEdge) endEdge = (endEdge + 2) % 4;
-        const start = edges[startEdge]();
-        const end = edges[endEdge]();
+        // Points along the INNER bounding box edges (the text area)
+        const innerEdge = (): Point => {
+          const side = Math.floor(Math.random() * 4);
+          switch (side) {
+            case 0:
+              return { x: innerLeft + Math.random() * innerW, y: innerTop };
+            case 1:
+              return { x: innerRight, y: innerTop + Math.random() * innerH };
+            case 2:
+              return { x: innerLeft + Math.random() * innerW, y: innerBottom };
+            default:
+              return { x: innerLeft, y: innerTop + Math.random() * innerH };
+          }
+        };
 
-        const displacement = Math.min(w, h) * 0.25;
-        drawBolt(ctx, start, end, displacement, 5, 0.35);
+        // Random point in the OUTER overflow zone (outside the inner box)
+        const outerPoint = (): Point => {
+          // pick one of the 4 margin bands: top, right, bottom, left
+          const band = Math.floor(Math.random() * 4);
+          switch (band) {
+            case 0:
+              return { x: Math.random() * w, y: Math.random() * innerTop };
+            case 1:
+              return {
+                x: innerRight + Math.random() * (w - innerRight),
+                y: Math.random() * h,
+              };
+            case 2:
+              return {
+                x: Math.random() * w,
+                y: innerBottom + Math.random() * (h - innerBottom),
+              };
+            default:
+              return {
+                x: Math.random() * innerLeft,
+                y: Math.random() * h,
+              };
+          }
+        };
+
+        // 2-3 bolts per qualifying frame, each shooting outward from the text
+        const boltCount = 2 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < boltCount; i++) {
+          const start = innerEdge();
+          const end = outerPoint();
+          drawBolt(ctx, start, end, 70, 5, 0.35);
+        }
+
+        // ~20% chance: one dramatic long stray arc reaching up to 1.5x the inner
+        // container dimensions away, clamped to canvas bounds.
+        if (Math.random() < 0.2) {
+          const start = innerEdge();
+          const maxReachX = innerW * 1.5;
+          const maxReachY = innerH * 1.5;
+          const angle = Math.random() * Math.PI * 2;
+          const distX = Math.cos(angle) * maxReachX;
+          const distY = Math.sin(angle) * maxReachY;
+          const end: Point = {
+            x: Math.max(0, Math.min(w, start.x + distX)),
+            y: Math.max(0, Math.min(h, start.y + distY)),
+          };
+          drawBolt(ctx, start, end, 70, 6, 0.4);
+        }
       }
 
       rafRef.current = requestAnimationFrame(tick);
@@ -169,7 +226,14 @@ export function LightningCrackle({ active, fadeOut }: LightningCrackleProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none z-10"
+      className="pointer-events-none z-10"
+      style={{
+        position: "absolute",
+        top: "-50%",
+        left: "-50%",
+        width: "200%",
+        height: "200%",
+      }}
       aria-hidden="true"
     />
   );
