@@ -57,20 +57,6 @@ export default function HeroCinema({
     };
   }, []);
 
-  /* ─── Flip content-visibility to visible after hydration ───
-     The SSR HTML ships the overlay + viewport with
-     `content-visibility: hidden` so the browser skips all rendering
-     work for the subtree (no layout, no paint, no CLS contribution).
-     Once client JS has mounted, we flip it to `visible` — any resulting
-     paint happens post-hydration on position:fixed elements and cannot
-     contribute to the document-level CLS metric. */
-  useEffect(() => {
-    const overlayEl = overlayRef.current;
-    if (overlayEl) overlayEl.style.contentVisibility = "visible";
-    const layerEl = svgLayerRef.current;
-    if (layerEl) layerEl.style.contentVisibility = "visible";
-  }, []);
-
   /* ─── Ambient blueprint flashes (irregular distant storm) ─── */
   useEffect(() => {
     if (!active || !fontsLoaded || phase !== "blueprint") return;

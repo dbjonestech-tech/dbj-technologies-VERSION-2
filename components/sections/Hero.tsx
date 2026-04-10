@@ -10,13 +10,14 @@ import { Spotlight } from "@/components/effects/Spotlight";
 import { MagneticButton } from "@/components/effects/MagneticButton";
 import { LightningCrackle } from "../effects/LightningCrackle";
 import { HERO_CONTENT } from "@/lib/constants";
-import HeroCinema from "./HeroCinema";
 
 const ParticleField = dynamic(
   () =>
     import("@/components/effects/ParticleField").then((m) => m.ParticleField),
   { ssr: false }
 );
+
+const HeroCinema = dynamic(() => import("./HeroCinema"), { ssr: false });
 
 type Mode = "cinematic" | "skip" | "fade";
 
@@ -244,6 +245,20 @@ export function Hero() {
 
       {/* Bottom gradient fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bg-primary/80 to-transparent z-10" />
+
+      {/* Hydration-flash cover: a tiny dark overlay that exists from SSR
+          to mask the light hero during the gap between first paint and
+          when the dynamic HeroCinema chunk mounts. Fades out the moment
+          onRevealComplete fires (setting lightRevealed = true). Sits at
+          z-[99], directly below the real cinema overlay (z-[100]). */}
+      <div
+        className="fixed inset-0 z-[99] bg-[#06060a] pointer-events-none"
+        style={{
+          opacity: lightRevealed ? 0 : 1,
+          transition: "opacity 0.3s ease-out",
+        }}
+        aria-hidden="true"
+      />
 
       {/* ════ CINEMATIC LAYER (deferred, no SSR) ════ */}
       <HeroCinema

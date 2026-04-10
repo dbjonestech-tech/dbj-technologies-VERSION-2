@@ -324,10 +324,6 @@ select:focus-visible {
   inset: 0;
   z-index: 100;
   background: #06060a;
-  /* Skip all rendering work until we explicitly flip it to visible
-     client-side after hydration. Prevents this subtree from ever
-     contributing to the CLS metric. */
-  content-visibility: hidden;
   -webkit-mask-image: radial-gradient(
     circle at 50% 50%,
     transparent var(--hero-reveal-r),
@@ -361,9 +357,6 @@ select:focus-visible {
   transition: opacity 0.15s ease-out;
   will-change: opacity;
   contain: layout paint;
-  /* Skip all rendering work (layout, paint, compositing) until flipped
-     to visible client-side after hydration. Zero CLS contribution. */
-  content-visibility: hidden;
 }
 
 /* SVG text layer — aspect-ratio locked box (the SVG's direct parent) */
