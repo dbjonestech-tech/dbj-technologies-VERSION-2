@@ -206,6 +206,11 @@ export default function HeroCinema({
           phase === "reveal" ? " hero-cinema-overlay-reveal" : ""
         }`}
         style={{
+          // Fixed positioning inlined so it's applied from the very first
+          // HTML parse, independent of when external CSS is applied.
+          position: "fixed",
+          inset: 0,
+          zIndex: 100,
           opacity: overlayVisible ? undefined : 0,
           pointerEvents: overlayVisible ? undefined : "none",
         }}
@@ -226,8 +231,18 @@ export default function HeroCinema({
         ref={svgLayerRef}
         className={`hero-cinema-viewport${shaking ? " hero-shake" : ""}`}
         style={{
+          // Fixed positioning + flex centering inlined so the viewport is
+          // out of document flow from the very first paint — any paint
+          // inside this subtree cannot be attributed as a shift to the
+          // parent <section>'s layout.
+          position: "fixed",
+          inset: 0,
+          zIndex: 110,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
           opacity: layerVisible ? 1 : 0,
-          pointerEvents: layerVisible ? "none" : "none",
         }}
         aria-hidden="true"
       >
