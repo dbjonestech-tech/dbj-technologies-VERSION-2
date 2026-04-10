@@ -2,7 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "redirects": [
-    { "source": "/websites", "destination": "/work", "permanent": true }
+    { "source": "/websites", "destination": "/work", "permanent": true },
+    { "source": "/pricing/foundation", "destination": "/pricing/starter", "permanent": true },
+    { "source": "/pricing/scale", "destination": "/pricing/professional", "permanent": true }
   ],
   "headers": [
     {

@@ -96,7 +96,7 @@ export const PRICING_DETAILS: PricingDetail[] = [
     slug: "enterprise",
     tierName: "Enterprise",
     heroTitle: "The Enterprise Phase:",
-    heroHighlight: "Full-Professional Digital Engineering.",
+    heroHighlight: "Full-Scale Digital Engineering.",
     heroDescription:
       "Custom application engineering, cloud infrastructure, dedicated architectural oversight, and white-glove delivery. For organizations that need technology to be a competitive advantage.",
     idealFor: [
