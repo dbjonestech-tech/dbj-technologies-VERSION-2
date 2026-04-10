@@ -111,15 +111,18 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, fontsLoaded, phase]);
 
-  if (!active) return null;
-
-  const svgClasses = [
+  const layerClasses = [
     "hero-cinema-layer",
     phase === "build" || phase === "reveal" ? "hero-cinema-build" : "",
-    phase === "reveal" ? "hero-cinema-reveal" : "",
+    phase === "reveal" || phase === "complete"
+      ? "hero-cinema-reveal"
+      : "",
   ]
     .filter(Boolean)
     .join(" ");
+
+  const layerVisible = active && fontsLoaded && phase !== "complete";
+  const overlayVisible = active && phase !== "complete";
 
   return (
     <>
@@ -130,12 +133,8 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
           phase === "reveal" ? " hero-cinema-overlay-reveal" : ""
         }`}
         style={{
-          position: "fixed",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          pointerEvents: "none",
-          zIndex: 100,
+          opacity: overlayVisible ? undefined : 0,
+          pointerEvents: overlayVisible ? undefined : "none",
         }}
         aria-hidden="true"
       >
@@ -145,46 +144,21 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
         />
       </div>
 
-      {/* ════ SVG TEXT LAYER (z-[110]) ════ */}
+      {/* ════ SVG TEXT VIEWPORT (z-[110]) ════ */}
       <div
         ref={svgLayerRef}
-        className={svgClasses}
+        className="hero-cinema-viewport"
         style={{
-          position: "fixed",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          pointerEvents: "none",
-          zIndex: 110,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          transform: "scale(1.3)",
-          opacity: fontsLoaded ? 1 : 0,
-          transition: "opacity 0.15s ease-out",
+          opacity: layerVisible ? 1 : 0,
+          pointerEvents: layerVisible ? "none" : "none",
         }}
         aria-hidden="true"
       >
-        <div
-          style={{
-            position: "relative",
-            width: "90%",
-            maxWidth: 1100,
-            margin: "0 auto",
-            height: 0,
-            paddingBottom: "36.36%",
-          }}
-        >
+        <div className={layerClasses}>
           <svg
             viewBox="0 0 1100 400"
+            preserveAspectRatio="xMidYMid meet"
             className="hero-cinema-svg"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-            }}
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>

@@ -9,14 +9,13 @@ import { GradientBlob } from "@/components/effects/GradientBlob";
 import { Spotlight } from "@/components/effects/Spotlight";
 import { MagneticButton } from "@/components/effects/MagneticButton";
 import { HERO_CONTENT } from "@/lib/constants";
+import HeroCinema from "./HeroCinema";
 
 const ParticleField = dynamic(
   () =>
     import("@/components/effects/ParticleField").then((m) => m.ParticleField),
   { ssr: false }
 );
-
-const HeroCinema = dynamic(() => import("./HeroCinema"), { ssr: false });
 
 type Mode = "cinematic" | "skip" | "fade";
 
