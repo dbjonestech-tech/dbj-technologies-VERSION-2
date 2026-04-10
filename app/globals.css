@@ -324,6 +324,10 @@ select:focus-visible {
   inset: 0;
   z-index: 100;
   background: #06060a;
+  /* Skip all rendering work until we explicitly flip it to visible
+     client-side after hydration. Prevents this subtree from ever
+     contributing to the CLS metric. */
+  content-visibility: hidden;
   -webkit-mask-image: radial-gradient(
     circle at 50% 50%,
     transparent var(--hero-reveal-r),
@@ -356,10 +360,10 @@ select:focus-visible {
   pointer-events: none;
   transition: opacity 0.15s ease-out;
   will-change: opacity;
-  /* strict = size layout paint style — full subtree isolation so the
-     scale transition on .hero-cinema-layer cannot be measured as a
-     document-level layout shift by Chromium's CLS observer. */
-  contain: strict;
+  contain: layout paint;
+  /* Skip all rendering work (layout, paint, compositing) until flipped
+     to visible client-side after hydration. Zero CLS contribution. */
+  content-visibility: hidden;
 }
 
 /* SVG text layer — aspect-ratio locked box (the SVG's direct parent) */
@@ -371,12 +375,6 @@ select:focus-visible {
   transform: scale(1.3);
   transform-origin: center center;
   contain: layout paint;
-  /* Promote to its own GPU compositing layer so the scale(1.3)→scale(1)
-     transition runs entirely on the compositor and cannot be flagged
-     as a layout shift — critical for desktop where the element covers
-     ~82% of the viewport. */
-  will-change: transform;
-  backface-visibility: hidden;
 }
 
 .hero-cinema-svg {
