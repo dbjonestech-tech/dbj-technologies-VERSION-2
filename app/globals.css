@@ -116,11 +116,6 @@ body {
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25), 0 1px 2px rgba(0, 0, 0, 0.06);
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-primary:active {
-    transform: translateY(0px);
-    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.3);
-    transition-duration: 100ms;
-  }
 
   .btn-outline {
     @apply relative inline-flex items-center gap-2 rounded-full px-8 py-3.5 font-body font-semibold text-gray-900 transition-all duration-300;
@@ -129,11 +124,6 @@ body {
     backdrop-filter: blur(8px);
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-outline:active {
-    transform: translateY(0px);
-    box-shadow: none;
-    transition-duration: 100ms;
-  }
 }
 
 @media (hover: hover) {
@@ -141,22 +131,38 @@ body {
     box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4), 0 2px 6px rgba(0, 0, 0, 0.08);
     transform: translateY(-2px);
   }
+  .btn-primary:active {
+    transform: translateY(0px);
+    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.3);
+    transition-duration: 100ms;
+  }
   .btn-outline:hover {
     border-color: rgba(59, 130, 246, 0.5);
     background: rgba(59, 130, 246, 0.04);
     box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1), 0 0 0 1px rgba(59, 130, 246, 0.08);
     transform: translateY(-2px);
   }
+  .btn-outline:active {
+    transform: translateY(0px);
+    box-shadow: none;
+    transition-duration: 100ms;
+  }
 }
 
 @media (hover: none) {
   .btn-primary:active,
-  .btn-outline:active {
-    transform: none;
-    box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+  .btn-primary:focus,
+  .btn-outline:active,
+  .btn-outline:focus {
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
   }
-  .btn-outline:active {
-    transform: none;
+  .btn-outline:active,
+  .btn-outline:focus {
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
   }
 }
 
