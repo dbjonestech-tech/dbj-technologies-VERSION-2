@@ -7,7 +7,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GridBackground } from "@/components/effects/GridBackground";
 import { GradientBlob } from "@/components/effects/GradientBlob";
 import { Accordion } from "@/components/ui/Accordion";
-import { PRICING_TIERS, FAQ_ITEMS } from "@/lib/constants";
+import { PRICING_TIERS, PRICING_ADDONS, FAQ_ITEMS } from "@/lib/constants";
 
 export default function PricingContent() {
   const billingFaqs = FAQ_ITEMS.filter((f) => f.category === "Billing");
@@ -88,18 +88,25 @@ export default function PricingContent() {
                 </p>
 
                 <div className="mt-6 mb-8">
-                  {tier.monthlyPrice !== null ? (
+                  {tier.price !== null ? (
                     <div className="flex items-baseline gap-1">
                       <span className="font-display text-5xl font-bold">
-                        ${tier.monthlyPrice.toLocaleString()}
+                        ${tier.price.toLocaleString()}
                       </span>
-                      <span className="text-text-muted text-sm">/project</span>
                     </div>
                   ) : (
-                    <div className="font-display text-4xl font-bold text-gradient">
-                      Custom
+                    <div>
+                      <div className="font-display text-4xl font-bold text-gradient">
+                        Custom
+                      </div>
+                      <div className="text-text-muted text-sm mt-1">
+                        Starts at $15,000
+                      </div>
                     </div>
                   )}
+                  <p className="text-sm text-text-secondary mt-2">
+                    Delivered in {tier.timeline}
+                  </p>
                 </div>
 
                 <Link
@@ -131,6 +138,42 @@ export default function PricingContent() {
                     </div>
                   ))}
                 </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Add-Ons */}
+      <section className="py-20">
+        <SectionHeading label="Add-Ons" title="Flexible Engagements" />
+        <div className="mx-auto max-w-4xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {PRICING_ADDONS.map((addon, i) => (
+              <motion.div
+                key={addon.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="border border-white/[0.06] rounded-2xl p-8 bg-white/[0.02]"
+              >
+                <h3 className="text-xl font-semibold">{addon.name}</h3>
+                <p className="text-sm text-text-secondary mt-2">
+                  {addon.description}
+                </p>
+                <div className="mt-6 flex items-baseline gap-2">
+                  <span className="text-3xl font-bold">${addon.price}</span>
+                  <span className="text-sm text-text-muted">
+                    / {addon.unit.replace("per ", "")}
+                  </span>
+                </div>
+                <Link
+                  href={addon.href}
+                  className="mt-6 block w-full text-center rounded-xl py-3.5 font-semibold text-sm border border-gray-200 bg-white text-gray-900 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300"
+                >
+                  {addon.cta}
+                </Link>
               </motion.div>
             ))}
           </div>

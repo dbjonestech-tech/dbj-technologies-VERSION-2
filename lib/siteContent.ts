@@ -70,11 +70,20 @@ export interface PricingFeature {
 export interface PricingTier {
   name: string;
   description: string;
-  monthlyPrice: number | null;
-  annualPrice: number | null;
+  price: number | null;
+  timeline: string;
   popular: boolean;
   features: PricingFeature[];
   cta: string;
+}
+
+export interface PricingAddon {
+  name: string;
+  description: string;
+  price: number;
+  unit: string;
+  cta: string;
+  href: string;
 }
 
 export interface PortfolioItem {
@@ -338,61 +347,82 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
 
 export const PRICING_TIERS: PricingTier[] = [
   {
-    name: "Foundation",
+    name: "Starter",
     description:
-      "A precision-built digital presence for businesses ready to launch with engineering-grade quality from day one.",
-    monthlyPrice: 2500,
-    annualPrice: 2000,
+      "Perfect for small businesses and personal brands launching their first professional site.",
+    price: 4500,
+    timeline: "3–4 weeks",
     popular: false,
     features: [
-      { text: "Up to 5 production pages", included: true },
-      { text: "Mobile-first responsive engineering", included: true },
-      { text: "Technical SEO & structured data", included: true },
-      { text: "Contact form with validation", included: true },
-      { text: "Performance baseline: 90+ Lighthouse", included: true },
+      { text: "Up to 5 pages", included: true },
+      { text: "Responsive design", included: true },
+      { text: "Basic SEO setup", included: true },
+      { text: "Contact form", included: true },
+      { text: "2 rounds of revisions", included: true },
       { text: "CMS integration", included: false },
-      { text: "Custom animation systems", included: false },
-      { text: "Priority support channel", included: false },
+      { text: "Custom animations", included: false },
+      { text: "Priority support", included: false },
     ],
-    cta: "Begin Foundation Phase",
+    cta: "Get Started",
   },
   {
-    name: "Scale",
+    name: "Professional",
     description:
-      "For growing businesses that need advanced architecture, CMS-driven content, and custom interaction design.",
-    monthlyPrice: 6000,
-    annualPrice: 5000,
+      "For growing companies that need a high-performance site with advanced features and integrations.",
+    price: 9500,
+    timeline: "5–8 weeks",
     popular: true,
     features: [
-      { text: "Up to 15 production pages", included: true },
-      { text: "Mobile-first responsive engineering", included: true },
-      { text: "Advanced SEO, analytics & schema markup", included: true },
-      { text: "Headless CMS integration", included: true },
-      { text: "Custom animation & interaction systems", included: true },
-      { text: "Collaborative design review cycles", included: true },
-      { text: "Performance target: 95+ Lighthouse", included: true },
-      { text: "Priority support channel (48h SLA)", included: true },
+      { text: "Up to 15 pages", included: true },
+      { text: "Responsive design", included: true },
+      { text: "Advanced SEO & analytics", included: true },
+      { text: "CMS integration", included: true },
+      { text: "Custom animations & interactions", included: true },
+      { text: "3 rounds of revisions", included: true },
+      { text: "Performance optimization", included: true },
+      { text: "Priority support (48h)", included: true },
     ],
-    cta: "Begin Scale Phase",
+    cta: "Go Professional",
   },
   {
     name: "Enterprise",
     description:
-      "Full-stack application engineering with dedicated architecture, cloud infrastructure, and white-glove delivery.",
-    monthlyPrice: null,
-    annualPrice: null,
+      "Full-scale digital transformation with dedicated engineering, custom infrastructure, and white-glove service.",
+    price: null,
+    timeline: "8–16 weeks",
     popular: false,
     features: [
-      { text: "Unlimited pages & application views", included: true },
-      { text: "Custom full-stack application", included: true },
-      { text: "API design & backend engineering", included: true },
-      { text: "Cloud infrastructure & DevOps", included: true },
-      { text: "CI/CD pipeline & staging environments", included: true },
-      { text: "Dedicated architectural oversight", included: true },
-      { text: "SLA & uptime guarantees", included: true },
-      { text: "Priority support with guaranteed response times", included: true },
+      { text: "Unlimited pages", included: true },
+      { text: "Custom web application", included: true },
+      { text: "Full-stack development", included: true },
+      { text: "Cloud infrastructure setup", included: true },
+      { text: "CI/CD & DevOps pipeline", included: true },
+      { text: "Dedicated project manager", included: true },
+      { text: "SLA & uptime guarantee", included: true },
+      { text: "24/7 priority support", included: true },
     ],
-    cta: "Schedule Discovery",
+    cta: "Contact Us",
+  },
+];
+
+export const PRICING_ADDONS: PricingAddon[] = [
+  {
+    name: "Hourly Consulting",
+    description:
+      "Need a specific fix, performance audit, code review, or migration? Book dedicated engineering hours.",
+    price: 175,
+    unit: "per hour",
+    cta: "Book Hours",
+    href: "/contact",
+  },
+  {
+    name: "Maintenance & Support",
+    description:
+      "Ongoing updates, monitoring, backups, security patches, and priority support to keep your site running flawlessly.",
+    price: 499,
+    unit: "per month",
+    cta: "Start Retainer",
+    href: "/contact",
   },
 ];
 
@@ -445,7 +475,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "Billing",
     question: "How does your pricing work?",
     answer:
-      "I offer fixed-price project engagements based on scope. Every engagement begins with a paid discovery phase that produces a detailed scope, timeline, and cost breakdown before development begins. No hourly billing, no surprise invoices.",
+      "We offer fixed-price project packages with clear deliverables and timelines. Every project begins with a paid discovery phase that includes a detailed scope, timeline, and cost breakdown before development begins. We also offer hourly consulting for specific needs and monthly retainers for ongoing maintenance and support.",
   },
   {
     category: "Billing",
@@ -457,7 +487,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "Billing",
     question: "Are there ongoing costs after launch?",
     answer:
-      "Hosting and domain fees are minimal (typically $20 to $50/month). I also offer optional maintenance retainers starting at $299/month that include updates, monitoring, backups, and priority support.",
+      "Hosting and domain fees are minimal (typically $20–50/month). We offer a Maintenance & Support retainer at $499/month that includes updates, monitoring, backups, security patches, and priority support.",
   },
   {
     category: "Support",

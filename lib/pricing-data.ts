@@ -19,9 +19,9 @@ export interface PricingDetail {
 
 export const PRICING_DETAILS: PricingDetail[] = [
   {
-    slug: "foundation",
-    tierName: "Foundation",
-    heroTitle: "The Foundation Phase:",
+    slug: "starter",
+    tierName: "Starter",
+    heroTitle: "The Starter Phase:",
     heroHighlight: "Launch With Precision.",
     heroDescription:
       "Everything a business needs to go live with a production-grade, high-performance web presence. No templates, no bloat. Just clean, engineered code built for your specific goals.",
@@ -49,15 +49,15 @@ export const PRICING_DETAILS: PricingDetail[] = [
       { title: "Analytics Setup", price: "+$200", description: "Vercel Analytics or Google Analytics with conversion tracking configured and tested." },
     ],
     faq: [
-      { question: "Is the Foundation phase right for me?", answer: "If you need a clean, production-grade website with up to 5 pages and don't require a CMS or complex custom features, Foundation is the ideal starting point. It's designed to get you live quickly with engineering-grade quality." },
-      { question: "Can I upgrade to Scale later?", answer: "Absolutely. Every Foundation engagement is built on the same modern architecture as Scale and Enterprise phases. Adding pages, CMS, or advanced features later is straightforward with no rewrites needed." },
-      { question: "What if I need more design review cycles?", answer: "Additional review cycles are available for $400 each. Most Foundation clients find that one focused cycle is sufficient when the discovery phase is thorough." },
+      { question: "Is the Starter phase right for me?", answer: "If you need a clean, production-grade website with up to 5 pages and don't require a CMS or complex custom features, Starter is the ideal starting point. It's designed to get you live quickly with engineering-grade quality." },
+      { question: "Can I upgrade to Professional later?", answer: "Absolutely. Every Starter engagement is built on the same modern architecture as Professional and Enterprise phases. Adding pages, CMS, or advanced features later is straightforward with no rewrites needed." },
+      { question: "What if I need more design review cycles?", answer: "Additional review cycles are available for $400 each. Most Starter clients find that one focused cycle is sufficient when the discovery phase is thorough." },
     ],
   },
   {
-    slug: "scale",
-    tierName: "Scale",
-    heroTitle: "The Scale Phase:",
+    slug: "professional",
+    tierName: "Professional",
+    heroTitle: "The Professional Phase:",
     heroHighlight: "Engineered for Growth.",
     heroDescription:
       "For growing businesses that need advanced architecture, CMS-driven content, custom interaction design, and priority support. This is the most common engagement tier.",
@@ -87,16 +87,16 @@ export const PRICING_DETAILS: PricingDetail[] = [
       { title: "Custom API Integrations", price: "+$600/integration", description: "CRM, marketing automation, scheduling, or any third-party API connected to your site." },
     ],
     faq: [
-      { question: "Why is Scale the most common engagement?", answer: "It hits the sweet spot for most businesses. Enough pages for a comprehensive site, CMS so you stay independent, custom animations that make a strong impression, and priority support for peace of mind." },
-      { question: "What CMS do you recommend?", answer: "For most Scale engagements, I recommend Sanity for its flexibility and developer experience. I also work with Strapi, Contentful, and headless WordPress depending on your needs." },
-      { question: "Can I add e-commerce later?", answer: "Yes. The Scale architecture supports adding e-commerce functionality as an upgrade at any time without rebuilding the foundation." },
+      { question: "Why is Professional the most common engagement?", answer: "It hits the sweet spot for most businesses. Enough pages for a comprehensive site, CMS so you stay independent, custom animations that make a strong impression, and priority support for peace of mind." },
+      { question: "What CMS do you recommend?", answer: "For most Professional engagements, I recommend Sanity for its flexibility and developer experience. I also work with Strapi, Contentful, and headless WordPress depending on your needs." },
+      { question: "Can I add e-commerce later?", answer: "Yes. The Professional architecture supports adding e-commerce functionality as an upgrade at any time without rebuilding the foundation." },
     ],
   },
   {
     slug: "enterprise",
     tierName: "Enterprise",
     heroTitle: "The Enterprise Phase:",
-    heroHighlight: "Full-Scale Digital Engineering.",
+    heroHighlight: "Full-Professional Digital Engineering.",
     heroDescription:
       "Custom application engineering, cloud infrastructure, dedicated architectural oversight, and white-glove delivery. For organizations that need technology to be a competitive advantage.",
     idealFor: [

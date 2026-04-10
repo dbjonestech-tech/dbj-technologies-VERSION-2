@@ -57,15 +57,16 @@ export function PricingDetailLayout({ detail, tier }: PricingDetailLayoutProps) 
             transition={{ delay: 0.3 }}
             className="mt-8"
           >
-            {tier.monthlyPrice !== null ? (
-              <div className="inline-flex items-baseline gap-2 glass-card px-8 py-4">
-                <span className="text-text-muted text-sm">Starting at</span>
-                <span className="font-display text-4xl font-bold">${tier.annualPrice!.toLocaleString()}</span>
-                <span className="text-text-muted text-sm">/project</span>
+            {tier.price !== null ? (
+              <div className="inline-flex flex-wrap items-baseline justify-center gap-2 glass-card px-8 py-4">
+                <span className="text-text-muted text-sm">One-time</span>
+                <span className="font-display text-4xl font-bold">${tier.price.toLocaleString()}</span>
+                <span className="text-text-muted text-sm">· Delivered in {tier.timeline}</span>
               </div>
             ) : (
-              <div className="inline-flex items-baseline gap-2 glass-card px-8 py-4">
+              <div className="inline-flex flex-col items-center gap-1 glass-card px-8 py-4">
                 <span className="font-display text-3xl font-bold text-gradient">Custom Pricing</span>
+                <span className="text-text-muted text-sm">Starts at $15,000 · Delivered in {tier.timeline}</span>
               </div>
             )}
           </motion.div>
