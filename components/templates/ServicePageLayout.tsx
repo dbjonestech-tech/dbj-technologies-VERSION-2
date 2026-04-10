@@ -253,7 +253,7 @@ export function ServicePageLayout({ service, relatedServices }: ServicePageLayou
                       href={`/services/${related.slug}`}
                       className="inline-flex items-center gap-1 mt-4 text-sm font-medium text-accent-blue group-hover:gap-2 transition-all min-h-[44px] min-w-[44px]"
                     >
-                      Learn More <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      Learn More<span className="sr-only"> about {related.title}</span> <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                     </Link>
                   </div>
                 </motion.div>

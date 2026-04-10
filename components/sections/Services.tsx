@@ -41,7 +41,7 @@ export function ServicesSection() {
                     href={`/services/${service.slug}`}
                     className="inline-flex items-center gap-1 text-sm font-medium text-accent-blue transition-all group-hover:gap-2 min-h-[44px] min-w-[44px]"
                   >
-                    Learn more
+                    Learn more<span className="sr-only"> about {service.title}</span>
                     <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                   </Link>
                 </div>

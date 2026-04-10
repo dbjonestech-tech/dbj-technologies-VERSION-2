@@ -138,7 +138,7 @@ export default function WorkContent() {
                         href={`/work/${project.slug}`}
                         className="inline-flex items-center gap-1 text-sm font-medium text-accent-blue min-h-[44px] min-w-[44px]"
                       >
-                        View Project
+                        View Project<span className="sr-only">: {project.title}</span>
                         <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                       </Link>
                     </div>
