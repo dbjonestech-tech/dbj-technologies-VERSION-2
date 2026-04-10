@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 
 interface MagneticButtonProps {
   children: React.ReactNode;
@@ -17,10 +17,13 @@ export function MagneticButton({
 }: MagneticButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const [transform, setTransform] = useState("translate(0px, 0px)");
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    setIsTouch(window.matchMedia("(hover: none)").matches);
+  }, []);
 
   const handleMouse = useCallback((e: React.MouseEvent) => {
-    // Disable on touch devices
-    if ("ontouchstart" in window) return;
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -32,6 +35,14 @@ export function MagneticButton({
   const handleLeave = useCallback(() => {
     setTransform("translate(0px, 0px)");
   }, []);
+
+  if (isTouch) {
+    return (
+      <button className={className} onClick={onClick}>
+        {children}
+      </button>
+    );
+  }
 
   return (
     <button
