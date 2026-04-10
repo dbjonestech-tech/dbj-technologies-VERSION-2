@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback, useLayoutEffect, useRef } from "react";
+import { useState, useCallback, useLayoutEffect } from "react";
 import dynamic from "next/dynamic";
-import { motion, useScroll } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { GradientBlob } from "@/components/effects/GradientBlob";
@@ -21,10 +21,9 @@ const ParticleField = dynamic(
 type Mode = "cinematic" | "skip" | "fade";
 
 export function Hero() {
-  const heroRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef });
   const [lightRevealed, setLightRevealed] = useState(false);
   const [mode, setMode] = useState<Mode>("cinematic");
+  const [cinemaPhase, setCinemaPhase] = useState<string>("blueprint");
 
   /* ─── SKIP DETECTION (runs before paint) ─── */
   useLayoutEffect(() => {
@@ -61,10 +60,7 @@ export function Hero() {
   };
 
   return (
-    <section
-      ref={heroRef}
-      className="relative flex min-h-screen items-center justify-center overflow-hidden"
-    >
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* ════ LIGHT HERO (z-0 to z-20) ════ */}
 
       {/* Morphing gradient mesh background */}
@@ -150,9 +146,8 @@ export function Hero() {
             </span>
           </motion.h1>
           <LightningCrackle
-            scrollYProgress={scrollYProgress}
-            peakScroll={0.15}
-            dissipateScroll={0.4}
+            active={cinemaPhase === "reveal" || cinemaPhase === "complete"}
+            fadeOut={cinemaPhase === "complete"}
           />
           </div>
         </div>
@@ -251,7 +246,10 @@ export function Hero() {
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bg-primary/80 to-transparent z-10" />
 
       {/* ════ CINEMATIC LAYER (deferred, no SSR) ════ */}
-      <HeroCinema onRevealComplete={handleRevealComplete} />
+      <HeroCinema
+        onRevealComplete={handleRevealComplete}
+        onPhaseChange={setCinemaPhase}
+      />
     </section>
   );
 }

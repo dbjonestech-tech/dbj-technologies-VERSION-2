@@ -447,6 +447,28 @@ select:focus-visible {
   }
 }
 
+/* ─── STORM: shake + lightning flash pulse ───────── */
+@keyframes hero-shake {
+  0%, 100% { transform: translate(0, 0); }
+  12% { transform: translate(-4px, 2px); }
+  25% { transform: translate(3px, -3px); }
+  37% { transform: translate(-2px, -1px); }
+  50% { transform: translate(4px, 3px); }
+  62% { transform: translate(-3px, 1px); }
+  75% { transform: translate(2px, -4px); }
+  87% { transform: translate(-1px, 3px); }
+}
+.hero-shake {
+  animation: hero-shake 0.3s ease-out;
+}
+.hero-storm-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8), transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* ─── REDUCED MOTION ──────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,

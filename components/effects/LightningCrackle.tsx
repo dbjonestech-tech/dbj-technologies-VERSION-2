@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion, useTransform, type MotionValue } from "framer-motion";
 
 interface LightningCrackleProps {
-  scrollYProgress: MotionValue<number>;
-  peakScroll: number;
-  dissipateScroll: number;
+  active: boolean;
+  fadeOut: boolean;
 }
 
 type Point = { x: number; y: number };
@@ -45,7 +43,6 @@ function drawBolt(
   }
   ctx.stroke();
 
-  // Branches off midpoints
   for (let i = 1; i < points.length - 1; i++) {
     if (Math.random() < branchChance) {
       const p = points[i];
@@ -60,25 +57,28 @@ function drawBolt(
   }
 }
 
-export function LightningCrackle({
-  scrollYProgress,
-  peakScroll,
-  dissipateScroll,
-}: LightningCrackleProps) {
+export function LightningCrackle({ active, fadeOut }: LightningCrackleProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number | null>(null);
 
-  const opacity = useTransform(
-    scrollYProgress,
-    [0, peakScroll, dissipateScroll],
-    [0.8, 1, 0]
-  );
-
+  // ─── Render loop: only runs while `active` ─────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    if (!active) {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      return;
+    }
+
+    // Reset canvas visibility at loop start
+    canvas.style.transition = "";
+    canvas.style.opacity = "1";
 
     const dpr = window.devicePixelRatio || 1;
 
@@ -114,7 +114,6 @@ export function LightningCrackle({
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
 
-        // Pick two random points along the bounding-box edges
         const edges = [
           (): Point => ({ x: Math.random() * w, y: 0 }),
           (): Point => ({ x: w, y: Math.random() * h }),
@@ -137,17 +136,40 @@ export function LightningCrackle({
     rafRef.current = requestAnimationFrame(tick);
 
     return () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
       ro.disconnect();
       window.removeEventListener("resize", resize);
     };
-  }, []);
+  }, [active]);
+
+  // ─── Fade-out: CSS transition opacity → 0, then stop the loop ────────
+  useEffect(() => {
+    if (!fadeOut) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.style.transition = "opacity 1.5s ease-out";
+    canvas.style.opacity = "0";
+
+    const t = window.setTimeout(() => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    }, 1500);
+
+    return () => {
+      window.clearTimeout(t);
+    };
+  }, [fadeOut]);
 
   return (
-    <motion.canvas
+    <canvas
       ref={canvasRef}
-      style={{ opacity }}
-      className="absolute inset-0 w-full h-full pointer-events-none z-10 mix-blend-screen"
+      className="absolute inset-0 w-full h-full pointer-events-none z-10"
       aria-hidden="true"
     />
   );

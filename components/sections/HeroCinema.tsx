@@ -6,14 +6,22 @@ type Phase = "blueprint" | "build" | "reveal" | "complete";
 
 interface HeroCinemaProps {
   onRevealComplete: () => void;
+  onPhaseChange?: (phase: string) => void;
 }
 
-export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
+export default function HeroCinema({
+  onRevealComplete,
+  onPhaseChange,
+}: HeroCinemaProps) {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [phase, setPhase] = useState<Phase>("blueprint");
   const [active, setActive] = useState(true);
+  const [flashOpacity, setFlashOpacity] = useState<number>(0);
+  const [shaking, setShaking] = useState<boolean>(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const svgLayerRef = useRef<HTMLDivElement>(null);
+  const ambientTimersRef = useRef<number[]>([]);
+  const triggerTimersRef = useRef<number[]>([]);
 
   /* ─── Skip if already revealed or reduced motion ─── */
   useEffect(() => {
@@ -34,8 +42,43 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
     } catch {
       /* sessionStorage blocked */
     }
+    // Cinematic is going to run — emit initial phase
+    onPhaseChange?.("blueprint");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /* ─── Clean up any pending timers on unmount ─── */
+  useEffect(() => {
+    return () => {
+      ambientTimersRef.current.forEach((id) => window.clearTimeout(id));
+      ambientTimersRef.current = [];
+      triggerTimersRef.current.forEach((id) => window.clearTimeout(id));
+      triggerTimersRef.current = [];
+    };
+  }, []);
+
+  /* ─── Ambient blueprint flashes (subtle distant storm) ─── */
+  useEffect(() => {
+    if (!active || !fontsLoaded || phase !== "blueprint") return;
+
+    const schedule = (delay: number, fn: () => void) => {
+      const id = window.setTimeout(fn, delay);
+      ambientTimersRef.current.push(id);
+    };
+
+    // ~1s after mount, three 150ms flashes at 0→0.3→0, ~400ms spacing
+    schedule(1000, () => setFlashOpacity(0.3));
+    schedule(1150, () => setFlashOpacity(0));
+    schedule(1400, () => setFlashOpacity(0.3));
+    schedule(1550, () => setFlashOpacity(0));
+    schedule(1800, () => setFlashOpacity(0.3));
+    schedule(1950, () => setFlashOpacity(0));
+
+    return () => {
+      ambientTimersRef.current.forEach((id) => window.clearTimeout(id));
+      ambientTimersRef.current = [];
+    };
+  }, [active, fontsLoaded, phase]);
 
   /* ─── Wait for custom fonts to prevent FOUT CLS ─── */
   useEffect(() => {
@@ -45,6 +88,11 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
   /* ─── Scroll / Touch / Key trigger (Act 1 → Act 2) ─── */
   useEffect(() => {
     if (!active || !fontsLoaded || phase !== "blueprint") return;
+
+    const scheduleTrigger = (delay: number, fn: () => void) => {
+      const id = window.setTimeout(fn, delay);
+      triggerTimersRef.current.push(id);
+    };
 
     const trigger = () => {
       document.body.style.overflow = "hidden";
@@ -56,14 +104,27 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
         svgLayerRef.current.style.willChange = "transform, opacity";
 
       setPhase("build");
+      onPhaseChange?.("build");
+
+      // Intense lightning flash pulses: 0→0.7→0 twice, 200ms apart
+      setFlashOpacity(0.7);
+      scheduleTrigger(100, () => setFlashOpacity(0));
+      scheduleTrigger(200, () => setFlashOpacity(0.7));
+      scheduleTrigger(300, () => setFlashOpacity(0));
+
+      // Screen shake on .hero-cinema-viewport (no conflict with layer scale)
+      scheduleTrigger(400, () => setShaking(true));
+      scheduleTrigger(700, () => setShaking(false));
 
       // Act 2 → Act 3 (after 1.5s build)
       setTimeout(() => {
         setPhase("reveal");
+        onPhaseChange?.("reveal");
 
         // Act 3 complete (after 0.8s reveal)
         setTimeout(() => {
           setPhase("complete");
+          onPhaseChange?.("complete");
           document.body.style.overflow = "";
           try {
             sessionStorage.setItem("hero-revealed", "true");
@@ -142,12 +203,16 @@ export default function HeroCinema({ onRevealComplete }: HeroCinemaProps) {
           className="dot-grid absolute inset-0"
           style={{ opacity: 0.15 }}
         />
+        <div
+          className="hero-storm-flash"
+          style={{ opacity: flashOpacity }}
+        />
       </div>
 
       {/* ════ SVG TEXT VIEWPORT (z-[110]) ════ */}
       <div
         ref={svgLayerRef}
-        className="hero-cinema-viewport"
+        className={`hero-cinema-viewport${shaking ? " hero-shake" : ""}`}
         style={{
           opacity: layerVisible ? 1 : 0,
           pointerEvents: layerVisible ? "none" : "none",
