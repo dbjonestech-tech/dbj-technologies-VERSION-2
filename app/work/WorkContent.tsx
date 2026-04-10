@@ -99,25 +99,13 @@ export default function WorkContent() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Link
-                    href={`/work/${project.slug}`}
-                    className="glass-card-hover overflow-hidden group cursor-pointer block"
-                  >
+                  <div className="glass-card-hover overflow-hidden group block cursor-default">
                     {/* Gradient placeholder image */}
                     <div
                       className={`relative h-56 bg-gradient-to-br ${project.gradient} overflow-hidden`}
                       role="img"
                       aria-label={`${project.title} project preview`}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-5">
-                        <span className="flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-md px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-lg translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                          View Project
-                          <ExternalLink
-                            className="h-3.5 w-3.5"
-                            aria-hidden="true"
-                          />
-                        </span>
-                      </div>
                       {/* Decorative pattern */}
                       <div
                         className="absolute inset-0 dot-grid opacity-20"
@@ -141,13 +129,20 @@ export default function WorkContent() {
                       <p className="text-sm text-text-secondary leading-relaxed mb-4">
                         {project.description}
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 mb-4">
                         {project.tags.map((tag) => (
                           <Badge key={tag}>{tag}</Badge>
                         ))}
                       </div>
+                      <Link
+                        href={`/work/${project.slug}`}
+                        className="inline-flex items-center gap-1 text-sm font-medium text-accent-blue min-h-[44px] min-w-[44px]"
+                      >
+                        View Project
+                        <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
                 </motion.div>
               ))}
             </AnimatePresence>

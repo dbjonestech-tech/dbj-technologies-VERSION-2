@@ -244,18 +244,18 @@ export function ServicePageLayout({ service, relatedServices }: ServicePageLayou
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                 >
-                  <Link
-                    href={`/services/${related.slug}`}
-                    className="glass-card-hover p-6 block group"
-                  >
+                  <div className="glass-card-hover p-6 block group cursor-default">
                     <h3 className="font-display text-lg font-bold mb-2 group-hover:text-accent-blue transition-colors">
                       {related.title}
                     </h3>
                     <p className="text-sm text-text-secondary">{related.tagline}</p>
-                    <span className="inline-flex items-center gap-1 mt-4 text-sm font-medium text-accent-blue group-hover:gap-2 transition-all">
+                    <Link
+                      href={`/services/${related.slug}`}
+                      className="inline-flex items-center gap-1 mt-4 text-sm font-medium text-accent-blue group-hover:gap-2 transition-all min-h-[44px] min-w-[44px]"
+                    >
                       Learn More <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                    </span>
-                  </Link>
+                    </Link>
+                  </div>
                 </motion.div>
               ))}
             </div>
