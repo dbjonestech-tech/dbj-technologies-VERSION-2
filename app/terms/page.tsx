@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "DBJ Technologies terms of service. The terms governing use of the website and services.",
-  openGraph: { title: "Terms of Service | DBJ Technologies" },
+  description:
+    "DBJ Technologies terms of service. Engagement scope, payment terms, intellectual property transfer, client responsibilities, limitation of liability, and Texas governing law.",
+  openGraph: {
+    title: "Terms of Service | DBJ Technologies",
+    description:
+      "The terms governing DBJ Technologies engagements: services, payment, IP transfer, client responsibilities, limitation of liability, termination, and Texas governing law.",
+  },
 };
 
 export default function TermsPage() {

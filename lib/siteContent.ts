@@ -433,7 +433,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "General",
     question: "What kind of clients does DBJ Technologies work with?",
     answer:
-      "I work with growth-stage companies, funded startups, and established businesses that need technology built correctly the first time. My minimum engagement starts at $2,500, which filters for clients who value engineering quality over the cheapest bid.",
+      "I work with growth-stage companies, funded startups, and established businesses that need technology built correctly the first time. The $2,500 minimum applies to consulting engagements; full project builds start at $4,500 (Starter tier), which filters for clients who value engineering quality over the cheapest bid.",
   },
   {
     category: "General",

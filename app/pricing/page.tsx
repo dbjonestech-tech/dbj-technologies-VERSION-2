@@ -4,11 +4,11 @@ import PricingContent from "./PricingContent";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Fixed-price engineering phases: Foundation, Scale, and Enterprise. Scope and cost agreed before development begins.",
+    "Fixed-price engineering engagements: Starter from $4,500, Professional from $9,500, Enterprise custom. Scope, timeline, and cost agreed before development begins.",
   openGraph: {
     title: "Pricing | DBJ Technologies",
     description:
-      "Fixed-price engineering engagements with clear scope. Know exactly what you're getting before I write a single line of code.",
+      "Transparent fixed pricing for web, application, and cloud engagements. Starter $4,500, Professional $9,500, Enterprise custom — every scope locked in before I write a line of code.",
   },
 };
 

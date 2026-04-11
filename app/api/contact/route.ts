@@ -154,7 +154,7 @@ export async function POST(request: Request) {
         subject: `New Project Inquiry: ${safe.projectType} — ${safe.name}`,
         html: htmlBody,
       });
-    } else {
+    } else if (process.env.NODE_ENV === "development") {
       // Log to console in dev when SMTP isn't configured
       console.log("──────────────────────────────────────");
       console.log("CONTACT FORM SUBMISSION (SMTP not configured)");

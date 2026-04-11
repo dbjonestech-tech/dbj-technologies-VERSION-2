@@ -51,9 +51,18 @@ export default function PricingContent() {
 
       {/* Pricing note */}
       <section className="pb-8">
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2 text-center">
           <span className="text-sm text-text-muted">
             All prices are per-engagement, fixed before development begins
+          </span>
+          <span className="text-sm text-text-muted">
+            Looking for post-launch care?{" "}
+            <Link
+              href="/maintenance-support"
+              className="text-accent-blue hover:underline"
+            >
+              See maintenance &amp; support plans →
+            </Link>
           </span>
         </div>
       </section>

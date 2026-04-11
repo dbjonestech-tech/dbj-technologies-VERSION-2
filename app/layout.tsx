@@ -58,6 +58,14 @@ export const metadata: Metadata = {
     title: "DBJ Technologies | Architect The Impossible",
     description:
       "High-performance websites, modern applications, and cloud infrastructure. Engineered by a solo principal architect in Dallas, TX.",
+    images: [
+      {
+        url: "https://dbjtechnologies.com/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "DBJ Technologies — Precision-Built Web Solutions",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

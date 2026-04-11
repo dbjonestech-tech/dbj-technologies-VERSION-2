@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "DBJ Technologies privacy policy. How information is collected, used, and protected.",
-  openGraph: { title: "Privacy Policy | DBJ Technologies" },
+  description:
+    "DBJ Technologies privacy policy. How contact form submissions are collected, used, and protected, plus details on encryption, cookies, third-party services, and your rights.",
+  openGraph: {
+    title: "Privacy Policy | DBJ Technologies",
+    description:
+      "How DBJ Technologies collects, uses, stores, and protects your information. Transparent practices, encrypted transmission, zero tracking cookies, and clearly defined user rights.",
+  },
 };
 
 export default function PrivacyPage() {
