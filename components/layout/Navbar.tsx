@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -53,13 +52,9 @@ export function Navbar() {
             }
           }}
         >
-          <Image
+          <img
             src="/brand/dbj_logo_horizontal.svg"
             alt="DBJ Technologies"
-            width={175}
-            height={60}
-            priority
-            unoptimized
             className="h-8 w-auto sm:h-10 lg:h-11"
           />
         </Link>

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowUpRight, Mail, MapPin } from "lucide-react";
 import { SITE, FOOTER_NAV_LINKS, SUPPORT_LINKS, SOCIALS, SERVICES } from "@/lib/constants";
 
@@ -25,12 +24,9 @@ export function Footer() {
                 }
               }}
             >
-              <Image
+              <img
                 src="/brand/dbj_logo_horizontal.svg"
                 alt="DBJ Technologies Logo"
-                width={175}
-                height={60}
-                unoptimized
                 className="h-9 w-auto"
               />
             </Link>
