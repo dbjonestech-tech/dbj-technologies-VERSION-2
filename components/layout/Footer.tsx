@@ -30,6 +30,7 @@ export function Footer() {
                 alt="DBJ Technologies Logo"
                 width={175}
                 height={60}
+                unoptimized
                 className="h-9 w-auto"
               />
             </Link>
