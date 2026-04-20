@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Outfit, JetBrains_Mono } from "next/font/google";
-import { CursorWrapper } from "@/components/layout/CursorWrapper";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/layout/JsonLd";
-import { PageTransition } from "@/components/layout/PageTransition";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 /* ─── FONTS ─────────────────────────────────────────── */
@@ -113,23 +108,7 @@ export default function RootLayout({
         <JsonLd type="localBusiness" />
       </head>
       <body className="font-body bg-bg-primary text-text-primary antialiased selection:bg-accent-blue/20">
-        {/* A11Y: Skip to content */}
-        <a href="#main-content" className="skip-to-content">
-          Skip to content
-        </a>
-
-        {/* Grain texture overlay */}
-        <div className="grain-overlay" aria-hidden="true" />
-
-        {/* Cursor charge enhancement (desktop only, no SSR) */}
-        <CursorWrapper />
-
-        <Navbar />
-        <main id="main-content" className="relative">
-          <PageTransition>{children}</PageTransition>
-        </main>
-        <Footer />
-        <SpeedInsights />
+        {children}
       </body>
     </html>
   );
