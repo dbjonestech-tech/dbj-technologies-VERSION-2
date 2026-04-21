@@ -16,6 +16,9 @@ export function ParticleField() {
   const animRef = useRef<number>(0);
   const mouseRef = useRef({ x: -1000, y: -1000 });
   const particlesRef = useRef<Particle[]>([]);
+  const isVisibleRef = useRef(true);
+  const isTabActiveRef = useRef(true);
+  const isRunningRef = useRef(false);
 
   const init = useCallback(() => {
     const canvas = canvasRef.current;
@@ -65,7 +68,13 @@ export function ParticleField() {
     const CONNECT_DIST_SQ = 120 * 120;
     const MOUSE_DIST_SQ = 150 * 150;
 
+    const shouldRun = () => isVisibleRef.current && isTabActiveRef.current;
+
     const draw = () => {
+      if (!shouldRun()) {
+        isRunningRef.current = false;
+        return;
+      }
       const w = canvas.width;
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
@@ -118,9 +127,33 @@ export function ParticleField() {
       animRef.current = requestAnimationFrame(draw);
     };
 
-    draw();
+    const startLoop = () => {
+      if (isRunningRef.current || !shouldRun()) return;
+      isRunningRef.current = true;
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+        if (entry.isIntersecting) startLoop();
+      },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+
+    const handleVisibility = () => {
+      isTabActiveRef.current = document.visibilityState === "visible";
+      if (isTabActiveRef.current) startLoop();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    startLoop();
     return () => {
       cancelAnimationFrame(animRef.current);
+      isRunningRef.current = false;
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("resize", handleResize);
       canvas.removeEventListener("mousemove", handleMouse);
     };

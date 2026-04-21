@@ -419,7 +419,7 @@ export const PRICING_ADDONS: PricingAddon[] = [
     name: "Maintenance & Support",
     description:
       "Ongoing updates, monitoring, backups, security patches, and priority support to keep your site running flawlessly.",
-    price: 499,
+    price: 299,
     unit: "per month",
     cta: "Start Retainer",
     href: "/contact",
@@ -433,7 +433,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "General",
     question: "What kind of clients does DBJ Technologies work with?",
     answer:
-      "I work with growth-stage companies, funded startups, and established businesses that need technology built correctly the first time. The $2,500 minimum applies to consulting engagements; full project builds start at $4,500 (Starter tier), which filters for clients who value engineering quality over the cheapest bid.",
+      "I work with growth-stage companies, funded startups, and established businesses that need technology built correctly the first time. The $4,500 minimum engagement (Starter tier) filters for clients who value engineering quality over the cheapest bid.",
   },
   {
     category: "General",
@@ -487,7 +487,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "Billing",
     question: "Are there ongoing costs after launch?",
     answer:
-      "Hosting and domain fees are minimal (typically $20–50/month). We offer a Maintenance & Support retainer at $499/month that includes updates, monitoring, backups, security patches, and priority support.",
+      "Hosting and domain fees are minimal (typically $20–50/month). We offer a Maintenance & Support retainer at $299/month that includes updates, monitoring, backups, security patches, and priority support.",
   },
   {
     category: "Support",
@@ -516,8 +516,7 @@ export const CTA_DEFAULTS: CTADefaults = {
 /* ─── BUDGET OPTIONS (CONTACT FORM) ────────────────── */
 
 export const BUDGET_OPTIONS = [
-  "$2,500 to $5,000",
-  "$5,000 to $10,000",
+  "$4,500 to $10,000",
   "$10,000 to $25,000",
   "$25,000+",
   "Not sure yet",
