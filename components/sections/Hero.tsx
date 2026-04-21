@@ -148,7 +148,7 @@ export function Hero() {
               style={{ clipPath: "inset(-5px -20px -5px -20px)" }}
             >
               <motion.span
-                className="inline-block text-gradient"
+                className="inline-block text-gradient pr-2"
                 initial={{ y: "110%" }}
                 animate={lightRevealed ? { y: 0 } : { y: "110%" }}
                 transition={{
