@@ -25,6 +25,10 @@ const TechStackSection = dynamic(
   () => import("@/components/sections/TechStack").then((m) => m.TechStackSection),
   { loading: () => <SectionSkeleton /> }
 );
+const PathlightCTA = dynamic(
+  () => import("@/components/sections/PathlightCTA").then((m) => m.PathlightCTA),
+  { loading: () => <SectionSkeleton /> }
+);
 const CTASection = dynamic(
   () => import("@/components/sections/CTA").then((m) => m.CTASection),
   { loading: () => <SectionSkeleton /> }
@@ -66,6 +70,7 @@ export default function HomePage() {
       <ProcessSteps />
       <TestimonialsSection />
       <TechStackSection />
+      <PathlightCTA />
       <CTASection />
     </>
   );

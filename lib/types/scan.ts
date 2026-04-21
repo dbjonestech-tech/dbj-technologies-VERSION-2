@@ -20,6 +20,85 @@ export type ScreenshotPair = {
   mobile: string | null;
 };
 
+export type DesignMetric = {
+  score: number;
+  observation: string;
+};
+
+export type DesignScores = {
+  hero_impact: DesignMetric;
+  typography: DesignMetric;
+  spacing: DesignMetric;
+  color_discipline: DesignMetric;
+  photography_quality: DesignMetric;
+  cta_clarity: DesignMetric;
+  mobile_experience: DesignMetric;
+  trust_signals: DesignMetric;
+  brand_coherence: DesignMetric;
+};
+
+export type PositioningMetric = {
+  score: number;
+  observation: string;
+};
+
+export type PositioningScores = {
+  value_proposition: PositioningMetric;
+  service_clarity: PositioningMetric;
+  social_proof: PositioningMetric;
+  contact_accessibility: PositioningMetric;
+  competitive_differentiation: PositioningMetric;
+};
+
+export type VisionAuditResult = {
+  design: DesignScores;
+  positioning: PositioningScores;
+};
+
+export type RemediationImpact = "high" | "medium" | "low";
+export type RemediationDifficulty = "easy" | "moderate" | "hard";
+
+export type RemediationItem = {
+  title: string;
+  problem: string;
+  improvement: string;
+  impact: RemediationImpact;
+  difficulty: RemediationDifficulty;
+};
+
+export type RemediationResult = {
+  items: RemediationItem[];
+};
+
+export type RevenueAssumptions = {
+  estimatedMonthlyVisitors: number;
+  industryAvgConversionRate: number;
+  avgDealValue: number;
+  conversionImprovementEstimate: number;
+};
+
+export type RevenueImpactResult = {
+  estimatedMonthlyLoss: number;
+  methodology: string;
+  confidence: "low" | "medium" | "high";
+  assumptions: RevenueAssumptions;
+};
+
+export type PillarScores = {
+  design: number;
+  performance: number;
+  positioning: number;
+  findability: number;
+};
+
+export type PageTextContent = {
+  title: string | null;
+  metaDescription: string | null;
+  headings: string[];
+  linkTexts: string[];
+  structuredData: unknown;
+};
+
 export type ScanRecord = {
   id: string;
   status: ScanStatus;
@@ -36,6 +115,31 @@ export type ScanRecord = {
   positioningAnalysis: unknown;
   remediationPlan: unknown;
   revenueImpact: unknown;
+  error: string | null;
+  duration: number | null;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+};
+
+export type PathlightReport = {
+  id: string;
+  status: ScanStatus;
+  url: string;
+  resolvedUrl: string | null;
+  email: string;
+  businessName: string | null;
+  city: string | null;
+  industry: string | null;
+  scores: PerformanceScores | null;
+  screenshotDesktop: string | null;
+  screenshotMobile: string | null;
+  design: DesignScores | null;
+  positioning: PositioningScores | null;
+  remediation: RemediationResult | null;
+  revenueImpact: RevenueImpactResult | null;
+  pathlightScore: number | null;
+  pillarScores: PillarScores | null;
   error: string | null;
   duration: number | null;
   createdAt: string;

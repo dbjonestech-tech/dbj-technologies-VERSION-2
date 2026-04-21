@@ -1,13 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getDb } from "@/lib/db";
 import { ScanStatus } from "./ScanStatus";
+
+export const metadata: Metadata = {
+  title: "Your Pathlight Report",
+  robots: { index: false, follow: false },
+};
 
 type ScanRow = {
   id: string;
   url: string;
   status: string;
-  completed_at: string | null;
-  error_message: string | null;
 };
 
 export default async function ScanResultsPage({
@@ -19,7 +23,7 @@ export default async function ScanResultsPage({
 
   const sql = getDb();
   const rows = (await sql`
-    SELECT id, url, status, completed_at, error_message
+    SELECT id, url, status
     FROM scans
     WHERE id = ${scanId}
     LIMIT 1
@@ -59,8 +63,6 @@ export default async function ScanResultsPage({
         scanId: row.id,
         url: row.url,
         status: row.status,
-        completedAt: row.completed_at,
-        errorMessage: row.error_message,
       }}
     />
   );

@@ -1,13 +1,27 @@
 import { getDb } from "../db";
 import {
+  getScanPipelineContext,
   markScanComplete,
+  updatePathlightScore,
+  updateScanAiAnalysis,
+  updateScanRemediation,
   updateScanResolvedUrl,
   updateScanResults,
+  updateScanRevenueImpact,
   updateScanScreenshots,
   updateScanStatus,
 } from "../db/queries";
+import type { PerformanceScores } from "@/lib/types/scan";
 import { captureScreenshot } from "../services/browserless";
+import {
+  extractPageTextContent,
+  runRemediationPlan,
+  runRevenueImpact,
+  runVisionAudit,
+} from "../services/claude-analysis";
 import { runPerformanceAudit } from "../services/pagespeed";
+import { fetchFindabilityScores } from "../services/pagespeed-extra";
+import { calculatePathlightScore } from "../services/scoring";
 import { normalizeUrl, validateUrl } from "../services/url";
 import { inngest } from "./client";
 
@@ -19,11 +33,22 @@ type ScreenshotOutcome = {
   errors: string[];
 };
 
+type StepOutcome = { ok: boolean; error?: string };
+type AuditOutcome = {
+  ok: boolean;
+  error: string | null;
+  scores: PerformanceScores | null;
+};
+
+function describeError(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
 export const scanRequested = inngest.createFunction(
   {
     id: "pathlight-scan-requested",
     triggers: [{ event: "pathlight/scan.requested" }],
-    timeouts: { finish: "120s" },
+    timeouts: { finish: "420s" },
     retries: 1,
   },
   async ({ event, step }) => {
@@ -101,18 +126,147 @@ export const scanRequested = inngest.createFunction(
         await updateScanStatus(scanId, "analyzing");
       });
 
-      const audit = await step.run("run-audit", async () => {
+      const audit: AuditOutcome = await step.run("run-audit", async () => {
         try {
           const { scores, raw } = await runPerformanceAudit(resolvedUrl);
           const durationMs = Date.now() - startedAt;
-          await updateScanResults(scanId, scores, raw, durationMs, resolvedUrl);
-          return { ok: true as const, error: null };
+          await updateScanResults(scanId, raw, durationMs, resolvedUrl);
+          return { ok: true, error: null, scores };
         } catch (err) {
           const message =
             err instanceof Error ? err.message : "Performance audit failed.";
-          return { ok: false as const, error: message };
+          return { ok: false, error: message, scores: null };
         }
       });
+
+      const visionStep: StepOutcome = await step.run(
+        "ai-vision-audit",
+        async () => {
+          if (!audit.ok || !audit.scores) {
+            return { ok: false, error: "skipped: performance audit failed" };
+          }
+          if (!screenshots.desktop || !screenshots.mobile) {
+            return {
+              ok: false,
+              error: "skipped: one or both screenshots are missing",
+            };
+          }
+          try {
+            const ctx = await getScanPipelineContext(scanId);
+            if (!ctx) return { ok: false, error: "scan record vanished" };
+            const pageText = extractPageTextContent(ctx.lighthouseData);
+            const result = await runVisionAudit(
+              screenshots.desktop,
+              screenshots.mobile,
+              ctx.industry,
+              ctx.city,
+              audit.scores,
+              pageText
+            );
+            await updateScanAiAnalysis(scanId, result);
+            return { ok: true };
+          } catch (err) {
+            return { ok: false, error: describeError(err) };
+          }
+        }
+      );
+
+      const remediationStep: StepOutcome = await step.run(
+        "ai-remediation",
+        async () => {
+          if (!visionStep.ok) {
+            return { ok: false, error: "skipped: vision audit did not succeed" };
+          }
+          if (!audit.scores) {
+            return { ok: false, error: "skipped: performance scores unavailable" };
+          }
+          try {
+            const ctx = await getScanPipelineContext(scanId);
+            if (!ctx || !ctx.visionAudit) {
+              return { ok: false, error: "missing prerequisites" };
+            }
+            const result = await runRemediationPlan(
+              ctx.visionAudit,
+              audit.scores,
+              ctx.industry
+            );
+            await updateScanRemediation(scanId, result);
+            return { ok: true };
+          } catch (err) {
+            return { ok: false, error: describeError(err) };
+          }
+        }
+      );
+
+      const revenueStep: StepOutcome = await step.run(
+        "ai-revenue-impact",
+        async () => {
+          if (!visionStep.ok) {
+            return { ok: false, error: "skipped: vision audit did not succeed" };
+          }
+          if (!remediationStep.ok) {
+            return { ok: false, error: "skipped: remediation plan unavailable" };
+          }
+          try {
+            const ctx = await getScanPipelineContext(scanId);
+            if (!ctx || !ctx.visionAudit || !ctx.remediation) {
+              return { ok: false, error: "missing prerequisites" };
+            }
+            const result = await runRevenueImpact(
+              ctx.visionAudit,
+              ctx.remediation,
+              ctx.industry,
+              ctx.city
+            );
+            await updateScanRevenueImpact(scanId, result);
+            return { ok: true };
+          } catch (err) {
+            return { ok: false, error: describeError(err) };
+          }
+        }
+      );
+
+      const scoreStep: StepOutcome = await step.run(
+        "calculate-score",
+        async () => {
+          if (!visionStep.ok) {
+            return { ok: false, error: "skipped: vision audit did not succeed" };
+          }
+          if (!audit.scores) {
+            return { ok: false, error: "skipped: performance scores unavailable" };
+          }
+          try {
+            const ctx = await getScanPipelineContext(scanId);
+            if (!ctx || !ctx.visionAudit) {
+              return { ok: false, error: "missing prerequisites" };
+            }
+
+            let seo = audit.scores.overall;
+            let accessibility = audit.scores.overall;
+            try {
+              const extras = await fetchFindabilityScores(
+                ctx.resolvedUrl ?? ctx.url
+              );
+              seo = extras.seo;
+              accessibility = extras.accessibility;
+            } catch {
+              // PSI failure is tolerated: fall back to performance score proxy.
+            }
+
+            const { pathlightScore, pillarScores } = calculatePathlightScore(
+              ctx.visionAudit.design,
+              audit.scores.overall,
+              ctx.visionAudit.positioning,
+              seo,
+              accessibility
+            );
+            await updatePathlightScore(scanId, pathlightScore, pillarScores);
+            return { ok: true };
+          } catch (err) {
+            return { ok: false, error: describeError(err) };
+          }
+        }
+      );
 
       await step.run("finalize", async () => {
         const haveScreenshots =
@@ -120,8 +274,15 @@ export const scanRequested = inngest.createFunction(
         const errors: string[] = [];
         if (!audit.ok && audit.error) errors.push(`audit: ${audit.error}`);
         if (screenshots.errors.length > 0) errors.push(...screenshots.errors);
+        if (!visionStep.ok) errors.push(`vision: ${visionStep.error ?? "unknown"}`);
+        if (!remediationStep.ok)
+          errors.push(`remediation: ${remediationStep.error ?? "unknown"}`);
+        if (!revenueStep.ok)
+          errors.push(`revenue: ${revenueStep.error ?? "unknown"}`);
+        if (!scoreStep.ok) errors.push(`score: ${scoreStep.error ?? "unknown"}`);
 
-        if (!audit.ok && !haveScreenshots) {
+        const hardFail = !audit.ok && !haveScreenshots;
+        if (hardFail) {
           await updateScanStatus(
             scanId,
             "failed",
@@ -130,7 +291,12 @@ export const scanRequested = inngest.createFunction(
           return;
         }
 
-        if (!audit.ok || !haveScreenshots) {
+        const aiFullySucceeded =
+          visionStep.ok && remediationStep.ok && revenueStep.ok && scoreStep.ok;
+        const delivered =
+          audit.ok && haveScreenshots && aiFullySucceeded;
+
+        if (!delivered) {
           await markScanComplete(scanId, "partial", errors.join("; "));
           return;
         }

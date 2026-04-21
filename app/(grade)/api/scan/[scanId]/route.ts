@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { getScanById } from "@/lib/db/queries";
+import { getFullScanReport } from "@/lib/db/queries";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ scanId: string }> }
 ) {
   const { scanId } = await params;
-  const record = await getScanById(scanId);
+  const report = await getFullScanReport(scanId);
 
-  if (!record) {
+  if (!report) {
     return NextResponse.json(
       { error: "Scan not found" },
       { status: 404, headers: { "Cache-Control": "no-cache" } }
@@ -17,20 +17,29 @@ export async function GET(
 
   return NextResponse.json(
     {
-      scanId: record.id,
-      id: record.id,
-      status: record.status,
-      url: record.url,
-      resolvedUrl: record.resolvedUrl,
-      scores: record.scores,
-      screenshotDesktop: record.screenshotDesktop,
-      screenshotMobile: record.screenshotMobile,
-      error: record.error,
-      errorMessage: record.error,
-      duration: record.duration,
-      createdAt: record.createdAt,
-      updatedAt: record.updatedAt,
-      completedAt: record.completedAt,
+      // Backward-compatible fields for the existing poller
+      scanId: report.id,
+      id: report.id,
+      status: report.status,
+      url: report.url,
+      resolvedUrl: report.resolvedUrl,
+      scores: report.scores,
+      screenshotDesktop: report.screenshotDesktop,
+      screenshotMobile: report.screenshotMobile,
+      error: report.error,
+      errorMessage: report.error,
+      duration: report.duration,
+      createdAt: report.createdAt,
+      updatedAt: report.updatedAt,
+      completedAt: report.completedAt,
+      // Full Pathlight report
+      industry: report.industry,
+      design: report.design,
+      positioning: report.positioning,
+      remediation: report.remediation,
+      revenueImpact: report.revenueImpact,
+      pathlightScore: report.pathlightScore,
+      pillarScores: report.pillarScores,
     },
     { headers: { "Cache-Control": "no-cache" } }
   );
