@@ -110,6 +110,47 @@ body {
     color: #2563eb;
   }
 
+  /* Hero revealed-state polish — only active when Hero.tsx toggles
+     the `.hero-revealed` class on the <section>. Blueprint phase has
+     no such class, so its appearance is untouched. */
+  .hero-revealed h1 {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  }
+
+  .hero-revealed .text-gradient {
+    text-shadow: none;
+    background: linear-gradient(
+      110deg,
+      #3b82f6 0%,
+      #60a5fa 35%,
+      #22d3ee 50%,
+      #60a5fa 65%,
+      #3b82f6 100%
+    );
+    background-size: 200% 100%;
+    background-position: 0% 50%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: hero-gradient-shift 10s ease-in-out infinite;
+  }
+
+  @keyframes hero-gradient-shift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-revealed .text-gradient {
+      animation: none;
+    }
+  }
+
   .btn-primary {
     @apply relative inline-flex items-center gap-2 rounded-full px-8 py-3.5 font-body font-semibold text-white;
     background: linear-gradient(135deg, #3b82f6, #2563eb);

@@ -61,7 +61,11 @@ export function Hero() {
   };
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
+    <section
+      className={`relative flex min-h-screen items-center justify-center${
+        lightRevealed ? " hero-revealed" : ""
+      }`}
+    >
       {/* ════ LIGHT HERO (z-0 to z-20) ════ */}
 
       {/* Morphing gradient mesh background */}
@@ -74,14 +78,23 @@ export function Hero() {
 
       <ParticleField />
       <Spotlight />
-      <GradientBlob
-        className="-top-40 -left-40"
-        colors={["#3b82f6", "#1e40af", "#06b6d4"]}
-      />
-      <GradientBlob
-        className="-bottom-40 -right-40"
-        colors={["#8b5cf6", "#6d28d9", "#3b82f6"]}
-      />
+
+      {/* Blobs live inside a clipping wrapper so they can't leak past the
+          section bounds; the text content below is outside this wrapper
+          and therefore never clipped by it. */}
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        <GradientBlob
+          className="-top-40 -left-40"
+          colors={["#3b82f6", "#1e40af", "#06b6d4"]}
+        />
+        <GradientBlob
+          className="-bottom-40 -right-40"
+          colors={["#8b5cf6", "#6d28d9", "#3b82f6"]}
+        />
+      </div>
 
       {/* Content */}
       <div className="relative z-20 mx-auto max-w-6xl px-6 text-center lg:px-8">
