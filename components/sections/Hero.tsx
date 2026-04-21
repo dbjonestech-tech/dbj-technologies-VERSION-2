@@ -143,7 +143,7 @@ export function Hero() {
               </span>
             ))}
             <br />
-            <span className="inline-block overflow-hidden pb-2 sm:pb-4">
+            <span className="inline-block overflow-hidden pb-2 pr-1 sm:pb-4">
               <motion.span
                 className="inline-block text-gradient"
                 initial={{ y: "110%" }}
