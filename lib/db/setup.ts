@@ -1,16 +1,26 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getDb } from "./index";
+
+const envPath = resolve(process.cwd(), ".env.local");
+if (existsSync(envPath) && typeof process.loadEnvFile === "function") {
+  process.loadEnvFile(envPath);
+}
 
 async function main() {
   const sql = getDb();
   const schemaPath = resolve(process.cwd(), "lib/db/schema.sql");
-  const schema = readFileSync(schemaPath, "utf8");
+  const schemaRaw = readFileSync(schemaPath, "utf8");
+
+  const schema = schemaRaw
+    .split("\n")
+    .filter((line) => !line.trim().startsWith("--"))
+    .join("\n");
 
   const statements = schema
     .split(";")
     .map((s) => s.trim())
-    .filter((s) => s.length > 0 && !s.startsWith("--"));
+    .filter((s) => s.length > 0);
 
   console.log(`Running ${statements.length} statements against Postgres...`);
 
