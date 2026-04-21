@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getDb } from "./index";
 
@@ -7,23 +7,20 @@ if (existsSync(envPath) && typeof process.loadEnvFile === "function") {
   process.loadEnvFile(envPath);
 }
 
-async function main() {
-  const sql = getDb();
-  const schemaPath = resolve(process.cwd(), "lib/db/schema.sql");
-  const schemaRaw = readFileSync(schemaPath, "utf8");
-
-  const schema = schemaRaw
+function splitStatements(raw: string): string[] {
+  return raw
     .split("\n")
     .filter((line) => !line.trim().startsWith("--"))
-    .join("\n");
-
-  const statements = schema
+    .join("\n")
     .split(";")
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
+}
 
-  console.log(`Running ${statements.length} statements against Postgres...`);
-
+async function runFile(label: string, path: string) {
+  const sql = getDb();
+  const statements = splitStatements(readFileSync(path, "utf8"));
+  console.log(`[${label}] running ${statements.length} statements...`);
   for (const statement of statements) {
     try {
       await sql.query(statement);
@@ -33,6 +30,20 @@ async function main() {
       console.error("  FAIL", statement);
       console.error(err);
       process.exit(1);
+    }
+  }
+}
+
+async function main() {
+  await runFile("schema", resolve(process.cwd(), "lib/db/schema.sql"));
+
+  const migrationsDir = resolve(process.cwd(), "lib/db/migrations");
+  if (existsSync(migrationsDir)) {
+    const files = readdirSync(migrationsDir)
+      .filter((f) => f.endsWith(".sql"))
+      .sort();
+    for (const file of files) {
+      await runFile(`migration:${file}`, resolve(migrationsDir, file));
     }
   }
 

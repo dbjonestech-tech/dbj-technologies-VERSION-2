@@ -1,36 +1,37 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
-
-type ScanRow = {
-  id: string;
-  status: string;
-  completed_at: string | null;
-  error_message: string | null;
-};
+import { getScanById } from "@/lib/db/queries";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ scanId: string }> }
 ) {
   const { scanId } = await params;
+  const record = await getScanById(scanId);
 
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT id, status, completed_at, error_message
-    FROM scans
-    WHERE id = ${scanId}
-    LIMIT 1
-  `) as ScanRow[];
-
-  if (rows.length === 0) {
-    return NextResponse.json({ error: "Scan not found" }, { status: 404 });
+  if (!record) {
+    return NextResponse.json(
+      { error: "Scan not found" },
+      { status: 404, headers: { "Cache-Control": "no-cache" } }
+    );
   }
 
-  const row = rows[0]!;
-  return NextResponse.json({
-    scanId: row.id,
-    status: row.status,
-    completedAt: row.completed_at,
-    errorMessage: row.error_message,
-  });
+  return NextResponse.json(
+    {
+      scanId: record.id,
+      id: record.id,
+      status: record.status,
+      url: record.url,
+      resolvedUrl: record.resolvedUrl,
+      scores: record.scores,
+      screenshotDesktop: record.screenshotDesktop,
+      screenshotMobile: record.screenshotMobile,
+      error: record.error,
+      errorMessage: record.error,
+      duration: record.duration,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+      completedAt: record.completedAt,
+    },
+    { headers: { "Cache-Control": "no-cache" } }
+  );
 }

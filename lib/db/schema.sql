@@ -4,13 +4,15 @@
 CREATE TABLE IF NOT EXISTS scans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   url TEXT NOT NULL,
+  resolved_url TEXT,
   email TEXT NOT NULL,
   business_name TEXT,
   industry TEXT DEFAULT 'general',
   city TEXT,
   state TEXT DEFAULT 'TX',
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'scanning', 'analyzing', 'complete', 'failed')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'scanning', 'analyzing', 'complete', 'partial', 'failed')),
   error_message TEXT,
+  scan_duration_ms INTEGER,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   completed_at TIMESTAMPTZ
@@ -18,7 +20,7 @@ CREATE TABLE IF NOT EXISTS scans (
 
 CREATE TABLE IF NOT EXISTS scan_results (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  scan_id UUID NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
+  scan_id UUID NOT NULL UNIQUE REFERENCES scans(id) ON DELETE CASCADE,
   lighthouse_data JSONB,
   screenshots JSONB,
   ai_analysis JSONB,
@@ -48,3 +50,4 @@ CREATE INDEX IF NOT EXISTS idx_scans_email ON scans(email);
 CREATE INDEX IF NOT EXISTS idx_scans_status ON scans(status);
 CREATE INDEX IF NOT EXISTS idx_scans_created ON scans(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email);
+CREATE UNIQUE INDEX IF NOT EXISTS scan_results_scan_id_key ON scan_results(scan_id);
