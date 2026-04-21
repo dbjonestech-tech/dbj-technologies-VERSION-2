@@ -5,12 +5,12 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { MapPin, Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { GridBackground } from "@/components/effects/GridBackground";
 import { GradientBlob } from "@/components/effects/GradientBlob";
-import { SITE, SOCIALS, BUDGET_OPTIONS, PROJECT_TYPE_OPTIONS } from "@/lib/constants";
+import { SITE, BUDGET_OPTIONS, PROJECT_TYPE_OPTIONS } from "@/lib/constants";
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -148,19 +148,11 @@ export default function ContactContent() {
                       {...register("email")}
                     />
                   </div>
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <Input
-                      label="Phone (optional)"
-                      type="tel"
-                      placeholder="+1 (214) 304-9779"
-                      {...register("phone")}
-                    />
-                    <Input
-                      label="Company (optional)"
-                      placeholder="Your company name"
-                      {...register("company")}
-                    />
-                  </div>
+                  <Input
+                    label="Company (optional)"
+                    placeholder="Your company name"
+                    {...register("company")}
+                  />
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div className="space-y-1.5">
                       <label htmlFor="budget" className="block text-sm font-medium text-text-secondary">
@@ -213,7 +205,7 @@ export default function ContactContent() {
                   {status === "error" && (
                     <div role="alert" className="flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
                       <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      Something went wrong. Please try again or email me directly.
+                      Something went wrong. Please try again in a moment.
                     </div>
                   )}
 
@@ -245,21 +237,6 @@ export default function ContactContent() {
               <div className="glass-card p-8">
                 <h3 className="font-display text-xl font-bold mb-6">Get In Touch</h3>
                 <div className="space-y-5">
-                  <a
-                    href={`mailto:${SITE.email}`}
-                    className="flex items-start gap-4 group"
-                    aria-label={`Email ${SITE.email}`}
-                  >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue group-hover:bg-accent-blue/20 transition-colors">
-                      <Mail className="h-5 w-5" aria-hidden="true" />
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-widest text-text-muted mb-1">Email</p>
-                      <p className="text-sm text-text-secondary group-hover:text-gray-900 transition-colors">
-                        {SITE.email}
-                      </p>
-                    </div>
-                  </a>
                   <div className="flex items-start gap-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue">
                       <MapPin className="h-5 w-5" aria-hidden="true" />
@@ -281,26 +258,6 @@ export default function ContactContent() {
                 </p>
               </div>
 
-              {/* Social — only shown when there are verified profiles */}
-              {SOCIALS.length > 0 && (
-                <div className="glass-card p-8">
-                  <h3 className="font-display text-lg font-bold mb-4">Find Me Online</h3>
-                  <div className="flex gap-3">
-                    {SOCIALS.map((s) => (
-                      <a
-                        key={s.label}
-                        href={s.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-text-secondary hover:text-accent-blue hover:border-accent-blue/30 transition-all"
-                        aria-label={s.label}
-                      >
-                        <span className="text-xs font-bold">{s.label.charAt(0)}</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
             </motion.div>
           </div>
         </div>

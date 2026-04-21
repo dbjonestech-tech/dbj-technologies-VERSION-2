@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { GridBackground } from "@/components/effects/GridBackground";
 import { GradientBlob } from "@/components/effects/GradientBlob";
 import { CTASection } from "@/components/sections/CTA";
-import { TEAM_MEMBERS, VALUES, SITE, ABOUT_CONTENT } from "@/lib/constants";
+import { TEAM_MEMBERS, VALUES, ABOUT_CONTENT } from "@/lib/constants";
 
 const valueIcons = [Zap, Eye, Target, Heart];
 

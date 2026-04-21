@@ -1,4 +1,4 @@
-import { SITE, SERVICES, SOCIALS } from "@/lib/constants";
+import { SITE, SERVICES } from "@/lib/constants";
 
 interface JsonLdProps {
   type?: "organization" | "localBusiness" | "website" | "faq" | "service";
@@ -6,8 +6,6 @@ interface JsonLdProps {
 }
 
 export function JsonLd({ type = "organization", faqItems }: JsonLdProps) {
-  const sameAs = SOCIALS.map((s) => s.href);
-
   const schemas: Record<string, object> = {
     organization: {
       "@context": "https://schema.org",
@@ -22,19 +20,12 @@ export function JsonLd({ type = "organization", faqItems }: JsonLdProps) {
         addressRegion: "TX",
         addressCountry: "US",
       },
-      contactPoint: {
-        "@type": "ContactPoint",
-        contactType: "sales",
-        email: SITE.email,
-      },
-      ...(sameAs.length > 0 && { sameAs }),
     },
     localBusiness: {
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
       name: SITE.name,
       url: SITE.url,
-      email: SITE.email,
       description: SITE.description,
       address: {
         "@type": "PostalAddress",

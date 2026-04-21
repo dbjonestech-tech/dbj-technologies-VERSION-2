@@ -47,8 +47,6 @@ export const SITE = {
   description:
     "DBJ Technologies is a bespoke digital engineering studio in Dallas, TX. I build high-performance websites, production-grade web applications, and cloud infrastructure using Next.js, React, and TypeScript.",
   url: "https://dbjtechnologies.com",
-  email: "dbjonestech@gmail.com",
-  phone: "+1 (214) 304-9779",
   address: "Dallas, TX",
 };
 
@@ -79,12 +77,6 @@ export const FOOTER_NAV_LINKS = [
 export const SUPPORT_LINKS = [
   { label: "Maintenance & Support", href: "/maintenance-support" },
   { label: "Why DBJ", href: "/why-dbj" },
-] as const;
-
-/* ─── SOCIAL LINKS ──────────────────────────────────── */
-export const SOCIALS = [
-  { label: "GitHub", href: "https://github.com/dbjtechnologies", icon: "github" },
-  { label: "LinkedIn", href: "https://linkedin.com/company/dbjtechnologies", icon: "linkedin" },
 ] as const;
 
 /* ─── TESTIMONIALS ──────────────────────────────────── */
