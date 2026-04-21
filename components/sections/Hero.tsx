@@ -143,7 +143,10 @@ export function Hero() {
               </span>
             ))}
             <br />
-            <span className="inline-block overflow-hidden pb-2 pr-3 sm:pb-4">
+            <span
+              className="inline-block pb-2 sm:pb-4"
+              style={{ clipPath: "inset(-5px -20px -5px -20px)" }}
+            >
               <motion.span
                 className="inline-block text-gradient"
                 initial={{ y: "110%" }}
