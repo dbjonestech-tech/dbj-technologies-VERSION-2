@@ -126,7 +126,8 @@ export function Hero() {
             {HERO_CONTENT.headlineWords.map((word, i) => (
               <span
                 key={i}
-                className="inline-block overflow-hidden pb-2 mr-[0.2em] sm:pb-3 sm:mr-[0.25em]"
+                className="inline-block pb-2 mr-[0.2em] sm:pb-3 sm:mr-[0.25em]"
+                style={{ clipPath: "inset(-5px -10px -5px -10px)" }}
               >
                 <motion.span
                   className="inline-block"
