@@ -4,8 +4,6 @@ import { CLIENT_LOGOS } from "@/lib/constants";
 import { useEffect, useRef, useState } from "react";
 
 export function ClientLogos() {
-  if (CLIENT_LOGOS.length === 0) return null;
-  const doubled = [...CLIENT_LOGOS, ...CLIENT_LOGOS];
   const labelRef = useRef<HTMLParagraphElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -19,6 +17,9 @@ export function ClientLogos() {
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+
+  if (CLIENT_LOGOS.length === 0) return null;
+  const doubled = [...CLIENT_LOGOS, ...CLIENT_LOGOS];
 
   return (
     <section className="relative min-h-[200px] py-20 overflow-hidden border-y border-gray-200">
