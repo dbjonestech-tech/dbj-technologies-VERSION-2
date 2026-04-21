@@ -1,0 +1,91 @@
+name: Lighthouse Gate
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
+  content-guard:
+    name: Content Regression Guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for reintroduced email, phone, social links
+        run: |
+          FAIL=0
+
+          if grep -r "dbjonestech@gmail" --include="*.tsx" --include="*.ts" -l | grep -v "route.ts"; then
+            echo "::error::Found dbjonestech@gmail.com in non-API files"
+            FAIL=1
+          fi
+
+          if grep -r "github.com/dbjtechnologies" --include="*.tsx" --include="*.ts" -l; then
+            echo "::error::Found github.com/dbjtechnologies link"
+            FAIL=1
+          fi
+          if grep -r "linkedin.com/company/dbjtechnologies" --include="*.tsx" --include="*.ts" -l; then
+            echo "::error::Found linkedin.com/company/dbjtechnologies link"
+            FAIL=1
+          fi
+
+          if grep -r "304-9779" --include="*.tsx" --include="*.ts" -l; then
+            echo "::error::Found phone number 304-9779"
+            FAIL=1
+          fi
+
+          exit $FAIL
+
+  import-boundaries:
+    name: Import Boundary Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for cross-imports between route groups
+        run: |
+          FAIL=0
+
+          if grep -r "from.*\(marketing\)\|import.*\(marketing\)" --include="*.tsx" --include="*.ts" app/\(grade\)/ 2>/dev/null; then
+            echo "::error::Found (grade) importing from (marketing)"
+            FAIL=1
+          fi
+
+          if grep -r "from.*\(grade\)\|import.*\(grade\)" --include="*.tsx" --include="*.ts" app/\(marketing\)/ 2>/dev/null; then
+            echo "::error::Found (marketing) importing from (grade)"
+            FAIL=1
+          fi
+
+          exit $FAIL
+
+  lighthouse:
+    name: Lighthouse Audit
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: Run Lighthouse CI
+        run: npx lhci autorun
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 14
