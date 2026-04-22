@@ -610,20 +610,12 @@ select:focus-visible {
 }
 
 /* ─── PATHLIGHT CINEMATIC EFFECTS ───────────────────────── */
-@keyframes distant-lightning {
-  0%, 95%, 98%, 100% { opacity: 0.05; }
-  96% { opacity: 0.8; }
-  97% { opacity: 0.2; }
-  99% { opacity: 0.6; }
-}
-.animate-lightning {
-  animation: distant-lightning 12s infinite;
-  will-change: opacity;
-}
 @keyframes subtle-pulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.1); }
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
 }
 .animate-mars {
-  animation: subtle-pulse 6s ease-in-out infinite;
+  animation: subtle-pulse 5s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
 }

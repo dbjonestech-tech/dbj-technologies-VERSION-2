@@ -25,33 +25,33 @@ export function PathlightBackdrop() {
         }}
       />
 
-      {/* 1.5 — The 3D Astrophysical Moon */}
+      {/* 1.5 — The 3D Astrophysical Moon (realistic spherical edge + moonlight) */}
       <div className="absolute pointer-events-none rounded-full h-[225px] w-[225px] top-[calc(22vh_-_112px)] left-[-75px] md:h-[425px] md:w-[425px] md:top-[calc(25vh_-_212px)] md:left-[-148px]">
 
-        {/* Layer 1: Atmospheric Glow (Additive light) */}
+        {/* Layer 1: Atmospheric moonlight glow (cool silver/cyan/indigo bleed) */}
         <div
           className="absolute inset-0 rounded-full mix-blend-screen"
           style={{
-            boxShadow: "0 0 50px 10px rgba(255, 255, 255, 0.3), 0 0 120px 40px rgba(186, 230, 253, 0.2), 0 0 350px 150px rgba(99, 102, 241, 0.08)"
+            boxShadow: "0 0 60px 15px rgba(248, 250, 252, 0.45), 0 0 140px 50px rgba(186, 230, 253, 0.25), 0 0 380px 160px rgba(147, 197, 253, 0.12)"
           }}
         />
 
-        {/* Layer 2: Physical Moon Body (Opaque, blocks stars) */}
+        {/* Layer 2: Physical Moon Body (opaque, blocks stars, perfect edge) */}
         <div className="absolute inset-0 rounded-full bg-black overflow-hidden">
           <div
             className="pathlight-moon w-full h-full bg-cover bg-center"
             style={{
               backgroundImage: "url(/brand/moon.webp)",
-              filter: "sepia(10%) hue-rotate(-10deg) contrast(1.2) brightness(1.1)"
+              filter: "sepia(8%) hue-rotate(-12deg) contrast(1.25) brightness(1.15) saturate(0.95)"
             }}
           />
         </div>
 
-        {/* Layer 3: The 3D Terminator Shadow (Creates the spherical depth) */}
+        {/* Layer 3: True Spherical Terminator (deep shadow on one side for 3D volume + rounded edge) */}
         <div
           className="absolute inset-0 rounded-full"
           style={{
-            boxShadow: "inset -50px -50px 80px rgba(0,0,0,0.95), inset 10px 10px 30px rgba(255,255,255,0.25)"
+            background: "radial-gradient(circle at 28% 32%, transparent 38%, rgba(0,0,0,0.97) 82%)"
           }}
         />
       </div>
@@ -116,46 +116,39 @@ export function PathlightBackdrop() {
         }}
       />
 
-      {/* Canyon, Storm, and Constellations */}
+      {/* Canyon, Thunderheads, and Mars (cursor lightning untouched) */}
       <div className="absolute bottom-0 left-0 right-0 w-full h-full overflow-hidden pointer-events-none z-[1]">
 
-        {/* Constellations & Mars (Absolute Top/Right) */}
+        {/* Constellations & Mars */}
         <svg className="absolute top-0 right-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          {/* Mars - Subtle red pulse */}
+          {/* Mars - fixed pulse */}
           <circle cx="85%" cy="20%" r="2" fill="#fca5a5" className="animate-mars" filter="blur(1px)"/>
-          {/* Orion's Belt (Subtle) */}
-          <circle cx="70%" cy="28%" r="1" fill="#e2e8f0" opacity="0.6"/>
-          <circle cx="71%" cy="27%" r="1.2" fill="#e2e8f0" opacity="0.8"/>
-          <circle cx="72%" cy="26%" r="1" fill="#e2e8f0" opacity="0.6"/>
+          {/* Orion's Belt (very subtle) */}
+          <circle cx="70%" cy="28%" r="1" fill="#e2e8f0" opacity="0.55"/>
+          <circle cx="71%" cy="27%" r="1.15" fill="#e2e8f0" opacity="0.75"/>
+          <circle cx="72%" cy="26%" r="1" fill="#e2e8f0" opacity="0.55"/>
         </svg>
 
-        {/* Horizon Terrain & Storm Clouds */}
+        {/* Horizon Terrain & Thunderheads */}
         <svg viewBox="0 0 1440 400" className="absolute bottom-0 w-full h-auto min-h-[250px] md:min-h-[400px] object-cover" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="cloud-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#334155" stopOpacity="0.5" />
+              <stop offset="0%" stopColor="#334155" stopOpacity="0.65" />
               <stop offset="100%" stopColor="#020617" stopOpacity="1" />
-            </linearGradient>
-            <linearGradient id="lightning-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="#020617" stopOpacity="0" />
             </linearGradient>
           </defs>
 
-          {/* Distant Lightning Flash Layer (Blurred for atmospheric scatter) */}
-          <path d="M100,200 Q300,100 600,180 T1000,150 T1440,220 L1440,400 L0,400 Z" fill="url(#lightning-grad)" className="animate-lightning" filter="blur(8px)" />
+          {/* Heavy West Texas Thunderhead Clouds (subtle distant storm feel) */}
+          <path d="M0,210 Q140,165 320,195 T680,155 T1050,185 T1440,165 L1440,400 L0,400 Z" fill="url(#cloud-grad)" filter="blur(6px)" />
 
-          {/* Thunderhead Clouds (Rolling, thick, behind mountains) */}
-          <path d="M0,220 Q80,180 150,200 T300,160 T500,190 T700,140 T950,170 T1200,130 T1440,180 L1440,400 L0,400 Z" fill="url(#cloud-grad)" />
+          {/* West Texas Mesas - Distant Layer (flat-topped plateaus) */}
+          <path d="M0,275 L70,275 L110,315 L240,315 L275,260 L440,260 L490,330 L640,330 L695,265 L880,265 L930,305 L1135,305 L1195,255 L1440,255 L1440,400 L0,400 Z" fill="#0f172a" opacity="0.85"/>
 
-          {/* True West Texas Mesas - Distant Layer (Sweeping Bezier Curves) */}
-          <path d="M0,250 Q100,230 200,240 T400,220 L450,220 Q500,220 550,250 T750,230 L800,230 Q900,230 1000,260 T1200,240 T1440,250 L1440,400 L0,400 Z" fill="#0f172a" opacity="0.8"/>
-
-          {/* True West Texas Mesas - Foreground Layer (Sharp Canyons and Plateaus) */}
-          <path d="M0,280 Q80,280 120,260 T250,260 L300,260 Q350,260 400,290 T600,280 Q650,260 700,260 L750,260 Q800,260 850,290 T1100,270 L1150,270 Q1200,270 1250,290 T1440,280 L1440,400 L0,400 Z" fill="#020617" />
+          {/* West Texas Mesas - Foreground Layer (sharp canyons & steep drops) */}
+          <path d="M0,315 L95,315 L145,365 L295,365 L340,285 L535,285 L595,375 L785,375 L840,295 L1035,295 L1095,345 L1290,345 L1345,305 L1440,305 L1440,400 L0,400 Z" fill="#020617" />
         </svg>
 
-        {/* Horizon blend gradient to ground the SVGs */}
+        {/* Horizon blend gradient */}
         <div className="absolute bottom-0 w-full h-16 bg-gradient-to-t from-[#020617] to-transparent"></div>
       </div>
     </div>
