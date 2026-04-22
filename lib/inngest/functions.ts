@@ -161,13 +161,18 @@ export const scanRequested = inngest.createFunction(
             const ctx = await getScanPipelineContext(scanId);
             if (!ctx) return { ok: false, error: "scan record vanished" };
             const pageText = extractPageTextContent(ctx.lighthouseData);
+            const businessName = await lookupBusinessName(scanId);
+            const siteUrl = ctx.resolvedUrl ?? ctx.url;
             const result = await runVisionAudit(
               screenshots.desktop,
               screenshots.mobile,
               ctx.industry,
               ctx.city,
               audit.scores,
-              pageText
+              pageText,
+              siteUrl,
+              businessName,
+              ctx.lighthouseData
             );
             await updateScanAiAnalysis(scanId, result);
             return { ok: true };
@@ -191,10 +196,15 @@ export const scanRequested = inngest.createFunction(
             if (!ctx || !ctx.visionAudit) {
               return { ok: false, error: "missing prerequisites" };
             }
+            const businessName = await lookupBusinessName(scanId);
+            const siteUrl = ctx.resolvedUrl ?? ctx.url;
             const result = await runRemediationPlan(
               ctx.visionAudit,
               audit.scores,
-              ctx.industry
+              ctx.industry,
+              ctx.city,
+              siteUrl,
+              businessName
             );
             await updateScanRemediation(scanId, result);
             return { ok: true };
@@ -213,16 +223,25 @@ export const scanRequested = inngest.createFunction(
           if (!remediationStep.ok) {
             return { ok: false, error: "skipped: remediation plan unavailable" };
           }
+          if (!audit.scores) {
+            return { ok: false, error: "skipped: performance scores unavailable" };
+          }
           try {
             const ctx = await getScanPipelineContext(scanId);
             if (!ctx || !ctx.visionAudit || !ctx.remediation) {
               return { ok: false, error: "missing prerequisites" };
             }
+            const businessName = await lookupBusinessName(scanId);
+            const siteUrl = ctx.resolvedUrl ?? ctx.url;
             const result = await runRevenueImpact(
               ctx.visionAudit,
               ctx.remediation,
               ctx.industry,
-              ctx.city
+              ctx.city,
+              siteUrl,
+              businessName,
+              audit.scores,
+              ctx.lighthouseData
             );
             await updateScanRevenueImpact(scanId, result);
             return { ok: true };
@@ -411,6 +430,14 @@ export const scanRequested = inngest.createFunction(
     }
   }
 );
+
+async function lookupBusinessName(scanId: string): Promise<string | null> {
+  const sql = getDb();
+  const rows = (await sql`
+    SELECT business_name FROM scans WHERE id = ${scanId} LIMIT 1
+  `) as { business_name: string | null }[];
+  return rows[0]?.business_name ?? null;
+}
 
 async function lookupScanEmail(scanId: string): Promise<string | null> {
   const sql = getDb();

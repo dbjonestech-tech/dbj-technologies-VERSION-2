@@ -164,7 +164,8 @@ type AnthropicMessageResponse = {
 
 async function callClaude(
   system: string,
-  messages: ChatMessage[]
+  messages: ChatMessage[],
+  maxTokens: number = 2048
 ): Promise<string> {
   const client = getAnthropic();
   const controller = new AbortController();
@@ -174,7 +175,7 @@ async function callClaude(
     const response = (await client.messages.create(
       {
         model: MODEL,
-        max_tokens: 2048,
+        max_tokens: maxTokens,
         system,
         messages: messages as unknown as Parameters<
           typeof client.messages.create
@@ -209,24 +210,31 @@ async function callClaudeWithJsonSchema<T>(
   label: string,
   system: string,
   initialUserContent: string | MessageBlock[],
-  schema: z.ZodType<T>
+  schema: z.ZodType<T>,
+  maxTokens: number = 2048
 ): Promise<T> {
-  const firstResponseText = await callClaude(system, [
-    { role: "user", content: initialUserContent },
-  ]);
+  const firstResponseText = await callClaude(
+    system,
+    [{ role: "user", content: initialUserContent }],
+    maxTokens
+  );
 
   const firstAttempt = tryParse<T>(firstResponseText, schema);
   if (firstAttempt.ok) return firstAttempt.value;
 
-  const secondResponseText = await callClaude(system, [
-    { role: "user", content: initialUserContent },
-    { role: "assistant", content: firstResponseText },
-    {
-      role: "user",
-      content:
-        "Your previous response was not valid JSON. Respond with ONLY a valid JSON object. No backticks, no explanation, no text before or after the JSON.",
-    },
-  ]);
+  const secondResponseText = await callClaude(
+    system,
+    [
+      { role: "user", content: initialUserContent },
+      { role: "assistant", content: firstResponseText },
+      {
+        role: "user",
+        content:
+          "Your previous response was not valid JSON. Respond with ONLY a valid JSON object. No backticks, no explanation, no text before or after the JSON.",
+      },
+    ],
+    maxTokens
+  );
 
   const secondAttempt = tryParse<T>(secondResponseText, schema);
   if (secondAttempt.ok) return secondAttempt.value;
@@ -315,6 +323,7 @@ const revenueImpactSchema = z.object({
 });
 
 const VISION_SYSTEM_PROMPT = `You are a senior brand and conversion strategist auditing a {{INDUSTRY}} website in {{CITY}}.
+The site is {{URL}}{{BUSINESS_NAME}}. Reference the domain and business name naturally in observations when relevant.
 
 Your job is to analyze two screenshots (desktop and mobile home page) and the supporting page text, and output a strictly-scored audit. You are opinionated, concrete, and conservative: when evidence is weak, score lower, not higher.
 
@@ -365,7 +374,8 @@ Return ONE JSON object, no markdown, no preamble. Exact shape:
   }
 }`;
 
-const REMEDIATION_SYSTEM_PROMPT = `You are a senior web strategist producing a prioritized fix list for a {{INDUSTRY}} website.
+const REMEDIATION_SYSTEM_PROMPT = `You are a senior web strategist producing a prioritized fix list for a {{INDUSTRY}} website in {{CITY}}.
+The site is {{URL}}{{BUSINESS_NAME}}. Reference the business name in fix descriptions to make recommendations specific rather than generic.
 
 You will receive the design scores, positioning scores, and Lighthouse performance metrics. Return exactly 3 fixes, ordered by impact (high → low), respecting sensible dependencies: fix structural or imagery issues before tweaking CTA copy; fix performance blockers before layering new marketing features.
 
@@ -387,8 +397,10 @@ Return ONE JSON object, no markdown, no preamble. Exact shape:
 }`;
 
 const REVENUE_SYSTEM_PROMPT = `You are a conservative revenue analyst estimating the monthly revenue a {{INDUSTRY}} website in {{CITY}} is leaving on the table due to the issues identified in the audit.
+The site is {{URL}}{{BUSINESS_NAME}}. Use the business name in the methodology narrative. Factor the URL domain quality (professional vs. generic, subdomain vs. root) into your confidence assessment.
 
-You will receive the design + positioning scores, the top 3 remediation items, and the business industry/city. Produce a DIRECTIONAL, CONSERVATIVE dollar estimate that can be defended by its assumptions.
+You will receive the design + positioning scores, the top 3 remediation items, the business industry/city, and Lighthouse performance scores. Produce a DIRECTIONAL, CONSERVATIVE dollar estimate that can be defended by its assumptions.
+Lighthouse performance scores are provided. Factor site speed into your revenue model: slow sites (LCP > 4s, poor CLS) lose significantly more visitors than fast ones.
 
 RULES
 - Under-estimate rather than over-estimate. When in doubt, round down.
@@ -416,21 +428,183 @@ Return ONE JSON object, no markdown, no preamble. Exact shape:
 function renderPrompt(
   template: string,
   industry: string | null | undefined,
-  city: string | null | undefined
+  city: string | null | undefined,
+  url: string | null | undefined,
+  businessName: string | null | undefined
 ): string {
   const label = industryLabel(industry);
+  const urlText = (url ?? "").trim() || "(unknown)";
+  const nameText =
+    businessName && businessName.trim().length > 0
+      ? ` (${businessName.trim()})`
+      : "";
   return template
     .replace(/{{INDUSTRY}}/g, label)
-    .replace(/{{CITY}}/g, (city ?? "").trim() || "the local market");
+    .replace(/{{CITY}}/g, (city ?? "").trim() || "the local market")
+    .replace(/{{URL}}/g, urlText)
+    .replace(/{{BUSINESS_NAME}}/g, nameText);
 }
 
-function stripDataUriPrefix(dataUri: string): { base64: string; mediaType: string } {
-  const match = dataUri.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
-  if (match) {
-    return { mediaType: match[1]!, base64: match[2]! };
+type DetectedMediaType = "image/jpeg" | "image/png" | "image/webp";
+
+function detectImageMediaType(base64: string): DetectedMediaType {
+  const prefixMatch = base64.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,/);
+  if (prefixMatch) {
+    const detected = prefixMatch[1]!.toLowerCase();
+    if (detected === "image/png") return "image/png";
+    if (detected === "image/webp") return "image/webp";
+    if (detected === "image/jpeg" || detected === "image/jpg") return "image/jpeg";
   }
-  // If no prefix present, assume caller already stripped it; default to jpeg.
-  return { mediaType: "image/jpeg", base64: dataUri };
+
+  const clean = base64.replace(/^data:[^;]+;base64,/, "").slice(0, 32);
+  try {
+    const buf = Buffer.from(clean, "base64");
+    if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) {
+      return "image/jpeg";
+    }
+    if (
+      buf.length >= 4 &&
+      buf[0] === 0x89 &&
+      buf[1] === 0x50 &&
+      buf[2] === 0x4e &&
+      buf[3] === 0x47
+    ) {
+      return "image/png";
+    }
+    if (
+      buf.length >= 12 &&
+      buf[0] === 0x52 &&
+      buf[1] === 0x49 &&
+      buf[2] === 0x46 &&
+      buf[3] === 0x46 &&
+      buf[8] === 0x57 &&
+      buf[9] === 0x45 &&
+      buf[10] === 0x42 &&
+      buf[11] === 0x50
+    ) {
+      return "image/webp";
+    }
+  } catch {
+    /* fall through */
+  }
+  return "image/jpeg";
+}
+
+function stripDataUriPrefix(dataUri: string): {
+  base64: string;
+  mediaType: DetectedMediaType;
+} {
+  const mediaType = detectImageMediaType(dataUri);
+  const base64 = dataUri.replace(/^data:[^;]+;base64,/, "");
+  return { base64, mediaType };
+}
+
+type LighthouseAuditFailure = {
+  title: string;
+  description: string;
+  displayValue: string | null;
+};
+
+type LighthouseCategoriesExtras = {
+  categories?: {
+    performance?: { score?: number | null };
+    accessibility?: { score?: number | null };
+    seo?: { score?: number | null };
+    "best-practices"?: { score?: number | null };
+  };
+  audits?: Record<
+    string,
+    {
+      score?: number | null;
+      title?: string | null;
+      description?: string | null;
+      displayValue?: string | null;
+    }
+  >;
+};
+
+function extractLighthouseAuditDetails(lighthouseData: unknown): {
+  accessibility: number | null;
+  seo: number | null;
+  bestPractices: number | null;
+  failures: LighthouseAuditFailure[];
+} {
+  const empty = {
+    accessibility: null,
+    seo: null,
+    bestPractices: null,
+    failures: [] as LighthouseAuditFailure[],
+  };
+  if (!lighthouseData || typeof lighthouseData !== "object") return empty;
+  const lh = lighthouseData as LighthouseCategoriesExtras;
+
+  const toScore = (v: number | null | undefined): number | null =>
+    typeof v === "number" && Number.isFinite(v) ? Math.round(v * 100) : null;
+
+  const accessibility = toScore(lh.categories?.accessibility?.score ?? null);
+  const seo = toScore(lh.categories?.seo?.score ?? null);
+  const bestPractices = toScore(lh.categories?.["best-practices"]?.score ?? null);
+
+  const failures: LighthouseAuditFailure[] = [];
+  const audits = lh.audits ?? {};
+  for (const [, audit] of Object.entries(audits)) {
+    if (!audit || typeof audit !== "object") continue;
+    const score = audit.score;
+    if (typeof score !== "number" || score >= 0.9) continue;
+    const title = typeof audit.title === "string" ? audit.title : null;
+    if (!title) continue;
+    const description =
+      typeof audit.description === "string"
+        ? audit.description.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+        : "";
+    failures.push({
+      title: truncate(title, 120),
+      description: truncate(description, 220),
+      displayValue:
+        typeof audit.displayValue === "string"
+          ? truncate(audit.displayValue, 80)
+          : null,
+    });
+    if (failures.length >= 15) break;
+  }
+
+  return { accessibility, seo, bestPractices, failures };
+}
+
+function renderLighthouseDetails(
+  details: ReturnType<typeof extractLighthouseAuditDetails>
+): string {
+  const lines: string[] = ["LIGHTHOUSE AUDIT DETAILS"];
+  lines.push(
+    `Accessibility score: ${details.accessibility !== null ? `${details.accessibility}/100` : "not available at this stage"}`
+  );
+  lines.push(
+    `SEO score: ${details.seo !== null ? `${details.seo}/100` : "not available at this stage"}`
+  );
+  lines.push(
+    `Best practices score: ${details.bestPractices !== null ? `${details.bestPractices}/100` : "not available at this stage"}`
+  );
+  if (details.failures.length === 0) {
+    lines.push("Key audit failures: (none flagged under 0.9)");
+  } else {
+    lines.push(`Key audit failures (max 15):`);
+    for (const f of details.failures) {
+      const suffix = f.displayValue ? ` — ${f.displayValue}` : "";
+      lines.push(`- ${f.title}${suffix}: ${f.description}`);
+    }
+  }
+  return lines.join("\n");
+}
+
+function renderSiteInformation(
+  url: string,
+  businessName: string | null
+): string {
+  return [
+    `SITE INFORMATION`,
+    `URL: ${url}`,
+    `Business: ${businessName && businessName.trim().length > 0 ? businessName.trim() : "(not provided)"}`,
+  ].join("\n");
 }
 
 function summarizePageText(content: PageTextContent): string {
@@ -465,10 +639,14 @@ export async function runVisionAudit(
   industry: string | null,
   city: string | null,
   performanceScores: PerformanceScores,
-  pageTextContent: PageTextContent
+  pageTextContent: PageTextContent,
+  url: string,
+  businessName: string | null,
+  lighthouseData: unknown
 ): Promise<VisionAuditResult> {
   const desktop = stripDataUriPrefix(desktopScreenshot);
   const mobile = stripDataUriPrefix(mobileScreenshot);
+  const lighthouseDetails = extractLighthouseAuditDetails(lighthouseData);
 
   const userBlocks: MessageBlock[] = [
     {
@@ -479,7 +657,7 @@ export async function runVisionAudit(
       type: "image",
       source: {
         type: "base64",
-        media_type: "image/jpeg",
+        media_type: desktop.mediaType,
         data: desktop.base64,
       },
     },
@@ -491,13 +669,15 @@ export async function runVisionAudit(
       type: "image",
       source: {
         type: "base64",
-        media_type: "image/jpeg",
+        media_type: mobile.mediaType,
         data: mobile.base64,
       },
     },
     {
       type: "text",
       text: [
+        renderSiteInformation(url, businessName),
+        ``,
         `BUSINESS CONTEXT`,
         `industry: ${industryLabel(industry)}`,
         `city: ${(city ?? "").trim() || "(unspecified)"}`,
@@ -510,6 +690,8 @@ export async function runVisionAudit(
         `TBT: ${performanceScores.tbt}ms`,
         `Speed Index: ${performanceScores.si}ms`,
         ``,
+        renderLighthouseDetails(lighthouseDetails),
+        ``,
         `EXTRACTED PAGE TEXT`,
         summarizePageText(pageTextContent),
         ``,
@@ -520,9 +702,10 @@ export async function runVisionAudit(
 
   return callClaudeWithJsonSchema(
     "vision-audit",
-    renderPrompt(VISION_SYSTEM_PROMPT, industry, city),
+    renderPrompt(VISION_SYSTEM_PROMPT, industry, city, url, businessName),
     userBlocks,
-    visionAuditSchema
+    visionAuditSchema,
+    3000
   ) as Promise<VisionAuditResult>;
 }
 
@@ -530,7 +713,7 @@ function summarizeDesignScores(scores: DesignScores): string {
   return Object.entries(scores)
     .map(
       ([k, v]) =>
-        `- ${k}: ${v.score} — ${v.observation.replace(/\s+/g, " ").slice(0, 240)}`
+        `- ${k}: ${v.score} — ${v.observation.replace(/\s+/g, " ").slice(0, 400)}`
     )
     .join("\n");
 }
@@ -539,7 +722,7 @@ function summarizePositioningScores(scores: PositioningScores): string {
   return Object.entries(scores)
     .map(
       ([k, v]) =>
-        `- ${k}: ${v.score} — ${v.observation.replace(/\s+/g, " ").slice(0, 240)}`
+        `- ${k}: ${v.score} — ${v.observation.replace(/\s+/g, " ").slice(0, 400)}`
     )
     .join("\n");
 }
@@ -547,9 +730,14 @@ function summarizePositioningScores(scores: PositioningScores): string {
 export async function runRemediationPlan(
   auditResult: VisionAuditResult,
   performanceScores: PerformanceScores,
-  industry: string | null
+  industry: string | null,
+  city: string | null,
+  url: string,
+  businessName: string | null
 ): Promise<RemediationResult> {
   const user = [
+    renderSiteInformation(url, businessName),
+    ``,
     `DESIGN SCORES`,
     summarizeDesignScores(auditResult.design),
     ``,
@@ -565,9 +753,10 @@ export async function runRemediationPlan(
 
   return callClaudeWithJsonSchema(
     "remediation-plan",
-    renderPrompt(REMEDIATION_SYSTEM_PROMPT, industry, null),
+    renderPrompt(REMEDIATION_SYSTEM_PROMPT, industry, city, url, businessName),
     user,
-    remediationSchema
+    remediationSchema,
+    2048
   ) as Promise<RemediationResult>;
 }
 
@@ -575,9 +764,26 @@ export async function runRevenueImpact(
   auditResult: VisionAuditResult,
   remediationPlan: RemediationResult,
   industry: string | null,
-  city: string | null
+  city: string | null,
+  url: string,
+  businessName: string | null,
+  performanceScores: PerformanceScores,
+  lighthouseData: unknown
 ): Promise<RevenueImpactResult> {
+  const lighthouseDetails = extractLighthouseAuditDetails(lighthouseData);
+
   const user = [
+    renderSiteInformation(url, businessName),
+    ``,
+    `CONTEXT`,
+    `industry: ${industryLabel(industry)}`,
+    `city: ${(city ?? "").trim() || "(unspecified)"}`,
+    ``,
+    `LIGHTHOUSE PERFORMANCE`,
+    `Overall: ${performanceScores.overall}/100, LCP: ${performanceScores.lcp}ms, CLS: ${performanceScores.cls}, INP: ${performanceScores.inp}ms, TBT: ${performanceScores.tbt}ms, Speed Index: ${performanceScores.si}ms`,
+    ``,
+    renderLighthouseDetails(lighthouseDetails),
+    ``,
     `DESIGN SCORES`,
     summarizeDesignScores(auditResult.design),
     ``,
@@ -592,17 +798,14 @@ export async function runRevenueImpact(
       )
       .join("\n"),
     ``,
-    `CONTEXT`,
-    `industry: ${industryLabel(industry)}`,
-    `city: ${(city ?? "").trim() || "(unspecified)"}`,
-    ``,
     `Respond with ONLY a valid JSON object matching the schema above. No backticks, no markdown, no explanation.`,
   ].join("\n");
 
   return callClaudeWithJsonSchema(
     "revenue-impact",
-    renderPrompt(REVENUE_SYSTEM_PROMPT, industry, city),
+    renderPrompt(REVENUE_SYSTEM_PROMPT, industry, city, url, businessName),
     user,
-    revenueImpactSchema
+    revenueImpactSchema,
+    1500
   ) as Promise<RevenueImpactResult>;
 }
