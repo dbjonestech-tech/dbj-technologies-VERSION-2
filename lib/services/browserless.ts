@@ -1,13 +1,15 @@
 export type Viewport = { width: number; height: number };
 
 const DEFAULT_BROWSERLESS_BASE = "https://production-sfo.browserless.io";
-const SCREENSHOT_TIMEOUT_MS = 30_000;
+const SCREENSHOT_TIMEOUT_MS = 45_000;
 
 type BrowserlessScreenshotBody = {
   url: string;
   viewport: Viewport;
-  gotoOptions: { waitUntil: "networkidle2"; timeout: number };
+  gotoOptions: { waitUntil: "networkidle0"; timeout: number };
   options: { type: "jpeg"; quality: number; fullPage: boolean };
+  waitForTimeout?: number;
+  bestAttempt?: boolean;
 };
 
 export async function captureScreenshot(
@@ -23,8 +25,10 @@ export async function captureScreenshot(
   const body: BrowserlessScreenshotBody = {
     url,
     viewport,
-    gotoOptions: { waitUntil: "networkidle2", timeout: 20_000 },
+    gotoOptions: { waitUntil: "networkidle0", timeout: 25_000 },
     options: { type: "jpeg", quality: 80, fullPage: false },
+    waitForTimeout: 3000,
+    bestAttempt: true,
   };
 
   const controller = new AbortController();
@@ -55,7 +59,7 @@ export async function captureScreenshot(
     return buf;
   } catch (err) {
     if ((err as Error).name === "AbortError") {
-      throw new Error("Browserless screenshot timed out after 30s.");
+      throw new Error("Browserless screenshot timed out after 45s.");
     }
     throw err;
   } finally {

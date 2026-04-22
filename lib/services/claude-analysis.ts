@@ -348,6 +348,7 @@ SCORING RUBRIC — POSITIONING (each 0-10)
 GUIDELINES
 - Each sub-score must include a 1-2 sentence observation grounded in what you actually see in the screenshots or read in the page text.
 - Do NOT hallucinate elements that are not visible. If something cannot be judged from the screenshots and page text, score it conservatively and say so in the observation.
+- IMPORTANT: Screenshots are captured by an automated headless browser and may occasionally show a pre-hydration or partially-loaded state — for example, unstyled text on a blank background, loading skeletons, spinner icons, or a page that appears nearly empty. If a screenshot appears to show a loading or incomplete render state while the EXTRACTED PAGE TEXT section below suggests substantially more content exists (multiple headings, descriptive link texts, a populated meta description), note this discrepancy in your observations and weight your scoring toward the page text evidence rather than heavily penalizing based on an incomplete visual capture. State clearly in the observation when you suspect a screenshot shows a pre-render state. However, if BOTH the screenshot AND the extracted page text show minimal content, score accordingly — that is a genuinely sparse site, not a capture issue.
 - Observations should be concrete (reference specific elements, colors, layout choices, phrases) — not generic.
 - Tone: honest, actionable, respectful. No marketing fluff.
 
