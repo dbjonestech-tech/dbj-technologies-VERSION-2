@@ -73,13 +73,10 @@ function MesaCanyonCanvas() {
         return points;
       };
 
-      type Band = { yFrac: number; color: string; heightFrac: number; alpha: number };
-
       const drawLayer = (
         profile: Array<{ x: number; y: number }>,
         fillStyle: CanvasGradient | string,
-        alpha: number,
-        bands?: Band[]
+        alpha: number
       ) => {
         ctx.save();
         ctx.globalAlpha = alpha;
@@ -90,56 +87,29 @@ function MesaCanyonCanvas() {
         ctx.closePath();
         ctx.fillStyle = fillStyle;
         ctx.fill();
-
-        if (bands && bands.length > 0) {
-          ctx.clip();
-          for (const band of bands) {
-            ctx.globalAlpha = alpha * band.alpha;
-            ctx.fillStyle = band.color;
-            ctx.fillRect(0, cssH * band.yFrac, cssW, cssH * band.heightFrac);
-          }
-        }
         ctx.restore();
       };
 
-      // Layer 1 — Distant range
+      // Layer 1 — Distant range (opaque; colors darkened to hug the sky for atmospheric perspective)
       const g1 = ctx.createLinearGradient(0, cssH * 0.6, 0, cssH);
-      g1.addColorStop(0, "#2d2640");
-      g1.addColorStop(1, "#1a1830");
-      drawLayer(generateProfile(0.75, 0.15, 60, 1.0, 1.0), g1, 0.25);
+      g1.addColorStop(0, "#1a1127");
+      g1.addColorStop(1, "#150d24");
+      drawLayer(generateProfile(0.75, 0.15, 60, 1.0, 1.0), g1, 1.0);
 
-      // Layer 2 — Mid-distance canyon walls
+      // Layer 2 — Mid-distance canyon walls (opaque; warm brown darkened to match prior composite)
       const g2 = ctx.createLinearGradient(0, cssH * 0.48, 0, cssH);
-      g2.addColorStop(0, "#5c3520");
-      g2.addColorStop(1, "#3a2010");
-      drawLayer(
-        generateProfile(0.7, 0.22, 100, 2.7, 1.2),
-        g2,
-        0.45,
-        [
-          { yFrac: 0.76, color: "#6b3a1f", heightFrac: 0.012, alpha: 0.55 },
-          { yFrac: 0.82, color: "#4a2815", heightFrac: 0.01, alpha: 0.45 },
-          { yFrac: 0.87, color: "#6b3a1f", heightFrac: 0.008, alpha: 0.35 },
-        ]
-      );
+      g2.addColorStop(0, "#381d13");
+      g2.addColorStop(1, "#21130a");
+      drawLayer(generateProfile(0.7, 0.22, 100, 2.7, 1.2), g2, 1.0);
 
-      // Layer 3 — Near buttes and mesas
+      // Layer 3 — Near buttes and mesas (opaque; burnt sienna darkened to match prior composite)
       const g3 = ctx.createLinearGradient(0, cssH * 0.5, 0, cssH);
-      g3.addColorStop(0, "#7a4528");
-      g3.addColorStop(1, "#4a2a15");
-      drawLayer(
-        generateProfile(0.78, 0.28, 120, 5.3, 1.5),
-        g3,
-        0.65,
-        [
-          { yFrac: 0.78, color: "#8b4a2a", heightFrac: 0.01, alpha: 0.6 },
-          { yFrac: 0.84, color: "#5a3018", heightFrac: 0.012, alpha: 0.5 },
-          { yFrac: 0.9, color: "#8b4a2a", heightFrac: 0.008, alpha: 0.4 },
-        ]
-      );
+      g3.addColorStop(0, "#58301d");
+      g3.addColorStop(1, "#351e0f");
+      drawLayer(generateProfile(0.78, 0.28, 120, 5.3, 1.5), g3, 1.0);
 
-      // Layer 4 — Foreground silhouette
-      drawLayer(generateProfile(0.88, 0.12, 150, 9.1, 1.1), "#0d0805", 0.95);
+      // Layer 4 — Foreground silhouette (unchanged color, now fully opaque)
+      drawLayer(generateProfile(0.88, 0.12, 150, 9.1, 1.1), "#0d0805", 1.0);
     };
 
     const schedule = () => {
