@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import { StarField } from "./StarField";
 
 /* ─── PATHLIGHT BACKDROP (scan page) ─────────────────
@@ -8,8 +11,162 @@ import { StarField } from "./StarField";
  *  3) Distant lightning — desktop only, CSS @keyframes, flashes
  *     occupy ~2% of each cycle (see globals.css)
  *  4) Warm horizon glow — amber haze along the horizon line
- *  5) Canyon silhouettes — three SVG layers, back to front
+ *  5) Canyon silhouettes — canvas-rendered procedural terrain (four layers)
  * ─────────────────────────────────────────────────── */
+
+/* ─── MESA CANYON CANVAS ─────────────────────────────
+ * Four procedural terrain layers rendered on a single canvas.
+ * Each layer is a height profile generated from overlapping sines
+ * (low-freq rolling, mid-freq abs-sine mesa plateaus, high-freq rocky
+ * detail, seeded hash for edge roughness). Static draw — no RAF loop.
+ * Redraws on ResizeObserver to match viewport changes.
+ * ─────────────────────────────────────────────────── */
+function MesaCanyonCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let rafId: number | null = null;
+
+    const prand = (n: number) => {
+      const x = Math.sin(n * 127.1) * 43758.5453;
+      return x - Math.floor(x);
+    };
+
+    const draw = () => {
+      rafId = null;
+      const dpr = window.devicePixelRatio || 1;
+      const cssW = canvas.clientWidth;
+      const cssH = canvas.clientHeight;
+      if (cssW === 0 || cssH === 0) return;
+
+      canvas.width = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, cssW, cssH);
+
+      const generateProfile = (
+        baseYFrac: number,
+        ampFrac: number,
+        segments: number,
+        seed: number,
+        mesaBoost: number
+      ) => {
+        const points: Array<{ x: number; y: number }> = [];
+        const step = cssW / segments;
+        const baseY = cssH * baseYFrac;
+        const amp = cssH * ampFrac;
+        for (let i = 0; i <= segments; i++) {
+          const x = i * step;
+          let y = baseY;
+          y -= Math.sin(x * 0.002 + seed) * amp * 0.6;
+          y -= Math.abs(Math.sin(x * 0.008 + seed * 2.3)) * amp * 0.3 * mesaBoost;
+          y -= Math.sin(x * 0.05 + seed * 7.1) * amp * 0.08;
+          y -= (prand(x + seed * 13) - 0.5) * amp * 0.05;
+          points.push({ x, y });
+        }
+        return points;
+      };
+
+      type Band = { yFrac: number; color: string; heightFrac: number; alpha: number };
+
+      const drawLayer = (
+        profile: Array<{ x: number; y: number }>,
+        fillStyle: CanvasGradient | string,
+        alpha: number,
+        bands?: Band[]
+      ) => {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.moveTo(0, cssH);
+        for (const p of profile) ctx.lineTo(p.x, p.y);
+        ctx.lineTo(cssW, cssH);
+        ctx.closePath();
+        ctx.fillStyle = fillStyle;
+        ctx.fill();
+
+        if (bands && bands.length > 0) {
+          ctx.clip();
+          for (const band of bands) {
+            ctx.globalAlpha = alpha * band.alpha;
+            ctx.fillStyle = band.color;
+            ctx.fillRect(0, cssH * band.yFrac, cssW, cssH * band.heightFrac);
+          }
+        }
+        ctx.restore();
+      };
+
+      // Layer 1 — Distant range
+      const g1 = ctx.createLinearGradient(0, cssH * 0.6, 0, cssH);
+      g1.addColorStop(0, "#2d2640");
+      g1.addColorStop(1, "#1a1830");
+      drawLayer(generateProfile(0.75, 0.15, 60, 1.0, 1.0), g1, 0.25);
+
+      // Layer 2 — Mid-distance canyon walls
+      const g2 = ctx.createLinearGradient(0, cssH * 0.48, 0, cssH);
+      g2.addColorStop(0, "#5c3520");
+      g2.addColorStop(1, "#3a2010");
+      drawLayer(
+        generateProfile(0.7, 0.22, 100, 2.7, 1.2),
+        g2,
+        0.45,
+        [
+          { yFrac: 0.76, color: "#6b3a1f", heightFrac: 0.012, alpha: 0.55 },
+          { yFrac: 0.82, color: "#4a2815", heightFrac: 0.01, alpha: 0.45 },
+          { yFrac: 0.87, color: "#6b3a1f", heightFrac: 0.008, alpha: 0.35 },
+        ]
+      );
+
+      // Layer 3 — Near buttes and mesas
+      const g3 = ctx.createLinearGradient(0, cssH * 0.5, 0, cssH);
+      g3.addColorStop(0, "#7a4528");
+      g3.addColorStop(1, "#4a2a15");
+      drawLayer(
+        generateProfile(0.78, 0.28, 120, 5.3, 1.5),
+        g3,
+        0.65,
+        [
+          { yFrac: 0.78, color: "#8b4a2a", heightFrac: 0.01, alpha: 0.6 },
+          { yFrac: 0.84, color: "#5a3018", heightFrac: 0.012, alpha: 0.5 },
+          { yFrac: 0.9, color: "#8b4a2a", heightFrac: 0.008, alpha: 0.4 },
+        ]
+      );
+
+      // Layer 4 — Foreground silhouette
+      drawLayer(generateProfile(0.88, 0.12, 150, 9.1, 1.1), "#0d0805", 0.95);
+    };
+
+    const schedule = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(draw);
+    };
+
+    schedule();
+
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(canvas);
+
+    return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="absolute bottom-0 left-0 w-full h-[27.78vw] min-h-[250px] md:min-h-[400px]"
+    />
+  );
+}
+
 export function PathlightBackdrop() {
   return (
     <div
@@ -129,74 +286,8 @@ export function PathlightBackdrop() {
           <circle cx="72%" cy="26%" r="1" fill="#e2e8f0" opacity="0.55"/>
         </svg>
 
-        {/* Horizon Terrain & Thunderheads */}
-        <svg viewBox="0 0 1440 400" className="absolute bottom-0 w-full h-auto min-h-[250px] md:min-h-[400px] object-cover" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            {/* userSpaceOnUse gradients so sedimentary bands align at absolute viewBox y-coords across every formation */}
-            <linearGradient id="mesa-distant" x1="0" y1="225" x2="0" y2="280" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#3a2e52" />
-              <stop offset="100%" stopColor="#2d2640" />
-            </linearGradient>
-            <linearGradient id="mesa-mid" x1="0" y1="260" x2="0" y2="400" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#5c3520" />
-              <stop offset="22%" stopColor="#5c3520" />
-              <stop offset="24%" stopColor="#7a4528" />
-              <stop offset="32%" stopColor="#7a4528" />
-              <stop offset="34%" stopColor="#4a2c1a" />
-              <stop offset="54%" stopColor="#4a2c1a" />
-              <stop offset="56%" stopColor="#6b3d25" />
-              <stop offset="68%" stopColor="#6b3d25" />
-              <stop offset="70%" stopColor="#3a2012" />
-              <stop offset="100%" stopColor="#3a2012" />
-            </linearGradient>
-            <linearGradient id="mesa-near" x1="0" y1="240" x2="0" y2="400" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#7a4528" />
-              <stop offset="15%" stopColor="#7a4528" />
-              <stop offset="17%" stopColor="#8b4a2a" />
-              <stop offset="26%" stopColor="#8b4a2a" />
-              <stop offset="28%" stopColor="#6b3a1f" />
-              <stop offset="45%" stopColor="#6b3a1f" />
-              <stop offset="47%" stopColor="#8b4a2a" />
-              <stop offset="55%" stopColor="#8b4a2a" />
-              <stop offset="57%" stopColor="#5a3018" />
-              <stop offset="75%" stopColor="#5a3018" />
-              <stop offset="77%" stopColor="#6b3a1f" />
-              <stop offset="100%" stopColor="#3a2012" />
-            </linearGradient>
-            <linearGradient id="mesa-foreground" x1="0" y1="340" x2="0" y2="400" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#231508" />
-              <stop offset="100%" stopColor="#1a0f08" />
-            </linearGradient>
-          </defs>
-
-          {/* Canyon Layer 1 — Distant range, atmospheric perspective */}
-          <path
-            d="M0,258 L160,258 L176,248 L282,248 L300,258 L428,258 L448,242 L612,242 L634,252 L798,252 L822,236 L990,236 L1012,246 L1178,246 L1204,230 L1378,230 L1402,242 L1440,242 L1440,400 L0,400 Z"
-            fill="url(#mesa-distant)"
-            opacity="0.22"
-          />
-
-          {/* Canyon Layer 2 — Mid-distance canyon walls, wedding-cake step-backs with sedimentary banding */}
-          <path
-            d="M0,305 L80,305 L80,282 L170,282 L170,268 L240,268 L240,290 L275,290 L285,320 L360,320 L360,295 L450,295 L455,275 L528,275 L528,302 L555,302 L570,322 L640,322 L640,288 L720,288 L725,272 L805,272 L805,295 L840,295 L852,325 L930,325 L930,298 L1008,298 L1010,282 L1090,282 L1090,308 L1118,308 L1128,330 L1205,330 L1205,295 L1290,295 L1290,278 L1370,278 L1375,298 L1410,298 L1420,320 L1440,320 L1440,400 L0,400 Z"
-            fill="url(#mesa-mid)"
-            opacity="0.42"
-          />
-
-          {/* Canyon Layer 3 — Near buttes & mesas (Monument Valley tall butte + wide Palo Duro mesa, banded cliff faces) */}
-          <path
-            d="M0,345 L50,345 L58,335 L130,335 L140,318 L230,318 L238,348 L315,348 L325,332 L395,332 L400,310 L430,310 L432,248 L465,244 L467,252 L478,320 L485,340 L545,340 L550,328 L625,328 L630,315 L700,315 L712,358 L778,358 L782,345 L818,345 L820,275 L1010,275 L1013,298 L1035,298 L1037,320 L1058,320 L1068,345 L1145,345 L1152,332 L1225,332 L1232,312 L1295,312 L1302,340 L1345,340 L1352,325 L1420,325 L1425,342 L1440,342 L1440,400 L0,400 Z"
-            fill="url(#mesa-near)"
-            opacity="0.62"
-          />
-
-          {/* Canyon Layer 4 — Foreground silhouette, irregular rocky top edge */}
-          <path
-            d="M0,372 L48,372 L62,362 L118,362 L132,380 L175,380 L192,370 L285,370 L302,382 L385,382 L402,372 L495,372 L512,385 L595,385 L615,370 L688,370 L702,378 L775,378 L790,368 L892,368 L912,380 L988,380 L1008,370 L1090,370 L1108,382 L1195,382 L1215,370 L1295,370 L1312,378 L1380,378 L1398,368 L1440,368 L1440,400 L0,400 Z"
-            fill="url(#mesa-foreground)"
-            opacity="0.96"
-          />
-        </svg>
+        {/* Horizon Terrain — canvas-rendered procedural canyon layers */}
+        <MesaCanyonCanvas />
 
         {/* Horizon blend gradient */}
         <div className="absolute bottom-0 w-full h-16 bg-gradient-to-t from-[#020617] to-transparent"></div>
