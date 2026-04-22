@@ -23,6 +23,12 @@ import { runPerformanceAudit } from "../services/pagespeed";
 import { fetchFindabilityScores } from "../services/pagespeed-extra";
 import { calculatePathlightScore } from "../services/scoring";
 import { normalizeUrl, validateUrl } from "../services/url";
+import {
+  logEmailEvent,
+  sendFollowUp,
+  sendPathlightReport,
+} from "../services/email";
+import { isUnsubscribed } from "../services/unsubscribe";
 import { inngest } from "./client";
 
 class ScanValidationError extends Error {}
@@ -308,6 +314,91 @@ export const scanRequested = inngest.createFunction(
         );
       });
 
+      await step.run("send-report-email", async () => {
+        try {
+          await sendPathlightReport(scanId);
+        } catch (err) {
+          await logEmailEvent({
+            scanId,
+            emailType: "report_delivery",
+            status: "failed",
+            errorMessage: describeError(err),
+          }).catch(() => {});
+        }
+      });
+
+      await step.sleep("wait-for-followup-1", "48h");
+
+      await step.run("send-followup-1", async () => {
+        try {
+          const email = await lookupScanEmail(scanId);
+          if (email && (await isUnsubscribed(email))) {
+            await logEmailEvent({
+              scanId,
+              emailType: "followup_48h",
+              status: "skipped",
+            });
+            return;
+          }
+          await sendFollowUp(scanId, 2);
+        } catch (err) {
+          await logEmailEvent({
+            scanId,
+            emailType: "followup_48h",
+            status: "failed",
+            errorMessage: describeError(err),
+          }).catch(() => {});
+        }
+      });
+
+      await step.sleep("wait-for-followup-2", "72h");
+
+      await step.run("send-followup-2", async () => {
+        try {
+          const email = await lookupScanEmail(scanId);
+          if (email && (await isUnsubscribed(email))) {
+            await logEmailEvent({
+              scanId,
+              emailType: "followup_5d",
+              status: "skipped",
+            });
+            return;
+          }
+          await sendFollowUp(scanId, 3);
+        } catch (err) {
+          await logEmailEvent({
+            scanId,
+            emailType: "followup_5d",
+            status: "failed",
+            errorMessage: describeError(err),
+          }).catch(() => {});
+        }
+      });
+
+      await step.sleep("wait-for-breakup", "72h");
+
+      await step.run("send-breakup", async () => {
+        try {
+          const email = await lookupScanEmail(scanId);
+          if (email && (await isUnsubscribed(email))) {
+            await logEmailEvent({
+              scanId,
+              emailType: "breakup_8d",
+              status: "skipped",
+            });
+            return;
+          }
+          await sendFollowUp(scanId, 4);
+        } catch (err) {
+          await logEmailEvent({
+            scanId,
+            emailType: "breakup_8d",
+            status: "failed",
+            errorMessage: describeError(err),
+          }).catch(() => {});
+        }
+      });
+
       return { scanId, status: "finalized" };
     } catch (err) {
       const message =
@@ -320,3 +411,11 @@ export const scanRequested = inngest.createFunction(
     }
   }
 );
+
+async function lookupScanEmail(scanId: string): Promise<string | null> {
+  const sql = getDb();
+  const rows = (await sql`
+    SELECT email FROM scans WHERE id = ${scanId} LIMIT 1
+  `) as { email: string }[];
+  return rows[0]?.email ?? null;
+}
