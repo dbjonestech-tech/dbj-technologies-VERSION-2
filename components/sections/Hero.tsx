@@ -65,11 +65,22 @@ export function Hero() {
       className={`relative flex min-h-screen items-center justify-center overflow-hidden${
         lightRevealed ? " hero-revealed" : ""
       }`}
+      style={{
+        backgroundColor: lightRevealed ? "transparent" : "#06060a",
+        transition: "background-color 0.5s ease-out",
+      }}
     >
       {/* ════ LIGHT HERO (z-0 to z-20) ════ */}
 
-      {/* Morphing gradient mesh background */}
-      <div className="absolute inset-0 z-0">
+      {/* Morphing gradient mesh background — hidden until lightRevealed so
+          the pre-cinema state stays flat dark #06060a. */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          opacity: lightRevealed ? 1 : 0,
+          transition: "opacity 0.5s ease-out",
+        }}
+      >
         <div className="gradient-mesh-bg absolute inset-0 opacity-30">
           <span className="gradient-mesh-layer" />
         </div>
@@ -84,6 +95,10 @@ export function Hero() {
           and therefore never clipped by it. */}
       <div
         className="pointer-events-none absolute inset-0 overflow-hidden"
+        style={{
+          opacity: lightRevealed ? 1 : 0,
+          transition: "opacity 0.5s ease-out",
+        }}
         aria-hidden="true"
       >
         <GradientBlob
@@ -114,55 +129,35 @@ export function Hero() {
           </span>
         </motion.div>
 
-        {/* Heading */}
+        {/* Heading — rendered visible at first paint so it is the LCP
+            element. The cinema overlay (z-100) covers it briefly while the
+            ssr:false HeroCinema chunk plays; once the cinema completes the
+            overlay fades and the already-painted heading remains in place. */}
         <div className="mt-6 sm:mt-8">
           <div className="relative inline-block">
-          <motion.h1
+          <h1
             className="font-display text-hero font-extrabold leading-tight tracking-tighter text-slate-900"
-            initial={{ opacity: 0 }}
-            animate={lightRevealed ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: mode === "skip" ? 0 : 0.3 }}
+            style={{
+              color: lightRevealed ? undefined : "#f8fafc",
+              transition: "color 0.3s ease-out",
+            }}
           >
             {HERO_CONTENT.headlineWords.map((word, i) => (
               <span
                 key={i}
                 className="inline-block pb-2 mr-[0.2em] sm:pb-3 sm:mr-[0.25em]"
-                style={{ clipPath: "inset(-5px -10px -5px -10px)" }}
               >
-                <motion.span
-                  className="inline-block"
-                  initial={{ y: "110%" }}
-                  animate={lightRevealed ? { y: 0 } : { y: "110%" }}
-                  transition={{
-                    duration: mode === "skip" ? 0 : 0.8,
-                    delay: mode === "cinematic" ? 0.1 * i : 0,
-                    ease: [0.33, 1, 0.68, 1],
-                  }}
-                >
-                  {word}
-                </motion.span>
+                {word}
               </span>
             ))}
             <br />
-            <span
-              className="inline-block pb-2 sm:pb-4"
-              style={{ clipPath: "inset(-5px -20px -5px -20px)" }}
-            >
-              <motion.span
-                className="inline-block text-gradient pr-2"
-                initial={{ y: "110%" }}
-                animate={lightRevealed ? { y: 0 } : { y: "110%" }}
-                transition={{
-                  duration: mode === "skip" ? 0 : 0.8,
-                  delay: mode === "cinematic" ? 0.15 : 0,
-                  ease: [0.33, 1, 0.68, 1],
-                }}
-              >
+            <span className="inline-block pb-2 sm:pb-4">
+              <span className="inline-block text-gradient pr-2">
                 {HERO_CONTENT.headlineAccent.replace(".", "")}
                 <span className="animate-pulse">.</span>
-              </motion.span>
+              </span>
             </span>
-          </motion.h1>
+          </h1>
           <LightningCrackle
             active={cinemaPhase === "reveal" || cinemaPhase === "complete"}
             fadeOut={cinemaPhase === "complete"}
@@ -260,21 +255,14 @@ export function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bg-primary/80 to-transparent z-10" />
-
-      {/* Hydration-flash cover: a tiny dark overlay that exists from SSR
-          to mask the light hero during the gap between first paint and
-          when the dynamic HeroCinema chunk mounts. Fades out the moment
-          onRevealComplete fires (setting lightRevealed = true). Sits at
-          z-[99], directly below the real cinema overlay (z-[100]). */}
+      {/* Bottom gradient fade — light-colored, so hidden in the pre-cinema
+          dark state. */}
       <div
-        className="fixed inset-0 z-[99] bg-[#06060a] pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bg-primary/80 to-transparent z-10"
         style={{
-          opacity: lightRevealed ? 0 : 1,
-          transition: "opacity 0.3s ease-out",
+          opacity: lightRevealed ? 1 : 0,
+          transition: "opacity 0.5s ease-out",
         }}
-        aria-hidden="true"
       />
 
       {/* ════ CINEMATIC LAYER (deferred, no SSR) ════ */}
