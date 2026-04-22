@@ -118,15 +118,7 @@ export default function GradePage() {
           </Link>
         </div>
         <section className="mb-14 text-center">
-          <h1
-            className="font-display text-5xl font-bold tracking-tight sm:text-6xl"
-            style={{
-              backgroundImage: "linear-gradient(135deg, #3b82f6, #0891b2)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-            }}
-          >
+          <h1 className="header-glow-premium font-display text-5xl font-bold tracking-tight sm:text-6xl">
             PATHLIGHT
           </h1>
           <p className="mt-4 text-lg sm:text-xl" style={{ color: "#c5ccd8" }}>

@@ -575,7 +575,7 @@ select:focus-visible {
 }
 
 /* ─── PATHLIGHT MOON ─────────────────────────────────
- * Slow 360° rotation over 150s. The global
+ * Slow 360° rotation over 1200s. The global
  * prefers-reduced-motion rule above already neutralizes
  * animations, but we also explicitly disable rotation
  * on the moon so the still frame is centered (no 0.01ms
@@ -586,11 +586,25 @@ select:focus-visible {
   to { transform: rotate(360deg); }
 }
 .pathlight-moon {
-  animation: pathlight-moon-rotate 400s linear infinite;
+  animation: pathlight-moon-rotate 1200s linear infinite;
   will-change: transform;
 }
 @media (prefers-reduced-motion: reduce) {
   .pathlight-moon {
     animation: none;
   }
+}
+
+/* ─── PATHLIGHT HERO HEADER ───────────────────────── */
+.header-glow-premium {
+  background: linear-gradient(
+    to right,
+    #f8fafc 0%,
+    #93c5fd 50%,
+    #3b82f6 100%
+  );
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  filter: drop-shadow(0px 0px 12px rgba(59, 130, 246, 0.4)) drop-shadow(0px 0px 30px rgba(59, 130, 246, 0.15));
 }

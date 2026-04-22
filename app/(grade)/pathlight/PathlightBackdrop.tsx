@@ -29,7 +29,7 @@ export function PathlightBackdrop() {
       <div
         className="absolute pointer-events-none mix-blend-screen rounded-full h-[225px] w-[225px] top-[calc(22vh_-_112px)] left-[-75px] md:h-[425px] md:w-[425px] md:top-[calc(25vh_-_212px)] md:left-[-148px]"
         style={{
-          boxShadow: "0 0 40px 10px rgba(255, 253, 245, 0.25), 0 0 120px 50px rgba(200, 220, 255, 0.15), 0 0 250px 100px rgba(180, 200, 240, 0.08)",
+          boxShadow: "0 0 60px 15px rgba(255, 253, 245, 0.25), 0 0 150px 60px rgba(200, 220, 255, 0.15), 0 0 350px 150px rgba(180, 200, 240, 0.08)",
           opacity: 0.9
         }}
       >
@@ -37,9 +37,10 @@ export function PathlightBackdrop() {
           className="pathlight-moon w-full h-full rounded-full bg-cover bg-center"
           style={{
             backgroundImage: "url(/brand/moon.webp)",
-            maskImage: "radial-gradient(circle at center, black 55%, transparent 95%)",
-            WebkitMaskImage: "radial-gradient(circle at center, black 55%, transparent 95%)",
-            opacity: 0.8
+            maskImage: "radial-gradient(circle at center, black 50%, transparent 95%)",
+            WebkitMaskImage: "radial-gradient(circle at center, black 50%, transparent 95%)",
+            filter: "sepia(30%) hue-rotate(-15deg) contrast(1.1) brightness(0.85)",
+            opacity: 0.75
           }}
         />
       </div>
@@ -104,41 +105,33 @@ export function PathlightBackdrop() {
         }}
       />
 
-      {/* 5a — Canyon silhouette BACK (lightest, tallest) */}
-      <svg
-        viewBox="0 0 1440 400"
-        preserveAspectRatio="none"
-        className="absolute bottom-0 left-0 w-full h-[15%] md:h-[30%]"
-      >
-        <path
-          fill="#0f0f1a"
-          d="M0,400 L0,280 L100,280 L100,140 L420,140 L420,280 L560,280 L560,310 L720,310 L720,220 L960,220 L960,140 L1100,140 L1100,280 L1220,280 L1220,200 L1320,200 L1320,280 L1440,280 L1440,400 Z"
-        />
-      </svg>
-
-      {/* 5b — Canyon silhouette MIDDLE */}
-      <svg
-        viewBox="0 0 1440 400"
-        preserveAspectRatio="none"
-        className="absolute bottom-0 left-0 w-full h-[11%] md:h-[22%]"
-      >
-        <path
-          fill="#0a0a14"
-          d="M0,400 L0,320 L80,280 L180,300 L240,260 L300,270 L360,230 L440,250 L520,260 L560,240 L600,320 L700,320 L780,240 L880,200 L980,70 L1050,90 L1080,230 L1180,250 L1260,290 L1360,270 L1440,300 L1440,400 Z"
-        />
-      </svg>
-
-      {/* 5c — Canyon silhouette FRONT (darkest, broken V-gap center) */}
-      <svg
-        viewBox="0 0 1440 400"
-        preserveAspectRatio="none"
-        className="absolute bottom-0 left-0 w-full h-[6%] md:h-[12%]"
-      >
-        <path
-          fill="#050510"
-          d="M0,400 L0,340 L120,320 L220,350 L340,310 L460,340 L560,290 L660,260 L720,380 L780,260 L860,310 L960,290 L1080,340 L1200,300 L1320,350 L1440,320 L1440,400 Z"
-        />
-      </svg>
+      {/* Canyon Silhouettes - West Texas Mesa */}
+      <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden pointer-events-none z-[1]">
+        <svg viewBox="0 0 1440 320" className="w-full h-auto min-h-[150px] md:min-h-[250px] object-cover" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="mesa-distant" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#0f172a" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#020617" stopOpacity="0.1" />
+            </linearGradient>
+            <linearGradient id="mesa-front" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#020617" stopOpacity="1" />
+              <stop offset="100%" stopColor="#000000" stopOpacity="1" />
+            </linearGradient>
+          </defs>
+          {/* Distant Layer - Soft Mesas fading into dust */}
+          <path
+            d="M0,250 Q100,230 200,240 T400,220 L450,220 Q500,220 550,250 T750,230 L800,230 Q900,230 1000,260 T1200,240 T1440,250 L1440,320 L0,320 Z"
+            fill="url(#mesa-distant)"
+          />
+          {/* Foreground Layer - Sharp Cliffs and Canyons */}
+          <path
+            d="M0,280 Q80,280 120,260 T250,260 L300,260 Q350,260 400,290 T600,280 Q650,260 700,260 L750,260 Q800,260 850,290 T1100,270 L1150,270 Q1200,270 1250,290 T1440,280 L1440,320 L0,320 Z"
+            fill="url(#mesa-front)"
+          />
+        </svg>
+        {/* Horizon blend gradient to ground the SVGs */}
+        <div className="absolute bottom-0 w-full h-12 bg-gradient-to-t from-[#020617] to-transparent"></div>
+      </div>
     </div>
   );
 }
