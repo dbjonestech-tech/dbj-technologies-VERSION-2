@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ScanningCore } from "./ScanningCore";
 import type {
   DesignScores,
   PerformanceScores,
@@ -211,7 +212,7 @@ function LoadingState({ status, url }: { status: string; url: string }) {
       </h1>
 
       <div className="mt-12 flex flex-col items-center gap-6">
-        <PulseRing />
+        <ScanningCore />
         <div
           className="font-display text-lg font-semibold"
           style={{ color: "#60a5fa" }}
@@ -250,24 +251,6 @@ function LoadingState({ status, url }: { status: string; url: string }) {
         </ol>
       </div>
     </section>
-  );
-}
-
-function PulseRing() {
-  return (
-    <span
-      aria-hidden="true"
-      className="relative inline-flex h-16 w-16 items-center justify-center"
-    >
-      <span
-        className="absolute inline-block h-full w-full animate-ping rounded-full"
-        style={{ backgroundColor: "rgba(59,130,246,0.35)" }}
-      />
-      <span
-        className="relative inline-block h-8 w-8 rounded-full"
-        style={{ backgroundImage: "linear-gradient(135deg, #3b82f6, #0891b2)" }}
-      />
-    </span>
   );
 }
 
