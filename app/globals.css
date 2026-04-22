@@ -586,7 +586,7 @@ select:focus-visible {
   to { transform: rotate(360deg); }
 }
 .pathlight-moon {
-  animation: pathlight-moon-rotate 150s linear infinite;
+  animation: pathlight-moon-rotate 400s linear infinite;
   will-change: transform;
 }
 @media (prefers-reduced-motion: reduce) {

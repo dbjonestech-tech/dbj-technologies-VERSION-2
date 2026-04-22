@@ -90,7 +90,7 @@ export default function GradePage() {
     <>
       <PathlightBackdrop />
       <div
-        className="relative z-10 min-h-screen w-full px-6 py-16 sm:py-24"
+        className="relative min-h-screen w-full px-6 py-16 sm:py-24"
         style={{ color: "#e7ebf2" }}
       >
         <div className="mx-auto w-full max-w-[600px]">

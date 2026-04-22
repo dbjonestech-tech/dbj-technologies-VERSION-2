@@ -104,7 +104,7 @@ export function ScanStatus({ initial }: { initial: InitialScanState }) {
 
   return (
     <div
-      className="relative z-10 min-h-screen w-full"
+      className="relative min-h-screen w-full"
       style={{ color: "#e7ebf2" }}
     >
       <TopBar />

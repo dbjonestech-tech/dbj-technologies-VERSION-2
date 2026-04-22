@@ -25,15 +25,24 @@ export function PathlightBackdrop() {
         }}
       />
 
-      {/* 1.5 — Moon (NASA LRO texture, slow rotation, atmospheric glow) */}
+      {/* 1.5 — Moon (NASA LRO texture, additive atmospheric scattering, slow rotation) */}
       <div
-        className="pathlight-moon absolute rounded-full bg-cover bg-center h-[225px] w-[225px] top-[calc(22vh_-_112px)] left-[-75px] md:h-[425px] md:w-[425px] md:top-[calc(25vh_-_212px)] md:left-[-148px]"
+        className="absolute pointer-events-none mix-blend-screen rounded-full h-[225px] w-[225px] top-[calc(22vh_-_112px)] left-[-75px] md:h-[425px] md:w-[425px] md:top-[calc(25vh_-_212px)] md:left-[-148px]"
         style={{
-          backgroundImage: "url(/brand/moon.webp)",
-          boxShadow:
-            "0 0 30px 10px rgba(255, 253, 245, 0.4), 0 0 80px 40px rgba(200, 220, 255, 0.15), 0 0 160px 80px rgba(180, 200, 240, 0.08)",
+          boxShadow: "0 0 40px 10px rgba(255, 253, 245, 0.25), 0 0 120px 50px rgba(200, 220, 255, 0.15), 0 0 250px 100px rgba(180, 200, 240, 0.08)",
+          opacity: 0.9
         }}
-      />
+      >
+        <div
+          className="pathlight-moon w-full h-full rounded-full bg-cover bg-center"
+          style={{
+            backgroundImage: "url(/brand/moon.webp)",
+            maskImage: "radial-gradient(circle at center, black 55%, transparent 95%)",
+            WebkitMaskImage: "radial-gradient(circle at center, black 55%, transparent 95%)",
+            opacity: 0.8
+          }}
+        />
+      </div>
 
       {/* 2 — Star field */}
       <StarField />

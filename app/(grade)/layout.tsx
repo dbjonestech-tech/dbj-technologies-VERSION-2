@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { CursorWrapper } from "@/components/layout/CursorWrapper";
-import { GradeEffects } from "@/components/layout/GradeEffects";
 
 export const metadata: Metadata = {
   title: {
@@ -15,7 +14,6 @@ export default function GradeLayout({ children }: { children: React.ReactNode })
   return (
     <main id="main-content" className="relative min-h-screen">
       <CursorWrapper />
-      <GradeEffects />
       {children}
     </main>
   );
