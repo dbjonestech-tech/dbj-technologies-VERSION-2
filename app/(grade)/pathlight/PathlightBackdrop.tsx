@@ -131,11 +131,71 @@ export function PathlightBackdrop() {
 
         {/* Horizon Terrain & Thunderheads */}
         <svg viewBox="0 0 1440 400" className="absolute bottom-0 w-full h-auto min-h-[250px] md:min-h-[400px] object-cover" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          {/* West Texas Mesas - Distant Layer (flat-topped plateaus) */}
-          <path d="M0,275 L65,275 L105,310 L225,310 L265,255 L425,255 L475,325 L615,325 L670,260 L845,260 L895,300 L1090,300 L1155,250 L1440,250 L1440,400 L0,400 Z" fill="#0f172a" opacity="0.85"/>
+          <defs>
+            {/* userSpaceOnUse gradients so sedimentary bands align at absolute viewBox y-coords across every formation */}
+            <linearGradient id="mesa-distant" x1="0" y1="225" x2="0" y2="280" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#3a2e52" />
+              <stop offset="100%" stopColor="#2d2640" />
+            </linearGradient>
+            <linearGradient id="mesa-mid" x1="0" y1="260" x2="0" y2="400" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#5c3520" />
+              <stop offset="22%" stopColor="#5c3520" />
+              <stop offset="24%" stopColor="#7a4528" />
+              <stop offset="32%" stopColor="#7a4528" />
+              <stop offset="34%" stopColor="#4a2c1a" />
+              <stop offset="54%" stopColor="#4a2c1a" />
+              <stop offset="56%" stopColor="#6b3d25" />
+              <stop offset="68%" stopColor="#6b3d25" />
+              <stop offset="70%" stopColor="#3a2012" />
+              <stop offset="100%" stopColor="#3a2012" />
+            </linearGradient>
+            <linearGradient id="mesa-near" x1="0" y1="240" x2="0" y2="400" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#7a4528" />
+              <stop offset="15%" stopColor="#7a4528" />
+              <stop offset="17%" stopColor="#8b4a2a" />
+              <stop offset="26%" stopColor="#8b4a2a" />
+              <stop offset="28%" stopColor="#6b3a1f" />
+              <stop offset="45%" stopColor="#6b3a1f" />
+              <stop offset="47%" stopColor="#8b4a2a" />
+              <stop offset="55%" stopColor="#8b4a2a" />
+              <stop offset="57%" stopColor="#5a3018" />
+              <stop offset="75%" stopColor="#5a3018" />
+              <stop offset="77%" stopColor="#6b3a1f" />
+              <stop offset="100%" stopColor="#3a2012" />
+            </linearGradient>
+            <linearGradient id="mesa-foreground" x1="0" y1="340" x2="0" y2="400" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#231508" />
+              <stop offset="100%" stopColor="#1a0f08" />
+            </linearGradient>
+          </defs>
 
-          {/* West Texas Mesas - Foreground Layer (sharp canyons & steep drops) */}
-          <path d="M0,315 L90,315 L135,355 L280,355 L330,280 L515,280 L580,365 L760,365 L815,290 L1015,290 L1075,340 L1275,340 L1330,300 L1440,300 L1440,400 L0,400 Z" fill="#020617" />
+          {/* Canyon Layer 1 — Distant range, atmospheric perspective */}
+          <path
+            d="M0,258 L160,258 L176,248 L282,248 L300,258 L428,258 L448,242 L612,242 L634,252 L798,252 L822,236 L990,236 L1012,246 L1178,246 L1204,230 L1378,230 L1402,242 L1440,242 L1440,400 L0,400 Z"
+            fill="url(#mesa-distant)"
+            opacity="0.22"
+          />
+
+          {/* Canyon Layer 2 — Mid-distance canyon walls, wedding-cake step-backs with sedimentary banding */}
+          <path
+            d="M0,305 L80,305 L80,282 L170,282 L170,268 L240,268 L240,290 L275,290 L285,320 L360,320 L360,295 L450,295 L455,275 L528,275 L528,302 L555,302 L570,322 L640,322 L640,288 L720,288 L725,272 L805,272 L805,295 L840,295 L852,325 L930,325 L930,298 L1008,298 L1010,282 L1090,282 L1090,308 L1118,308 L1128,330 L1205,330 L1205,295 L1290,295 L1290,278 L1370,278 L1375,298 L1410,298 L1420,320 L1440,320 L1440,400 L0,400 Z"
+            fill="url(#mesa-mid)"
+            opacity="0.42"
+          />
+
+          {/* Canyon Layer 3 — Near buttes & mesas (Monument Valley tall butte + wide Palo Duro mesa, banded cliff faces) */}
+          <path
+            d="M0,345 L50,345 L58,335 L130,335 L140,318 L230,318 L238,348 L315,348 L325,332 L395,332 L400,310 L430,310 L432,248 L465,244 L467,252 L478,320 L485,340 L545,340 L550,328 L625,328 L630,315 L700,315 L712,358 L778,358 L782,345 L818,345 L820,275 L1010,275 L1013,298 L1035,298 L1037,320 L1058,320 L1068,345 L1145,345 L1152,332 L1225,332 L1232,312 L1295,312 L1302,340 L1345,340 L1352,325 L1420,325 L1425,342 L1440,342 L1440,400 L0,400 Z"
+            fill="url(#mesa-near)"
+            opacity="0.62"
+          />
+
+          {/* Canyon Layer 4 — Foreground silhouette, irregular rocky top edge */}
+          <path
+            d="M0,372 L48,372 L62,362 L118,362 L132,380 L175,380 L192,370 L285,370 L302,382 L385,382 L402,372 L495,372 L512,385 L595,385 L615,370 L688,370 L702,378 L775,378 L790,368 L892,368 L912,380 L988,380 L1008,370 L1090,370 L1108,382 L1195,382 L1215,370 L1295,370 L1312,378 L1380,378 L1398,368 L1440,368 L1440,400 L0,400 Z"
+            fill="url(#mesa-foreground)"
+            opacity="0.96"
+          />
         </svg>
 
         {/* Horizon blend gradient */}
