@@ -3,6 +3,7 @@ import { StarField } from "./StarField";
 /* ─── PATHLIGHT BACKDROP (scan page) ─────────────────
  * Layers (back-to-front):
  *  1) Sky gradient — deep navy to warm horizon
+ *  1.5) Moon — low-hanging NASA lunar texture, rotating
  *  2) Star field — canvas with twinkle (respects reduced motion)
  *  3) Distant lightning — desktop only, CSS @keyframes, flashes
  *     occupy ~2% of each cycle (see globals.css)
@@ -21,6 +22,16 @@ export function PathlightBackdrop() {
         style={{
           background:
             "linear-gradient(to bottom, #050510 0%, #0a0a2e 48%, #140a20 72%, #1a0a08 88%, #0d0805 100%)",
+        }}
+      />
+
+      {/* 1.5 — Moon (NASA LRO texture, slow rotation, atmospheric glow) */}
+      <div
+        className="pathlight-moon absolute rounded-full bg-cover bg-center h-[225px] w-[225px] top-[calc(22vh_-_112px)] left-[-75px] md:h-[425px] md:w-[425px] md:top-[calc(25vh_-_212px)] md:left-[-148px]"
+        style={{
+          backgroundImage: "url(/brand/moon.webp)",
+          boxShadow:
+            "0 0 30px 10px rgba(255, 253, 245, 0.4), 0 0 80px 40px rgba(200, 220, 255, 0.15), 0 0 160px 80px rgba(180, 200, 240, 0.08)",
         }}
       />
 

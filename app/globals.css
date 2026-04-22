@@ -573,3 +573,24 @@ select:focus-visible {
   72.7% { opacity: 0; }
   100% { opacity: 0; }
 }
+
+/* ─── PATHLIGHT MOON ─────────────────────────────────
+ * Slow 360° rotation over 150s. The global
+ * prefers-reduced-motion rule above already neutralizes
+ * animations, but we also explicitly disable rotation
+ * on the moon so the still frame is centered (no 0.01ms
+ * animation flicker).
+ * ──────────────────────────────────────────────────── */
+@keyframes pathlight-moon-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.pathlight-moon {
+  animation: pathlight-moon-rotate 150s linear infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pathlight-moon {
+    animation: none;
+  }
+}

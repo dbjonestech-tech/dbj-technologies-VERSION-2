@@ -94,7 +94,11 @@ export function Navbar() {
                 }`;
             return (
               <Link key={link.href} href={link.href} className={className}>
-                <span className="relative z-10">{link.label}</span>
+                {isPathlight ? (
+                  link.label
+                ) : (
+                  <span className="relative z-10">{link.label}</span>
+                )}
                 {isActive && !isPathlight && (
                   <motion.div
                     layoutId="nav-indicator"
