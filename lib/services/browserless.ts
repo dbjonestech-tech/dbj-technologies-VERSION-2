@@ -3,13 +3,32 @@ export type Viewport = { width: number; height: number };
 const DEFAULT_BROWSERLESS_BASE = "https://production-sfo.browserless.io";
 const SCREENSHOT_TIMEOUT_MS = 45_000;
 
-type BrowserlessScreenshotBody = {
-  url: string;
-  viewport: Viewport;
-  gotoOptions: { waitUntil: "networkidle0"; timeout: number };
-  options: { type: "jpeg"; quality: number; fullPage: boolean };
-  waitForTimeout?: number;
-  bestAttempt?: boolean;
+// Runs inside Browserless v2 /function (Puppeteer in a managed Chromium).
+// Emulating prefers-reduced-motion BEFORE navigation lets sites that respect
+// that media query (including dbjtechnologies.com's HeroCinema) skip
+// interaction-gated entrance animations so the captured frame shows real
+// content instead of a permanent blueprint overlay.
+const SCREENSHOT_FUNCTION = `
+export default async function ({ page, context }) {
+  const { url, width, height } = context;
+  await page.emulateMediaFeatures([
+    { name: "prefers-reduced-motion", value: "reduce" }
+  ]);
+  await page.setViewport({ width, height });
+  await page.goto(url, { waitUntil: "networkidle0", timeout: 25000 });
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  const buffer = await page.screenshot({
+    type: "jpeg",
+    quality: 80,
+    fullPage: false,
+  });
+  return { data: buffer, type: "image/jpeg" };
+}
+`;
+
+type BrowserlessFunctionBody = {
+  code: string;
+  context: { url: string; width: number; height: number };
 };
 
 export async function captureScreenshot(
@@ -22,13 +41,9 @@ export async function captureScreenshot(
   }
   const base = process.env.BROWSERLESS_BASE_URL ?? DEFAULT_BROWSERLESS_BASE;
 
-  const body: BrowserlessScreenshotBody = {
-    url,
-    viewport,
-    gotoOptions: { waitUntil: "networkidle0", timeout: 25_000 },
-    options: { type: "jpeg", quality: 80, fullPage: false },
-    waitForTimeout: 3000,
-    bestAttempt: true,
+  const body: BrowserlessFunctionBody = {
+    code: SCREENSHOT_FUNCTION,
+    context: { url, width: viewport.width, height: viewport.height },
   };
 
   const controller = new AbortController();
@@ -36,7 +51,7 @@ export async function captureScreenshot(
 
   try {
     const res = await fetch(
-      `${base}/screenshot?token=${encodeURIComponent(token)}`,
+      `${base}/function?token=${encodeURIComponent(token)}`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
