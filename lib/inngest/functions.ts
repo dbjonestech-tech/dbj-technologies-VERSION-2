@@ -20,7 +20,6 @@ import {
   runVisionAudit,
 } from "../services/claude-analysis";
 import { runPerformanceAudit } from "../services/pagespeed";
-import { fetchFindabilityScores } from "../services/pagespeed-extra";
 import { calculatePathlightScore } from "../services/scoring";
 import { normalizeUrl, validateUrl } from "../services/url";
 import {
@@ -268,15 +267,11 @@ export const scanRequested = inngest.createFunction(
 
             let seo = audit.scores.overall;
             let accessibility = audit.scores.overall;
-            try {
-              const extras = await fetchFindabilityScores(
-                ctx.resolvedUrl ?? ctx.url
-              );
-              seo = extras.seo;
-              accessibility = extras.accessibility;
-            } catch {
-              // PSI failure is tolerated: fall back to performance score proxy.
-            }
+            const lhData = ctx.lighthouseData as Record<string, any> | null;
+            const rawSeo = lhData?.categories?.seo?.score;
+            const rawA11y = lhData?.categories?.accessibility?.score;
+            seo = typeof rawSeo === "number" && isFinite(rawSeo) ? Math.round(rawSeo * 100) : audit.scores.overall;
+            accessibility = typeof rawA11y === "number" && isFinite(rawA11y) ? Math.round(rawA11y * 100) : audit.scores.overall;
 
             const { pathlightScore, pillarScores } = calculatePathlightScore(
               ctx.visionAudit.design,
