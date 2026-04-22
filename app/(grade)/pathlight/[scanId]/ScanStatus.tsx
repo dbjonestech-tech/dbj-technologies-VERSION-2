@@ -104,8 +104,8 @@ export function ScanStatus({ initial }: { initial: InitialScanState }) {
 
   return (
     <div
-      className="min-h-screen w-full"
-      style={{ backgroundColor: "#06060a", color: "#e7ebf2" }}
+      className="relative min-h-screen w-full"
+      style={{ color: "#e7ebf2" }}
     >
       <TopBar />
       <div className="mx-auto w-full max-w-[1120px] px-6 py-10 sm:py-14">
@@ -148,7 +148,7 @@ function TopBar() {
         DBJ Technologies
       </Link>
       <Link
-        href="/grade"
+        href="/pathlight"
         className="text-xs font-semibold uppercase tracking-[0.2em]"
         style={{ color: "#9aa3b2" }}
       >
@@ -263,6 +263,46 @@ function PulseRing() {
 
 /* ─────────────────────── Failed ─────────────────────── */
 
+function sanitizeScanError(raw: string | null): {
+  friendly: string;
+  technical: string | null;
+} {
+  const fallback =
+    "Something went wrong with the scan. Please try again, and if the problem persists, contact us.";
+  if (!raw) return { friendly: fallback, technical: null };
+  const lower = raw.toLowerCase();
+  let friendly = fallback;
+  if (
+    lower.includes("401") ||
+    lower.includes("invalid api key") ||
+    lower.includes("api key")
+  ) {
+    friendly =
+      "Our scanning service is temporarily unavailable. Please try again in a few minutes.";
+  } else if (
+    lower.includes("429") ||
+    lower.includes("quota") ||
+    lower.includes("rate limit")
+  ) {
+    friendly =
+      "We're experiencing high demand. Please try again in a few minutes.";
+  } else if (lower.includes("timeout") || lower.includes("etimedout")) {
+    friendly =
+      "The scan took too long to complete. The target website may be slow to respond. Please try again.";
+  } else if (
+    lower.includes("enotfound") ||
+    lower.includes("dns") ||
+    lower.includes("getaddrinfo")
+  ) {
+    friendly =
+      "We couldn't reach that website. Please check the URL and try again.";
+  } else if (lower.includes("ssl") || lower.includes("certificate")) {
+    friendly =
+      "We couldn't establish a secure connection to that website. The site may have SSL issues.";
+  }
+  return { friendly, technical: raw };
+}
+
 function FailedState({
   url,
   message,
@@ -270,6 +310,7 @@ function FailedState({
   url: string;
   message: string | null;
 }) {
+  const { friendly, technical } = sanitizeScanError(message);
   return (
     <section className="mx-auto max-w-xl py-20 text-center">
       <p
@@ -297,21 +338,43 @@ function FailedState({
         >
           Scan failed
         </div>
-        {message ? (
-          <p className="mt-3 text-sm" style={{ color: "#f5c6c6" }}>
-            {message}
-          </p>
+        <p className="mt-3 text-sm" style={{ color: "#f5c6c6" }}>
+          {friendly}
+        </p>
+        {technical ? (
+          <details className="mt-4 text-left">
+            <summary
+              className="cursor-pointer select-none text-xs font-medium uppercase tracking-wider"
+              style={{ color: "#6b7280" }}
+            >
+              Show technical details
+            </summary>
+            <pre
+              className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-md border p-3 text-[11px] leading-relaxed"
+              style={{
+                borderColor: "rgba(255,255,255,0.08)",
+                backgroundColor: "rgba(0,0,0,0.3)",
+                color: "#9aa3b2",
+                fontFamily:
+                  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+              }}
+            >
+              {technical}
+            </pre>
+          </details>
         ) : null}
-        <Link
-          href="/grade"
-          className="mt-6 inline-block rounded-full px-5 py-2 text-sm font-semibold"
-          style={{
-            backgroundImage: "linear-gradient(135deg, #3b82f6, #0891b2)",
-            color: "white",
-          }}
-        >
-          Try another scan
-        </Link>
+        <div>
+          <Link
+            href="/pathlight"
+            className="mt-6 inline-block rounded-full px-5 py-2 text-sm font-semibold"
+            style={{
+              backgroundImage: "linear-gradient(135deg, #3b82f6, #0891b2)",
+              color: "white",
+            }}
+          >
+            Try another scan
+          </Link>
+        </div>
       </div>
     </section>
   );

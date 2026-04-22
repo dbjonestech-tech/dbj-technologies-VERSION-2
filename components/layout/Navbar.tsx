@@ -84,18 +84,18 @@ export function Navbar() {
         <div className="hidden items-center gap-1 lg:flex">
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 ${
+            const isPathlight = link.label === "Pathlight";
+            const className = isPathlight
+              ? "relative rounded-lg px-4 py-2 text-sm font-semibold nav-pathlight"
+              : `relative rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 ${
                   isActive
                     ? "text-gray-900 font-semibold"
                     : "text-gray-500 hover:text-gray-900"
-                }`}
-              >
+                }`;
+            return (
+              <Link key={link.href} href={link.href} className={className}>
                 <span className="relative z-10">{link.label}</span>
-                {isActive && (
+                {isActive && !isPathlight && (
                   <motion.div
                     layoutId="nav-indicator"
                     className="absolute inset-0 rounded-lg bg-gray-100 border border-gray-200/80"
@@ -162,26 +162,32 @@ export function Navbar() {
             className="overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-2xl lg:hidden"
           >
             <div className="mx-auto max-w-7xl px-6 py-6">
-              {NAV_LINKS.map((link, i) => (
-                <motion.div
-                  key={link.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <Link
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`block rounded-lg px-4 py-3 text-lg font-medium transition-colors ${
+              {NAV_LINKS.map((link, i) => {
+                const isPathlight = link.label === "Pathlight";
+                const className = isPathlight
+                  ? "block rounded-lg px-4 py-3 text-lg font-semibold nav-pathlight"
+                  : `block rounded-lg px-4 py-3 text-lg font-medium transition-colors ${
                       pathname === link.href
                         ? "text-accent-blue bg-accent-blue/5"
                         : "text-text-secondary hover:text-gray-900 hover:bg-gray-50"
-                    }`}
+                    }`;
+                return (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
                   >
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className={className}
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                );
+              })}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

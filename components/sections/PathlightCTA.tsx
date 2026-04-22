@@ -45,7 +45,7 @@ export function PathlightCTA() {
         </p>
         <div className="mt-10">
           <Link
-            href="/grade"
+            href="/pathlight"
             className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5"
             style={{
               backgroundImage: "linear-gradient(135deg, #3b82f6, #0891b2)",
