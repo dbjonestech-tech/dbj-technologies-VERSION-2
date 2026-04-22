@@ -22,7 +22,7 @@ export default async function ({ page, context }) {
     quality: 80,
     fullPage: false,
   });
-  return { data: buffer, type: "image/jpeg" };
+  return { screenshot: buffer.toString("base64") };
 }
 `;
 
@@ -67,7 +67,8 @@ export async function captureScreenshot(
       );
     }
 
-    const buf = Buffer.from(await res.arrayBuffer());
+    const json = (await res.json()) as { screenshot: string };
+    const buf = Buffer.from(json.screenshot, "base64");
     if (buf.byteLength === 0) {
       throw new Error("Browserless returned an empty screenshot.");
     }
