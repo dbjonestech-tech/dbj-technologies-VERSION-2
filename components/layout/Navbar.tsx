@@ -40,7 +40,7 @@ export function Navbar() {
           : "bg-transparent"
       }`}
     >
-      <nav aria-label="Main navigation" className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+      <nav aria-label="Main navigation" className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 xl:px-8">
         {/* Logo */}
         <Link
           href="/"
@@ -57,7 +57,7 @@ export function Navbar() {
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-labelledby="nav-logo-title nav-logo-desc"
-            className="h-8 w-auto sm:h-10 lg:h-11"
+            className="h-8 w-auto sm:h-10 xl:h-11"
           >
             <title id="nav-logo-title">DBJ Technologies logo</title>
             <desc id="nav-logo-desc">Cyan geometric DBJ mark with dark DBJ Technologies wordmark</desc>
@@ -81,7 +81,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden items-center gap-1 lg:flex">
+        <div className="hidden items-center gap-1 xl:flex">
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href;
             const isPathlight = link.label === "Pathlight";
@@ -115,14 +115,14 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <Link
             href="/contact"
-            className="btn-primary hidden text-sm lg:inline-flex"
+            className="btn-primary hidden text-sm xl:inline-flex"
           >
             Start a Project
           </Link>
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="relative z-10 flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white lg:hidden"
+            className="relative z-10 flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white xl:hidden"
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
@@ -163,7 +163,7 @@ export function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             id="mobile-menu"
-            className="overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-2xl lg:hidden"
+            className="overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-2xl xl:hidden"
           >
             <div className="mx-auto max-w-7xl px-6 py-6">
               {NAV_LINKS.map((link, i) => {
