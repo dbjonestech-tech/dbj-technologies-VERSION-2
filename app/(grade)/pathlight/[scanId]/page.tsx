@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getDb } from "@/lib/db";
+import { getFullScanReport } from "@/lib/db/queries";
+import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import { ReportBackdrop } from "../PathlightBackdrop";
+import AskPathlightLoader from "./AskPathlightLoader";
 import { ScanStatus } from "./ScanStatus";
 
 export const metadata: Metadata = {
@@ -61,6 +64,11 @@ export default async function ScanResultsPage({
 
   const row = rows[0]!;
 
+  const isReportReady = row.status === "complete" || row.status === "partial";
+  const report = isReportReady ? await getFullScanReport(row.id) : null;
+  const suggestedChips = report ? generateSuggestedChips(report) : [];
+  const calendlyUrl = process.env.CALENDLY_URL ?? null;
+
   return (
     <>
       <ReportBackdrop />
@@ -71,6 +79,15 @@ export default async function ScanResultsPage({
           status: row.status,
         }}
       />
+      {report ? (
+        <AskPathlightLoader
+          scanId={report.id}
+          businessName={report.businessName}
+          pathlightScore={report.pathlightScore}
+          suggestedChips={suggestedChips}
+          calendlyUrl={calendlyUrl}
+        />
+      ) : null}
     </>
   );
 }

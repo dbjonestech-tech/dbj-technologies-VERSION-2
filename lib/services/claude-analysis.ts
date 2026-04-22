@@ -10,7 +10,7 @@ import type {
   VisionAuditResult,
 } from "@/lib/types/scan";
 
-const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "claude-sonnet-4-6";
 const CALL_TIMEOUT_MS = 60_000;
 const MAX_HEADINGS = 40;
 const MAX_LINK_TEXTS = 40;
