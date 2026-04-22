@@ -44,8 +44,11 @@ export async function runPerformanceAudit(url: string): Promise<AuditResult> {
   const qs = new URLSearchParams({
     url,
     strategy: "desktop",
-    category: "performance",
   });
+  qs.append("category", "performance");
+  qs.append("category", "accessibility");
+  qs.append("category", "seo");
+  qs.append("category", "best-practices");
   const key = process.env.PAGESPEED_API_KEY;
   if (key) qs.set("key", key);
 
