@@ -25,10 +25,10 @@ export function PathlightBackdrop() {
         }}
       />
 
-      {/* 1.5 — The 3D Astrophysical Moon (realistic spherical edge + moonlight) */}
-      <div className="absolute pointer-events-none rounded-full h-[225px] w-[225px] top-[calc(22vh_-_112px)] left-[-75px] md:h-[425px] md:w-[425px] md:top-[calc(25vh_-_212px)] md:left-[-148px]">
+      {/* 1.5 — The 3D Astrophysical Moon (stars now properly behind + realistic spherical edge) */}
+      <div className="absolute pointer-events-none rounded-full h-[225px] w-[225px] top-[calc(22vh_-_112px)] left-[-75px] z-[2] md:h-[425px] md:w-[425px] md:top-[calc(25vh_-_212px)] md:left-[-148px]">
 
-        {/* Layer 1: Atmospheric moonlight glow (cool silver/cyan/indigo bleed) */}
+        {/* Layer 1: Atmospheric moonlight glow */}
         <div
           className="absolute inset-0 rounded-full mix-blend-screen"
           style={{
@@ -36,7 +36,7 @@ export function PathlightBackdrop() {
           }}
         />
 
-        {/* Layer 2: Physical Moon Body (opaque, blocks stars, perfect edge) */}
+        {/* Layer 2: Physical Moon Body (SOLID black base + texture — this occludes stars) */}
         <div className="absolute inset-0 rounded-full bg-black overflow-hidden">
           <div
             className="pathlight-moon w-full h-full bg-cover bg-center"
@@ -47,7 +47,7 @@ export function PathlightBackdrop() {
           />
         </div>
 
-        {/* Layer 3: True Spherical Terminator (deep shadow on one side for 3D volume + rounded edge) */}
+        {/* Layer 3: True Spherical Terminator (deep rounded shadow) */}
         <div
           className="absolute inset-0 rounded-full"
           style={{
@@ -131,21 +131,11 @@ export function PathlightBackdrop() {
 
         {/* Horizon Terrain & Thunderheads */}
         <svg viewBox="0 0 1440 400" className="absolute bottom-0 w-full h-auto min-h-[250px] md:min-h-[400px] object-cover" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="cloud-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#334155" stopOpacity="0.65" />
-              <stop offset="100%" stopColor="#020617" stopOpacity="1" />
-            </linearGradient>
-          </defs>
-
-          {/* Heavy West Texas Thunderhead Clouds (subtle distant storm feel) */}
-          <path d="M0,210 Q140,165 320,195 T680,155 T1050,185 T1440,165 L1440,400 L0,400 Z" fill="url(#cloud-grad)" filter="blur(6px)" />
-
           {/* West Texas Mesas - Distant Layer (flat-topped plateaus) */}
-          <path d="M0,275 L70,275 L110,315 L240,315 L275,260 L440,260 L490,330 L640,330 L695,265 L880,265 L930,305 L1135,305 L1195,255 L1440,255 L1440,400 L0,400 Z" fill="#0f172a" opacity="0.85"/>
+          <path d="M0,275 L65,275 L105,310 L225,310 L265,255 L425,255 L475,325 L615,325 L670,260 L845,260 L895,300 L1090,300 L1155,250 L1440,250 L1440,400 L0,400 Z" fill="#0f172a" opacity="0.85"/>
 
           {/* West Texas Mesas - Foreground Layer (sharp canyons & steep drops) */}
-          <path d="M0,315 L95,315 L145,365 L295,365 L340,285 L535,285 L595,375 L785,375 L840,295 L1035,295 L1095,345 L1290,345 L1345,305 L1440,305 L1440,400 L0,400 Z" fill="#020617" />
+          <path d="M0,315 L90,315 L135,355 L280,355 L330,280 L515,280 L580,365 L760,365 L815,290 L1015,290 L1075,340 L1275,340 L1330,300 L1440,300 L1440,400 L0,400 Z" fill="#020617" />
         </svg>
 
         {/* Horizon blend gradient */}
