@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "DBJ Technologies privacy policy. How contact form submissions are collected, used, and protected, plus details on encryption, cookies, third-party services, and your rights.",
+  alternates: { canonical: "https://dbjtechnologies.com/privacy" },
   openGraph: {
     title: "Privacy Policy | DBJ Technologies",
     description:

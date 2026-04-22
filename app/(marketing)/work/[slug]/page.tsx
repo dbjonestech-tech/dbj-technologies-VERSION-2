@@ -22,6 +22,7 @@ export async function generateMetadata({
   return {
     title: project.title,
     description: project.tagline,
+    alternates: { canonical: `https://dbjtechnologies.com/work/${slug}` },
     openGraph: {
       title: `${project.title} | DBJ Technologies`,
       description: project.tagline,

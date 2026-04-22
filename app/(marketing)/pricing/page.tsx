@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Pricing",
   description:
     "Fixed-price engineering engagements: Starter from $4,500, Professional from $9,500, Enterprise custom. Scope, timeline, and cost agreed before development begins.",
+  alternates: { canonical: "https://dbjtechnologies.com/pricing" },
   openGraph: {
     title: "Pricing | DBJ Technologies",
     description:

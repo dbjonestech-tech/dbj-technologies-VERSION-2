@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Terms of Service",
   description:
     "DBJ Technologies terms of service. Engagement scope, payment terms, intellectual property transfer, client responsibilities, limitation of liability, and Texas governing law.",
+  alternates: { canonical: "https://dbjtechnologies.com/terms" },
   openGraph: {
     title: "Terms of Service | DBJ Technologies",
     description:

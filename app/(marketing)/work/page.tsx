@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Core Disciplines",
   description:
     "Three core engineering disciplines that define my practice: Frontend Architecture, Backend Infrastructure, and Performance Engineering.",
+  alternates: { canonical: "https://dbjtechnologies.com/work" },
   openGraph: {
     title: "Core Disciplines | DBJ Technologies",
     description:

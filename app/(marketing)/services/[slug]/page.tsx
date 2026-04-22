@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: service.title,
     description: service.heroDescription,
+    alternates: { canonical: `https://dbjtechnologies.com/services/${slug}` },
     openGraph: {
       title: `${service.title} | DBJ Technologies`,
       description: service.heroDescription,

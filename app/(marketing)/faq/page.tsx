@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "FAQ",
   description:
     "Answers to common questions about working with DBJ Technologies. Project timelines, pricing, technologies, post-launch support, and more.",
+  alternates: { canonical: "https://dbjtechnologies.com/faq" },
   openGraph: {
     title: "FAQ | DBJ Technologies",
     description:
