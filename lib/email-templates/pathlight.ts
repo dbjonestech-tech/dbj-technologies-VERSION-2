@@ -95,7 +95,7 @@ function shell(preheader: string, body: string, unsubscribeUrl: string): string 
 function buildReportEmail(data: EmailMergeData): BuiltEmail {
   const subject = `Your Pathlight report for ${data.url} is ready`;
   const preheader = "See exactly what your website is costing you each month.";
-  const scoreDisplay = data.pathlightScore !== null ? `${data.pathlightScore}` : "—";
+  const scoreDisplay = data.pathlightScore !== null ? `${data.pathlightScore}` : "n/a";
   const revenueDisplay = formatMoney(data.revenueLoss);
 
   const body = `
@@ -118,7 +118,7 @@ function buildReportEmail(data: EmailMergeData): BuiltEmail {
         </table>
         <p style="margin: 16px 0;">Your report includes Lighthouse performance scores, AI-powered design analysis, conversion psychology evaluation, and prioritized fixes ranked by revenue impact.</p>
         ${button("View Your Full Report", data.reportUrl)}
-        <p style="margin: 16px 0;">Questions about your report? Just reply to this email &mdash; I read every one.</p>
+        <p style="margin: 16px 0;">Questions about your report? Just reply to this email. I read every one.</p>
         <p style="margin: 24px 0 8px;">Joshua Jones<br/>
         <span style="color: ${MUTED_COLOR};">Principal Architect, DBJ Technologies</span><br/>
         <em style="color: ${MUTED_COLOR};">Architect The Impossible</em></p>
@@ -138,13 +138,13 @@ function buildReportEmail(data: EmailMergeData): BuiltEmail {
     "",
     `View your full report: ${data.reportUrl}`,
     "",
-    "Questions about your report? Just reply to this email — I read every one.",
+    "Questions about your report? Just reply to this email. I read every one.",
     "",
     "Joshua Jones",
     "Principal Architect, DBJ Technologies",
     "Architect The Impossible",
     "",
-    "—",
+    "--",
     "DBJ Technologies · Dallas, TX",
     `Unsubscribe: ${data.unsubscribeUrl}`,
   ].join("\n");
@@ -177,7 +177,7 @@ function buildFollowUp48h(data: EmailMergeData): BuiltEmail {
         <p style="margin: 16px 0;">A meaningful share of your estimated <strong style="color: ${ACCENT_COLOR};">${revenueDisplay}/mo</strong> in lost revenue traces back to this single issue. Fixing it looks like: ${topFix}</p>
         <p style="margin: 16px 0;">If you'd like to talk through what a focused rebuild would cost and how fast we could ship it, grab 15 minutes.</p>
         ${button("Book a 15-Minute Discovery Call", data.calendlyUrl)}
-        <p style="margin: 16px 0; color: ${MUTED_COLOR}; font-size: 14px;">No obligation &mdash; just a focused conversation.</p>
+        <p style="margin: 16px 0; color: ${MUTED_COLOR}; font-size: 14px;">No obligation. Just a focused conversation.</p>
         <p style="margin: 24px 0 8px;">Joshua</p>
       </td>
     </tr>
@@ -198,11 +198,11 @@ function buildFollowUp48h(data: EmailMergeData): BuiltEmail {
     "",
     `Book a 15-minute discovery call: ${data.calendlyUrl}`,
     "",
-    "No obligation — just a focused conversation.",
+    "No obligation. Just a focused conversation.",
     "",
     "Joshua",
     "",
-    "—",
+    "--",
     "DBJ Technologies · Dallas, TX",
     `Unsubscribe: ${data.unsubscribeUrl}`,
   ].join("\n");
@@ -219,9 +219,9 @@ function buildFollowUp5d(data: EmailMergeData): BuiltEmail {
       <td style="padding: 8px 32px 0; font-family: ${FONT_STACK}; font-size: 16px; line-height: 24px; color: ${TEXT_COLOR};">
         <p style="margin: 16px 0;">${greeting(data.businessName)}</p>
         <p style="margin: 16px 0;">Quick story that matches what Pathlight showed on ${data.url}.</p>
-        <p style="margin: 16px 0;">A Richardson auto repair shop &mdash; Star Auto Service &mdash; ran their site through Pathlight. Same gaps we found on yours. We rebuilt the entire site from scratch in one 6-hour session.</p>
+        <p style="margin: 16px 0;">A Richardson auto repair shop (Star Auto Service) ran their site through Pathlight. Same gaps we found on yours. We rebuilt the entire site from scratch in one 6-hour session.</p>
         <p style="margin: 16px 0;"><strong>Result:</strong> perfect Lighthouse 100s on desktop and mobile, stronger trust signals, and a clear path to more customers.</p>
-        <p style="margin: 16px 0;">That's the exact gap Pathlight is showing you right now. The fix isn't years of work &mdash; it's one focused rebuild.</p>
+        <p style="margin: 16px 0;">That's the exact gap Pathlight is showing you right now. The fix isn't years of work. It's one focused rebuild.</p>
         ${button("See What a DBJ Rebuild Looks Like", data.calendlyUrl)}
         <p style="margin: 24px 0 8px;">Joshua</p>
       </td>
@@ -233,17 +233,17 @@ function buildFollowUp5d(data: EmailMergeData): BuiltEmail {
     "",
     `Quick story that matches what Pathlight showed on ${data.url}.`,
     "",
-    "A Richardson auto repair shop — Star Auto Service — ran their site through Pathlight. Same gaps we found on yours. We rebuilt the entire site from scratch in one 6-hour session.",
+    "A Richardson auto repair shop (Star Auto Service) ran their site through Pathlight. Same gaps we found on yours. We rebuilt the entire site from scratch in one 6-hour session.",
     "",
     "Result: perfect Lighthouse 100s on desktop and mobile, stronger trust signals, and a clear path to more customers.",
     "",
-    "That's the exact gap Pathlight is showing you right now. The fix isn't years of work — it's one focused rebuild.",
+    "That's the exact gap Pathlight is showing you right now. The fix isn't years of work. It's one focused rebuild.",
     "",
     `See what a DBJ rebuild looks like: ${data.calendlyUrl}`,
     "",
     "Joshua",
     "",
-    "—",
+    "--",
     "DBJ Technologies · Dallas, TX",
     `Unsubscribe: ${data.unsubscribeUrl}`,
   ].join("\n");
@@ -263,7 +263,7 @@ function buildBreakup8d(data: EmailMergeData): BuiltEmail {
         <p style="margin: 16px 0;">Just closing the loop on your Pathlight scan of ${data.url}.</p>
         <p style="margin: 16px 0;">Pathlight estimated roughly <strong style="color: ${ACCENT_COLOR};">${revenueDisplay}/mo</strong> in revenue leaking out of your site. If that number sits heavier the longer it stays on the page, 15 minutes on the calendar is the fastest way to stop it.</p>
         ${button("Book Your Discovery Call", data.calendlyUrl)}
-        <p style="margin: 16px 0;">Either way, thanks for trying Pathlight. The tool is always free for future scans &mdash; rerun it anytime a site ships major changes.</p>
+        <p style="margin: 16px 0;">Either way, thanks for trying Pathlight. The tool is always free for future scans. Rerun it anytime a site ships major changes.</p>
         <p style="margin: 24px 0 8px;">Wishing you the best,<br/>Joshua</p>
       </td>
     </tr>
@@ -278,12 +278,12 @@ function buildBreakup8d(data: EmailMergeData): BuiltEmail {
     "",
     `Book your discovery call: ${data.calendlyUrl}`,
     "",
-    "Either way, thanks for trying Pathlight. The tool is always free for future scans — rerun it anytime a site ships major changes.",
+    "Either way, thanks for trying Pathlight. The tool is always free for future scans. Rerun it anytime a site ships major changes.",
     "",
     "Wishing you the best,",
     "Joshua",
     "",
-    "—",
+    "--",
     "DBJ Technologies · Dallas, TX",
     `Unsubscribe: ${data.unsubscribeUrl}`,
   ].join("\n");

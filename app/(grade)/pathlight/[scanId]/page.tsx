@@ -78,6 +78,7 @@ export default async function ScanResultsPage({
           url: row.url,
           status: row.status,
         }}
+        calendlyUrl={calendlyUrl}
       />
       {report ? (
         <AskPathlightLoader

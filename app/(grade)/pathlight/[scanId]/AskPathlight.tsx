@@ -356,10 +356,9 @@ export function AskPathlight({
           from { opacity: 0; transform: translateY(12px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes askpath-pulse-once {
-          0% { box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 0 rgba(59,130,246,0.55); }
-          60% { box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 14px rgba(59,130,246,0); }
-          100% { box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 0 rgba(59,130,246,0); }
+        @keyframes askpath-glow-breathe {
+          0%, 100% { box-shadow: 0 4px 24px rgba(59, 130, 246, 0.2), 0 0 60px rgba(59, 130, 246, 0.06); }
+          50%      { box-shadow: 0 4px 24px rgba(59, 130, 246, 0.4), 0 0 60px rgba(59, 130, 246, 0.12); }
         }
         @keyframes askpath-panel-in {
           from { opacity: 0; transform: translateY(20px); }
@@ -368,7 +367,7 @@ export function AskPathlight({
         .askpath-trigger {
           animation:
             askpath-trigger-in 320ms ease-out both,
-            askpath-pulse-once 1600ms ease-out 360ms 1;
+            askpath-glow-breathe 3s ease-in-out 360ms infinite;
           transition: transform 150ms ease-out;
         }
         .askpath-trigger:hover { transform: scale(1.05); }
@@ -379,7 +378,11 @@ export function AskPathlight({
         .askpath-chips::-webkit-scrollbar { display: none; }
         .askpath-chips { -ms-overflow-style: none; scrollbar-width: none; }
         @media (prefers-reduced-motion: reduce) {
-          .askpath-trigger, .askpath-panel { animation: none !important; }
+          .askpath-panel { animation: none !important; }
+          .askpath-trigger {
+            animation: none !important;
+            box-shadow: 0 4px 24px rgba(59, 130, 246, 0.3), 0 0 60px rgba(59, 130, 246, 0.09) !important;
+          }
         }
       `}</style>
 
@@ -398,13 +401,15 @@ export function AskPathlight({
             display: triggerVisible ? "inline-flex" : "none",
             alignItems: "center",
             gap: 8,
-            padding: "12px 20px",
-            backgroundColor: "#1a1a2e",
+            padding: "14px 24px",
+            backgroundImage:
+              "linear-gradient(135deg, #1e3a5f 0%, #1a1a2e 100%)",
             color: "#ffffff",
             borderRadius: 999,
-            border: "1px solid #2d3748",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
-            fontSize: 14,
+            border: "1px solid rgba(59, 130, 246, 0.25)",
+            boxShadow:
+              "0 4px 24px rgba(59, 130, 246, 0.3), 0 0 60px rgba(59, 130, 246, 0.08)",
+            fontSize: 15,
             fontWeight: 600,
             cursor: "pointer",
           }}
@@ -445,7 +450,7 @@ export function AskPathlight({
                 Ask Pathlight
               </div>
               <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
-                AI-powered insights about your scan
+                Ask anything about your results
               </div>
             </div>
             <button

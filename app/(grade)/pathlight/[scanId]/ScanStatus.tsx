@@ -55,7 +55,13 @@ const PHASE_LABELS = [
 const SCANNING_PHASES = [0, 1];
 const ANALYZING_PHASES = [2, 3, 4];
 
-export function ScanStatus({ initial }: { initial: InitialScanState }) {
+export function ScanStatus({
+  initial,
+  calendlyUrl = null,
+}: {
+  initial: InitialScanState;
+  calendlyUrl?: string | null;
+}) {
   const [report, setReport] = useState<ApiReport | null>(null);
   const [statusState, setStatusState] = useState<string>(initial.status);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -121,7 +127,11 @@ export function ScanStatus({ initial }: { initial: InitialScanState }) {
         ) : null}
 
         {hasReportData && report ? (
-          <Report report={report} isPartial={isPartial} />
+          <Report
+            report={report}
+            isPartial={isPartial}
+            calendlyUrl={calendlyUrl}
+          />
         ) : null}
       </div>
     </div>
@@ -385,9 +395,11 @@ function FailedState({
 function Report({
   report,
   isPartial,
+  calendlyUrl,
 }: {
   report: ApiReport;
   isPartial: boolean;
+  calendlyUrl: string | null;
 }) {
   const scanDate = formatScanDate(report.completedAt ?? report.createdAt);
   const displayUrl = report.resolvedUrl ?? report.url;
@@ -425,7 +437,7 @@ function Report({
 
       {hasRevenue ? <RevenueImpactBlock impact={report.revenueImpact!} /> : null}
 
-      <FinalCta />
+      <FinalCta calendlyUrl={calendlyUrl} />
     </section>
   );
 }
@@ -910,7 +922,11 @@ function AssumptionRow({ label, value }: { label: string; value: string }) {
 
 /* ─────────── Final CTA ─────────── */
 
-function FinalCta() {
+function FinalCta({ calendlyUrl }: { calendlyUrl: string | null }) {
+  const ctaHref =
+    calendlyUrl && calendlyUrl !== "#"
+      ? calendlyUrl
+      : "/contact?utm_source=pathlight";
   return (
     <section className="mt-4 text-center">
       <div
@@ -934,8 +950,10 @@ function FinalCta() {
           Book a discovery call and I will show you exactly what your site
           could look like.
         </p>
-        <Link
-          href="/contact?utm_source=pathlight"
+        <a
+          href={ctaHref}
+          target="_blank"
+          rel="noopener noreferrer"
           className="mt-6 inline-block rounded-full px-6 py-3 text-sm font-semibold"
           style={{
             backgroundImage: "linear-gradient(135deg, #3b82f6, #0891b2)",
@@ -943,7 +961,7 @@ function FinalCta() {
           }}
         >
           Book a discovery call
-        </Link>
+        </a>
         <div
           className="mt-6 text-[11px] uppercase tracking-[0.25em]"
           style={{ color: "#6b7280" }}
