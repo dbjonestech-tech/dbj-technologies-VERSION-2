@@ -235,6 +235,17 @@ function LoadingState({ status, url }: { status: string; url: string }) {
 
       <div className="mt-12 flex flex-col items-center gap-6">
         <ScanningCore />
+        <p
+          className="mx-auto my-2 max-w-lg text-sm leading-relaxed"
+          style={{ color: "rgba(255,255,255,0.5)" }}
+        >
+          Your report typically takes 2–3 minutes to generate. Pathlight is
+          capturing real screenshots of your site, auditing performance against
+          Google&apos;s Core Web Vitals, analyzing your design and positioning
+          with AI vision, researching real industry benchmarks for your
+          specific business type, and estimating actual revenue impact. Every
+          number in your report is backed by real data — not a template score.
+        </p>
         <div
           className="font-display text-lg font-semibold"
           style={{ color: "#60a5fa" }}
