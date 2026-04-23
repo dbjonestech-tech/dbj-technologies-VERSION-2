@@ -316,7 +316,6 @@ const remediationSchema = z.object({
 });
 
 const revenueImpactSchema = z.object({
-  estimatedMonthlyLoss: z.number().finite().nonnegative(),
   methodology: z.string().min(1),
   confidence: z.enum(["low", "medium", "high"]),
   assumptions: z.object({
@@ -430,6 +429,7 @@ Monthly visitor estimates by business type (single-location, local):
 - Fitness / gym: 300-600
 - Salon / barbershop: 300-600
 - Construction / contractor: 150-400
+- B2B materials / wholesale / supply: 200-350
 - If the industry doesn't match above, use 300-500 as default range for local businesses.
 
 Average deal values by business type:
@@ -443,7 +443,9 @@ Average deal values by business type:
 - Fitness: $50-100 per monthly membership
 - Salon: $40-80 per visit
 - Construction: $5000-25000 per project
+- B2B materials / wholesale / supply: $1,000-2,000 per order
 - Default: use $150-300 for unmatched industries.
+- For B2B or commercial businesses where individual orders are large but transaction volume is low, use the lower end of the visitor range and the industry-specific deal value. Do NOT use residential consumer deal values for commercial operations.
 
 Conversion rate: always use 2% for local businesses unless there is strong evidence otherwise. Do NOT deviate from 2% without explicit justification in methodology.
 
@@ -454,8 +456,7 @@ ALWAYS pick the midpoint of the applicable range. Do NOT pick the low end one sc
 OUTPUT FORMAT
 Return ONE JSON object, no markdown, no preamble. Exact shape:
 {
-  "estimatedMonthlyLoss": <number, whole dollars>,
-  "methodology": "<2-3 sentences explaining how you derived this>",
+  "methodology": "<2-3 sentences explaining your reasoning for each assumption — why this visitor count, why this deal value, why this conversion rate. Do NOT state a final dollar figure for the estimated loss. End with something like 'The estimated loss is derived from these assumptions.'>",
   "confidence": "low" | "medium" | "high",
   "assumptions": {
     "estimatedMonthlyVisitors": <number>,
@@ -463,7 +464,9 @@ Return ONE JSON object, no markdown, no preamble. Exact shape:
     "avgDealValue": <number, dollars>,
     "conversionImprovementEstimate": <number between 0 and 1>
   }
-}`;
+}
+
+CRITICAL: Do NOT include estimatedMonthlyLoss in your JSON — it will be computed server-side from your assumptions. In your methodology text, do NOT state a final dollar figure for the estimated loss or perform the final multiplication. Describe your reasoning for each assumption (why you chose this visitor count, this deal value, this conversion rate, this improvement estimate) but leave the final calculation to the system. This prevents any mismatch between your narrative and the displayed number.`;
 
 function renderPrompt(
   template: string,
@@ -745,7 +748,8 @@ export async function runVisionAudit(
     renderPrompt(VISION_SYSTEM_PROMPT, industry, city, url, businessName),
     userBlocks,
     visionAuditSchema,
-    3000
+    3000,
+    0
   ) as Promise<VisionAuditResult>;
 }
 
@@ -796,7 +800,8 @@ export async function runRemediationPlan(
     renderPrompt(REMEDIATION_SYSTEM_PROMPT, industry, city, url, businessName),
     user,
     remediationSchema,
-    2048
+    2048,
+    0
   ) as Promise<RemediationResult>;
 }
 
@@ -841,12 +846,26 @@ export async function runRevenueImpact(
     `Respond with ONLY a valid JSON object matching the schema above. No backticks, no markdown, no explanation.`,
   ].join("\n");
 
-  return callClaudeWithJsonSchema(
+  const claude = await callClaudeWithJsonSchema(
     "revenue-impact",
     renderPrompt(REVENUE_SYSTEM_PROMPT, industry, city, url, businessName),
     user,
     revenueImpactSchema,
     1500,
     0
-  ) as Promise<RevenueImpactResult>;
+  );
+
+  const estimatedMonthlyLoss = Math.round(
+    claude.assumptions.estimatedMonthlyVisitors *
+      claude.assumptions.industryAvgConversionRate *
+      claude.assumptions.avgDealValue *
+      claude.assumptions.conversionImprovementEstimate
+  );
+
+  return {
+    estimatedMonthlyLoss,
+    methodology: claude.methodology,
+    confidence: claude.confidence,
+    assumptions: claude.assumptions,
+  } satisfies RevenueImpactResult;
 }
