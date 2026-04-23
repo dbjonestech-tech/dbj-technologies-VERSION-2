@@ -41,6 +41,7 @@ export async function GET(
       revenueImpact: report.revenueImpact,
       pathlightScore: report.pathlightScore,
       pillarScores: report.pillarScores,
+      lighthouseScores: report.lighthouseScores ?? null,
     },
     { headers: { "Cache-Control": "no-cache" } }
   );

@@ -7,6 +7,7 @@ import AskPathlightLoader from "./AskPathlightLoader";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
   DesignScores,
+  LighthouseCategoryScores,
   PerformanceScores,
   PillarScores,
   PositioningScores,
@@ -43,6 +44,7 @@ type ApiReport = {
   revenueImpact: RevenueImpactResult | null;
   pathlightScore: number | null;
   pillarScores: PillarScores | null;
+  lighthouseScores: LighthouseCategoryScores | null;
 };
 
 const ACTIVE_STATUSES = new Set<string>(["pending", "scanning", "analyzing"]);
@@ -433,6 +435,10 @@ function Report({
 
       {report.pillarScores ? <PillarBreakdown scores={report.pillarScores} /> : null}
 
+      {report.lighthouseScores ? (
+        <LighthouseBreakdown scores={report.lighthouseScores} />
+      ) : null}
+
       {hasScreenshots ? (
         <ScreenshotsSection
           desktop={report.screenshotDesktop}
@@ -629,6 +635,70 @@ function PillarBreakdown({ scores }: { scores: PillarScores }) {
           );
         })}
       </div>
+    </section>
+  );
+}
+
+/* ─────────── Lighthouse Breakdown ─────────── */
+
+function LighthouseBreakdown({ scores }: { scores: LighthouseCategoryScores }) {
+  const [open, setOpen] = useState(false);
+  const items = [
+    { label: "Performance", value: scores.performance },
+    { label: "Accessibility", value: scores.accessibility },
+    { label: "Best Practices", value: scores.bestPractices },
+    { label: "SEO", value: scores.seo },
+  ];
+
+  return (
+    <section>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-white/50 hover:text-white/70 transition-colors"
+      >
+        <span>Lighthouse Scores</span>
+        <span
+          className="text-[10px] transition-transform"
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+        >
+          ▾
+        </span>
+      </button>
+      {open && (
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {items.map((item) => (
+            <div
+              key={item.label}
+              className="rounded-xl border px-4 py-3"
+              style={{
+                borderColor: "rgba(255,255,255,0.08)",
+                backgroundColor: "rgba(10,12,18,0.5)",
+              }}
+            >
+              <span className="text-[11px] uppercase tracking-wider" style={{ color: "#9aa3b2" }}>
+                {item.label}
+              </span>
+              <p
+                className="mt-1 text-2xl font-semibold"
+                style={{
+                  color:
+                    item.value >= 90
+                      ? "#22c55e"
+                      : item.value >= 50
+                        ? "#f59e0b"
+                        : "#ef4444",
+                }}
+              >
+                {item.value}
+                <span className="text-sm font-normal" style={{ color: "#6b7280" }}>
+                  /100
+                </span>
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

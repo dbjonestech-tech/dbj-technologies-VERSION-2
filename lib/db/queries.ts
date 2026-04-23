@@ -1,6 +1,7 @@
 import { getDb } from "./index";
 import type {
   DesignScores,
+  LighthouseCategoryScores,
   PathlightReport,
   PerformanceScores,
   PillarScores,
@@ -216,6 +217,29 @@ export function extractPerformanceScoresFromLighthouse(
   };
 }
 
+export function extractLighthouseCategoryScores(
+  raw: unknown
+): LighthouseCategoryScores | null {
+  if (!raw || typeof raw !== "object") return null;
+  const lh = raw as Record<string, any>;
+  const cats = lh.categories;
+  if (!cats || typeof cats !== "object") return null;
+
+  const perf = cats.performance?.score;
+  const a11y = cats.accessibility?.score;
+  const bp = cats["best-practices"]?.score;
+  const seo = cats.seo?.score;
+
+  if (typeof perf !== "number") return null;
+
+  return {
+    performance: Math.round((perf ?? 0) * 100),
+    accessibility: Math.round((a11y ?? 0) * 100),
+    bestPractices: Math.round((bp ?? 0) * 100),
+    seo: Math.round((seo ?? 0) * 100),
+  };
+}
+
 function coercePillarScores(v: unknown): PillarScores | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Record<string, unknown>;
@@ -369,6 +393,7 @@ export async function getFullScanReport(
   const { scan, result } = loaded;
 
   const perf = extractPerformanceScoresFromLighthouse(result?.lighthouse_data);
+  const lighthouseScores = extractLighthouseCategoryScores(result?.lighthouse_data);
   const pillar = coercePillarScores(result?.pillar_scores);
   const vision = coerceVisionAudit(result?.ai_analysis);
   const remediation = coerceRemediation(result?.remediation_items);
@@ -397,6 +422,7 @@ export async function getFullScanReport(
     revenueImpact: revenue,
     pathlightScore,
     pillarScores: pillar,
+    lighthouseScores,
     error: scan.error_message,
     duration: scan.scan_duration_ms,
     createdAt: scan.created_at,

@@ -15,6 +15,13 @@ export type PerformanceScores = {
   si: number;
 };
 
+export type LighthouseCategoryScores = {
+  performance: number;
+  accessibility: number;
+  bestPractices: number;
+  seo: number;
+};
+
 export type ScreenshotPair = {
   desktop: string | null;
   mobile: string | null;
@@ -140,6 +147,7 @@ export type PathlightReport = {
   revenueImpact: RevenueImpactResult | null;
   pathlightScore: number | null;
   pillarScores: PillarScores | null;
+  lighthouseScores: LighthouseCategoryScores | null;
   error: string | null;
   duration: number | null;
   createdAt: string;

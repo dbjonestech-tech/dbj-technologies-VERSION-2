@@ -94,7 +94,13 @@ Pillar scores:
 - Design & Visual Quality: ${design}
 - Business Positioning: ${positioning}
 - Findability: ${findability}
-
+${report.lighthouseScores ? `
+Lighthouse raw scores (Google PageSpeed Insights):
+- Performance: ${report.lighthouseScores.performance}/100
+- Accessibility: ${report.lighthouseScores.accessibility}/100
+- Best Practices: ${report.lighthouseScores.bestPractices}/100
+- SEO: ${report.lighthouseScores.seo}/100
+` : ""}
 Revenue impact:
 - Estimated monthly revenue loss: ${revenueLoss} per month
 - Confidence: ${revenueConfidence}
