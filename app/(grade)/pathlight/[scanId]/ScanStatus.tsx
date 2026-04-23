@@ -235,17 +235,40 @@ function LoadingState({ status, url }: { status: string; url: string }) {
 
       <div className="mt-12 flex flex-col items-center gap-6">
         <ScanningCore />
-        <p
-          className="mx-auto my-2 max-w-lg text-sm leading-relaxed"
-          style={{ color: "rgba(255,255,255,0.5)" }}
-        >
-          Your report typically takes 2–3 minutes to generate. Pathlight is
-          capturing real screenshots of your site, auditing performance against
-          Google&apos;s Core Web Vitals, analyzing your design and positioning
-          with AI vision, researching real industry benchmarks for your
-          specific business type, and estimating actual revenue impact. Every
-          number in your report is backed by real data — not a template score.
-        </p>
+        <div className="mt-6 mb-8 flex flex-col items-center">
+          <p
+            className="text-sm font-medium"
+            style={{ color: "rgba(255,255,255,0.7)" }}
+          >
+            Your report typically takes 2–3 minutes. Here&apos;s why that matters.
+          </p>
+          <p
+            className="mx-auto mt-4 max-w-lg text-center text-xs leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.4)" }}
+          >
+            When you ask ChatGPT, Gemini, or any AI chatbot to &ldquo;audit my
+            website,&rdquo; it never actually sees your site. It reads metadata
+            and source code, if it can access them at all, and writes a generic
+            essay based on assumptions. It cannot open a browser. It cannot
+            capture a screenshot. It cannot see that your headline is unreadable
+            over your hero image, that your CTA button blends into the
+            background, or that your mobile layout is broken. It is guessing
+            what your site looks like.
+          </p>
+          <p
+            className="mx-auto mt-4 max-w-lg text-center text-xs leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.4)" }}
+          >
+            Pathlight doesn&apos;t guess. It opens a real browser, captures real
+            screenshots at desktop and mobile sizes, runs a full Google
+            PageSpeed audit against Core Web Vitals, analyzes your actual visual
+            design and brand positioning with AI vision, researches real
+            industry benchmarks for your specific business type, and computes
+            revenue impact from verified data. Every number and recommendation
+            in your report is based on what your visitors actually see, not
+            what your source code suggests they might see.
+          </p>
+        </div>
         <div
           className="font-display text-lg font-semibold"
           style={{ color: "#60a5fa" }}
