@@ -22,7 +22,10 @@ export default async function ({ page, context }) {
     quality: 80,
     fullPage: false,
   });
-  return { screenshot: buffer.toString("base64") };
+  const b = typeof Buffer !== "undefined"
+    ? Buffer.from(buffer).toString("base64")
+    : btoa(Array.from(new Uint8Array(buffer), (b) => String.fromCharCode(b)).join(""));
+  return { screenshot: b };
 }
 `;
 
