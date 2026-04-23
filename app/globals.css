@@ -619,3 +619,41 @@ select:focus-visible {
   transform-origin: center;
   transform-box: fill-box;
 }
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  canvas {
+    display: none !important;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  .print-expand {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+  }
+
+  main {
+    background: white !important;
+  }
+
+  .print-static {
+    position: static !important;
+  }
+
+  [class*="break-inside-avoid"] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

@@ -144,7 +144,7 @@ export function ScanStatus({
 function TopBar() {
   return (
     <header
-      className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4"
+      className="print-hidden print-static sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4"
       style={{
         backgroundColor: "rgba(6,6,10,0.9)",
         borderColor: "rgba(255,255,255,0.08)",
@@ -160,7 +160,7 @@ function TopBar() {
       </Link>
       <Link
         href="/pathlight"
-        className="text-xs font-semibold uppercase tracking-[0.2em]"
+        className="print-hidden text-xs font-semibold uppercase tracking-[0.2em]"
         style={{ color: "#9aa3b2" }}
       >
         Scan another website →
@@ -395,6 +395,14 @@ function Report({
     !!report.remediation && report.remediation.items.length > 0;
   const hasRevenue = !!report.revenueImpact;
 
+  const fixItems = report.remediation?.items ?? [];
+  const [openIndices, setOpenIndices] = useState<Set<number>>(new Set([0]));
+
+  const handlePrint = () => {
+    setOpenIndices(new Set(fixItems.map((_, i) => i)));
+    setTimeout(() => window.print(), 300);
+  };
+
   return (
     <section className="flex flex-col gap-16 py-12">
       {isPartial ? <PartialNotice /> : null}
@@ -407,6 +415,15 @@ function Report({
         />
       ) : null}
 
+      <button
+        type="button"
+        onClick={handlePrint}
+        className="print-hidden text-sm text-white/60 hover:text-white/90 transition-colors flex items-center gap-1.5 mx-auto -mt-8"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print Full Report
+      </button>
+
       {report.pillarScores ? <PillarBreakdown scores={report.pillarScores} /> : null}
 
       {hasScreenshots ? (
@@ -416,7 +433,13 @@ function Report({
         />
       ) : null}
 
-      {hasFixes ? <TopFixes items={report.remediation!.items} /> : null}
+      {hasFixes ? (
+        <TopFixes
+          items={report.remediation!.items}
+          openIndices={openIndices}
+          setOpenIndices={setOpenIndices}
+        />
+      ) : null}
 
       {hasRevenue ? <RevenueImpactBlock impact={report.revenueImpact!} /> : null}
 
@@ -669,8 +692,15 @@ function ScreenshotPanel({
 
 /* ─────────── Top Fixes ─────────── */
 
-function TopFixes({ items }: { items: RemediationItem[] }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+function TopFixes({
+  items,
+  openIndices,
+  setOpenIndices,
+}: {
+  items: RemediationItem[];
+  openIndices: Set<number>;
+  setOpenIndices: React.Dispatch<React.SetStateAction<Set<number>>>;
+}) {
   return (
     <section>
       <h2
@@ -681,11 +711,11 @@ function TopFixes({ items }: { items: RemediationItem[] }) {
       </h2>
       <div className="mt-4 flex flex-col gap-3">
         {items.map((item, idx) => {
-          const isOpen = openIndex === idx;
+          const isOpen = openIndices.has(idx);
           return (
             <div
               key={`${idx}-${item.title}`}
-              className="overflow-hidden rounded-2xl border"
+              className="overflow-hidden rounded-2xl border break-inside-avoid"
               style={{
                 borderColor: "rgba(255,255,255,0.08)",
                 backgroundColor: "rgba(10,12,18,0.7)",
@@ -693,7 +723,14 @@ function TopFixes({ items }: { items: RemediationItem[] }) {
             >
               <button
                 type="button"
-                onClick={() => setOpenIndex(isOpen ? null : idx)}
+                onClick={() =>
+                  setOpenIndices((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(idx)) next.delete(idx);
+                    else next.add(idx);
+                    return next;
+                  })
+                }
                 className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
                 aria-expanded={isOpen}
               >
@@ -718,7 +755,7 @@ function TopFixes({ items }: { items: RemediationItem[] }) {
                   <ImpactBadge impact={item.impact} />
                   <DifficultyBadge difficulty={item.difficulty} />
                   <span
-                    className="text-xs"
+                    className="print-hidden text-xs"
                     style={{
                       color: "#9aa3b2",
                       transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
@@ -729,34 +766,32 @@ function TopFixes({ items }: { items: RemediationItem[] }) {
                   </span>
                 </div>
               </button>
-              {isOpen ? (
-                <div
-                  className="border-t px-5 py-4 text-sm"
-                  style={{
-                    borderColor: "rgba(255,255,255,0.06)",
-                    color: "#c5ccd8",
-                  }}
-                >
-                  <div>
-                    <span
-                      className="text-[11px] uppercase tracking-wider"
-                      style={{ color: "#6b7280" }}
-                    >
-                      Problem
-                    </span>
-                    <p className="mt-1">{item.problem}</p>
-                  </div>
-                  <div className="mt-4">
-                    <span
-                      className="text-[11px] uppercase tracking-wider"
-                      style={{ color: "#6b7280" }}
-                    >
-                      Improvement
-                    </span>
-                    <p className="mt-1">{item.improvement}</p>
-                  </div>
+              <div
+                className={`print-expand border-t px-5 py-4 text-sm${isOpen ? "" : " hidden"}`}
+                style={{
+                  borderColor: "rgba(255,255,255,0.06)",
+                  color: "#c5ccd8",
+                }}
+              >
+                <div>
+                  <span
+                    className="text-[11px] uppercase tracking-wider"
+                    style={{ color: "#6b7280" }}
+                  >
+                    Problem
+                  </span>
+                  <p className="mt-1">{item.problem}</p>
                 </div>
-              ) : null}
+                <div className="mt-4">
+                  <span
+                    className="text-[11px] uppercase tracking-wider"
+                    style={{ color: "#6b7280" }}
+                  >
+                    Improvement
+                  </span>
+                  <p className="mt-1">{item.improvement}</p>
+                </div>
+              </div>
             </div>
           );
         })}
