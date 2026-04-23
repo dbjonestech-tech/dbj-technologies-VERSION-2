@@ -1,6 +1,7 @@
 import { getDb } from "./index";
 import type {
   DesignScores,
+  IndustryBenchmark,
   LighthouseCategoryScores,
   PathlightReport,
   PerformanceScores,
@@ -38,6 +39,7 @@ type ScanResultsRow = {
   pillar_scores: PillarScores | null;
   remediation_items: { items?: unknown[] } | null;
   revenue_impact: Record<string, unknown> | null;
+  industry_benchmark: unknown;
 };
 
 export async function updateScanStatus(
@@ -147,6 +149,19 @@ export async function updateScanRevenueImpact(
     VALUES (${scanId}, ${JSON.stringify(impact)}::jsonb)
     ON CONFLICT (scan_id) DO UPDATE
     SET revenue_impact = EXCLUDED.revenue_impact
+  `;
+}
+
+export async function updateScanIndustryBenchmark(
+  scanId: string,
+  benchmark: IndustryBenchmark
+): Promise<void> {
+  const sql = getDb();
+  await sql`
+    INSERT INTO scan_results (scan_id, industry_benchmark)
+    VALUES (${scanId}, ${JSON.stringify(benchmark)}::jsonb)
+    ON CONFLICT (scan_id) DO UPDATE
+    SET industry_benchmark = EXCLUDED.industry_benchmark
   `;
 }
 
@@ -286,6 +301,38 @@ function coerceRemediation(v: unknown): RemediationResult | null {
   return { items: o.items as RemediationResult["items"] };
 }
 
+function coerceIndustryBenchmark(v: unknown): IndustryBenchmark | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  if (
+    typeof o.avgDealValue !== "number" ||
+    typeof o.avgMonthlyVisitors !== "number"
+  ) {
+    return null;
+  }
+  return {
+    avgDealValue: o.avgDealValue,
+    dealValueLow:
+      typeof o.dealValueLow === "number" ? o.dealValueLow : o.avgDealValue,
+    dealValueHigh:
+      typeof o.dealValueHigh === "number" ? o.dealValueHigh : o.avgDealValue,
+    avgMonthlyVisitors: o.avgMonthlyVisitors,
+    visitorsLow:
+      typeof o.visitorsLow === "number" ? o.visitorsLow : o.avgMonthlyVisitors,
+    visitorsHigh:
+      typeof o.visitorsHigh === "number"
+        ? o.visitorsHigh
+        : o.avgMonthlyVisitors,
+    source: typeof o.source === "string" ? o.source : "web research",
+    confidence:
+      o.confidence === "low" ||
+      o.confidence === "medium" ||
+      o.confidence === "high"
+        ? o.confidence
+        : "low",
+  };
+}
+
 function coerceRevenueImpact(v: unknown): RevenueImpactResult | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Record<string, unknown>;
@@ -318,7 +365,7 @@ async function loadScanWithResults(scanId: string): Promise<{
 
   const resultRows = (await sql`
     SELECT lighthouse_data, screenshots, ai_analysis, pathlight_score,
-           pillar_scores, remediation_items, revenue_impact
+           pillar_scores, remediation_items, revenue_impact, industry_benchmark
     FROM scan_results
     WHERE scan_id = ${scanId}
     ORDER BY created_at DESC
@@ -401,6 +448,7 @@ export async function getFullScanReport(
   const vision = coerceVisionAudit(result?.ai_analysis);
   const remediation = coerceRemediation(result?.remediation_items);
   const revenue = coerceRevenueImpact(result?.revenue_impact);
+  const industryBenchmark = coerceIndustryBenchmark(result?.industry_benchmark);
   const screenshots = result?.screenshots ?? null;
   const pathlightScore =
     typeof result?.pathlight_score === "number" && pillar !== null
@@ -426,6 +474,7 @@ export async function getFullScanReport(
     pathlightScore,
     pillarScores: pillar,
     lighthouseScores,
+    industryBenchmark,
     error: scan.error_message,
     duration: scan.scan_duration_ms,
     createdAt: scan.created_at,

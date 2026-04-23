@@ -7,6 +7,7 @@ import AskPathlightLoader from "./AskPathlightLoader";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
   DesignScores,
+  IndustryBenchmark,
   LighthouseCategoryScores,
   PerformanceScores,
   PillarScores,
@@ -45,6 +46,7 @@ type ApiReport = {
   pathlightScore: number | null;
   pillarScores: PillarScores | null;
   lighthouseScores: LighthouseCategoryScores | null;
+  industryBenchmark: IndustryBenchmark | null;
 };
 
 const ACTIVE_STATUSES = new Set<string>(["pending", "scanning", "analyzing"]);
@@ -469,7 +471,12 @@ function Report({
         />
       ) : null}
 
-      {hasRevenue ? <RevenueImpactBlock impact={report.revenueImpact!} /> : null}
+      {hasRevenue ? (
+        <RevenueImpactBlock
+          impact={report.revenueImpact!}
+          benchmark={report.industryBenchmark}
+        />
+      ) : null}
 
       <FinalCta calendlyUrl={calendlyUrl} />
 
@@ -936,7 +943,13 @@ function DifficultyBadge({
 
 /* ─────────── Revenue Impact ─────────── */
 
-function RevenueImpactBlock({ impact }: { impact: RevenueImpactResult }) {
+function RevenueImpactBlock({
+  impact,
+  benchmark,
+}: {
+  impact: RevenueImpactResult;
+  benchmark?: IndustryBenchmark | null;
+}) {
   const formatted = useMemo(() => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -977,6 +990,15 @@ function RevenueImpactBlock({ impact }: { impact: RevenueImpactResult }) {
         <p className="mt-5 text-sm" style={{ color: "#c5ccd8" }}>
           {impact.methodology}
         </p>
+
+        {benchmark?.source ? (
+          <p
+            className="mt-2 text-xs uppercase tracking-[0.15em]"
+            style={{ color: "rgba(255,255,255,0.35)" }}
+          >
+            Deal value based on industry research · Source: {benchmark.source}
+          </p>
+        ) : null}
 
         <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <AssumptionRow

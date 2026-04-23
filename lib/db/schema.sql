@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS scan_results (
   pillar_scores JSONB,
   remediation_items JSONB,
   revenue_impact JSONB,
+  industry_benchmark JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

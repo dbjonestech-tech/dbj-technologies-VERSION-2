@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import type {
   DesignScores,
+  IndustryBenchmark,
   PageTextContent,
   PerformanceScores,
   PositioningScores,
@@ -35,17 +36,6 @@ type LighthouseAudit = {
 type LighthouseResultShape = {
   audits?: Record<string, LighthouseAudit>;
   finalDisplayedUrl?: string;
-};
-
-export type IndustryBenchmark = {
-  avgDealValue: number;
-  dealValueLow: number;
-  dealValueHigh: number;
-  avgMonthlyVisitors: number;
-  visitorsLow: number;
-  visitorsHigh: number;
-  source: string;
-  confidence: "low" | "medium" | "high";
 };
 
 function truncate(s: string, max = MAX_TEXT_CHARS): string {

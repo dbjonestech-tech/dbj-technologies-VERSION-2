@@ -4,6 +4,7 @@ import {
   markScanComplete,
   updatePathlightScore,
   updateScanAiAnalysis,
+  updateScanIndustryBenchmark,
   updateScanRemediation,
   updateScanResolvedUrl,
   updateScanResults,
@@ -11,7 +12,7 @@ import {
   updateScanScreenshots,
   updateScanStatus,
 } from "../db/queries";
-import type { PerformanceScores } from "@/lib/types/scan";
+import type { IndustryBenchmark, PerformanceScores } from "@/lib/types/scan";
 import { captureScreenshot } from "../services/browserless";
 import {
   extractPageTextContent,
@@ -20,7 +21,6 @@ import {
   runRevenueImpact,
   runVisionAudit,
 } from "../services/claude-analysis";
-import type { IndustryBenchmark } from "../services/claude-analysis";
 import { runPerformanceAudit } from "../services/pagespeed";
 import { calculatePathlightScore } from "../services/scoring";
 import { normalizeUrl, validateUrl } from "../services/url";
@@ -236,6 +236,9 @@ export const scanRequested = inngest.createFunction(
             siteUrl,
             businessName
           );
+          if (benchmark) {
+            await updateScanIndustryBenchmark(scanId, benchmark);
+          }
           return { ok: true, benchmark };
         } catch (err) {
           return {

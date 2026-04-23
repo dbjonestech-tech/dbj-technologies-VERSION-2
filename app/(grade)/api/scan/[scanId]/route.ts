@@ -42,6 +42,7 @@ export async function GET(
       pathlightScore: report.pathlightScore,
       pillarScores: report.pillarScores,
       lighthouseScores: report.lighthouseScores ?? null,
+      industryBenchmark: report.industryBenchmark ?? null,
     },
     { headers: { "Cache-Control": "no-cache" } }
   );

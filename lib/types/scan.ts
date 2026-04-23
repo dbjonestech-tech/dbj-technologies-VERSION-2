@@ -22,6 +22,17 @@ export type LighthouseCategoryScores = {
   seo: number;
 };
 
+export type IndustryBenchmark = {
+  avgDealValue: number;
+  dealValueLow: number;
+  dealValueHigh: number;
+  avgMonthlyVisitors: number;
+  visitorsLow: number;
+  visitorsHigh: number;
+  source: string;
+  confidence: "low" | "medium" | "high";
+};
+
 export type ScreenshotPair = {
   desktop: string | null;
   mobile: string | null;
@@ -148,6 +159,7 @@ export type PathlightReport = {
   pathlightScore: number | null;
   pillarScores: PillarScores | null;
   lighthouseScores: LighthouseCategoryScores | null;
+  industryBenchmark: IndustryBenchmark | null;
   error: string | null;
   duration: number | null;
   createdAt: string;
