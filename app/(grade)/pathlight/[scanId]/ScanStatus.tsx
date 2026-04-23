@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ScanningCore } from "./ScanningCore";
+import AskPathlightLoader from "./AskPathlightLoader";
+import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
   DesignScores,
   PerformanceScores,
@@ -33,6 +35,7 @@ type ApiReport = {
   duration: number | null;
   completedAt: string | null;
   createdAt: string;
+  businessName: string | null;
   industry: string | null;
   design: DesignScores | null;
   positioning: PositioningScores | null;
@@ -444,6 +447,14 @@ function Report({
       {hasRevenue ? <RevenueImpactBlock impact={report.revenueImpact!} /> : null}
 
       <FinalCta calendlyUrl={calendlyUrl} />
+
+      <AskPathlightLoader
+        scanId={report.scanId}
+        businessName={report.businessName}
+        pathlightScore={report.pathlightScore ?? null}
+        suggestedChips={generateSuggestedChips(report)}
+        calendlyUrl={calendlyUrl}
+      />
     </section>
   );
 }

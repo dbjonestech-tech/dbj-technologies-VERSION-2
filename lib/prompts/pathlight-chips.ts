@@ -32,7 +32,9 @@ function pickLowestPillar(
   return lowestKey;
 }
 
-export function generateSuggestedChips(report: PathlightReport): string[] {
+export function generateSuggestedChips(
+  report: Pick<PathlightReport, "pillarScores" | "revenueImpact">
+): string[] {
   const chips: string[] = ["What should I fix first?"];
 
   const lowestPillar = pickLowestPillar(report.pillarScores);

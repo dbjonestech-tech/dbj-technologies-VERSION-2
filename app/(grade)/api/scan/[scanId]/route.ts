@@ -33,6 +33,7 @@ export async function GET(
       updatedAt: report.updatedAt,
       completedAt: report.completedAt,
       // Full Pathlight report
+      businessName: report.businessName ?? null,
       industry: report.industry,
       design: report.design,
       positioning: report.positioning,
