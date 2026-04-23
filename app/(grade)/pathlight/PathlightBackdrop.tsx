@@ -274,7 +274,7 @@ export function ReportBackdrop() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 overflow-hidden"
+      className="print-hidden pointer-events-none fixed inset-0 overflow-hidden"
     >
       <div
         className="absolute inset-0"

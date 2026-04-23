@@ -21,7 +21,7 @@ const INITIAL_STATE: FormState = {
 };
 
 const BULLETS = [
-  { title: "AI-powered design analysis", body: "Claude evaluates layout, hierarchy, and conversion psychology." },
+  { title: "AI-powered design analysis", body: "Pathlight evaluates layout, hierarchy, and conversion psychology." },
   { title: "Performance & technical audit", body: "Lighthouse metrics, Core Web Vitals, and load-time impact." },
   { title: "Revenue impact estimate", body: "Dollars you lose to every friction point, modelled by industry." },
   { title: "Actionable fix priorities", body: "A ranked list of what to change first, and why it matters." },

@@ -399,15 +399,19 @@ function Report({
   const hasRevenue = !!report.revenueImpact;
 
   const fixItems = report.remediation?.items ?? [];
-  const [openIndices, setOpenIndices] = useState<Set<number>>(new Set([0]));
+  const [openIndices, setOpenIndices] = useState<Set<number>>(new Set());
 
   const handlePrint = () => {
+    const prev = new Set(openIndices);
     setOpenIndices(new Set(fixItems.map((_, i) => i)));
-    setTimeout(() => window.print(), 300);
+    setTimeout(() => {
+      window.print();
+      setOpenIndices(prev);
+    }, 300);
   };
 
   return (
-    <section className="flex flex-col gap-16 py-12">
+    <section className="pathlight-report flex flex-col gap-16 py-12">
       {isPartial ? <PartialNotice /> : null}
 
       {hasScore ? (
@@ -726,7 +730,7 @@ function TopFixes({
           return (
             <div
               key={`${idx}-${item.title}`}
-              className="overflow-hidden rounded-2xl border break-inside-avoid"
+              className="overflow-hidden rounded-2xl border"
               style={{
                 borderColor: "rgba(255,255,255,0.08)",
                 backgroundColor: "rgba(10,12,18,0.7)",

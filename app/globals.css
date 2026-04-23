@@ -656,4 +656,21 @@ select:focus-visible {
     break-inside: avoid;
     page-break-inside: avoid;
   }
+
+  .pathlight-report,
+  .pathlight-report * {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border-color: #d1d5db !important;
+  }
+
+  .pathlight-report *:not(svg):not(svg *) {
+    color: #111827 !important;
+  }
+
+  .pathlight-report .askpath-trigger,
+  .pathlight-report .askpath-panel {
+    display: none !important;
+  }
 }

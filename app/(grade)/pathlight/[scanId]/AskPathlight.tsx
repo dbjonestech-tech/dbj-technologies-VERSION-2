@@ -392,7 +392,7 @@ export function AskPathlight({
           type="button"
           onClick={openPanel}
           aria-label="Open Ask Pathlight chat"
-          className="askpath-trigger"
+          className="askpath-trigger print-hidden"
           style={{
             position: "fixed",
             bottom: 24,
@@ -424,7 +424,7 @@ export function AskPathlight({
           role="dialog"
           aria-label="Ask Pathlight chat"
           aria-modal="false"
-          className="askpath-panel"
+          className="askpath-panel print-hidden"
           style={{
             position: "fixed",
             zIndex: 50,
