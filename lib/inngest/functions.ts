@@ -15,10 +15,12 @@ import type { PerformanceScores } from "@/lib/types/scan";
 import { captureScreenshot } from "../services/browserless";
 import {
   extractPageTextContent,
+  researchIndustryBenchmark,
   runRemediationPlan,
   runRevenueImpact,
   runVisionAudit,
 } from "../services/claude-analysis";
+import type { IndustryBenchmark } from "../services/claude-analysis";
 import { runPerformanceAudit } from "../services/pagespeed";
 import { calculatePathlightScore } from "../services/scoring";
 import { normalizeUrl, validateUrl } from "../services/url";
@@ -213,6 +215,37 @@ export const scanRequested = inngest.createFunction(
         }
       );
 
+      const benchmarkStep: {
+        ok: boolean;
+        benchmark: IndustryBenchmark | null;
+        error?: string;
+      } = await step.run("research-benchmark", async () => {
+        try {
+          const ctx = await getScanPipelineContext(scanId);
+          if (!ctx)
+            return {
+              ok: false,
+              error: "no context",
+              benchmark: null as IndustryBenchmark | null,
+            };
+          const businessName = await lookupBusinessName(scanId);
+          const siteUrl = ctx.resolvedUrl ?? ctx.url;
+          const benchmark = await researchIndustryBenchmark(
+            ctx.industry,
+            ctx.city,
+            siteUrl,
+            businessName
+          );
+          return { ok: true, benchmark };
+        } catch (err) {
+          return {
+            ok: false,
+            error: describeError(err),
+            benchmark: null as IndustryBenchmark | null,
+          };
+        }
+      });
+
       const revenueStep: StepOutcome = await step.run(
         "ai-revenue-impact",
         async () => {
@@ -240,7 +273,8 @@ export const scanRequested = inngest.createFunction(
               siteUrl,
               businessName,
               audit.scores,
-              ctx.lighthouseData
+              ctx.lighthouseData,
+              benchmarkStep.benchmark ?? null
             );
             await updateScanRevenueImpact(scanId, result);
             return { ok: true };

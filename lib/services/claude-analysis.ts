@@ -37,6 +37,17 @@ type LighthouseResultShape = {
   finalDisplayedUrl?: string;
 };
 
+export type IndustryBenchmark = {
+  avgDealValue: number;
+  dealValueLow: number;
+  dealValueHigh: number;
+  avgMonthlyVisitors: number;
+  visitorsLow: number;
+  visitorsHigh: number;
+  source: string;
+  confidence: "low" | "medium" | "high";
+};
+
 function truncate(s: string, max = MAX_TEXT_CHARS): string {
   const trimmed = s.trim().replace(/\s+/g, " ");
   return trimmed.length > max ? `${trimmed.slice(0, max - 1)}…` : trimmed;
@@ -805,6 +816,121 @@ export async function runRemediationPlan(
   ) as Promise<RemediationResult>;
 }
 
+export async function researchIndustryBenchmark(
+  industry: string | null,
+  city: string | null,
+  url: string,
+  businessName: string | null
+): Promise<IndustryBenchmark | null> {
+  if (!industry && !businessName && !url) return null;
+
+  const client = getAnthropic();
+  const industryLabel = industry?.trim() || "local business";
+  const cityLabel = city?.trim() || "United States";
+  const bizContext = businessName ? ` (${businessName})` : "";
+
+  const systemPrompt = `You are a market research analyst. Your job is to find the average transaction value (average job ticket, average order value, or average service cost) and typical monthly website visitor count for a specific type of local business.
+
+Search the web for real industry data. Look for:
+- Industry reports, trade publications, or benchmark studies
+- Average job/ticket/order values for this specific business type
+- Typical monthly website traffic for local businesses in this category
+
+Be specific to the business type. A soil brokerage is different from a general contractor. A veterinary clinic is different from a human dentist. A car dealership is different from an auto repair shop.
+
+After researching, respond with ONLY a valid JSON object (no backticks, no markdown, no explanation):
+{
+  "avgDealValue": <number, the midpoint of the range you found, in dollars>,
+  "dealValueLow": <number, low end of typical range>,
+  "dealValueHigh": <number, high end of typical range>,
+  "avgMonthlyVisitors": <number, estimated monthly website visitors for a single-location business in this category>,
+  "visitorsLow": <number, low end>,
+  "visitorsHigh": <number, high end>,
+  "source": "<brief description of where this data came from, e.g. 'ServiceTitan industry report 2025'>",
+  "confidence": "low" | "medium" | "high"
+}
+
+Rules:
+- avgDealValue means the amount a CUSTOMER pays per transaction/visit/job/order, NOT the business's total revenue
+- For service businesses (plumber, HVAC, etc), this is the average service ticket
+- For retail, this is the average transaction
+- For B2B, this is the average order/contract value
+- For subscription businesses, this is the monthly subscription value
+- Use the most specific data you can find for this exact business type
+- If you find conflicting sources, use the midpoint and note "multiple sources"
+- If you cannot find specific data for this exact business type, find the closest comparable industry and note that in source
+- Monthly visitors should reflect a SINGLE LOCATION local business website, not a national chain`;
+
+  const userPrompt = `Research the average transaction value and monthly website visitors for this business:
+- Business type: ${industryLabel}${bizContext}
+- Location: ${cityLabel}
+- Website: ${url}
+
+Search for "${industryLabel} average job ticket value" or "${industryLabel} average transaction value" and "${industryLabel} website traffic benchmarks". Find real numbers.`;
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 90_000);
+
+    const response = await client.messages.create(
+      {
+        model: MODEL,
+        max_tokens: 1024,
+        temperature: 0,
+        system: systemPrompt,
+        tools: [
+          {
+            type: "web_search_20250305",
+            name: "web_search",
+            max_uses: 3,
+          } as any,
+        ],
+        messages: [{ role: "user", content: userPrompt }],
+      },
+      { signal: controller.signal }
+    );
+
+    clearTimeout(timeout);
+
+    const textContent = response.content
+      .filter((block: any) => block.type === "text")
+      .map((block: any) => block.text)
+      .join("\n");
+
+    if (!textContent) return null;
+
+    const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    if (
+      typeof parsed.avgDealValue !== "number" ||
+      typeof parsed.dealValueLow !== "number" ||
+      typeof parsed.dealValueHigh !== "number" ||
+      typeof parsed.avgMonthlyVisitors !== "number" ||
+      !parsed.avgDealValue ||
+      !parsed.avgMonthlyVisitors
+    ) {
+      return null;
+    }
+
+    return {
+      avgDealValue: Math.round(parsed.avgDealValue),
+      dealValueLow: Math.round(parsed.dealValueLow),
+      dealValueHigh: Math.round(parsed.dealValueHigh),
+      avgMonthlyVisitors: Math.round(parsed.avgMonthlyVisitors),
+      visitorsLow: Math.round(parsed.visitorsLow ?? parsed.avgMonthlyVisitors * 0.7),
+      visitorsHigh: Math.round(parsed.visitorsHigh ?? parsed.avgMonthlyVisitors * 1.3),
+      source: typeof parsed.source === "string" ? parsed.source : "web research",
+      confidence: ["low", "medium", "high"].includes(parsed.confidence) ? parsed.confidence : "low",
+    };
+  } catch (err) {
+    console.error("[researchIndustryBenchmark] failed:", err instanceof Error ? err.message : err);
+    return null;
+  }
+}
+
 export async function runRevenueImpact(
   auditResult: VisionAuditResult,
   remediationPlan: RemediationResult,
@@ -813,7 +939,8 @@ export async function runRevenueImpact(
   url: string,
   businessName: string | null,
   performanceScores: PerformanceScores,
-  lighthouseData: unknown
+  lighthouseData: unknown,
+  benchmark?: IndustryBenchmark | null
 ): Promise<RevenueImpactResult> {
   const lighthouseDetails = extractLighthouseAuditDetails(lighthouseData);
 
@@ -846,9 +973,21 @@ export async function runRevenueImpact(
     `Respond with ONLY a valid JSON object matching the schema above. No backticks, no markdown, no explanation.`,
   ].join("\n");
 
+  const benchmarkOverride = benchmark
+    ? `\n\nRESEARCHED INDUSTRY BENCHMARK (USE THIS — DO NOT GUESS):
+The following deal value and visitor data was researched via web search for this specific business type. Use these numbers directly as your assumptions. Do NOT deviate from these values.
+- Researched average deal value: $${benchmark.dealValueLow}–$${benchmark.dealValueHigh} (use midpoint: $${benchmark.avgDealValue})
+- Researched monthly website visitors: ${benchmark.visitorsLow}–${benchmark.visitorsHigh} (use midpoint: ${benchmark.avgMonthlyVisitors})
+- Data source: ${benchmark.source}
+- Research confidence: ${benchmark.confidence}
+
+Set avgDealValue to ${benchmark.avgDealValue}. Set estimatedMonthlyVisitors to ${benchmark.avgMonthlyVisitors}. These are researched values, not estimates.`
+    : "";
+
   const claude = await callClaudeWithJsonSchema(
     "revenue-impact",
-    renderPrompt(REVENUE_SYSTEM_PROMPT, industry, city, url, businessName),
+    renderPrompt(REVENUE_SYSTEM_PROMPT, industry, city, url, businessName) +
+      benchmarkOverride,
     user,
     revenueImpactSchema,
     1500,
