@@ -95,7 +95,7 @@ export type PillarScores = {
   design: number;
   performance: number;
   positioning: number;
-  findability: number;
+  searchVisibility: number;
 };
 
 export type PageTextContent = {

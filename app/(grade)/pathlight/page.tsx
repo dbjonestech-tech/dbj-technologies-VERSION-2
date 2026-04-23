@@ -124,6 +124,9 @@ export default function GradePage() {
           <p className="mt-4 text-lg sm:text-xl" style={{ color: "#c5ccd8" }}>
             See what your website is really costing you.
           </p>
+          <p className="mt-2 text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.35)" }}>
+            by DBJ Technologies
+          </p>
 
           <div className="mt-10 grid gap-3 sm:grid-cols-2">
             {BULLETS.map((b) => (

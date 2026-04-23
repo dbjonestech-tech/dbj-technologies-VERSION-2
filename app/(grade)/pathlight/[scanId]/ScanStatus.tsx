@@ -157,11 +157,26 @@ function TopBar() {
       }}
     >
       <Link
-        href="/"
-        className="font-display text-sm font-semibold tracking-wide"
-        style={{ color: "#e7ebf2" }}
+        href="/pathlight"
+        className="flex items-center gap-2"
       >
-        DBJ Technologies
+        <svg
+          viewBox="0 0 174 214"
+          aria-hidden="true"
+          style={{ height: 22, width: "auto", color: "#1AD4EA" }}
+        >
+          <path
+            fill="currentColor"
+            fillRule="evenodd"
+            d="M 173 98 L 153 87 L 153 149 L 88 189 L 21 150 L 21 88 L 0 99 L 0 160 L 8 166 L 87 213 L 90 213 L 93 210 L 103 205 L 173 160 Z M 57 67 L 37 79 L 37 143 L 57 155 L 59 155 L 59 67 Z M 116 66 L 116 154 L 122 153 L 123 151 L 135 145 L 138 142 L 138 77 L 122 68 Z M 116 24 L 115 26 L 115 46 L 116 48 L 172 83 L 173 82 L 173 58 L 125 29 L 122 26 Z M 96 0 L 92 1 L 89 4 L 0 58 L 0 82 L 2 82 L 42 58 L 74 37 L 76 38 L 76 165 L 87 171 L 96 167 Z"
+          />
+        </svg>
+        <span
+          className="font-display text-sm font-semibold tracking-wide"
+          style={{ color: "#e7ebf2" }}
+        >
+          Pathlight
+        </span>
       </Link>
       <Link
         href="/pathlight"
@@ -574,7 +589,7 @@ const PILLAR_CONFIG: {
   { key: "design", label: "Design", weight: "35%" },
   { key: "performance", label: "Performance", weight: "25%" },
   { key: "positioning", label: "Positioning", weight: "25%" },
-  { key: "findability", label: "Findability", weight: "15%" },
+  { key: "searchVisibility", label: "Search Visibility", weight: "15%" },
 ];
 
 function PillarBreakdown({ scores }: { scores: PillarScores }) {
@@ -737,6 +752,7 @@ function ScreenshotPanel({
   src: string | null;
   aspect: string;
 }) {
+  if (!src) return null;
   return (
     <div
       className="rounded-2xl border p-3"
@@ -755,21 +771,12 @@ function ScreenshotPanel({
         className={`mt-3 ${aspect} overflow-hidden rounded-xl`}
         style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
       >
-        {src ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={src}
-            alt={`${label} screenshot`}
-            className="h-full w-full object-cover object-top"
-          />
-        ) : (
-          <div
-            className="flex h-full w-full items-center justify-center text-xs"
-            style={{ color: "#6b7280" }}
-          >
-            Not captured
-          </div>
-        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={`${label} screenshot`}
+          className="h-full w-full object-cover object-top"
+        />
       </div>
     </div>
   );
@@ -1033,7 +1040,7 @@ function FinalCta({ calendlyUrl }: { calendlyUrl: string | null }) {
   return (
     <section className="mt-4 text-center">
       <div
-        className="rounded-3xl border px-6 py-12"
+        className="pathlight-cta rounded-3xl border px-6 py-8"
         style={{
           borderColor: "rgba(59,130,246,0.25)",
           backgroundImage:

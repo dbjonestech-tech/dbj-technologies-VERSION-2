@@ -165,7 +165,8 @@ type AnthropicMessageResponse = {
 async function callClaude(
   system: string,
   messages: ChatMessage[],
-  maxTokens: number = 2048
+  maxTokens: number = 2048,
+  temperature?: number
 ): Promise<string> {
   const client = getAnthropic();
   const controller = new AbortController();
@@ -180,6 +181,7 @@ async function callClaude(
         messages: messages as unknown as Parameters<
           typeof client.messages.create
         >[0]["messages"],
+        ...(temperature !== undefined && { temperature }),
       },
       { signal: controller.signal }
     )) as unknown as AnthropicMessageResponse;
@@ -211,12 +213,14 @@ async function callClaudeWithJsonSchema<T>(
   system: string,
   initialUserContent: string | MessageBlock[],
   schema: z.ZodType<T>,
-  maxTokens: number = 2048
+  maxTokens: number = 2048,
+  temperature?: number
 ): Promise<T> {
   const firstResponseText = await callClaude(
     system,
     [{ role: "user", content: initialUserContent }],
-    maxTokens
+    maxTokens,
+    temperature
   );
 
   const firstAttempt = tryParse<T>(firstResponseText, schema);
@@ -233,7 +237,8 @@ async function callClaudeWithJsonSchema<T>(
           "Your previous response was not valid JSON. Respond with ONLY a valid JSON object. No backticks, no explanation, no text before or after the JSON.",
       },
     ],
-    maxTokens
+    maxTokens,
+    temperature
   );
 
   const secondAttempt = tryParse<T>(secondResponseText, schema);
@@ -316,9 +321,9 @@ const revenueImpactSchema = z.object({
   confidence: z.enum(["low", "medium", "high"]),
   assumptions: z.object({
     estimatedMonthlyVisitors: z.number().finite().nonnegative(),
-    industryAvgConversionRate: z.number().finite().nonnegative(),
+    industryAvgConversionRate: z.number().finite().nonnegative().max(0.10),
     avgDealValue: z.number().finite().nonnegative(),
-    conversionImprovementEstimate: z.number().finite().nonnegative(),
+    conversionImprovementEstimate: z.number().finite().nonnegative().max(0.50),
   }),
 });
 
@@ -411,6 +416,40 @@ RULES
 - Use conservative deal values appropriate for the vertical.
 - "conversionImprovementEstimate" is the fractional uplift you expect if the top 3 fixes were executed (e.g. 0.3 = 30%). Keep it modest.
 - Be explicit in methodology about the fact that this is a model, not a guarantee.
+
+REFERENCE BENCHMARKS (use these as starting points, adjust only with explicit reasoning):
+
+Monthly visitor estimates by business type (single-location, local):
+- Auto repair / mechanic shop: 300-500
+- Restaurant / café: 500-1000
+- Dental / medical practice: 400-700
+- Law firm (local): 200-400
+- Real estate agent: 300-600
+- Home services (plumber, HVAC, electrician): 200-500
+- Retail / boutique: 400-800
+- Fitness / gym: 300-600
+- Salon / barbershop: 300-600
+- Construction / contractor: 150-400
+- If the industry doesn't match above, use 300-500 as default range for local businesses.
+
+Average deal values by business type:
+- Auto repair: $150-250 per visit
+- Restaurant: $25-50 per visit
+- Dental: $200-400 per visit
+- Law firm: $1500-5000 per engagement
+- Real estate: $5000-15000 per commission
+- Home services: $200-500 per job
+- Retail: $40-100 per transaction
+- Fitness: $50-100 per monthly membership
+- Salon: $40-80 per visit
+- Construction: $5000-25000 per project
+- Default: use $150-300 for unmatched industries.
+
+Conversion rate: always use 2% for local businesses unless there is strong evidence otherwise. Do NOT deviate from 2% without explicit justification in methodology.
+
+Conversion improvement estimate: always use 0.15-0.25 (15-25%) for the top 3 fixes combined. Do NOT exceed 0.30 unless the current site has catastrophic issues (e.g., completely broken mobile, no contact information visible). Use 0.20 as the default.
+
+ALWAYS pick the midpoint of the applicable range. Do NOT pick the low end one scan and the high end the next. Consistency across rescans of the same site is critical — the same site with the same issues should produce the same estimate.
 
 OUTPUT FORMAT
 Return ONE JSON object, no markdown, no preamble. Exact shape:
@@ -807,6 +846,7 @@ export async function runRevenueImpact(
     renderPrompt(REVENUE_SYSTEM_PROMPT, industry, city, url, businessName),
     user,
     revenueImpactSchema,
-    1500
+    1500,
+    0
   ) as Promise<RevenueImpactResult>;
 }

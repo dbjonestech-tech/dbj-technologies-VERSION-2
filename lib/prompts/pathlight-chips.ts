@@ -1,19 +1,19 @@
 import type { PathlightReport } from "@/lib/types/scan";
 
-type PillarKey = "design" | "performance" | "positioning" | "findability";
+type PillarKey = "design" | "performance" | "positioning" | "searchVisibility";
 
 const PILLAR_TIEBREAK_ORDER: PillarKey[] = [
   "design",
   "performance",
   "positioning",
-  "findability",
+  "searchVisibility",
 ];
 
 const LOW_PILLAR_CHIP: Record<PillarKey, string> = {
   design: "Why is my design score low?",
   performance: "Why is my site slow?",
   positioning: "How can I improve my messaging?",
-  findability: "How can more people find my site?",
+  searchVisibility: "How can more people find my site?",
 };
 
 function pickLowestPillar(

@@ -58,7 +58,7 @@ export function buildChatSystemPrompt(report: PathlightReport): string {
   const performance = formatScore(pillar?.performance ?? null);
   const design = formatScore(pillar?.design ?? null);
   const positioning = formatScore(pillar?.positioning ?? null);
-  const findability = formatScore(pillar?.findability ?? null);
+  const searchVisibility = formatScore(pillar?.searchVisibility ?? null);
 
   const revenueLoss = formatMoney(
     report.revenueImpact?.estimatedMonthlyLoss ?? null
@@ -93,7 +93,7 @@ Pillar scores:
 - Performance: ${performance}
 - Design & Visual Quality: ${design}
 - Business Positioning: ${positioning}
-- Findability: ${findability}
+- Search Visibility: ${searchVisibility}
 ${report.lighthouseScores ? `
 Lighthouse raw scores (Google PageSpeed Insights):
 - Performance: ${report.lighthouseScores.performance}/100

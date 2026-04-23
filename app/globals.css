@@ -673,4 +673,36 @@ select:focus-visible {
   .pathlight-report .askpath-panel {
     display: none !important;
   }
+
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  .pathlight-report {
+    display: block !important;
+    gap: 0 !important;
+  }
+
+  .pathlight-report > * {
+    margin-bottom: 2rem !important;
+  }
+
+  .pathlight-report > section {
+    break-before: auto;
+    page-break-before: auto;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .pathlight-report > section:last-of-type {
+    break-before: avoid;
+    page-break-before: avoid;
+  }
+
+  .pathlight-cta {
+    padding: 1rem 1.5rem !important;
+    border-radius: 0 !important;
+    border: 1px solid #d1d5db !important;
+  }
 }

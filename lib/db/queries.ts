@@ -247,7 +247,7 @@ function coercePillarScores(v: unknown): PillarScores | null {
     typeof o.design !== "number" ||
     typeof o.performance !== "number" ||
     typeof o.positioning !== "number" ||
-    typeof o.findability !== "number"
+    (typeof o.searchVisibility !== "number" && typeof o.findability !== "number")
   ) {
     return null;
   }
@@ -255,7 +255,10 @@ function coercePillarScores(v: unknown): PillarScores | null {
     design: o.design,
     performance: o.performance,
     positioning: o.positioning,
-    findability: o.findability,
+    searchVisibility:
+      typeof o.searchVisibility === "number"
+        ? o.searchVisibility
+        : (o.findability as number),
   };
 }
 

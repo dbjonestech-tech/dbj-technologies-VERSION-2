@@ -45,7 +45,7 @@ export function normalizePositioningScore(scores: PositioningScores): number {
   return clamp(Math.round((sum / 50) * 100), 0, 100);
 }
 
-export function calculateFindabilityScore(
+export function calculateSearchVisibilityScore(
   seoScore: number,
   accessibilityScore: number
 ): number {
@@ -64,14 +64,14 @@ export function calculatePathlightScore(
   const design = normalizeDesignScore(designScores);
   const performance = clamp(Math.round(performanceScore), 0, 100);
   const positioning = normalizePositioningScore(positioningScores);
-  const findability = calculateFindabilityScore(
+  const searchVisibility = calculateSearchVisibilityScore(
     lighthouseSeoScore,
     lighthouseAccessibilityScore
   );
 
   const pathlightScore = clamp(
     Math.round(
-      design * 0.35 + performance * 0.25 + positioning * 0.25 + findability * 0.15
+      design * 0.35 + performance * 0.25 + positioning * 0.25 + searchVisibility * 0.15
     ),
     0,
     100
@@ -79,6 +79,6 @@ export function calculatePathlightScore(
 
   return {
     pathlightScore,
-    pillarScores: { design, performance, positioning, findability },
+    pillarScores: { design, performance, positioning, searchVisibility },
   };
 }
