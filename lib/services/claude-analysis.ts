@@ -12,7 +12,7 @@ import type {
 } from "@/lib/types/scan";
 
 const MODEL = "claude-sonnet-4-6";
-const CALL_TIMEOUT_MS = 60_000;
+const CALL_TIMEOUT_MS = 90_000;
 const MAX_HEADINGS = 40;
 const MAX_LINK_TEXTS = 40;
 const MAX_TEXT_CHARS = 160;

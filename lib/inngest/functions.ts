@@ -237,7 +237,14 @@ export const scanRequested = inngest.createFunction(
             businessName
           );
           if (benchmark) {
-            await updateScanIndustryBenchmark(scanId, benchmark);
+            try {
+              await updateScanIndustryBenchmark(scanId, benchmark);
+            } catch (dbErr) {
+              console.error(
+                "[research-benchmark] DB write failed (benchmark still available in closure):",
+                describeError(dbErr)
+              );
+            }
           }
           return { ok: true, benchmark };
         } catch (err) {
