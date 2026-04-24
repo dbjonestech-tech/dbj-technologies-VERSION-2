@@ -149,7 +149,7 @@ export default function GradePage() {
           </div>
 
           <p className="mt-8 text-xs uppercase tracking-[0.25em]" style={{ color: "#6b7280" }}>
-            Free · No credit card · Results in 60 seconds
+            Free · No credit card · Results in minutes
           </p>
         </section>
 
@@ -164,10 +164,9 @@ export default function GradePage() {
           />
           <form
             onSubmit={handleSubmit}
-            className="relative rounded-2xl border p-6 sm:p-8"
+            className="relative rounded-2xl p-6 sm:p-8"
             style={{
-              borderColor: "rgba(59,130,246,0.18)",
-              backgroundColor: "rgba(10,12,18,0.7)",
+              backgroundColor: "rgba(10,12,18,0.45)",
               backdropFilter: "blur(6px)",
             }}
           >
