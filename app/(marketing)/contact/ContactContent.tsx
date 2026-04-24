@@ -149,6 +149,12 @@ export default function ContactContent() {
                     />
                   </div>
                   <Input
+                    label="Phone (optional)"
+                    type="tel"
+                    placeholder="Your phone number"
+                    {...register("phone")}
+                  />
+                  <Input
                     label="Company (optional)"
                     placeholder="Your company name"
                     {...register("company")}
