@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { z } from "zod";
 
 /* ─── HTML SANITIZATION ─────────────────────────── */
@@ -120,17 +120,6 @@ export async function POST(request: Request) {
       message: escapeHtml(message),
     };
 
-    // Create transporter (configure via .env)
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
     const htmlBody = `
       <h2>New Project Inquiry from ${safe.name}</h2>
       <table style="border-collapse:collapse;width:100%;max-width:600px;">
@@ -145,19 +134,25 @@ export async function POST(request: Request) {
       <p style="white-space:pre-wrap;background:#f9f9f9;padding:16px;border-radius:8px;">${safe.message}</p>
     `;
 
-    // Only attempt to send if SMTP is configured
-    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      await transporter.sendMail({
+    if (process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const { error: sendError } = await resend.emails.send({
         from: process.env.CONTACT_FROM_EMAIL || "DBJ Technologies Website <joshua@dbjtechnologies.com>",
         to: process.env.CONTACT_EMAIL || "joshua@dbjtechnologies.com",
         replyTo: email,
         subject: `New Project Inquiry: ${safe.projectType} — ${safe.name}`,
         html: htmlBody,
       });
+      if (sendError) {
+        console.error("Resend error:", sendError);
+        return NextResponse.json(
+          { error: "Failed to send message" },
+          { status: 500 }
+        );
+      }
     } else if (process.env.NODE_ENV === "development") {
-      // Log to console in dev when SMTP isn't configured
       console.log("──────────────────────────────────────");
-      console.log("CONTACT FORM SUBMISSION (SMTP not configured)");
+      console.log("CONTACT FORM SUBMISSION (RESEND_API_KEY not configured)");
       console.log("──────────────────────────────────────");
       console.log({ name, email, phone, company, budget, projectType, message });
       console.log("──────────────────────────────────────");
