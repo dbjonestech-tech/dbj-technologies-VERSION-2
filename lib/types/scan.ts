@@ -71,6 +71,9 @@ export type PositioningScores = {
 export type VisionAuditResult = {
   design: DesignScores;
   positioning: PositioningScores;
+  businessModel?: "B2B" | "B2C" | "mixed";
+  inferredVertical?: string;
+  inferredVerticalParent?: string;
 };
 
 export type RemediationImpact = "high" | "medium" | "low";

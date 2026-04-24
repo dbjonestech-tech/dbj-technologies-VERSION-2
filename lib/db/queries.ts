@@ -291,6 +291,9 @@ function coerceVisionAudit(v: unknown): VisionAuditResult | null {
   return {
     design: o.design as DesignScores,
     positioning: o.positioning as PositioningScores,
+    businessModel: (o.businessModel as "B2B" | "B2C" | "mixed") ?? undefined,
+    inferredVertical: (o.inferredVertical as string) ?? undefined,
+    inferredVerticalParent: (o.inferredVerticalParent as string) ?? undefined,
   };
 }
 

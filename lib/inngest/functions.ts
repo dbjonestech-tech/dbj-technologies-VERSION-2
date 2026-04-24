@@ -234,7 +234,10 @@ export const scanRequested = inngest.createFunction(
             ctx.industry,
             ctx.city,
             siteUrl,
-            businessName
+            businessName,
+            ctx.visionAudit?.businessModel ?? "B2C",
+            ctx.visionAudit?.inferredVertical ?? "general",
+            ctx.visionAudit?.inferredVerticalParent ?? "Other"
           );
           if (benchmark) {
             try {

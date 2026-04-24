@@ -845,7 +845,10 @@ export async function researchIndustryBenchmark(
   industry: string | null,
   city: string | null,
   url: string,
-  businessName: string | null
+  businessName: string | null,
+  businessModel: "B2B" | "B2C" | "mixed" = "B2C",
+  inferredVertical: string = "general",
+  inferredVerticalParent: string = "Other"
 ): Promise<IndustryBenchmark | null> {
   if (!industry && !businessName && !url) return null;
 
@@ -890,6 +893,18 @@ Rules:
 - Business type: ${industryLabel}${bizContext}
 - Location: ${cityLabel}
 - Website: ${url}
+
+BUSINESS CLASSIFICATION (from visual analysis):
+- Business Model: ${businessModel}
+- Specific Vertical: ${inferredVertical}
+- Parent Category: ${inferredVerticalParent}
+
+CRITICAL RESEARCH RULES:
+1. If businessModel is "B2B", you MUST search for commercial/wholesale/enterprise pricing. DO NOT use residential consumer pricing sources. Specifically REJECT these sources for B2B businesses: HomeAdvisor, Angi, Thumbtack, Fixr, HomeGuide, Houzz, CostHelper, and any site that provides "homeowner" or "residential" cost estimates.
+2. If businessModel is "B2B", the average deal value should reflect business-to-business transaction sizes, not consumer purchases. A commercial soil brokerage moves thousands of tons — a $400 deal value is implausible. A commercial electrical contractor handles $5,000-$50,000 projects, not $150 service calls.
+3. If businessModel is "B2C", consumer pricing sources are appropriate.
+4. If businessModel is "mixed", weight toward the higher-value segment (typically the commercial side).
+5. After determining the deal value, perform a sanity check: does this number make sense for a ${inferredVertical} operating as ${businessModel}? If not, re-research with more specific queries.
 
 Search for "${industryLabel} average job ticket value" or "${industryLabel} average transaction value" and "${industryLabel} website traffic benchmarks". Find real numbers.`;
 
@@ -940,7 +955,7 @@ Search for "${industryLabel} average job ticket value" or "${industryLabel} aver
       return null;
     }
 
-    return {
+    const result: IndustryBenchmark = {
       avgDealValue: Math.round(parsed.avgDealValue),
       dealValueLow: Math.round(parsed.dealValueLow),
       dealValueHigh: Math.round(parsed.dealValueHigh),
@@ -950,6 +965,25 @@ Search for "${industryLabel} average job ticket value" or "${industryLabel} aver
       source: typeof parsed.source === "string" ? parsed.source : "web research",
       confidence: ["low", "medium", "high"].includes(parsed.confidence) ? parsed.confidence : "low",
     };
+
+    // Sanity check: B2B deal values below $500 are suspicious
+    if (businessModel === "B2B" && result.avgDealValue < 500) {
+      console.warn(
+        `[Benchmark] Suspiciously low B2B deal value: $${result.avgDealValue} for ${inferredVertical}. ` +
+          `Source: ${result.source || "unknown"}. Clamping to minimum $500.`
+      );
+      result.avgDealValue = Math.max(result.avgDealValue, 500);
+    }
+
+    // Sanity check: Any deal value below $10 is almost certainly wrong
+    if (result.avgDealValue < 10) {
+      console.warn(
+        `[Benchmark] Deal value below $10: $${result.avgDealValue} for ${inferredVertical}. Clamping to $50.`
+      );
+      result.avgDealValue = Math.max(result.avgDealValue, 50);
+    }
+
+    return result;
   } catch (err) {
     console.error("[researchIndustryBenchmark] failed:", err instanceof Error ? err.message : err);
     return null;
