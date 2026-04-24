@@ -42,7 +42,7 @@ body {
    is no white flash. Toggled by the inline script in app/layout.tsx
    and cleared by HeroCinema once the reveal completes. */
 html.hero-pre-reveal body {
-  background-color: #06060a;
+  background-color: #06060a !important;
 }
 
 /* ─── SCROLLBAR ───────────────────────────────────── */

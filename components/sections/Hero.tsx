@@ -154,7 +154,15 @@ export function Hero() {
             <span className="inline-block pb-2 sm:pb-4">
               <span className="inline-block text-gradient pr-2">
                 {HERO_CONTENT.headlineAccent.replace(".", "")}
-                <span className="animate-pulse">.</span>
+                <span
+                  className="animate-pulse"
+                  style={{
+                    color: "#3b82f6",
+                    WebkitTextFillColor: "#3b82f6",
+                  }}
+                >
+                  .
+                </span>
               </span>
             </span>
           </h1>
