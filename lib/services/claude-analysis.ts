@@ -1,4 +1,10 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic, {
+  APIConnectionError,
+  APIError,
+  APIUserAbortError,
+  InternalServerError,
+  RateLimitError,
+} from "@anthropic-ai/sdk";
 import { z } from "zod";
 import type {
   DesignScores,
@@ -146,6 +152,56 @@ function getAnthropic(): Anthropic {
   return new Anthropic({ apiKey });
 }
 
+const RETRY_DELAYS_MS = [15_000, 30_000];
+
+function isTransientAnthropicError(err: unknown): boolean {
+  if (err instanceof APIUserAbortError) return false;
+  if (err instanceof APIConnectionError) return true;
+  if (err instanceof RateLimitError) return true;
+  if (err instanceof InternalServerError) return true;
+  if (err instanceof APIError) {
+    const status = err.status;
+    if (typeof status === "number" && (status >= 500 || status === 429)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function describeRetryError(err: unknown): string {
+  if (err instanceof APIError) {
+    return `${err.constructor.name} status=${err.status ?? "n/a"} type=${err.type ?? "n/a"}`;
+  }
+  if (err instanceof Error) {
+    return `${err.name}: ${err.message.slice(0, 140)}`;
+  }
+  return String(err);
+}
+
+async function callWithRetry<T>(
+  label: string,
+  fn: () => Promise<T>
+): Promise<T> {
+  const maxAttempts = 1 + RETRY_DELAYS_MS.length;
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (attempt === maxAttempts || !isTransientAnthropicError(err)) {
+        throw err;
+      }
+      const delay = RETRY_DELAYS_MS[attempt - 1]!;
+      console.warn(
+        `[${label}] transient Anthropic error on attempt ${attempt}/${maxAttempts} (${describeRetryError(err)}); retrying in ${delay / 1000}s`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastErr;
+}
+
 type MessageBlock =
   | { type: "text"; text: string }
   | {
@@ -170,22 +226,28 @@ async function callClaude(
   temperature?: number
 ): Promise<string> {
   const client = getAnthropic();
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), CALL_TIMEOUT_MS);
 
   try {
-    const response = (await client.messages.create(
-      {
-        model: MODEL,
-        max_tokens: maxTokens,
-        system,
-        messages: messages as unknown as Parameters<
-          typeof client.messages.create
-        >[0]["messages"],
-        ...(temperature !== undefined && { temperature }),
-      },
-      { signal: controller.signal }
-    )) as unknown as AnthropicMessageResponse;
+    const response = await callWithRetry("callClaude", async () => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), CALL_TIMEOUT_MS);
+      try {
+        return (await client.messages.create(
+          {
+            model: MODEL,
+            max_tokens: maxTokens,
+            system,
+            messages: messages as unknown as Parameters<
+              typeof client.messages.create
+            >[0]["messages"],
+            ...(temperature !== undefined && { temperature }),
+          },
+          { signal: controller.signal }
+        )) as unknown as AnthropicMessageResponse;
+      } finally {
+        clearTimeout(timer);
+      }
+    });
 
     const text = response.content
       .filter((b): b is TextContentBlock => b.type === "text")
@@ -204,8 +266,6 @@ async function callClaude(
     if (err instanceof ClaudeAnalysisError) throw err;
     const msg = err instanceof Error ? err.message : String(err);
     throw new ClaudeAnalysisError(`Claude API error: ${msg}`, err);
-  } finally {
-    clearTimeout(timer);
   }
 }
 
@@ -909,28 +969,34 @@ CRITICAL RESEARCH RULES:
 Search for "${industryLabel} average job ticket value" or "${industryLabel} average transaction value" and "${industryLabel} website traffic benchmarks". Find real numbers.`;
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 90_000);
-
-    const response = await client.messages.create(
-      {
-        model: MODEL,
-        max_tokens: 1024,
-        temperature: 0,
-        system: systemPrompt,
-        tools: [
-          {
-            type: "web_search_20250305",
-            name: "web_search",
-            max_uses: 3,
-          } as any,
-        ],
-        messages: [{ role: "user", content: userPrompt }],
-      },
-      { signal: controller.signal }
+    const response = await callWithRetry(
+      "researchIndustryBenchmark",
+      async () => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 90_000);
+        try {
+          return await client.messages.create(
+            {
+              model: MODEL,
+              max_tokens: 1024,
+              temperature: 0,
+              system: systemPrompt,
+              tools: [
+                {
+                  type: "web_search_20250305",
+                  name: "web_search",
+                  max_uses: 3,
+                } as any,
+              ],
+              messages: [{ role: "user", content: userPrompt }],
+            },
+            { signal: controller.signal }
+          );
+        } finally {
+          clearTimeout(timeout);
+        }
+      }
     );
-
-    clearTimeout(timeout);
 
     const textContent = response.content
       .filter((block: any) => block.type === "text")
