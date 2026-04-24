@@ -42,7 +42,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "Production website for a 25-year Richardson, TX auto repair shop. Perfect Lighthouse scores across the board, automated lead capture, and local SEO architecture. Built and deployed from zero in a single focused session.",
     category: "Client Project",
     gradient: "from-blue-600 to-cyan-500",
-    liveUrl: "https://star-auto-service.vercel.app",
+    liveUrl: "https://thestarautoservice.com",
     metrics: [
       { label: "Performance", value: "100" },
       { label: "Accessibility", value: "100" },

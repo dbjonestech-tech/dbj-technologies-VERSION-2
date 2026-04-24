@@ -100,6 +100,16 @@ export default function RootLayout({
       className={`${jakarta.variable} ${outfit.variable} ${jetbrains.variable}`}
     >
       <head>
+        {/* Anti-flicker: paint dark on the homepage before HeroCinema
+            mounts. Repeat visitors (sessionStorage flag set) skip it
+            and keep the default white. Runs synchronously before first
+            paint. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(window.location.pathname==='/'&&sessionStorage.getItem('hero-revealed')!=='true'){document.documentElement.classList.add('hero-pre-reveal');}}catch(e){}",
+          }}
+        />
         <JsonLd type="organization" />
         <JsonLd type="website" />
         <JsonLd type="localBusiness" />
