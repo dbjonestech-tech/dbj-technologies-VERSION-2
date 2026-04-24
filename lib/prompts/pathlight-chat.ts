@@ -109,6 +109,10 @@ Industry benchmark (used to estimate the deal value above):
 - Average deal value: ${formatMoney(report.industryBenchmark.avgDealValue)}
 - Source: ${report.industryBenchmark.source || "not specified"}
 - Confidence: ${report.industryBenchmark.confidence ?? "unknown"}
+` : ""}${report.businessModel || report.inferredVertical ? `
+Business classification (from visual analysis):
+- Business Model: ${report.businessModel ?? "not classified"}
+- Inferred Vertical: ${report.inferredVertical ?? "not classified"}
 ` : ""}
 Top 3 remediation items (sorted by scan priority):
 ${topItemsBlock}
