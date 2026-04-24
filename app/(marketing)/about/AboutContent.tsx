@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Zap, Eye, Target, Heart } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -19,9 +20,24 @@ export default function AboutContent() {
         <GridBackground />
         <GradientBlob className="-top-40 -right-40" />
         <div className="relative mx-auto max-w-4xl px-6 text-center lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mx-auto mb-6 aspect-square h-40 w-40 overflow-hidden rounded-full ring-1 ring-gray-200"
+          >
+            <Image
+              src="/images/joshua-jones.jpeg"
+              alt="Joshua Jones, Founder & Principal Architect"
+              width={160}
+              height={160}
+              className="h-full w-full object-cover"
+              priority
+            />
+          </motion.div>
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
             className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue mb-6"
           >
             {ABOUT_CONTENT.badge}

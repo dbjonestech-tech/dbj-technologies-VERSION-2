@@ -281,7 +281,7 @@ export const VALUES: ValueItem[] = [
   {
     title: "Ownership, Not Dependency",
     description:
-      "You own everything I build. Full source code, deployment configs, and documentation. No lock-in, no vendor traps.",
+      "When the project is done, you walk away with everything. No monthly platform fees, no proprietary CMS you can't leave, no dependency on me to keep the lights on.",
   },
 ];
 
@@ -292,7 +292,7 @@ export const ABOUT_CONTENT = {
   headline: "The Anti-Agency",
   headlineAccent: "Model.",
   description:
-    "DBJ Technologies exists because most businesses get sold agency overhead, junior developers, and template sites when what they actually need is one experienced architect who builds the system right the first time.",
+    "I'm Joshua Jones, a principal architect in Dallas, TX. I started DBJ Technologies because most businesses get sold agency overhead, junior developers, and template sites when what they actually need is one experienced architect who builds the system right the first time.",
   principles: [
     {
       title: "I build with the tools I'd choose for my own products",
