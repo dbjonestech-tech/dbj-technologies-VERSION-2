@@ -148,7 +148,7 @@ export async function POST(request: Request) {
     // Only attempt to send if SMTP is configured
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
       await transporter.sendMail({
-        from: `"DBJ Technologies Website" <${process.env.SMTP_USER}>`,
+        from: process.env.CONTACT_FROM_EMAIL || "DBJ Technologies Website <joshua@dbjtechnologies.com>",
         to: process.env.CONTACT_EMAIL || "joshua@dbjtechnologies.com",
         replyTo: email,
         subject: `New Project Inquiry: ${safe.projectType} — ${safe.name}`,
