@@ -100,21 +100,22 @@ export default function RootLayout({
       className={`${jakarta.variable} ${outfit.variable} ${jetbrains.variable}`}
     >
       <head>
-        {/* Anti-flicker: paint dark on the homepage before HeroCinema
-            mounts. Repeat visitors (sessionStorage flag set) skip it
-            and keep the default white. Runs synchronously before first
-            paint. */}
+        {/* Anti-flicker: paint the html element dark on the homepage
+            before body renders. Body is transparent (see globals.css)
+            so the html color shows through. HeroCinema clears the
+            inline style when the reveal completes. Repeat visitors
+            (sessionStorage flag set) skip it and keep the default. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(window.location.pathname==='/'&&sessionStorage.getItem('hero-revealed')!=='true'){document.documentElement.classList.add('hero-pre-reveal');}}catch(e){}",
+              "try{if(window.location.pathname==='/'&&sessionStorage.getItem('hero-revealed')!=='true'){document.documentElement.style.backgroundColor='#06060a';}}catch(e){}",
           }}
         />
         <JsonLd type="organization" />
         <JsonLd type="website" />
         <JsonLd type="localBusiness" />
       </head>
-      <body className="font-body bg-bg-primary text-text-primary antialiased selection:bg-accent-blue/20">
+      <body className="font-body text-text-primary antialiased selection:bg-accent-blue/20">
         {children}
       </body>
     </html>

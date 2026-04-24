@@ -28,21 +28,18 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Base background lives on the html element so an inline
+     style override (set by the anti-flicker script in layout.tsx)
+     is visible immediately, before body parses. */
+  background-color: var(--bg-primary);
 }
 
 body {
-  background-color: var(--bg-primary);
+  /* Transparent so html's background (default or inline-styled dark)
+     shows through. Prevents the white flash on first paint of "/". */
+  background-color: transparent;
   color: #0f172a;
   overflow-x: hidden;
-}
-
-/* Anti-flicker: on the homepage, before the HeroCinema overlay has
-   mounted (or on repeat visits after the cinema has been skipped), the
-   body should match HeroCinema's dark overlay color (#06060a) so there
-   is no white flash. Toggled by the inline script in app/layout.tsx
-   and cleared by HeroCinema once the reveal completes. */
-html.hero-pre-reveal body {
-  background-color: #06060a !important;
 }
 
 /* ─── SCROLLBAR ───────────────────────────────────── */
