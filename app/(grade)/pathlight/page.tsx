@@ -92,7 +92,7 @@ export default function GradePage() {
             PATHLIGHT
           </h1>
           <p className="mt-4 text-lg sm:text-xl" style={{ color: "#c5ccd8" }}>
-            AI-powered website intelligence. What&apos;s broken, what it&apos;s costing you, and what to fix first.
+            AI-powered website intelligence. Find the problems. Find the money drain. Find the fix.
           </p>
           <Link
             href="/"
@@ -115,7 +115,7 @@ export default function GradePage() {
           </Link>
 
           <p className="mt-12 text-xs uppercase tracking-[0.25em]" style={{ color: "#6b7280" }}>
-            Free · No credit card · Results in minutes
+            Free. No credit card. Results in minutes.
           </p>
         </section>
 

@@ -113,7 +113,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "pathlight",
     name: "Pathlight",
     description:
-      "The only free tool that tells a business owner what's broken on their website, what it's costing them, and what to fix first. AI-powered analysis with industry-specific revenue modeling, not generic scores.",
+      "Find the problems. Find the money drain. Find the fix. AI-powered analysis with industry-specific revenue modeling, not generic scores.",
     category: "Internal Product",
     gradient: "from-violet-600 to-pink-500",
     liveUrl: "https://dbjtechnologies.com/pathlight",
