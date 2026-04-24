@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowLeft, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { GridBackground } from "@/components/effects/GridBackground";
 import { GradientBlob } from "@/components/effects/GradientBlob";
@@ -13,11 +14,32 @@ interface ProjectDetailLayoutProps {
   project: ProjectDetail;
 }
 
+function splitCtaText(text: string): { heading: string; highlight: string } {
+  const words = text.trim().split(/\s+/);
+  if (words.length <= 1) {
+    return { heading: "", highlight: text };
+  }
+  return {
+    heading: words.slice(0, -1).join(" "),
+    highlight: words[words.length - 1]!,
+  };
+}
+
+function resolveCtaButtonText(ctaHref: string): string {
+  if (ctaHref === "/pathlight") return "Try Pathlight";
+  return "Start a Project";
+}
+
 export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
+  const { heading: ctaHeading, highlight: ctaHighlight } = splitCtaText(
+    project.ctaText
+  );
+  const ctaButtonText = resolveCtaButtonText(project.ctaHref);
+
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-40 pb-16 overflow-hidden">
+      <section className="relative pt-40 pb-20 overflow-hidden">
         <GridBackground />
         <GradientBlob className="-top-40 -right-40" />
         <div className="relative mx-auto max-w-4xl px-6 lg:px-8">
@@ -57,7 +79,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
             transition={{ delay: 0.2 }}
             className="mt-6 text-xl text-text-secondary leading-relaxed"
           >
-            {project.description}
+            {project.heroDescription}
           </motion.p>
 
           <motion.div
@@ -76,22 +98,21 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
               <ExternalLink className="h-4 w-4" aria-hidden="true" />
             </a>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Gradient preview */}
-      <section className="pb-20">
-        <div className="mx-auto max-w-5xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className={`relative h-72 md:h-96 rounded-2xl bg-gradient-to-br ${project.gradient} overflow-hidden`}
-            role="img"
-            aria-label={`${project.name} accent`}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="relative mt-12 aspect-video w-full overflow-hidden rounded-2xl shadow-xl"
           >
-            <div className="absolute inset-0 dot-grid opacity-20" aria-hidden="true" />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/40 to-transparent" />
+            <Image
+              src={project.image}
+              alt={`${project.name} screenshot`}
+              fill
+              className="object-cover object-top"
+              sizes="(max-width: 768px) 100vw, 800px"
+              priority
+            />
           </motion.div>
         </div>
       </section>
@@ -121,38 +142,89 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
         </div>
       </section>
 
-      {/* Tech stack */}
-      <section className="py-16 bg-bg-secondary/50">
-        <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
-          <h2 className="font-display text-2xl font-bold mb-6">Built With</h2>
-          <div className="flex flex-wrap justify-center gap-2">
-            {project.techStack.map((tech) => (
-              <Badge key={tech} variant="blue">
-                {tech}
-              </Badge>
+      {/* Narrative sections */}
+      {project.sections.map((section, i) => (
+        <section
+          key={section.heading}
+          className={`py-20 ${i % 2 === 1 ? "bg-bg-secondary/50" : ""}`}
+        >
+          <div className="mx-auto max-w-3xl px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="font-display text-3xl font-bold mb-6">
+                {section.heading}
+              </h2>
+              <p className="text-lg text-text-secondary leading-relaxed">
+                {section.body}
+              </p>
+            </motion.div>
+          </div>
+        </section>
+      ))}
+
+      {/* Tech deep dive */}
+      <section className="py-20 bg-bg-secondary/50">
+        <div className="mx-auto max-w-5xl px-6 lg:px-8">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-display text-3xl font-bold mb-12 text-center"
+          >
+            Built With <span className="text-gradient">— And Why</span>
+          </motion.h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {project.techDetails.map((tech, i) => (
+              <motion.div
+                key={tech.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="glass-card p-6"
+              >
+                <h3 className="font-display text-lg font-bold text-accent-blue mb-2">
+                  {tech.name}
+                </h3>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  {tech.reason}
+                </p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Notable */}
-      <section className="py-20">
-        <div className="mx-auto max-w-3xl px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass-card p-10"
-          >
-            <h2 className="font-display text-2xl font-bold mb-4">Notable</h2>
-            <p className="text-text-secondary leading-relaxed">
-              {project.notable}
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      {/* Timeline callout */}
+      {project.timeline && (
+        <section className="py-20">
+          <div className="mx-auto max-w-2xl px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="rounded-2xl border border-gray-200 bg-gray-50 px-10 py-10 text-center"
+            >
+              <p className="text-xs font-mono uppercase tracking-widest text-accent-blue mb-4">
+                Timeline
+              </p>
+              <p className="text-lg text-text-secondary leading-relaxed">
+                {project.timeline}
+              </p>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
-      <CTASection />
+      <CTASection
+        heading={ctaHeading}
+        highlight={ctaHighlight}
+        buttonText={ctaButtonText}
+        buttonHref={project.ctaHref}
+      />
     </>
   );
 }

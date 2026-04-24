@@ -21,11 +21,11 @@ export async function generateMetadata({
 
   return {
     title: project.name,
-    description: project.description,
+    description: project.heroDescription,
     alternates: { canonical: `https://dbjtechnologies.com/work/${slug}` },
     openGraph: {
       title: `${project.name} | DBJ Technologies`,
-      description: project.description,
+      description: project.heroDescription,
     },
   };
 }

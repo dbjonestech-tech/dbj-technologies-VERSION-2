@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ExternalLink } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { GridBackground } from "@/components/effects/GridBackground";
 import { GradientBlob } from "@/components/effects/GradientBlob";
 import { CTASection } from "@/components/sections/CTA";
@@ -56,17 +58,16 @@ export default function WorkContent() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="glass-card-hover overflow-hidden flex flex-col"
+                className="group glass-card-hover overflow-hidden flex flex-col"
               >
-                {/* Gradient accent */}
-                <div
-                  className={`relative h-40 bg-gradient-to-br ${project.gradient} overflow-hidden`}
-                  role="img"
-                  aria-label={`${project.name} accent`}
-                >
-                  <div
-                    className="absolute inset-0 dot-grid opacity-20"
-                    aria-hidden="true"
+                {/* Screenshot */}
+                <div className="relative h-52 overflow-hidden">
+                  <Image
+                    src={project.image}
+                    alt={`${project.name} screenshot`}
+                    fill
+                    className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 </div>
 
@@ -120,16 +121,26 @@ export default function WorkContent() {
                     </p>
                   </div>
 
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-accent-blue transition-colors hover:text-accent-cyan min-h-[44px]"
-                  >
-                    View Live Site
-                    <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                    <span className="sr-only">: {project.name}</span>
-                  </a>
+                  {/* Two links */}
+                  <div className="mt-auto flex items-center gap-6 pt-2">
+                    <Link
+                      href={`/work/${project.slug}`}
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-accent-blue transition-colors hover:text-accent-cyan min-h-[44px]"
+                    >
+                      View Case Study
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      <span className="sr-only">: {project.name}</span>
+                    </Link>
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors min-h-[44px]"
+                    >
+                      Live Site
+                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                    </a>
+                  </div>
                 </div>
               </motion.article>
             ))}
