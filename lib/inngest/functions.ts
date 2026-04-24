@@ -25,6 +25,10 @@ import { runPerformanceAudit } from "../services/pagespeed";
 import { calculatePathlightScore } from "../services/scoring";
 import { normalizeUrl, validateUrl } from "../services/url";
 import {
+  buildBenchmarkFromVertical,
+  lookupVertical,
+} from "../services/vertical-lookup";
+import {
   logEmailEvent,
   sendFollowUp,
   sendPathlightReport,
@@ -228,6 +232,34 @@ export const scanRequested = inngest.createFunction(
               error: "no context",
               benchmark: null as IndustryBenchmark | null,
             };
+
+          const curatedMatch = lookupVertical(
+            ctx.visionAudit?.inferredVertical,
+            ctx.visionAudit?.businessModel
+          );
+          if (
+            curatedMatch &&
+            (curatedMatch.confidence === "high" ||
+              curatedMatch.confidence === "medium")
+          ) {
+            console.log(
+              `[research-benchmark] Curated match: "${curatedMatch.name}" (${curatedMatch.confidence}) — skipping web research`
+            );
+            const curatedBenchmark = buildBenchmarkFromVertical(curatedMatch);
+            try {
+              await updateScanIndustryBenchmark(scanId, curatedBenchmark);
+            } catch (dbErr) {
+              console.error(
+                "[research-benchmark] DB write failed (benchmark still available in closure):",
+                describeError(dbErr)
+              );
+            }
+            return { ok: true, benchmark: curatedBenchmark };
+          }
+          console.log(
+            `[research-benchmark] ${curatedMatch ? `Single-source match: "${curatedMatch.name}" — using web research` : "No curated match — using web research"}`
+          );
+
           const businessName = await lookupBusinessName(scanId);
           const siteUrl = ctx.resolvedUrl ?? ctx.url;
           const benchmark = await researchIndustryBenchmark(
