@@ -233,17 +233,17 @@ function LoadingState({ status, url }: { status: string; url: string }) {
         {url}
       </h1>
 
-      <div className="mt-12 flex flex-col items-center gap-6">
+      <div className="mt-12 flex flex-col items-center gap-2">
         <ScanningCore />
-        <div className="mt-6 mb-8 flex flex-col items-center">
+        <div className="mt-2 mb-6 flex flex-col items-center">
           <p
-            className="text-sm font-medium"
+            className="text-base font-medium"
             style={{ color: "rgba(255,255,255,0.7)" }}
           >
             Your report typically takes 2–3 minutes. Here&apos;s why that matters.
           </p>
           <p
-            className="mx-auto mt-4 max-w-lg text-center text-xs leading-relaxed"
+            className="mx-auto mt-4 max-w-lg text-center text-sm leading-relaxed"
             style={{ color: "rgba(255,255,255,0.4)" }}
           >
             When you ask ChatGPT, Gemini, or any AI chatbot to &ldquo;audit my
@@ -256,7 +256,7 @@ function LoadingState({ status, url }: { status: string; url: string }) {
             what your site looks like.
           </p>
           <p
-            className="mx-auto mt-4 max-w-lg text-center text-xs leading-relaxed"
+            className="mx-auto mt-4 max-w-lg text-center text-sm leading-relaxed"
             style={{ color: "rgba(255,255,255,0.4)" }}
           >
             Pathlight doesn&apos;t guess. It opens a real browser, captures real
