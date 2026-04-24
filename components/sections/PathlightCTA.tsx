@@ -41,7 +41,7 @@ export function PathlightCTA() {
         >
           Free AI-powered website intelligence. Performance audit, design
           review, revenue impact estimate, and actionable fix priorities.
-          60 seconds. No credit card.
+          minutes. No credit card.
         </p>
         <div className="mt-10">
           <Link
