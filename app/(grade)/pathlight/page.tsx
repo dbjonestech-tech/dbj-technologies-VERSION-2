@@ -122,7 +122,7 @@ export default function GradePage() {
             PATHLIGHT
           </h1>
           <p className="mt-4 text-lg sm:text-xl" style={{ color: "#c5ccd8" }}>
-            See what your website is really costing you.
+            AI-powered website intelligence. What&apos;s broken, what it costs, and what to fix first.
           </p>
           <p className="mt-2 text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.35)" }}>
             by DBJ Technologies

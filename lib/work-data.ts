@@ -39,7 +39,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "star-auto-service",
     name: "Star Auto Service",
     description:
-      "Production website for a 25-year Richardson, TX auto repair shop. Perfect Lighthouse scores across the board, automated lead capture, and local SEO architecture — built and deployed from zero in a single focused session.",
+      "Production website for a 25-year Richardson, TX auto repair shop. Perfect Lighthouse scores across the board, automated lead capture, and local SEO architecture. Built and deployed from zero in a single focused session.",
     category: "Client Project",
     gradient: "from-blue-600 to-cyan-500",
     liveUrl: "https://star-auto-service.vercel.app",
@@ -57,7 +57,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     sections: [
       {
         heading: "The Client",
-        body: "Miguel Ibarra runs The Star Auto Service — a family-owned, ASE-certified auto repair shop in Richardson, TX that's been serving the community since 1998. With a 4.8-star rating, bilingual service, and NAPA Auto Care certification, the shop had decades of trust built in person. What it didn't have was a web presence that matched.",
+        body: "Miguel Ibarra runs The Star Auto Service, a family-owned, ASE-certified auto repair shop in Richardson, TX that's been serving the community since 1998. With a 4.8-star rating, bilingual service, and NAPA Auto Care certification, the shop had decades of trust built in person. What it didn't have was a web presence that matched.",
       },
       {
         heading: "The Challenge",
@@ -65,7 +65,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
       {
         heading: "The Approach",
-        body: "Mobile-first, because over 60% of local service searches happen on phones. Sub-second load times, because every extra second of load time costs conversions. Local SEO from day one — not as an afterthought. The site was architected around a single conversion goal: get the visitor to call (972) 231-2886 or submit the contact form. Every design decision serves that goal.",
+        body: "Mobile-first, because over 60% of local service searches happen on phones. Sub-second load times, because every extra second of load time costs conversions. Local SEO from day one, not as an afterthought. The site was architected around a single conversion goal: get the visitor to call (972) 231-2886 or submit the contact form. Every design decision serves that goal.",
       },
       {
         heading: "What I Delivered",
@@ -86,7 +86,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       {
         name: "Resend",
         reason:
-          "Transactional email API for the contact form. Every inquiry hits Miguel's inbox within seconds — no missed leads.",
+          "Transactional email API for the contact form. Every inquiry hits Miguel's inbox within seconds. No missed leads.",
       },
       {
         name: "Google Analytics",
@@ -113,7 +113,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "pathlight",
     name: "Pathlight",
     description:
-      "The only free tool that tells a business owner what's broken on their website, what it's costing them, and what to fix first. AI-powered analysis with industry-specific revenue modeling — not generic scores.",
+      "The only free tool that tells a business owner what's broken on their website, what it's costing them, and what to fix first. AI-powered analysis with industry-specific revenue modeling, not generic scores.",
     category: "Internal Product",
     gradient: "from-violet-600 to-pink-500",
     liveUrl: "https://dbjtechnologies.com/pathlight",
@@ -125,82 +125,61 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     techStack: [
       "Next.js 16",
       "TypeScript",
-      "Claude API",
-      "Inngest",
-      "Neon PostgreSQL",
-      "Resend",
+      "AI/LLM Integration",
+      "PostgreSQL",
+      "Serverless",
     ],
     notable:
       "The only free tool that translates website problems into dollar signs. 206 industry benchmarks. Zero scan-to-scan variance for covered verticals.",
     image: "/images/case-studies/pathlight-landing.webp",
     heroDescription:
-      "A full-stack AI platform that scans any business website and produces an intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list — all in minutes, for free. Built to prove that AI can deliver genuine business insight, not just summarize what you already know.",
+      "A full-stack AI platform built from the ground up to scan any business website and produce a complete intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list. All in minutes, for free. Proof that AI-powered analysis, when properly engineered, delivers genuine business insight instead of generic summaries.",
     sections: [
       {
         heading: "The Problem",
-        body: "Small business owners know their website 'could be better.' But they don't know what specifically is wrong, how much it's costing them, or what to fix first. Free tools like Lighthouse give technical scores that mean nothing to a restaurant owner. Agencies charge thousands for discovery calls before providing any insight. There's no middle ground — no tool that translates technical website problems into business language with dollar signs attached.",
+        body: "Small business owners know their website 'could be better.' But they don't know what specifically is wrong, how much it's costing them, or what to fix first. Free tools like Lighthouse give technical scores that mean nothing to a restaurant owner. Agencies charge thousands for discovery calls before providing any insight. There's no middle ground. No tool translates technical website problems into business language with dollar signs attached.",
       },
       {
         heading: "The Solution",
-        body: "Pathlight scans any business website and delivers a complete intelligence report in minutes. Not a Lighthouse score. Not a generic SEO checklist. A full analysis: how the site looks and functions (vision analysis), how it performs technically (Lighthouse + PageSpeed Insights), what the design problems are costing in real revenue (industry-benchmarked modeling), and exactly what to fix first ranked by business impact.",
+        body: "Pathlight scans any business website and delivers a complete intelligence report in minutes. Not a Lighthouse score. Not a generic SEO checklist. A full analysis covering design quality, technical performance, estimated revenue impact modeled against real industry data, and a prioritized fix list ranked by business impact.",
       },
       {
         heading: "How It Works",
-        body: "A 5-stage AI pipeline processes every scan. Stage 1: Headless Chrome captures desktop and mobile screenshots plus a full Lighthouse audit. Stage 2: Claude's vision model analyzes design, layout, conversion psychology, and competitive positioning. Stage 3: The curated vertical database matches the business to its industry and retrieves validated deal values — no web research variance. Stage 4: Revenue impact modeling combines the deal value with estimated traffic, conversion rates, and the specific problems found. Stage 5: Remediation priorities rank every issue by business impact and implementation difficulty.",
+        body: "Every scan runs through a multi-stage AI analysis pipeline. The system captures full-page screenshots on desktop and mobile, runs a comprehensive performance audit, evaluates design and competitive positioning using computer vision, matches the business to its industry for accurate revenue modeling, and generates prioritized recommendations. The entire process is automated with built-in quality checks at every stage.",
       },
       {
         heading: "The Curated Database",
-        body: "206 industry verticals with validated deal values, sourced from cross-referencing Gemini, Grok, and Claude research with human adjudication. High-confidence entries skip the AI benchmark call entirely — instant lookup, zero variance, zero token cost. A three-layer matching system (exact name, alias table, fuzzy scoring with synonym expansion) ensures accurate classification even when vision describes the business differently than the database expects.",
+        body: "Pathlight maintains a curated database of industry-specific benchmarks covering hundreds of business verticals. Each benchmark has been validated across multiple independent research sources and reviewed for accuracy. When a scan identifies a business's industry, Pathlight pulls validated data rather than relying on a single web search. This eliminates the variance and inconsistency that plague other automated analysis tools.",
       },
       {
         heading: "The Report",
-        body: "Every scan produces a Pathlight Score (0-100) broken into four weighted pillars: Design (35%), Performance (25%), Positioning (25%), and Findability (15%). Below the score: the top 3 fixes ranked by impact and difficulty, full desktop and mobile screenshots, and a revenue impact estimate with methodology transparency. The Ask Pathlight chatbot lets business owners ask follow-up questions about their results — and it's honest about confidence levels rather than pretending precision.",
+        body: "Every scan produces a Pathlight Score (0-100) broken into four weighted pillars: Design (35%), Performance (25%), Positioning (25%), and Findability (15%). Below the score, the top 3 fixes ranked by impact and difficulty, full desktop and mobile screenshots, and a revenue impact estimate with full methodology transparency. The built-in chatbot lets business owners ask follow-up questions about their results, and it's transparent about confidence levels rather than pretending precision.",
       },
     ],
     techDetails: [
       {
-        name: "Claude Sonnet 4.6",
+        name: "AI & Machine Learning",
         reason:
-          "Vision analysis for design evaluation and remediation. Three separate API calls per scan with specialized prompts for each stage.",
+          "Multiple large language models handle different stages of analysis, from visual design evaluation to revenue impact modeling. Each model is prompted with specialized instructions tuned to its task.",
       },
       {
-        name: "Claude Haiku 4.5",
+        name: "Full-Stack TypeScript",
         reason:
-          "Powers the Ask Pathlight chatbot. Streaming responses with full scan context injection and methodology transparency rules.",
+          "Next.js 16 with strict TypeScript from database schema to API response to frontend component. Type safety at every layer, not just the UI.",
       },
       {
-        name: "Inngest",
+        name: "Cloud Infrastructure",
         reason:
-          "Background job orchestration with step-level retry and backoff. Each pipeline stage runs as an independent step — if one fails, others still complete.",
+          "Serverless architecture with background job orchestration, automatic retry logic, rate limiting, and transactional email delivery. Built to handle concurrent scans without degradation.",
       },
       {
-        name: "Neon PostgreSQL",
+        name: "Data Architecture",
         reason:
-          "Serverless Postgres for scan persistence, findings storage, and email event tracking. JSONB columns for flexible AI analysis storage.",
-      },
-      {
-        name: "Resend",
-        reason:
-          "4-email nurture sequence triggered per scan. HMAC-secured unsubscribe links and RFC 8058 List-Unsubscribe headers for deliverability.",
-      },
-      {
-        name: "Browserless",
-        reason:
-          "Headless Chrome API for screenshot capture and Lighthouse audits. Runs in the cloud so serverless functions don't need Chrome installed.",
-      },
-      {
-        name: "PageSpeed Insights API",
-        reason:
-          "Google's own performance scoring with retry logic for transient failures. Feeds data into both the performance pillar and the revenue model.",
-      },
-      {
-        name: "Upstash Redis",
-        reason:
-          "Rate limiting infrastructure. Per-IP and per-session scan throttling to prevent abuse and control API costs.",
+          "PostgreSQL for scan persistence and analysis storage. A curated industry benchmark database for accurate revenue modeling. Email event tracking for deliverability monitoring.",
       },
     ],
     timeline:
-      "Designed, architected, and built as a solo project. Pipeline iteratively hardened across 15+ commits addressing variance, accuracy, and reliability.",
+      "Designed, architected, and built as a solo project. Iteratively hardened across multiple releases addressing accuracy, reliability, and scan consistency.",
     ctaText: "Scan Your Website Free",
     ctaHref: "/pathlight",
   },
