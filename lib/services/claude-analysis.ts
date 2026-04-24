@@ -299,6 +299,27 @@ const visionAuditSchema = z.object({
     contact_accessibility: designMetricSchema,
     competitive_differentiation: designMetricSchema,
   }),
+  businessModel: z
+    .enum(["B2B", "B2C", "mixed"])
+    .optional()
+    .default("B2C")
+    .describe(
+      "Primary business model visible from the website. B2B = sells to other businesses (contractors, agencies, wholesalers, SaaS platforms). B2C = sells directly to individual consumers. Mixed = clearly serves both."
+    ),
+  inferredVertical: z
+    .string()
+    .optional()
+    .default("general")
+    .describe(
+      "The specific business vertical inferred from visible content. Be as specific as possible. Examples: 'commercial soil brokerage', 'residential plumbing', 'personal injury law firm', 'SaaS project management', 'fine dining restaurant', 'mobile dog grooming'. Do NOT use generic labels like 'services' or 'business'."
+    ),
+  inferredVerticalParent: z
+    .string()
+    .optional()
+    .default("Other")
+    .describe(
+      "The broad parent category. One of: 'Home Services & Trades', 'Automotive', 'Health & Wellness', 'Legal', 'Financial Services', 'Food & Beverage', 'Professional Services / B2B', 'Retail & E-Commerce', 'Real Estate', 'Education & Childcare', 'Beauty & Personal Care', 'Technology / SaaS', 'Construction & Materials', 'Fitness & Recreation', 'Pet Services', 'Events & Entertainment', 'Travel & Hospitality', 'Agriculture & Landscaping', 'Nonprofit', 'Other'."
+    ),
 });
 
 const remediationSchema = z.object({
@@ -350,6 +371,17 @@ SCORING RUBRIC — POSITIONING (each 0-10)
 - contact_accessibility: Is it obvious how to reach the business (phone, form, chat)?
 - competitive_differentiation: What makes them different from direct competitors?
 
+BUSINESS MODEL CLASSIFICATION:
+Determine the business model from visible website content:
+- B2B: Look for indicators like "contractors", "enterprise", "wholesale", "fleet", "commercial", bulk pricing, RFQ forms, industry jargon, no consumer-facing shopping cart.
+- B2C: Look for consumer language, individual pricing, shopping carts, "book now" for personal services, residential imagery.
+- Mixed: Clear evidence of both (e.g., "residential and commercial" in headline).
+
+VERTICAL CLASSIFICATION:
+Identify the specific business vertical from the homepage content. Use the most specific label supported by visible evidence. Do not guess beyond what the site content shows. If the site says "soil brokerage serving contractors across DFW," the vertical is "commercial soil brokerage," NOT "landscaping" or "construction."
+
+For inferredVerticalParent, use exactly one of these categories: Home Services & Trades, Automotive, Health & Wellness, Legal, Financial Services, Food & Beverage, Professional Services / B2B, Retail & E-Commerce, Real Estate, Education & Childcare, Beauty & Personal Care, Technology / SaaS, Construction & Materials, Fitness & Recreation, Pet Services, Events & Entertainment, Travel & Hospitality, Agriculture & Landscaping, Nonprofit, Other.
+
 GUIDELINES
 - Each sub-score must include a 1-2 sentence observation grounded in what you actually see in the screenshots or read in the page text.
 - Do NOT hallucinate elements that are not visible. If something cannot be judged from the screenshots and page text, score it conservatively and say so in the observation.
@@ -377,7 +409,10 @@ Return ONE JSON object, no markdown, no preamble. Exact shape:
     "social_proof": { "score": <number 0-10>, "observation": "<1-2 sentences>" },
     "contact_accessibility": { "score": <number 0-10>, "observation": "<1-2 sentences>" },
     "competitive_differentiation": { "score": <number 0-10>, "observation": "<1-2 sentences>" }
-  }
+  },
+  "businessModel": "B2B" | "B2C" | "mixed",
+  "inferredVertical": "<specific vertical label>",
+  "inferredVerticalParent": "<one of the parent categories listed above>"
 }`;
 
 const REMEDIATION_SYSTEM_PROMPT = `You are a senior web strategist producing a prioritized fix list for a {{INDUSTRY}} website in {{CITY}}.
