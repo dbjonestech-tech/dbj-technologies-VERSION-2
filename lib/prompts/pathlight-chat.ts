@@ -104,7 +104,12 @@ Lighthouse raw scores (Google PageSpeed Insights):
 Revenue impact:
 - Estimated monthly revenue loss: ${revenueLoss} per month
 - Confidence: ${revenueConfidence}
-
+${report.industryBenchmark ? `
+Industry benchmark (used to estimate the deal value above):
+- Average deal value: ${formatMoney(report.industryBenchmark.avgDealValue)}
+- Source: ${report.industryBenchmark.source || "not specified"}
+- Confidence: ${report.industryBenchmark.confidence ?? "unknown"}
+` : ""}
 Top 3 remediation items (sorted by scan priority):
 ${topItemsBlock}
 
