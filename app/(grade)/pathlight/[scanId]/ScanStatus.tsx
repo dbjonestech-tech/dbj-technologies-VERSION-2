@@ -776,7 +776,7 @@ function ScreenshotsSection({
       </h2>
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <ScreenshotPanel label="Desktop" src={desktop} aspect="aspect-[16/10]" />
-        <ScreenshotPanel label="Mobile" src={mobile} aspect="aspect-[9/16]" />
+        <ScreenshotPanel label="Mobile" src={mobile} aspect="aspect-[9/16]" printBreakBefore />
       </div>
     </section>
   );
@@ -786,15 +786,17 @@ function ScreenshotPanel({
   label,
   src,
   aspect,
+  printBreakBefore = false,
 }: {
   label: string;
   src: string | null;
   aspect: string;
+  printBreakBefore?: boolean;
 }) {
   if (!src) return null;
   return (
     <div
-      className="rounded-2xl border p-3"
+      className={`rounded-2xl border p-3 print-avoid-break${printBreakBefore ? " print-break-before" : ""}`}
       style={{
         borderColor: "rgba(255,255,255,0.08)",
         backgroundColor: "rgba(10,12,18,0.7)",
