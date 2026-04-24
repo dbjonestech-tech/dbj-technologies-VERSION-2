@@ -33,7 +33,7 @@ export function PathlightCTA() {
           className="mt-5 text-xl font-medium sm:text-2xl"
           style={{ color: "#e7ebf2" }}
         >
-          AI-powered website intelligence. What&apos;s broken, what it costs, and what to fix first.
+          AI-powered website intelligence. What&apos;s broken, what it&apos;s costing you, and what to fix first.
         </p>
         <p
           className="mx-auto mt-5 max-w-2xl text-base sm:text-lg"

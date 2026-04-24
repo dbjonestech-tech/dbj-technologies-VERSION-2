@@ -20,13 +20,6 @@ const INITIAL_STATE: FormState = {
   city: "Dallas",
 };
 
-const BULLETS = [
-  { title: "AI-powered design analysis", body: "Pathlight evaluates layout, hierarchy, and conversion psychology." },
-  { title: "Performance & technical audit", body: "Lighthouse metrics, Core Web Vitals, and load-time impact." },
-  { title: "Revenue impact estimate", body: "Dollars you lose to every friction point, modelled by industry." },
-  { title: "Actionable fix priorities", body: "A ranked list of what to change first, and why it matters." },
-];
-
 export default function GradePage() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
@@ -94,20 +87,23 @@ export default function GradePage() {
         style={{ color: "#e7ebf2" }}
       >
         <div className="mx-auto w-full max-w-[600px]">
-        <div
-          className="mb-8 flex justify-center"
-          style={{ color: "#1AD4EA" }}
-        >
+        <section className="mb-14 text-center">
+          <h1 className="header-glow-premium font-display text-5xl font-bold tracking-tight sm:text-6xl">
+            PATHLIGHT
+          </h1>
+          <p className="mt-4 text-lg sm:text-xl" style={{ color: "#c5ccd8" }}>
+            AI-powered website intelligence. What&apos;s broken, what it&apos;s costing you, and what to fix first.
+          </p>
           <Link
             href="/"
             aria-label="DBJ Technologies home"
-            className="block transition-opacity hover:opacity-100"
-            style={{ opacity: 0.75 }}
+            className="mt-3 inline-flex items-center justify-center gap-2 text-xs uppercase tracking-[0.2em] transition-opacity hover:opacity-100"
+            style={{ color: "rgba(255,255,255,0.35)" }}
           >
             <svg
               viewBox="0 0 174 214"
               aria-hidden="true"
-              style={{ height: 44, width: "auto" }}
+              style={{ height: 16, width: "auto" }}
             >
               <path
                 fill="currentColor"
@@ -115,40 +111,10 @@ export default function GradePage() {
                 d="M 173 98 L 153 87 L 153 149 L 88 189 L 21 150 L 21 88 L 0 99 L 0 160 L 8 166 L 87 213 L 90 213 L 93 210 L 103 205 L 173 160 Z M 57 67 L 37 79 L 37 143 L 57 155 L 59 155 L 59 67 Z M 116 66 L 116 154 L 122 153 L 123 151 L 135 145 L 138 142 L 138 77 L 122 68 Z M 116 24 L 115 26 L 115 46 L 116 48 L 172 83 L 173 82 L 173 58 L 125 29 L 122 26 Z M 96 0 L 92 1 L 89 4 L 0 58 L 0 82 L 2 82 L 42 58 L 74 37 L 76 38 L 76 165 L 87 171 L 96 167 Z"
               />
             </svg>
+            <span>by DBJ Technologies</span>
           </Link>
-        </div>
-        <section className="mb-14 text-center">
-          <h1 className="header-glow-premium font-display text-5xl font-bold tracking-tight sm:text-6xl">
-            PATHLIGHT
-          </h1>
-          <p className="mt-4 text-lg sm:text-xl" style={{ color: "#c5ccd8" }}>
-            AI-powered website intelligence. What&apos;s broken, what it costs, and what to fix first.
-          </p>
-          <p className="mt-2 text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.35)" }}>
-            by DBJ Technologies
-          </p>
 
-          <div className="mt-10 grid gap-3 sm:grid-cols-2">
-            {BULLETS.map((b) => (
-              <div
-                key={b.title}
-                className="rounded-xl border p-4 text-left"
-                style={{
-                  borderColor: "rgba(59,130,246,0.18)",
-                  backgroundColor: "rgba(14,16,22,0.6)",
-                }}
-              >
-                <div className="font-display text-sm font-semibold" style={{ color: "#60a5fa" }}>
-                  {b.title}
-                </div>
-                <div className="mt-1 text-xs leading-relaxed" style={{ color: "#9aa3b2" }}>
-                  {b.body}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-8 text-xs uppercase tracking-[0.25em]" style={{ color: "#6b7280" }}>
+          <p className="mt-12 text-xs uppercase tracking-[0.25em]" style={{ color: "#6b7280" }}>
             Free · No credit card · Results in minutes
           </p>
         </section>
