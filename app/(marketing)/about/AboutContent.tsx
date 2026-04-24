@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Zap, Eye, Target, Heart } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -178,15 +179,16 @@ export default function AboutContent() {
                 ease: [0.25, 0.46, 0.45, 0.94],
               }}
             >
-              <div className="relative aspect-[3/2] w-64 lg:w-80">
+              <div className="relative aspect-[3/2] w-72 flex-shrink-0 lg:w-[400px]">
                 <Image
                   src="/images/joshua-jones.png"
                   alt="Joshua Jones, Founder & Principal Architect"
                   fill
-                  sizes="(max-width: 1024px) 256px, 320px"
+                  sizes="(max-width: 1024px) 288px, 400px"
                   className="rounded-2xl object-cover shadow-2xl"
-                  quality={90}
+                  quality={95}
                   priority
+                  unoptimized
                 />
               </div>
             </motion.div>
@@ -215,7 +217,7 @@ export default function AboutContent() {
                     transition={{ delay: 0.4 + i * 0.02, duration: 0.3 }}
                     style={{ display: "inline-block" }}
                   >
-                    {char === " " ? " " : char}
+                    {char === " " ? " " : char}
                   </motion.span>
                 ))}
               </span>
@@ -238,11 +240,20 @@ export default function AboutContent() {
             >
               {ABOUT_CONTENT.description}
             </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.6 }}
+              className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed lg:mx-0"
+              style={{ color: "#8892a4" }}
+            >
+              {ABOUT_STORY.personal}
+            </motion.p>
           </div>
         </div>
       </section>
 
-      {/* Gradient divider between dark hero and light sections */}
+      {/* Gradient divider between hero and story */}
       <div
         aria-hidden="true"
         className="h-px w-full"
@@ -252,29 +263,98 @@ export default function AboutContent() {
         }}
       />
 
-      {/* Story sections */}
-      <section className="mx-auto max-w-3xl px-6 py-16 lg:py-24">
-        {storySections.map((section, i) => (
-          <motion.div
-            key={section.heading}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay: i * 0.1 }}
-            className="mb-16 last:mb-0"
-          >
-            <h3 className="mb-4 text-2xl font-semibold tracking-tight text-text-primary">
-              {section.heading}
-            </h3>
-            <p className="text-lg leading-relaxed text-text-secondary">
-              {section.body}
-            </p>
-          </motion.div>
-        ))}
+      {/* Story sections (dark) */}
+      <section
+        className="relative overflow-hidden"
+        style={{ backgroundColor: "#06060a" }}
+      >
+        {/* Dark-friendly dot grid, same as hero */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-50"
+          style={{
+            backgroundImage:
+              "radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
+          }}
+        />
+        <div className="relative mx-auto max-w-3xl px-6 py-20 lg:py-32">
+          {storySections.map((section, i) => (
+            <motion.div
+              key={section.heading}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="mb-20 last:mb-0"
+            >
+              {/* Accent line before heading */}
+              <div
+                className="mb-4 h-px w-16"
+                style={{
+                  background:
+                    "linear-gradient(to right, #3b82f6, transparent)",
+                }}
+              />
+              <h3 className="mb-6 text-2xl font-semibold tracking-tight text-white lg:text-3xl">
+                {section.heading}
+              </h3>
+              <p
+                className="text-lg leading-relaxed"
+                style={{ color: "#9ca3af" }}
+              >
+                {section.body}
+              </p>
+              {i === storySections.length - 1 && (
+                <div className="mt-8">
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:gap-3"
+                    style={{ backgroundColor: "#3b82f6" }}
+                  >
+                    Start a Conversation
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12h14" />
+                      <path d="m12 5 7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
       </section>
 
+      {/* Gradient divider between story and values */}
+      <div
+        aria-hidden="true"
+        className="h-px w-full"
+        style={{
+          background:
+            "linear-gradient(to right, transparent, #3b82f6, transparent)",
+        }}
+      />
+      {/* Dark-to-light fade so the transition reads as continuous */}
+      <div
+        aria-hidden="true"
+        className="h-16 w-full"
+        style={{
+          background: "linear-gradient(to bottom, #06060a, #FAFAFA)",
+        }}
+      />
+
       {/* Values */}
-      <section className="py-32 bg-bg-secondary/50">
+      <section className="py-20 bg-bg-secondary/50">
         <SectionHeading
           label="Core Values"
           title="What Drives Every Decision"
@@ -303,7 +383,7 @@ export default function AboutContent() {
       </section>
 
       {/* How I Work */}
-      <section className="py-32">
+      <section className="py-20">
         <SectionHeading label="How I Work" title="Operating Principles" />
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
           <div className="relative ml-4 space-y-12 border-l border-gray-200 pl-8">
@@ -329,19 +409,6 @@ export default function AboutContent() {
           </div>
         </div>
       </section>
-
-      {/* Personal sign-off */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-        className="border-t border-gray-200 py-16"
-      >
-        <p className="mx-auto max-w-2xl px-6 text-center text-base italic leading-relaxed text-text-muted">
-          {ABOUT_STORY.personal}
-        </p>
-      </motion.section>
 
       {/* Team: shown only when real team members are added */}
       {TEAM_MEMBERS.length > 0 && (
