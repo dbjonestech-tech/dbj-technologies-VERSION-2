@@ -149,7 +149,7 @@ export async function POST(request: Request) {
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
       await transporter.sendMail({
         from: `"DBJ Technologies Website" <${process.env.SMTP_USER}>`,
-        to: process.env.CONTACT_EMAIL || "dbjonestech@gmail.com",
+        to: process.env.CONTACT_EMAIL || "joshua@dbjtechnologies.com",
         replyTo: email,
         subject: `New Project Inquiry: ${safe.projectType} — ${safe.name}`,
         html: htmlBody,

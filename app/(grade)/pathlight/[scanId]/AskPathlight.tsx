@@ -41,7 +41,7 @@ function limitReachedText(calendlyUrl: string | null): string {
   const link =
     calendlyUrl && calendlyUrl !== "#"
       ? calendlyUrl
-      : "mailto:dbjonestech@gmail.com";
+      : "mailto:joshua@dbjtechnologies.com";
   return `You've reached the message limit for this session. For a deeper conversation, book a discovery call: ${link}`;
 }
 

@@ -26,7 +26,7 @@ export type EmailSendResult = {
   error: string | null;
 };
 
-const REPLY_TO = "dbjonestech@gmail.com";
+const REPLY_TO = "joshua@dbjtechnologies.com";
 const DEFAULT_FROM = "Pathlight <pathlight@dbjtechnologies.com>";
 
 const EMAIL_TYPE_BY_NUMBER: Record<2 | 3 | 4, EmailType> = {

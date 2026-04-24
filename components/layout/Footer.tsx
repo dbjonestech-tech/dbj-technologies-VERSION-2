@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, MapPin } from "lucide-react";
-import { SITE, FOOTER_NAV_LINKS, SUPPORT_LINKS, SERVICES } from "@/lib/constants";
+import { ArrowUpRight, MapPin, Linkedin, Github } from "lucide-react";
+import { SITE, FOOTER_NAV_LINKS, SUPPORT_LINKS, SERVICES, SOCIAL_LINKS } from "@/lib/constants";
 
 export function Footer() {
   return (
@@ -130,6 +130,25 @@ export function Footer() {
                 <span>{SITE.address}</span>
               </li>
             </ul>
+
+            {/* Social */}
+            <div className="mt-5 flex items-center gap-4">
+              {SOCIAL_LINKS.map((link) => {
+                const Icon = link.icon === "linkedin" ? Linkedin : Github;
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.label}
+                    className="text-gray-500 transition-colors hover:text-gray-900"
+                  >
+                    <Icon size={20} aria-hidden="true" />
+                  </a>
+                );
+              })}
+            </div>
 
             {/* CTA */}
             <div className="mt-8">

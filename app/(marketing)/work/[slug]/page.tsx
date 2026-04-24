@@ -20,12 +20,12 @@ export async function generateMetadata({
   }
 
   return {
-    title: project.title,
-    description: project.tagline,
+    title: project.name,
+    description: project.description,
     alternates: { canonical: `https://dbjtechnologies.com/work/${slug}` },
     openGraph: {
-      title: `${project.title} | DBJ Technologies`,
-      description: project.tagline,
+      title: `${project.name} | DBJ Technologies`,
+      description: project.description,
     },
   };
 }

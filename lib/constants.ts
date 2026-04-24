@@ -62,6 +62,12 @@ export const NAV_LINKS = [
   { label: "Contact", href: "/contact" },
 ] as const;
 
+/* ─── SOCIAL LINKS ─────────────────────────────────── */
+export const SOCIAL_LINKS = [
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/dbj-technologies/", icon: "linkedin" },
+  { label: "GitHub", href: "https://github.com/dbjonestech-tech", icon: "github" },
+] as const;
+
 /* ─── FOOTER LINKS (EXTENDED) ─────────────────────── */
 export const FOOTER_NAV_LINKS = [
   { label: "Home", href: "/" },

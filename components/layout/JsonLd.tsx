@@ -1,4 +1,4 @@
-import { SITE, SERVICES } from "@/lib/constants";
+import { SITE, SERVICES, SOCIAL_LINKS } from "@/lib/constants";
 
 interface JsonLdProps {
   type?: "organization" | "localBusiness" | "website" | "faq" | "service";
@@ -20,6 +20,7 @@ export function JsonLd({ type = "organization", faqItems }: JsonLdProps) {
         addressRegion: "TX",
         addressCountry: "US",
       },
+      sameAs: SOCIAL_LINKS.map((link) => link.href),
     },
     localBusiness: {
       "@context": "https://schema.org",
@@ -33,6 +34,7 @@ export function JsonLd({ type = "organization", faqItems }: JsonLdProps) {
         addressRegion: "TX",
         addressCountry: "US",
       },
+      sameAs: SOCIAL_LINKS.map((link) => link.href),
       priceRange: "$$$$",
       areaServed: {
         "@type": "Country",

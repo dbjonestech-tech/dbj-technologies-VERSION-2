@@ -48,7 +48,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `SMTP_PORT` | SMTP mail server port | `587` |
 | `SMTP_USER` | SMTP username/email | — |
 | `SMTP_PASS` | SMTP password or app password | — |
-| `CONTACT_EMAIL` | Where contact form submissions are sent | `dbjonestech@gmail.com` |
+| `CONTACT_EMAIL` | Where contact form submissions are sent | `joshua@dbjtechnologies.com` |
 | `NEXT_PUBLIC_SITE_URL` | Public site URL for metadata | `https://dbjtechnologies.com` |
 
 > **Note:** The contact form works without SMTP credentials during development — submissions are logged to the console instead.

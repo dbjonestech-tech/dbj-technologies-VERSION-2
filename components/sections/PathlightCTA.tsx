@@ -40,7 +40,7 @@ export function PathlightCTA() {
           style={{ color: "#9aa3b2" }}
         >
           Free AI-powered website intelligence. Performance audit, design
-          review, revenue impact estimate, and actionable fix priorities.
+          review, revenue impact estimate, and actionable fix priorities in
           minutes. No credit card.
         </p>
         <div className="mt-10">
