@@ -1033,14 +1033,19 @@ export async function runRevenueImpact(
   ].join("\n");
 
   const benchmarkOverride = benchmark
-    ? `\n\nRESEARCHED INDUSTRY BENCHMARK (USE THIS — DO NOT GUESS):
-The following deal value and visitor data was researched via web search for this specific business type. Use these numbers directly as your assumptions. Do NOT deviate from these values.
-- Researched average deal value: $${benchmark.dealValueLow}–$${benchmark.dealValueHigh} (use midpoint: $${benchmark.avgDealValue})
-- Researched monthly website visitors: ${benchmark.visitorsLow}–${benchmark.visitorsHigh} (use midpoint: ${benchmark.avgMonthlyVisitors})
-- Data source: ${benchmark.source}
-- Research confidence: ${benchmark.confidence}
+    ? `\n\nBENCHMARK DATA (from automated research — may contain errors):
+- Average Deal Value: $${benchmark.avgDealValue}
+- Benchmark Confidence: ${benchmark.confidence ?? "unknown"}
+- Benchmark Source: ${benchmark.source || "not specified"}
+- Business Model: ${auditResult.businessModel ?? "B2C"}
+- Inferred Vertical: ${auditResult.inferredVertical ?? "general"}
 
-Set avgDealValue to ${benchmark.avgDealValue}. Set estimatedMonthlyVisitors to ${benchmark.avgMonthlyVisitors}. These are researched values, not estimates.`
+INSTRUCTIONS FOR USING BENCHMARK DATA:
+1. Use the provided deal value as your starting point, but apply critical judgment.
+2. If the benchmark confidence is "low" or "unknown", treat the deal value as a rough estimate and note this uncertainty in your output.
+3. Sanity-check the deal value against the business type. If it seems implausible for the stated vertical and business model, adjust toward a more reasonable estimate and explain your reasoning.
+4. If you adjust the deal value, state both the original benchmark value and your adjusted value with reasoning.
+5. Never present the revenue estimate as precise — it is an informed approximation.`
     : "";
 
   const claude = await callClaudeWithJsonSchema(
