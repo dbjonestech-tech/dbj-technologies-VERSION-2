@@ -36,6 +36,7 @@ export {
   FAQ_ITEMS,
   CTA_DEFAULTS,
   ABOUT_CONTENT,
+  ABOUT_STORY,
   BUDGET_OPTIONS,
   PROJECT_TYPE_OPTIONS,
 } from "./siteContent";

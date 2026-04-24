@@ -314,6 +314,28 @@ export const ABOUT_CONTENT = {
   ctaButton: "Get in Touch",
 };
 
+/* ─── ABOUT STORY ──────────────────────────────────── */
+
+export const ABOUT_STORY = {
+  whyThisWay: {
+    heading: "Why I Work This Way",
+    body: "I left the consultancy world because I watched smart decisions get buried by politics and ego. Leadership who had no business touching technology were blocking engineers from doing their best work. I sat through a 140-page website rebuild where every improvement had to survive a committee of people who didn’t understand what they were approving. I knew I could serve clients better alone than a room full of titles ever would.",
+  },
+  whatYouGet: {
+    heading: "What You Actually Get",
+    body: "White glove is overused. I mean it literally. I obsess over details most developers never notice, because I come from a hospitality mindset, not just an engineering one. The smallest interaction, the fastest response, the pixel nobody else would catch. That’s what turns a good product into something that makes your client say \"wow.\" I’m on call for my clients. Not during business hours. Not until the invoice clears. Always. I don’t disappear after the project ships. I built it, I know it inside out, and I’m a phone call away whether it’s been three days or three years.",
+  },
+  howIBuild: {
+    heading: "How I Build",
+    body: "I don’t ship until it’s right. That means painstaking hours, iteration after iteration, hammering at every detail until nothing slips through. I’ll rebuild a section five times if the first four aren’t good enough. Most developers ship \"good enough\" and move on. I stay until it’s done. AI is part of my workflow, not a shortcut. I use it to go deeper, move faster, and catch what I’d otherwise miss, but every decision, every line, every pixel still runs through a human standard: mine.",
+  },
+  whoThisIsFor: {
+    heading: "Who This Is For",
+    body: "I work with business owners who need one thing built right, not an agency retainer that never ends. I choose my clients carefully and I’m selective about the work I take on. If you need a website, a product, or a digital system and you want to own it completely when it’s done, we should talk.",
+  },
+  personal: "Based in Dallas. I seek to love Jesus. Husband to Sarah, a licensed professional counselor. Father of two. We live on a farm where we raise sheep and are building an orchard and vineyard. Professional musician, conversational in French and Spanish, and currently writing a novel. I build wooden structures for fun.",
+};
+
 /* ─── PORTFOLIO / WORK ─────────────────────────────── */
 
 export const PORTFOLIO_ITEMS: PortfolioItem[] = [
