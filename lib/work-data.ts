@@ -110,6 +110,108 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ctaHref: "/contact",
   },
   {
+    slug: "soil-depot",
+    name: "Soil Depot",
+    description:
+      "Local SEO infrastructure and full digital presence buildout for a Texas commercial soil logistics broker serving Dallas, Fort Worth, Houston, Austin, and San Antonio.",
+    category: "Client Project",
+    gradient: "from-amber-600 to-yellow-500",
+    liveUrl: "https://soil-depot.com",
+    metrics: [
+      { label: "Texas Metros", value: "5" },
+      { label: "City Landing Pages", value: "5" },
+      { label: "Compliance", value: "TDPSA" },
+    ],
+    techStack: [
+      "WordPress",
+      "Rank Math SEO",
+      "Schema.org (JSON-LD)",
+      "Google Business Profile",
+      "Bing Webmaster Tools",
+      "Google Maps API",
+    ],
+    notable:
+      "Full LocalBusiness JSON-LD coverage with geo coordinates, NAICS codes, and areaServed for every market. Google Business Profile entity-aligned with the website. TDPSA-compliant privacy policy built for the actual data practices, not a template.",
+    image: "/images/soil-depot-screenshot.png",
+    heroDescription:
+      "Building local search dominance for a Texas commercial soil logistics broker. A complete local SEO infrastructure and digital presence buildout covering structured data architecture, Google Business Profile entity wiring, city-specific landing pages across five major Texas metros, TDPSA legal compliance, and a technical SEO foundation engineered to compound organic growth across both Google and Bing.",
+    sections: [
+      {
+        heading: "The Client",
+        body: "Soil Depot is a commercial soil brokerage and logistics company serving contractors, developers, and landscapers across five major Texas markets: Dallas, Fort Worth, Houston, Austin, and San Antonio. They supply fill dirt, topsoil, select fill, and sand, brokered from vetted sources and delivered on schedule to active job sites. The team needed their digital infrastructure to match their operational scale. The website existed but had no structured data, no local SEO strategy, no legal compliance with Texas data privacy requirements, and no connection between their Google Business Profile and their website. Google had no clear signal about what the business was, where it operated, or how it related to the search profile prospects were finding.",
+      },
+      {
+        heading: "The Challenge",
+        body: "Three core problems. First, Google could not connect the website to the Google Business Profile. There was no entity wiring: no matching NAP data, no structured markup, no Maps integration linking the two. This meant the website and the business profile were functioning as two separate entities in Google's eyes, splitting authority instead of building it. Second, city-level search terms were completely untapped. Contractors searching for 'fill dirt delivery Houston' or 'topsoil supplier Austin' had no Soil Depot page to find. The site was a single domain with no geographic targeting, competing against local suppliers who had dedicated pages for each service area. Third, the site had no privacy policy and no compliance with the Texas Data Privacy and Security Act (TDPSA). For a business that collects contact information through quote request forms, this was a legal gap that needed closing.",
+      },
+      {
+        heading: "Structured Data Architecture",
+        body: "Implemented comprehensive LocalBusiness schema markup using JSON-LD, giving Google an unambiguous machine-readable definition of the business. The markup includes precise geo coordinates, NAICS industry classification codes, areaServed definitions covering all five Texas metros, and openingHoursSpecification. When Google crawls Soil Depot, it now knows exactly what the business is, where it operates, what industry it serves, and when it is open. This is the foundation that every other local SEO improvement builds on.",
+      },
+      {
+        heading: "Google Business Profile Entity Wiring",
+        body: "Connected the Google Business Profile to the website with consistent NAP (name, address, phone) data across every touchpoint. Embedded a Google Maps widget that references the verified business entity, creating a closed loop: the GBP points to the website, the website references the GBP, and the structured data confirms the relationship. This entity alignment is what tells Google these are the same business, consolidating search authority instead of fragmenting it.",
+      },
+      {
+        heading: "City-Level Search Targeting",
+        body: "Built dedicated landing pages targeting commercial soil and fill dirt keywords in each of Soil Depot's five primary markets. Each page is optimized through Rank Math with city-specific meta titles, descriptions, and content targeting terms like 'fill dirt delivery [city]', 'topsoil supplier [city]', and 'bulk soil [city]'. Set up Bing Webmaster Tools in parallel to ensure the site is indexed and optimized for Microsoft's search engine, which handles a meaningful share of B2B searches.",
+      },
+      {
+        heading: "Legal Compliance",
+        body: "Deployed a TDPSA-compliant privacy policy configured for Soil Depot's specific data collection practices. This is not a generic template paste. The policy addresses the actual forms on the site, the types of data collected through quote requests and the soil calculator, cookie usage, and third-party service integrations. It meets the requirements of the Texas Data Privacy and Security Act that took effect in 2024.",
+      },
+      {
+        heading: "Technical SEO Foundation",
+        body: "Configured Rank Math across the entire site for on-page SEO optimization: XML sitemap generation, Open Graph and Twitter Card meta tags, canonical URL management, and breadcrumb structured data. Set up Google Search Console and Bing Webmaster Tools for ongoing performance monitoring. The site now has a complete technical SEO foundation that compounds over time as Google indexes new content and processes the structured data.",
+      },
+      {
+        heading: "The Outcome",
+        body: "The site went from zero structured data to complete LocalBusiness schema coverage. Five city-specific landing pages now target previously untapped local search terms. Google Business Profile and website are entity-aligned with consistent NAP data. TDPSA compliance is in place. The technical SEO foundation supports long-term organic growth across both Google and Bing.",
+      },
+    ],
+    techDetails: [
+      {
+        name: "WordPress",
+        reason:
+          "Battle-tested CMS that gives the owners full editorial control over service descriptions, city pages, and quote request flows without needing a developer for every content change.",
+      },
+      {
+        name: "Rank Math SEO",
+        reason:
+          "On-page SEO configured at scale: city-specific meta titles, descriptions, Open Graph tags, canonical URLs, XML sitemaps, and breadcrumb structured data wired into every page template.",
+      },
+      {
+        name: "Schema.org (JSON-LD)",
+        reason:
+          "Full LocalBusiness markup with geo coordinates, NAICS industry codes, areaServed definitions for all five Texas metros, and openingHoursSpecification. The unambiguous machine-readable identity Google uses for local pack ranking.",
+      },
+      {
+        name: "Google Business Profile",
+        reason:
+          "Entity-aligned with the website through consistent NAP data, structured markup, and a verified Maps embed. Tells Google the business profile and the website are the same entity, consolidating search authority instead of splitting it.",
+      },
+      {
+        name: "Google Maps API",
+        reason:
+          "Embedded map referencing the verified business entity, closing the loop between the Google Business Profile and the website. Visitors get instant location context, Google gets reinforced entity signals.",
+      },
+      {
+        name: "Bing Webmaster Tools",
+        reason:
+          "Indexing and optimization for Microsoft's search engine, which handles a meaningful share of B2B and contractor search traffic that Google-only setups miss entirely.",
+      },
+      {
+        name: "Google Search Console",
+        reason:
+          "Ongoing performance visibility into impressions, clicks, average position, and indexing status. The dashboard the owners check to watch their organic footprint grow.",
+      },
+    ],
+    timeline:
+      "Delivered across a focused engagement covering structured data architecture, Google Business Profile entity wiring, five city-specific landing pages, TDPSA legal compliance, and a complete technical SEO foundation.",
+    ctaText: "Ready for Results Like These?",
+    ctaHref: "/contact",
+  },
+  {
     slug: "pathlight",
     name: "Pathlight",
     description:
