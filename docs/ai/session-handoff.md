@@ -34,6 +34,10 @@ Major work session. Primary outcomes:
 5. Run the Gemini Deep Research prompt for DFW competitive landscape and keyword research
 6. Set up Google Voice for business phone number ($10/month Google Workspace add-on)
 
+## Founder Photo (April 25, late afternoon)
+
+Initial photo replacement (96eba49) used a Canva PNG with no alpha channel, so the white circular backdrop from the source was baked into the webp. Confirmed via three tools (file, sips, identify) that the source PNG had color_type 2 (RGB only). User regenerated via Canva BG Remover and exported a true RGBA PNG. Re-converted with `cwebp -q 90 -alpha_q 100` to preserve alpha; output webp is 347 KB with channels srgba 4.0 and mean alpha 0.280 matching the source. Subject now floats over the dark hero bg with no white halo.
+
 ## Current Git Status
 
-main is at 1c09428 (auto-update rule). Working tree has the Pathlight landing overhaul + memory-doc updates uncommitted, awaiting user authorization.
+main is at d01895e (Pathlight landing overhaul). Working tree has the transparent-photo replacement + this handoff note + the current-state.md update queued for one commit.
