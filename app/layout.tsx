@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Outfit, JetBrains_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import { JsonLd } from "@/components/layout/JsonLd";
 import "./globals.css";
 
@@ -89,27 +90,38 @@ export const metadata: Metadata = {
 };
 
 /* ─── ROOT LAYOUT ───────────────────────────────────── */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  /* Anti-flicker (homepage): paint the html element dark BEFORE any
+     stylesheet or script can run. Inline `style` on the <html> tag is
+     applied at HTML parse time, ahead of CSS download. Next.js auto-
+     hoists <link rel="stylesheet"> above any user-provided head tags,
+     which means a head-level <script> is parser-blocked behind CSS and
+     can't paint the canvas in time. The only mechanism that beats CSS
+     to first paint is an attribute on the root element itself.
+     Path is read via middleware.ts which forwards `x-pathname` on the
+     request. Non-home routes get no inline style and behave as before. */
+  const pathname = (await headers()).get("x-pathname") ?? "";
+  const isHome = pathname === "/";
+
   return (
     <html
       lang="en"
       className={`${jakarta.variable} ${outfit.variable} ${jetbrains.variable}`}
+      style={isHome ? { backgroundColor: "#06060a" } : undefined}
     >
       <head>
-        {/* Anti-flicker: paint the html element dark on the homepage
-            before body renders. Body is transparent (see globals.css)
-            so the html color shows through. HeroCinema clears the
-            inline style when the reveal completes. Repeat visitors
-            (sessionStorage flag set) skip it and keep the default. */}
         <meta name="theme-color" content="#06060a" />
+        {/* Repeat-visit fast-path: if HeroCinema has previously revealed,
+            the inline html style above is no longer needed. Clear it so
+            the page reads as the default light theme on subsequent loads. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(window.location.pathname==='/'&&sessionStorage.getItem('hero-revealed')!=='true'){document.documentElement.style.setProperty('background-color','#06060a','important');}}catch(e){}",
+              "try{if(window.location.pathname==='/'&&sessionStorage.getItem('hero-revealed')==='true'){document.documentElement.style.removeProperty('background-color');}}catch(e){}",
           }}
         />
         <JsonLd type="organization" />
