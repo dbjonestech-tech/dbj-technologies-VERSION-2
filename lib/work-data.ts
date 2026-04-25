@@ -206,7 +206,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     notable:
       "Full LocalBusiness JSON-LD coverage with geo coordinates, NAICS codes, and areaServed for every market. Google Business Profile entity-aligned with the website. TDPSA-compliant privacy policy built for the actual data practices, not a template.",
-    image: "/images/soil-depot-screenshot.png",
+    image: "/images/case-studies/soil-depot-desktop.webp",
     heroDescription:
       "Building local search dominance for a Texas commercial soil logistics broker. A complete local SEO infrastructure and digital presence buildout covering structured data architecture, Google Business Profile entity wiring, city-specific landing pages across five major Texas metros, TDPSA legal compliance, and a technical SEO foundation engineered to compound organic growth across both Google and Bing.",
     sections: [

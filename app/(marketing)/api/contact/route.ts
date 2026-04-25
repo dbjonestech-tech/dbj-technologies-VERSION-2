@@ -134,28 +134,40 @@ export async function POST(request: Request) {
       <p style="white-space:pre-wrap;background:#f9f9f9;padding:16px;border-radius:8px;">${safe.message}</p>
     `;
 
-    if (process.env.RESEND_API_KEY) {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      const { error: sendError } = await resend.emails.send({
-        from: process.env.CONTACT_FROM_EMAIL || "DBJ Technologies Website <joshua@dbjtechnologies.com>",
-        to: process.env.CONTACT_EMAIL || "joshua@dbjtechnologies.com",
-        replyTo: email,
-        subject: `New Project Inquiry: ${safe.projectType} — ${safe.name}`,
-        html: htmlBody,
-      });
-      if (sendError) {
-        console.error("Resend error:", sendError);
-        return NextResponse.json(
-          { error: "Failed to send message" },
-          { status: 500 }
+    if (!process.env.RESEND_API_KEY) {
+      if (process.env.NODE_ENV === "development") {
+        // Local development convenience: surface that a submission arrived
+        // when the dev hasn't configured Resend yet. Never reached in
+        // production because the early return below short-circuits.
+        console.log(
+          "[contact] RESEND_API_KEY not set; submission accepted but no email sent (dev only)"
         );
+        return NextResponse.json({ success: true });
       }
-    } else if (process.env.NODE_ENV === "development") {
-      console.log("──────────────────────────────────────");
-      console.log("CONTACT FORM SUBMISSION (RESEND_API_KEY not configured)");
-      console.log("──────────────────────────────────────");
-      console.log({ name, email, phone, company, budget, projectType, message });
-      console.log("──────────────────────────────────────");
+      // Production: missing email config is a server error, not a silent
+      // success. Surface it so the user retries instead of believing
+      // their inquiry was delivered.
+      console.error("[contact] RESEND_API_KEY missing in production");
+      return NextResponse.json(
+        { error: "Server configuration error. Please email joshua@dbjtechnologies.com directly." },
+        { status: 500 }
+      );
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const { error: sendError } = await resend.emails.send({
+      from: process.env.CONTACT_FROM_EMAIL || "DBJ Technologies Website <joshua@dbjtechnologies.com>",
+      to: process.env.CONTACT_EMAIL || "joshua@dbjtechnologies.com",
+      replyTo: email,
+      subject: `New Project Inquiry: ${safe.projectType} - ${safe.name}`,
+      html: htmlBody,
+    });
+    if (sendError) {
+      console.error("Resend error:", sendError);
+      return NextResponse.json(
+        { error: "Failed to send message" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true });

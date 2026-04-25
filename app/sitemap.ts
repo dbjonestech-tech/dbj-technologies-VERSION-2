@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/work",
     "/process",
     "/pricing",
+    "/pathlight",
     "/faq",
     "/contact",
     "/maintenance-support",
@@ -26,7 +27,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" ? ("weekly" as const) : ("monthly" as const),
-    priority: route === "" ? 1 : route === "/services" || route === "/pricing" ? 0.9 : 0.8,
+    priority:
+      route === ""
+        ? 1
+        : route === "/services" || route === "/pricing" || route === "/pathlight"
+          ? 0.9
+          : 0.8,
   }));
 
   /* ─── Service detail pages ──────────────────────── */

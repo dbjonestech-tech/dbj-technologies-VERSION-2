@@ -293,14 +293,13 @@ export default function AboutContent() {
                 }}
               >
                 <Image
-                  src="/images/joshua-jones.png"
+                  src="/images/joshua-jones.webp"
                   alt="Joshua Jones, Founder & Principal Architect"
                   fill
                   sizes="(max-width: 1024px) 320px, 500px"
                   className="object-cover"
                   quality={95}
                   priority
-                  unoptimized
                 />
               </motion.div>
             </div>

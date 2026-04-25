@@ -6,6 +6,7 @@ import { ScanStatus } from "./ScanStatus";
 
 export const metadata: Metadata = {
   title: "Your Pathlight Report",
+  description: "Personalized AI-powered analysis of your website.",
   robots: { index: false, follow: false },
 };
 
