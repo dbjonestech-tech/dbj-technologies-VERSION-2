@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PathlightBackdrop } from "./PathlightBackdrop";
+import { PathlightContent } from "./PathlightContent";
 import { PathlightForm } from "./PathlightForm";
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default function GradePage() {
     <>
       <PathlightBackdrop />
       <PathlightForm />
+      <PathlightContent />
     </>
   );
 }

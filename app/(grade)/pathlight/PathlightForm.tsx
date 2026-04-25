@@ -80,6 +80,7 @@ export function PathlightForm() {
 
   return (
     <div
+      id="scan-form"
       className="relative min-h-screen w-full px-6 py-16 sm:py-24"
       style={{ color: "#e7ebf2" }}
     >
@@ -89,7 +90,7 @@ export function PathlightForm() {
             PATHLIGHT
           </h1>
           <p className="mt-4 text-lg sm:text-xl" style={{ color: "#c5ccd8" }}>
-            AI-powered website intelligence. Find the problems. Find the money drain. Find the fix.
+            Find where your website is losing trust, leads, and revenue.
           </p>
           <Link
             href="/"

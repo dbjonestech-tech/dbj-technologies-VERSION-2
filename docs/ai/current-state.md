@@ -16,7 +16,7 @@ Last updated: April 25, 2026
 - Footer: LinkedIn company page + GitHub social icons with proper aria-labels
 - Schema.org: JSON-LD with sameAs for social profiles
 - Professional email: joshua@dbjtechnologies.com (Google Workspace, SPF/DKIM/DMARC verified)
-- Pathlight landing page: tagline "Find the problems. Find the money drain. Find the fix." with subtext "Free. No credit card. Results in minutes." Feature cards removed. DBJ emblem relocated to footer attribution. "by DBJ Technologies" text under wordmark.
+- Pathlight landing page (overhauled April 25): hero tagline updated to "Find where your website is losing trust, leads, and revenue." with subtext "Free. No credit card. Results in minutes." DBJ emblem + "by DBJ Technologies" link under wordmark. Form unchanged (id="scan-form" added as anchor target). New server-rendered sections below the form via app/(grade)/pathlight/PathlightContent.tsx: (3) "What Your Report Includes" 2x2 dark glass card grid covering Pathlight Score, Revenue Impact Estimate, Top 3 Priority Fixes, Full Desktop & Mobile Screenshots; (4) "Most audits check code. Pathlight checks the experience." three-paragraph differentiator; (5) "Built for businesses where one lead matters" audience flow line; (6) Secondary CTA card with "Scan My Website Free" anchor + "Book a Strategy Call" link to /contact; (7) "Powered by DBJ Technologies" footer line. PathlightBackdrop (fixed inset-0) continues to span behind all sections as user scrolls.
 
 ### Active Bugs Being Fixed (April 25)
 - About page: ScrollWordBatch component has words running together (inline-block whitespace collapse). CC prompt actively executing fix.

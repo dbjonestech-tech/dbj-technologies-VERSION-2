@@ -23,7 +23,7 @@
 - [ ] Revenue confidence bands on reports (show range instead of single precise number)
 - [ ] Input validation gate (detect bot-blocking pages, parked domains, login walls, non-business URLs before burning 4 Claude API calls)
 - [ ] Rate limiting per IP/session (Upstash Redis is configured but rate limiting logic may need strengthening before any public marketing push)
-- [ ] Pathlight landing page rewrite with sample report screenshots (currently undersells the product)
+- [ ] Pathlight landing page: add sample report screenshots (textual rewrite shipped April 25; remaining gap is visual proof of the report itself)
 
 ## Priority 4: Content and SEO
 
