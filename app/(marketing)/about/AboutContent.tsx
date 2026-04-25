@@ -135,7 +135,13 @@ function ScrollWordBatch({
         <motion.span
           key={i}
           style={{ opacity, color }}
-          className="inline-block"
+          /* `inline` (not `inline-block`): inline-block collapses
+             trailing whitespace inside the box, which ate the space
+             after the last word of each batch and produced
+             "smartdecisions", "buriedby", etc. on the live site.
+             The component only animates opacity and color, both of
+             which work fine on inline elements. */
+          className="inline"
         >
           {word}
           {i < words.length - 1 ? "\u00A0" : " "}
@@ -315,7 +321,17 @@ export default function AboutContent() {
             >
               {ABOUT_CONTENT.badge}
             </motion.span>
-            <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+            {/* Capped at md:text-6xl. The text column in this side-by-side
+                layout is ~524px at lg (max-w-6xl - lg:px-8 - lg:w-[500px]
+                photo - lg:gap-16 = 524px); "The Anti-Agency" at text-7xl
+                (~620-640px) overflows that, and because each character is
+                its own inline-block (needed for the y-translate stagger),
+                the browser breaks at character boundaries when it overflows,
+                producing the visible "Anti-Agen / cy" mid-word wrap. At
+                text-6xl with tracking-tight the headline measures ~510px
+                and fits cleanly. A stacked headline-above-photo layout
+                would let larger sizes breathe; that's a separate change. */}
+            <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
               <span className="sr-only">
                 {ABOUT_CONTENT.headline} {ABOUT_CONTENT.headlineAccent}
               </span>

@@ -100,6 +100,11 @@ export default async function RootLayout({
      which means a head-level <script> is parser-blocked behind CSS and
      can't paint the canvas in time. The only mechanism that beats CSS
      to first paint is an attribute on the root element itself.
+     `color-scheme: dark` is critical alongside the bg color: it tells
+     the user-agent to use a dark canvas during the render-blocking CSS
+     download window, before any styles are computed. Without it, the
+     UA paints its default light canvas in that gap regardless of what
+     inline styles say.
      Path is read via middleware.ts which forwards `x-pathname` on the
      request. Non-home routes get no inline style and behave as before. */
   const pathname = (await headers()).get("x-pathname") ?? "";
@@ -109,20 +114,25 @@ export default async function RootLayout({
     <html
       lang="en"
       className={`${jakarta.variable} ${outfit.variable}`}
-      style={isHome ? { backgroundColor: "#06060a" } : undefined}
+      style={
+        isHome
+          ? { backgroundColor: "#06060a", colorScheme: "dark" }
+          : undefined
+      }
     >
       <head>
         <meta name="theme-color" content="#06060a" />
         {/* Repeat-visit fast-path: if HeroCinema has previously revealed,
-            the inline html style above is no longer needed. Clear it so
-            the page reads as the default light theme on subsequent loads.
-            Only emitted on the homepage so other routes don't pay the
-            parser-blocking cost of an inline <script> they never need. */}
+            the inline html style above is no longer needed. Clear both
+            background-color and color-scheme so the page reads as the
+            default light theme on subsequent loads. Only emitted on the
+            homepage so other routes don't pay the parser-blocking cost
+            of an inline <script> they never need. */}
         {isHome && (
           <script
             dangerouslySetInnerHTML={{
               __html:
-                "try{if(sessionStorage.getItem('hero-revealed')==='true'){document.documentElement.style.removeProperty('background-color');}}catch(e){}",
+                "try{if(sessionStorage.getItem('hero-revealed')==='true'){var s=document.documentElement.style;s.removeProperty('background-color');s.removeProperty('color-scheme');}}catch(e){}",
             }}
           />
         )}
