@@ -1,8 +1,15 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
 import { Zap, Eye, Target, Heart } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card } from "@/components/ui/Card";
@@ -25,6 +32,65 @@ const storySections = [
   ABOUT_STORY.howIBuild,
   ABOUT_STORY.whoThisIsFor,
 ];
+
+function ScrollRevealText({ text }: { text: string }) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start 0.9", "end 0.4"],
+  });
+
+  const words = text.split(" ");
+  const batches: string[][] = [];
+  for (let i = 0; i < words.length; i += 3) {
+    batches.push(words.slice(i, i + 3));
+  }
+
+  return (
+    <p ref={containerRef} className="text-lg leading-relaxed">
+      {batches.map((batch, i) => {
+        const start = i / batches.length;
+        const end = Math.min(start + 1.5 / batches.length, 1);
+        return (
+          <ScrollWordBatch
+            key={i}
+            words={batch}
+            range={[start, end]}
+            progress={scrollYProgress}
+          />
+        );
+      })}
+    </p>
+  );
+}
+
+function ScrollWordBatch({
+  words,
+  range,
+  progress,
+}: {
+  words: string[];
+  range: [number, number];
+  progress: MotionValue<number>;
+}) {
+  const opacity = useTransform(progress, range, [0.3, 1]);
+  const color = useTransform(progress, range, ["#4b5563", "#d1d5db"]);
+
+  return (
+    <>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          style={{ opacity, color }}
+          className="inline-block"
+        >
+          {word}
+          {i < words.length - 1 ? "\u00A0" : " "}
+        </motion.span>
+      ))}
+    </>
+  );
+}
 
 export default function AboutContent() {
   const prefersReducedMotion = useReducedMotion();
@@ -55,6 +121,21 @@ export default function AboutContent() {
               "linear-gradient(to bottom, rgba(6,6,10,0.6), transparent 25%, transparent 75%, rgba(6,6,10,0.9))",
           }}
         />
+        {/* One-shot scan line: sweeps down on page load */}
+        {!prefersReducedMotion && (
+          <motion.div
+            initial={{ top: "0%" }}
+            animate={{ top: "100%" }}
+            transition={{ duration: 2.5, ease: "easeInOut", delay: 0.3 }}
+            className="pointer-events-none absolute left-0 right-0 z-[1] h-px opacity-20"
+            style={{
+              background:
+                "linear-gradient(to right, transparent, #3b82f6, transparent)",
+              boxShadow: "0 0 15px 3px rgba(59,130,246,0.3)",
+            }}
+            aria-hidden="true"
+          />
+        )}
         <GradientBlob className="-top-40 -right-40" />
 
         {/* Floating geometric accents: exactly 4 */}
@@ -66,7 +147,7 @@ export default function AboutContent() {
               ? undefined
               : { duration: 30, repeat: Infinity, ease: "linear" }
           }
-          className="pointer-events-none absolute hidden opacity-[0.08] lg:block"
+          className="pointer-events-none absolute hidden opacity-[0.12] lg:block"
           style={{ top: "12%", left: "6%", width: 65, height: 65 }}
           viewBox="0 0 60 60"
         >
@@ -86,7 +167,7 @@ export default function AboutContent() {
               ? undefined
               : { duration: 40, repeat: Infinity, ease: "linear" }
           }
-          className="pointer-events-none absolute hidden opacity-[0.06] lg:block"
+          className="pointer-events-none absolute hidden opacity-[0.11] lg:block"
           style={{ top: "18%", right: "10%", width: 50, height: 50 }}
           viewBox="0 0 50 50"
         >
@@ -106,7 +187,7 @@ export default function AboutContent() {
               ? undefined
               : { duration: 25, repeat: Infinity, ease: "linear" }
           }
-          className="pointer-events-none absolute opacity-[0.07]"
+          className="pointer-events-none absolute opacity-[0.10]"
           style={{ bottom: "15%", left: "12%", width: 45, height: 45 }}
           viewBox="0 0 45 45"
         >
@@ -128,7 +209,7 @@ export default function AboutContent() {
               ? undefined
               : { duration: 35, repeat: Infinity, ease: "linear" }
           }
-          className="pointer-events-none absolute hidden opacity-[0.09] lg:block"
+          className="pointer-events-none absolute hidden opacity-[0.13] lg:block"
           style={{ bottom: "20%", right: "7%", width: 55, height: 55 }}
           viewBox="0 0 50 50"
         >
@@ -179,17 +260,38 @@ export default function AboutContent() {
                 ease: [0.25, 0.46, 0.45, 0.94],
               }}
             >
-              <div className="relative aspect-[3/2] w-72 flex-shrink-0 lg:w-[400px]">
-                <Image
-                  src="/images/joshua-jones.png"
-                  alt="Joshua Jones, Founder & Principal Architect"
-                  fill
-                  sizes="(max-width: 1024px) 288px, 400px"
-                  className="rounded-2xl object-cover shadow-2xl"
-                  quality={95}
-                  priority
-                  unoptimized
+              <div className="relative">
+                {/* Pulsing gradient border */}
+                <motion.div
+                  animate={
+                    prefersReducedMotion
+                      ? undefined
+                      : { opacity: [0.3, 0.6, 0.3] }
+                  }
+                  transition={
+                    prefersReducedMotion
+                      ? undefined
+                      : { duration: 3, repeat: Infinity, ease: "easeInOut" }
+                  }
+                  className="absolute -inset-[2px] rounded-2xl"
+                  aria-hidden="true"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #3b82f6, #06060a, #3b82f6)",
+                  }}
                 />
+                <div className="relative aspect-[3/2] w-72 flex-shrink-0 overflow-hidden rounded-2xl lg:w-[400px]">
+                  <Image
+                    src="/images/joshua-jones.png"
+                    alt="Joshua Jones, Founder & Principal Architect"
+                    fill
+                    sizes="(max-width: 1024px) 288px, 400px"
+                    className="object-cover"
+                    quality={95}
+                    priority
+                    unoptimized
+                  />
+                </div>
               </div>
             </motion.div>
           </div>
@@ -217,7 +319,7 @@ export default function AboutContent() {
                     transition={{ delay: 0.4 + i * 0.02, duration: 0.3 }}
                     style={{ display: "inline-block" }}
                   >
-                    {char === " " ? " " : char}
+                    {char === " " ? "\u00A0" : char}
                   </motion.span>
                 ))}
               </span>
@@ -240,11 +342,34 @@ export default function AboutContent() {
             >
               {ABOUT_CONTENT.description}
             </motion.p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.1, duration: 0.5 }}
+              className="mt-8 mb-4 flex items-center justify-center gap-3 lg:justify-start"
+              aria-hidden="true"
+            >
+              <div
+                className="h-px w-8"
+                style={{
+                  background:
+                    "linear-gradient(to right, #3b82f6, transparent)",
+                }}
+              />
+              <div className="h-1.5 w-1.5 rounded-sm bg-accent-blue/40" />
+              <div
+                className="h-px w-8"
+                style={{
+                  background:
+                    "linear-gradient(to left, #3b82f6, transparent)",
+                }}
+              />
+            </motion.div>
             <motion.p
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.2, duration: 0.6 }}
-              className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed lg:mx-0"
+              className="mx-auto max-w-2xl text-sm leading-relaxed lg:mx-0"
               style={{ color: "#8892a4" }}
             >
               {ABOUT_STORY.personal}
@@ -254,7 +379,11 @@ export default function AboutContent() {
       </section>
 
       {/* Gradient divider between hero and story */}
-      <div
+      <motion.div
+        initial={{ opacity: 0.3, scaleX: 0.6 }}
+        whileInView={{ opacity: 1, scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         aria-hidden="true"
         className="h-px w-full"
         style={{
@@ -286,7 +415,11 @@ export default function AboutContent() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="mb-20 last:mb-0"
+              className="mb-12 last:mb-0 rounded-xl border border-white/[0.06] p-8 lg:p-10"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
+              }}
             >
               {/* Accent line before heading */}
               <div
@@ -296,20 +429,37 @@ export default function AboutContent() {
                     "linear-gradient(to right, #3b82f6, transparent)",
                 }}
               />
-              <h3 className="mb-6 text-2xl font-semibold tracking-tight text-white lg:text-3xl">
-                {section.heading}
-              </h3>
-              <p
-                className="text-lg leading-relaxed"
-                style={{ color: "#9ca3af" }}
+              <motion.h3
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="mb-6 text-2xl font-semibold tracking-tight lg:text-3xl"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #ffffff 30%, #93c5fd 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
               >
-                {section.body}
-              </p>
+                {section.heading}
+              </motion.h3>
+              {prefersReducedMotion ? (
+                <p
+                  className="text-lg leading-relaxed"
+                  style={{ color: "#9ca3af" }}
+                >
+                  {section.body}
+                </p>
+              ) : (
+                <ScrollRevealText text={section.body} />
+              )}
               {i === storySections.length - 1 && (
                 <div className="mt-8">
                   <Link
                     href="/contact"
-                    className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:gap-3"
+                    className="inline-flex transform items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:scale-[1.02] hover:gap-3 hover:shadow-[0_0_20px_-2px_rgba(59,130,246,0.4)] hover:brightness-110"
                     style={{ backgroundColor: "#3b82f6" }}
                   >
                     Start a Conversation
@@ -336,7 +486,11 @@ export default function AboutContent() {
       </section>
 
       {/* Gradient divider between story and values */}
-      <div
+      <motion.div
+        initial={{ opacity: 0.3, scaleX: 0.6 }}
+        whileInView={{ opacity: 1, scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         aria-hidden="true"
         className="h-px w-full"
         style={{

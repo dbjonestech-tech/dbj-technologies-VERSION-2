@@ -105,10 +105,11 @@ export default function RootLayout({
             so the html color shows through. HeroCinema clears the
             inline style when the reveal completes. Repeat visitors
             (sessionStorage flag set) skip it and keep the default. */}
+        <meta name="theme-color" content="#06060a" />
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(window.location.pathname==='/'&&sessionStorage.getItem('hero-revealed')!=='true'){document.documentElement.style.backgroundColor='#06060a';}}catch(e){}",
+              "try{if(window.location.pathname==='/'&&sessionStorage.getItem('hero-revealed')!=='true'){document.documentElement.style.setProperty('background-color','#06060a','important');}}catch(e){}",
           }}
         />
         <JsonLd type="organization" />

@@ -30,14 +30,14 @@ export default function HeroCinema({
     ).matches;
     if (reducedMotion) {
       setActive(false);
-      document.documentElement.style.backgroundColor = "";
+      document.documentElement.style.removeProperty("background-color");
       onRevealComplete();
       return;
     }
     try {
       if (sessionStorage.getItem("hero-revealed") === "true") {
         setActive(false);
-        document.documentElement.style.backgroundColor = "";
+        document.documentElement.style.removeProperty("background-color");
         onRevealComplete();
         return;
       }
@@ -145,7 +145,7 @@ export default function HeroCinema({
           } catch {
             /* noop */
           }
-          document.documentElement.style.backgroundColor = "";
+          document.documentElement.style.removeProperty("background-color");
 
           onRevealComplete();
 

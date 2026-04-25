@@ -36,6 +36,80 @@ export interface ProjectDetail {
 
 export const PROJECT_DETAILS: ProjectDetail[] = [
   {
+    slug: "pathlight",
+    name: "Pathlight",
+    description:
+      "Find the problems. Find the money drain. Find the fix. AI-powered analysis with industry-specific revenue modeling, not generic scores.",
+    category: "Internal Product",
+    gradient: "from-violet-600 to-pink-500",
+    liveUrl: "https://dbjtechnologies.com/pathlight",
+    metrics: [
+      { label: "AI Pipeline Stages", value: "5" },
+      { label: "Curated Verticals", value: "206" },
+      { label: "Scan Time", value: "~2 min" },
+    ],
+    techStack: [
+      "Next.js 16",
+      "TypeScript",
+      "AI/LLM Integration",
+      "PostgreSQL",
+      "Serverless",
+    ],
+    notable:
+      "The only free tool that translates website problems into dollar signs. 206 industry benchmarks. Zero scan-to-scan variance for covered verticals.",
+    image: "/images/case-studies/pathlight-landing.webp",
+    heroDescription:
+      "A full-stack AI platform built from the ground up to scan any business website and produce a complete intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list. All in minutes, for free. Proof that AI-powered analysis, when properly engineered, delivers genuine business insight instead of generic summaries.",
+    sections: [
+      {
+        heading: "The Problem",
+        body: "Small business owners know their website 'could be better.' But they don't know what specifically is wrong, how much it's costing them, or what to fix first. Free tools like Lighthouse give technical scores that mean nothing to a restaurant owner. Agencies charge thousands for discovery calls before providing any insight. There's no middle ground. No tool translates technical website problems into business language with dollar signs attached.",
+      },
+      {
+        heading: "The Solution",
+        body: "Pathlight scans any business website and delivers a complete intelligence report in minutes. Not a Lighthouse score. Not a generic SEO checklist. A full analysis covering design quality, technical performance, estimated revenue impact modeled against real industry data, and a prioritized fix list ranked by business impact.",
+      },
+      {
+        heading: "How It Works",
+        body: "Every scan runs through a multi-stage AI analysis pipeline. The system captures full-page screenshots on desktop and mobile, runs a comprehensive performance audit, evaluates design and competitive positioning using computer vision, matches the business to its industry for accurate revenue modeling, and generates prioritized recommendations. The entire process is automated with built-in quality checks at every stage.",
+      },
+      {
+        heading: "The Curated Database",
+        body: "Pathlight maintains a curated database of industry-specific benchmarks covering hundreds of business verticals. Each benchmark has been validated across multiple independent research sources and reviewed for accuracy. When a scan identifies a business's industry, Pathlight pulls validated data rather than relying on a single web search. This eliminates the variance and inconsistency that plague other automated analysis tools.",
+      },
+      {
+        heading: "The Report",
+        body: "Every scan produces a Pathlight Score (0-100) broken into four weighted pillars: Design (35%), Performance (25%), Positioning (25%), and Findability (15%). Below the score, the top 3 fixes ranked by impact and difficulty, full desktop and mobile screenshots, and a revenue impact estimate with full methodology transparency. The built-in chatbot lets business owners ask follow-up questions about their results, and it's transparent about confidence levels rather than pretending precision.",
+      },
+    ],
+    techDetails: [
+      {
+        name: "AI & Machine Learning",
+        reason:
+          "Multiple large language models handle different stages of analysis, from visual design evaluation to revenue impact modeling. Each model is prompted with specialized instructions tuned to its task.",
+      },
+      {
+        name: "Full-Stack TypeScript",
+        reason:
+          "Next.js 16 with strict TypeScript from database schema to API response to frontend component. Type safety at every layer, not just the UI.",
+      },
+      {
+        name: "Cloud Infrastructure",
+        reason:
+          "Serverless architecture with background job orchestration, automatic retry logic, rate limiting, and transactional email delivery. Built to handle concurrent scans without degradation.",
+      },
+      {
+        name: "Data Architecture",
+        reason:
+          "PostgreSQL for scan persistence and analysis storage. A curated industry benchmark database for accurate revenue modeling. Email event tracking for deliverability monitoring.",
+      },
+    ],
+    timeline:
+      "Designed, architected, and built as a solo project. Iteratively hardened across multiple releases addressing accuracy, reliability, and scan consistency.",
+    ctaText: "Scan Your Website Free",
+    ctaHref: "/pathlight",
+  },
+  {
     slug: "star-auto-service",
     name: "Star Auto Service",
     description:
@@ -210,80 +284,6 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "Delivered across a focused engagement covering structured data architecture, Google Business Profile entity wiring, five city-specific landing pages, TDPSA legal compliance, and a complete technical SEO foundation.",
     ctaText: "Ready for Results Like These?",
     ctaHref: "/contact",
-  },
-  {
-    slug: "pathlight",
-    name: "Pathlight",
-    description:
-      "Find the problems. Find the money drain. Find the fix. AI-powered analysis with industry-specific revenue modeling, not generic scores.",
-    category: "Internal Product",
-    gradient: "from-violet-600 to-pink-500",
-    liveUrl: "https://dbjtechnologies.com/pathlight",
-    metrics: [
-      { label: "AI Pipeline Stages", value: "5" },
-      { label: "Curated Verticals", value: "206" },
-      { label: "Scan Time", value: "~2 min" },
-    ],
-    techStack: [
-      "Next.js 16",
-      "TypeScript",
-      "AI/LLM Integration",
-      "PostgreSQL",
-      "Serverless",
-    ],
-    notable:
-      "The only free tool that translates website problems into dollar signs. 206 industry benchmarks. Zero scan-to-scan variance for covered verticals.",
-    image: "/images/case-studies/pathlight-landing.webp",
-    heroDescription:
-      "A full-stack AI platform built from the ground up to scan any business website and produce a complete intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list. All in minutes, for free. Proof that AI-powered analysis, when properly engineered, delivers genuine business insight instead of generic summaries.",
-    sections: [
-      {
-        heading: "The Problem",
-        body: "Small business owners know their website 'could be better.' But they don't know what specifically is wrong, how much it's costing them, or what to fix first. Free tools like Lighthouse give technical scores that mean nothing to a restaurant owner. Agencies charge thousands for discovery calls before providing any insight. There's no middle ground. No tool translates technical website problems into business language with dollar signs attached.",
-      },
-      {
-        heading: "The Solution",
-        body: "Pathlight scans any business website and delivers a complete intelligence report in minutes. Not a Lighthouse score. Not a generic SEO checklist. A full analysis covering design quality, technical performance, estimated revenue impact modeled against real industry data, and a prioritized fix list ranked by business impact.",
-      },
-      {
-        heading: "How It Works",
-        body: "Every scan runs through a multi-stage AI analysis pipeline. The system captures full-page screenshots on desktop and mobile, runs a comprehensive performance audit, evaluates design and competitive positioning using computer vision, matches the business to its industry for accurate revenue modeling, and generates prioritized recommendations. The entire process is automated with built-in quality checks at every stage.",
-      },
-      {
-        heading: "The Curated Database",
-        body: "Pathlight maintains a curated database of industry-specific benchmarks covering hundreds of business verticals. Each benchmark has been validated across multiple independent research sources and reviewed for accuracy. When a scan identifies a business's industry, Pathlight pulls validated data rather than relying on a single web search. This eliminates the variance and inconsistency that plague other automated analysis tools.",
-      },
-      {
-        heading: "The Report",
-        body: "Every scan produces a Pathlight Score (0-100) broken into four weighted pillars: Design (35%), Performance (25%), Positioning (25%), and Findability (15%). Below the score, the top 3 fixes ranked by impact and difficulty, full desktop and mobile screenshots, and a revenue impact estimate with full methodology transparency. The built-in chatbot lets business owners ask follow-up questions about their results, and it's transparent about confidence levels rather than pretending precision.",
-      },
-    ],
-    techDetails: [
-      {
-        name: "AI & Machine Learning",
-        reason:
-          "Multiple large language models handle different stages of analysis, from visual design evaluation to revenue impact modeling. Each model is prompted with specialized instructions tuned to its task.",
-      },
-      {
-        name: "Full-Stack TypeScript",
-        reason:
-          "Next.js 16 with strict TypeScript from database schema to API response to frontend component. Type safety at every layer, not just the UI.",
-      },
-      {
-        name: "Cloud Infrastructure",
-        reason:
-          "Serverless architecture with background job orchestration, automatic retry logic, rate limiting, and transactional email delivery. Built to handle concurrent scans without degradation.",
-      },
-      {
-        name: "Data Architecture",
-        reason:
-          "PostgreSQL for scan persistence and analysis storage. A curated industry benchmark database for accurate revenue modeling. Email event tracking for deliverability monitoring.",
-      },
-    ],
-    timeline:
-      "Designed, architected, and built as a solo project. Iteratively hardened across multiple releases addressing accuracy, reliability, and scan consistency.",
-    ctaText: "Scan Your Website Free",
-    ctaHref: "/pathlight",
   },
 ];
 
