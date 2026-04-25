@@ -274,7 +274,10 @@ export default function AboutContent() {
                     "radial-gradient(circle, #3b82f6 0%, transparent 65%)",
                 }}
               />
-              {/* Clip-path reveal applied to the masked container */}
+              {/* Clip-path reveal applied to the photo container. The
+                  source webp carries its own alpha (RGBA, color_type 6),
+                  so no maskImage is needed — adding one would trim the
+                  silhouette at the mask's edges. */}
               <motion.div
                 initial={
                   prefersReducedMotion
@@ -291,12 +294,6 @@ export default function AboutContent() {
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
                 className="relative aspect-[3/2]"
-                style={{
-                  maskImage:
-                    "radial-gradient(ellipse 85% 80% at 50% 45%, black 40%, transparent 100%)",
-                  WebkitMaskImage:
-                    "radial-gradient(ellipse 85% 80% at 50% 45%, black 40%, transparent 100%)",
-                }}
               >
                 <Image
                   src="/images/joshua-jones.webp"
