@@ -13,27 +13,36 @@ Major work session. Primary outcomes:
 7. Founder photo iteration chain (commits 96eba49 -> 57d0001 -> 115127d -> baf8920): replaced source PNG, swapped to true alpha-transparent webp, removed radial-gradient mask, then enlarged on desktop and swapped to a higher-res source. See "Founder Photo" notes below for the full diagnostic trail.
 8. Homepage SSR dark fallback (commit a670ae8): closed the brief initial-load void on the homepage by making the SSR fallback render a static dark layer instead of opacity:0.
 9. Post-commit handoff rule added to CLAUDE.md (commit 3489139): the "After Every Code Change" section now requires session-handoff.md to be refreshed after every commit+push so it reflects the actual final state (commit hash, working-tree status, push status), not a mid-progress note. Amend-and-force-push is preferred; standalone "update session handoff" commit is the safe fallback when amending would cause problems (e.g. force-pushing main).
+10. Homepage strategic overhaul (commit fceb83d): PathlightCTA moved from position 8 (above bottom CTA) to position 2 (immediately after Hero), so the lead-gen tool now sits above the fold-after-hero instead of buried below the tech stack. Hero subheading rewritten from "Sub-second frontends, reliable infrastructure..." to "Websites and digital systems that generate trust, capture leads, and grow revenue." Primary CTA "Start Your Engagement" -> "Start a Project". Secondary CTA "View My Work" -> "See What We Build". All 6 SERVICES entries got business-owner titles + taglines (Frontend Architecture -> Website Design & Development; Backend & API Systems -> Business Systems & Integrations; Cloud & Edge Infrastructure -> Hosting & Reliability; Interface & Interaction Engineering -> User Experience & Conversion; E-Commerce & Platform Engineering -> E-Commerce & Custom Applications; Web Performance & Core Web Vitals -> Speed & Search Performance). Service slugs, descriptions, and features arrays preserved (drive /services/[slug] detail pages — out of scope). Process step descriptions softened to non-technical language. New PATHLIGHT_CTA_CONTENT constant added to siteContent.ts; PathlightCTA component refactored to read from it (was hardcoded). Phase 5 (two-button bottom CTA) skipped — would have required CTASection component changes.
+11. About page hydration crash fix (commit ad3ab47): root cause was two adjacent text children inside motion.span in ScrollWordBatch ({word}{separator}). React 18's text-marker insertion is unreliable through framer-motion's forwardRef wrapper, so under intermittent timing the SSR HTML's single concatenated text node didn't match the client's two-text-node expectation, triggering "NotFoundError: Failed to execute 'insertBefore'". Fix concatenates word+separator into a single text expression: {word + (i < words.length - 1 ? "\\u00A0" : " ")}. Visual result identical (each span still has a word followed by a non-breaking space). Comment block above the JSX now documents the hydration constraint to prevent regression. The earlier ScrollWordBatch fix (commit 6895b60) solved the visual word-collapse but introduced this hydration bug; ad3ab47 keeps the visual fix and resolves the crash.
+12. Services and Process section headings reframed to business language (commit 1e74d92): Services.tsx title "Engineering Disciplines" -> "What We Build", description rewritten to lead with custom-built-for-business-goals language. ProcessSteps.tsx title "From Diagnosis to Deployment" -> "How Every Project Works", description rewritten to clear-process-so-you-know-what-comes-next language. Closes the gap between the new business-owner service card titles and their (previously developer-facing) section headers. Label props ("Capabilities", "My Process") left untouched.
 
 ## Files Currently Modified (Uncommitted)
 
-None. Working tree clean as of 3489139.
+None. Working tree clean as of 1e74d92.
 
 ## Unresolved Issues
 
 - Pathlight "Some analysis steps could not be completed" banner appears intermittently (retry logic handles most cases; root cause of remaining occurrences unknown)
-- Sample report screenshots still missing from Pathlight landing (textual rewrite is done; visual proof is the next gap)
+- Sample report screenshots still missing from Pathlight landing (textual rewrite is done; visual proof is the next gap, and now even more important since the homepage leads with PathlightCTA)
+- Service detail pages (/services/[slug]) still carry the original developer-facing description and features arrays. Homepage card titles + taglines now read for business owners but a click-through to the detail page reverts to technical voice. Out of scope for this session; flag for future reframe.
 
 ## Next Recommended Tasks
 
-1. Add sample report screenshot(s) to Pathlight landing (next gap after the textual overhaul)
-2. Follow up with Tyler on testimonial request
-3. Run the Gemini Deep Research prompt for DFW competitive landscape and keyword research
-4. Set up Google Voice for business phone number ($10/month Google Workspace add-on)
+1. Add sample report screenshot(s) to Pathlight landing (next gap after the textual overhaul; doubly urgent now that the homepage leads with PathlightCTA)
+2. Reframe /services/[slug] detail-page copy (description + features arrays in lib/siteContent.ts SERVICES) to match the new business-owner voice on the homepage cards
+3. Follow up with Tyler on testimonial request
+4. Run the Gemini Deep Research prompt for DFW competitive landscape and keyword research
+5. Set up Google Voice for business phone number ($10/month Google Workspace add-on)
 
 ## Founder Photo (April 25, full chain)
 
 Initial photo replacement (96eba49) used a Canva PNG with no alpha channel, so the white circular backdrop from the source was baked into the webp. Confirmed via three tools (file, sips, identify) that the source PNG had color_type 2 (RGB only). User regenerated via Canva BG Remover and exported a true RGBA PNG. Re-converted with `cwebp -q 90 -alpha_q 100` to preserve alpha; output webp had channels srgba 4.0 and mean alpha 0.280 matching the source (commit 57d0001). Subsequent commit 115127d removed a radial-gradient CSS mask that was no longer needed once the alpha was baked correctly. Final commit baf8920 enlarged the photo on desktop breakpoints and swapped to a higher-res source. Subject now floats over the dark hero bg with no white halo at full desktop size.
 
+## ScrollWordBatch Hydration Constraint (April 25, commit ad3ab47)
+
+The About page ScrollWordBatch component animates each word's opacity and color independently. The natural JSX shape is `<motion.span>{word}{separator}</motion.span>` (two text children), but this triggers an intermittent "Failed to execute 'insertBefore'" hydration mismatch through framer-motion's forwardRef wrapper because React 18's `<!-- -->` text-marker insertion isn't reliable through that path. The required pattern is a single concatenated text child: `<motion.span>{word + separator}</motion.span>`. Future edits to this component (or any motion.* span/div animating per-word text) must keep one text child per element. Same constraint likely applies to motion.span elsewhere in the codebase if anyone adds dual-text-children patterns.
+
 ## Current Git Status
 
-main is at 3489139 (Add post-commit handoff update rule to CLAUDE.md). Working tree clean. Pushed to origin main. Today's commit chain: 6895b60 -> a238f74 -> 7dacb84 -> a65d0cd -> 1c09428 -> 96eba49 -> d01895e -> 57d0001 -> 115127d -> a670ae8 -> baf8920 -> 3489139.
+main is at 1e74d92 (copy: update Services and Process section headings to business language). Working tree clean. Pushed to origin main. Today's full commit chain: 6895b60 -> a238f74 -> 7dacb84 -> a65d0cd -> 1c09428 -> 96eba49 -> d01895e -> 57d0001 -> 115127d -> a670ae8 -> baf8920 -> 3489139 -> 5c2cab5 -> fceb83d -> ad3ab47 -> 1e74d92. Three code commits today after the post-commit-handoff rule landed: fceb83d (homepage overhaul), ad3ab47 (About hydration hotfix), 1e74d92 (section headings).
