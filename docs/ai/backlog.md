@@ -16,6 +16,12 @@
 - [ ] Add Tyler's testimonial to homepage or about page once received
 - [ ] Verify all ~24 pages look correct (full visual audit -- Chrome MCP couldn't complete this due to scroll-triggered animations)
 
+## Context Pack Maintenance (recurring)
+
+- [ ] Watch for the `dbjcontext` "session-handoff.md > 30 KB" warning. When it fires, archive older session entries to docs/ai/history/.
+- [ ] When the script flags new em dashes, replace with hyphens or restructure. Internal docs feed the chat that writes copy, so drift here propagates.
+- [ ] When new long-lived docs are added under docs/ai/ or .claude/rules/, add them to the FILES array in scripts/dbj-context.sh.
+
 ## Priority 3: Pathlight Hardening
 
 - [ ] Investigate intermittent "Some analysis steps could not be completed" banner (not systematic, retry logic handles most cases, root cause of remaining occurrences unknown)

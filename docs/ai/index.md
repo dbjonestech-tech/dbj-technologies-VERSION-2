@@ -26,3 +26,20 @@ Before large changes, read these files:
 **End of session:** Update session-handoff.md with what changed, files edited, decisions made, bugs found, and next recommended task.
 
 **After durable decisions:** Add entries to decision-log.md so future sessions don't relitigate settled questions.
+
+## Portal Chat Context Pack (`dbjcontext`)
+
+The `dbjcontext` zsh alias copies a curated context pack to the macOS clipboard for pasting into a fresh Claude.ai portal chat (which has none of these files auto-loaded). The alias calls `scripts/dbj-context.sh`.
+
+**Pack contents (in order):** CLAUDE.md, product-brief.md, business-strategy.md, .claude/rules/{frontend,pathlight,deployment}.md, do-not-break.md, current-state.md, decision-log.md, session-handoff.md, backlog.md.
+
+**Audit warnings printed after copy:**
+- Missing files in the file list
+- session-handoff.md exceeding 30 KB (archive trigger)
+- Em dashes anywhere in the pack (CLAUDE.md forbids them)
+- Legacy email `dbjonestech@gmail.com` beyond the baseline of 2 known structural references
+
+**Maintenance triggers:**
+- When session-handoff.md crosses 30 KB, archive older session summaries to `docs/ai/history/` so the latest session stays prominent.
+- When the legacy-email or em-dash baseline changes, update the constants at the top of `scripts/dbj-context.sh`.
+- When a new long-lived doc is added under `docs/ai/` or `.claude/rules/`, add it to the FILES array in the script.

@@ -78,10 +78,10 @@ Before large changes, read these docs:
 ## After Every Code Change
 
 After completing any implementation task (before committing), also update whichever of these files are affected by the change:
-- docs/ai/session-handoff.md — what changed, files edited, next recommended task
-- docs/ai/current-state.md — if the change affects what's deployed, working, or broken
-- docs/ai/backlog.md — if a task was completed or a new issue was discovered
-- docs/ai/decision-log.md — if a meaningful architectural or business decision was made
+- docs/ai/session-handoff.md - what changed, files edited, next recommended task
+- docs/ai/current-state.md - if the change affects what's deployed, working, or broken
+- docs/ai/backlog.md - if a task was completed or a new issue was discovered
+- docs/ai/decision-log.md - if a meaningful architectural or business decision was made
 
 **After every commit+push:**
 Update docs/ai/session-handoff.md to reflect the actual final state:
