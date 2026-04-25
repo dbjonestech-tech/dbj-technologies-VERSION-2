@@ -20,13 +20,13 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <PathlightCTA />
       <ClientLogos />
       <ServicesSection />
       <StatsSection />
       <ProcessSteps />
       <TestimonialsSection />
       <TechStackSection />
-      <PathlightCTA />
       <CTASection />
     </>
   );

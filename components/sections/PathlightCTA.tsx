@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PATHLIGHT_CTA_CONTENT } from "@/lib/constants";
 
 export function PathlightCTA() {
   return (
@@ -20,37 +21,31 @@ export function PathlightCTA() {
           className="text-xs font-semibold uppercase tracking-[0.3em]"
           style={{ color: "#9aa3b2" }}
         >
-          Free tool
+          {PATHLIGHT_CTA_CONTENT.eyebrow}
         </p>
         <h2
           id="pathlight-cta-heading"
           className="mt-4 font-display text-section font-bold leading-tight"
           style={{ color: "#e7ebf2" }}
         >
-          <span className="text-gradient">Pathlight</span>
+          <span className="text-gradient">{PATHLIGHT_CTA_CONTENT.heading}</span>
         </h2>
         <p
-          className="mt-5 text-xl font-medium sm:text-2xl"
+          className="mx-auto mt-5 max-w-2xl text-xl font-medium sm:text-2xl"
           style={{ color: "#e7ebf2" }}
         >
-          AI-powered website intelligence. Find the problems. Find the money drain. Find the fix.
-        </p>
-        <p
-          className="mx-auto mt-5 max-w-2xl text-base sm:text-lg"
-          style={{ color: "#9aa3b2" }}
-        >
-          Free. No credit card. Results in minutes.
+          {PATHLIGHT_CTA_CONTENT.tagline}
         </p>
         <div className="mt-10">
           <Link
-            href="/pathlight"
+            href={PATHLIGHT_CTA_CONTENT.buttonHref}
             className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5"
             style={{
               backgroundImage: "linear-gradient(135deg, #3b82f6, #0891b2)",
               color: "white",
             }}
           >
-            Scan My Website
+            {PATHLIGHT_CTA_CONTENT.buttonLabel}
             <span aria-hidden="true">→</span>
           </Link>
         </div>

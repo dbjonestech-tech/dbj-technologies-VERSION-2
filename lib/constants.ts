@@ -39,6 +39,7 @@ export {
   ABOUT_STORY,
   BUDGET_OPTIONS,
   PROJECT_TYPE_OPTIONS,
+  PATHLIGHT_CTA_CONTENT,
 } from "./siteContent";
 
 /* ─── SITE META ─────────────────────────────────────── */
