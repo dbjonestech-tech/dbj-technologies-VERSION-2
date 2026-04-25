@@ -113,6 +113,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
+      translate="no"
       className={`${jakarta.variable} ${outfit.variable}`}
       style={
         isHome
@@ -121,6 +122,7 @@ export default async function RootLayout({
       }
     >
       <head>
+        <meta name="google" content="notranslate" />
         <meta name="theme-color" content="#06060a" />
         {/* Repeat-visit fast-path: if HeroCinema has previously revealed,
             the inline html style above is no longer needed. Clear both
