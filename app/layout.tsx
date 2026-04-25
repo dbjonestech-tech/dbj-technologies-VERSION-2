@@ -141,6 +141,26 @@ export default async function RootLayout({
         <JsonLd type="localBusiness" />
       </head>
       <body className="font-body text-text-primary antialiased selection:bg-accent-blue/20">
+        {/* Static dark cinema fallback (homepage only): covers the
+            viewport at z:100 from first paint, so the gap between
+            CSS-load and HeroCinema's dynamic chunk arrival is filled
+            with a solid dark surface instead of a void. HeroCinema
+            removes this element on mount; its own animated overlay
+            takes over the same z:100 slot seamlessly. Inline styles
+            only — must paint without external CSS. */}
+        {isHome && (
+          <div
+            id="hero-cinema-fallback"
+            aria-hidden="true"
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 100,
+              backgroundColor: "#06060a",
+              pointerEvents: "none",
+            }}
+          />
+        )}
         {children}
       </body>
     </html>

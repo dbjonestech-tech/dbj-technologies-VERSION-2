@@ -25,6 +25,13 @@ export default function HeroCinema({
 
   /* ─── Skip if already revealed or reduced motion ─── */
   useEffect(() => {
+    /* Remove the SSR static fallback overlay (rendered by app/layout.tsx
+       only on the homepage). The cinema's own overlay also lives at
+       z:100 and is now mounted, so the slot transitions from static
+       dark fill to animated dark fill with no perceptible seam. */
+    const fallback = document.getElementById("hero-cinema-fallback");
+    if (fallback) fallback.remove();
+
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
