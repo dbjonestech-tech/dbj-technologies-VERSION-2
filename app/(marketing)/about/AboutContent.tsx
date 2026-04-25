@@ -255,10 +255,10 @@ export default function AboutContent() {
         )}
         <GradientBlob className="-top-40 -right-40" />
 
-        <div className="relative z-[2] mx-auto flex max-w-6xl flex-col items-center gap-12 px-6 lg:flex-row lg:gap-16 lg:px-8">
+        <div className="relative z-[2] mx-auto flex max-w-6xl flex-col items-center gap-12 px-6 lg:flex-row lg:gap-16 lg:px-8 xl:max-w-7xl">
           {/* Photo column with parallax */}
           <ParallaxPhoto reduce={prefersReducedMotion}>
-            <div className="relative w-80 lg:w-[500px]">
+            <div className="relative w-80 lg:w-[600px] xl:w-[720px]">
               {/* Atmospheric blue glow behind photo */}
               <motion.div
                 aria-hidden="true"
@@ -276,7 +276,7 @@ export default function AboutContent() {
               />
               {/* Clip-path reveal applied to the photo container. The
                   source webp carries its own alpha (RGBA, color_type 6),
-                  so no maskImage is needed — adding one would trim the
+                  so no maskImage is needed; adding one would trim the
                   silhouette at the mask's edges. */}
               <motion.div
                 initial={
@@ -299,7 +299,7 @@ export default function AboutContent() {
                   src="/images/joshua-jones.webp"
                   alt="Joshua Jones, Founder & Principal Architect"
                   fill
-                  sizes="(max-width: 1024px) 320px, 500px"
+                  sizes="(max-width: 1024px) 320px, (max-width: 1280px) 600px, 720px"
                   className="object-cover"
                   quality={95}
                   priority
@@ -318,17 +318,17 @@ export default function AboutContent() {
             >
               {ABOUT_CONTENT.badge}
             </motion.span>
-            {/* Capped at md:text-6xl. The text column in this side-by-side
-                layout is ~524px at lg (max-w-6xl - lg:px-8 - lg:w-[500px]
-                photo - lg:gap-16 = 524px); "The Anti-Agency" at text-7xl
-                (~620-640px) overflows that, and because each character is
-                its own inline-block (needed for the y-translate stagger),
-                the browser breaks at character boundaries when it overflows,
-                producing the visible "Anti-Agen / cy" mid-word wrap. At
-                text-6xl with tracking-tight the headline measures ~510px
-                and fits cleanly. A stacked headline-above-photo layout
-                would let larger sizes breathe; that's a separate change. */}
-            <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
+            {/* Sized to fit alongside the enlarged photo column without
+                breaking the headline mid-word. Each character is its own
+                inline-block (for the y-translate stagger), so when the
+                text overflows its column the browser wraps at character
+                boundaries; that is how "Anti-Agen / cy" used to appear.
+                Column math (post-photo enlargement):
+                  - md and below: stacked, headline gets full width.
+                  - lg (max-w-6xl, photo 600): text col ~424px, drop to text-5xl (~385px).
+                  - xl (max-w-7xl, photo 720): text col ~432px, stay at text-5xl.
+                If the photo ever shrinks back, lg+ can return to text-6xl. */}
+            <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl lg:text-5xl">
               <span className="sr-only">
                 {ABOUT_CONTENT.headline} {ABOUT_CONTENT.headlineAccent}
               </span>
