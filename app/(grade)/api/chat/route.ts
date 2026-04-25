@@ -4,8 +4,9 @@ import { z } from "zod";
 import { getFullScanReport } from "@/lib/db/queries";
 import { buildChatSystemPrompt } from "@/lib/prompts/pathlight-chat";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+/* runtime/dynamic exports removed; redundant with the default Node.js
+   runtime for route handlers in Next 16 and incompatible with the
+   experimental.cacheComponents option enabled in next.config.mjs. */
 
 const CHAT_MODEL = "claude-haiku-4-5-20251001";
 const MAX_TOKENS = 1024;

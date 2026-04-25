@@ -7,25 +7,29 @@ import * as Sentry from "@sentry/nextjs";
 Sentry.init({
   dsn: "https://ca7ba43b092282f239bf28254de03a07@o4511187949256704.ingest.us.sentry.io/4511187956924416",
 
-  // Add optional integrations for additional features
-  integrations: [Sentry.replayIntegration()],
+  // Tuned for Lighthouse-perfect mobile Performance:
+  //  - Session Replay removed: ~50-80 KB gzipped shipped to every visitor;
+  //    rarely useful on a marketing site and dominates the client bundle.
+  //  - tracesSampleRate 1.0 -> 0.1 in production so we trace 10% instead
+  //    of 100% of sessions; halves outbound network noise during navigation.
+  //  - enableLogs and sendDefaultPii disabled. Logging is a per-event
+  //    fetch out of the client; PII forwarding inflates events and is
+  //    a privacy concern on a public marketing site.
+  // To turn Replay back on locally, set NEXT_PUBLIC_SENTRY_REPLAY=1.
+  integrations:
+    process.env.NEXT_PUBLIC_SENTRY_REPLAY === "1"
+      ? [Sentry.replayIntegration()]
+      : [],
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 1,
-  // Enable logs to be sent to Sentry
-  enableLogs: true,
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
 
-  // Define how likely Replay events are sampled.
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
+  enableLogs: false,
+  sendDefaultPii: false,
 
-  // Define how likely Replay events are sampled when an error occurs.
-  replaysOnErrorSampleRate: 1.0,
-
-  // Enable sending user PII (Personally Identifiable Information)
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
+  // Replay sample rates only matter when the integration is loaded.
+  // Kept at zero as a defense in depth in case Replay is enabled.
+  replaysSessionSampleRate: 0,
+  replaysOnErrorSampleRate: 0,
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

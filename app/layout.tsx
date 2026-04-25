@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Outfit, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Outfit } from "next/font/google";
 import { headers } from "next/headers";
 import { JsonLd } from "@/components/layout/JsonLd";
 import "./globals.css";
 
 /* ─── FONTS ─────────────────────────────────────────── */
+/* Two web fonts only. The previous third (JetBrains Mono) was loaded
+   for ~1% of glyphs (small uppercase mono labels) and removed; the
+   `font-mono` Tailwind class now resolves to the system monospace
+   stack, indistinguishable at the sizes used. */
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-display",
@@ -14,12 +18,6 @@ const jakarta = Plus_Jakarta_Sans({
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
-  display: "swap",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
   display: "swap",
 });
 
@@ -110,20 +108,24 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} ${outfit.variable} ${jetbrains.variable}`}
+      className={`${jakarta.variable} ${outfit.variable}`}
       style={isHome ? { backgroundColor: "#06060a" } : undefined}
     >
       <head>
         <meta name="theme-color" content="#06060a" />
         {/* Repeat-visit fast-path: if HeroCinema has previously revealed,
             the inline html style above is no longer needed. Clear it so
-            the page reads as the default light theme on subsequent loads. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{if(window.location.pathname==='/'&&sessionStorage.getItem('hero-revealed')==='true'){document.documentElement.style.removeProperty('background-color');}}catch(e){}",
-          }}
-        />
+            the page reads as the default light theme on subsequent loads.
+            Only emitted on the homepage so other routes don't pay the
+            parser-blocking cost of an inline <script> they never need. */}
+        {isHome && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html:
+                "try{if(sessionStorage.getItem('hero-revealed')==='true'){document.documentElement.style.removeProperty('background-color');}}catch(e){}",
+            }}
+          />
+        )}
         <JsonLd type="organization" />
         <JsonLd type="website" />
         <JsonLd type="localBusiness" />

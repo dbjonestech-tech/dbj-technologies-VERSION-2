@@ -34,7 +34,16 @@ const config: Config = {
       fontFamily: {
         display: ["var(--font-display)", "sans-serif"],
         body: ["var(--font-outfit)", "sans-serif"],
-        mono: ["var(--font-jetbrains)", "monospace"],
+        mono: [
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Monaco",
+          "Consolas",
+          "Liberation Mono",
+          "Courier New",
+          "monospace",
+        ],
       },
       fontSize: {
         "hero": "clamp(2.5rem, 8vw, 7.5rem)",

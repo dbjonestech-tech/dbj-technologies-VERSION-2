@@ -4,8 +4,9 @@ import {
   verifyUnsubscribeToken,
 } from "@/lib/services/unsubscribe";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+/* runtime/dynamic exports removed; redundant with the default Node.js
+   runtime for route handlers in Next 16 and incompatible with the
+   experimental.cacheComponents option enabled in next.config.mjs. */
 
 function renderPage(options: {
   title: string;
