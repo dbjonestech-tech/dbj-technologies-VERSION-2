@@ -83,6 +83,16 @@ After completing any implementation task (before committing), also update whiche
 - docs/ai/backlog.md — if a task was completed or a new issue was discovered
 - docs/ai/decision-log.md — if a meaningful architectural or business decision was made
 
+**After every commit+push:**
+Update docs/ai/session-handoff.md to reflect the actual final state:
+- Current commit hash (from `git rev-parse --short HEAD`)
+- Working tree status (clean or list of remaining uncommitted files)
+- Push status (confirmed pushed to origin main, or not yet pushed)
+
+This update should be amended into the same commit if possible (`git add docs/ai/session-handoff.md && git commit --amend --no-edit && git push origin main --force-with-lease`), or committed as a standalone "update session handoff" commit if amending would cause problems.
+
+The goal: session-handoff.md should always be a snapshot of the actual repo state at session end, never a mid-progress note written before the commit happened.
+
 Include these .md updates in the same commit as the code change. Do not make a separate commit for documentation.
 
 At the end of every session (when the user says "end session", "that's it for today", "let's stop", or similar), proactively update docs/ai/session-handoff.md even if no code was changed, covering: what was discussed, decisions made, current git status, and next recommended task.
