@@ -121,7 +121,7 @@ export const HERO_CONTENT: HeroContent = {
   subheading:
     "Websites and digital systems that generate trust, capture leads, and grow revenue. Built by a solo principal architect in Dallas, TX.",
   primaryCta: { label: "Start a Project", href: "/contact" },
-  secondaryCta: { label: "See What We Build", href: "/work" },
+  secondaryCta: { label: "See What I Build", href: "/work" },
   techTicker: ["React", "Next.js", "TypeScript", "Node.js", "Vercel"],
 };
 
