@@ -79,7 +79,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
       {
         heading: "The Report",
-        body: "Every scan produces a Pathlight Score (0-100) broken into four weighted pillars: Design (35%), Performance (25%), Positioning (25%), and Findability (15%). Below the score, the top 3 fixes ranked by impact and difficulty, full desktop and mobile screenshots, and a revenue impact estimate with full methodology transparency. The built-in chatbot lets business owners ask follow-up questions about their results, and it's transparent about confidence levels rather than pretending precision.",
+        body: "Every scan produces a Pathlight Score (0-100) broken into four weighted pillars: Design (35%), Performance (25%), Positioning (25%), and Search Visibility (15%). Below the score, the top 3 fixes ranked by impact and difficulty, full desktop and mobile screenshots, and a revenue impact estimate with full methodology transparency. The built-in chatbot lets business owners ask follow-up questions about their results, and it's transparent about confidence levels rather than pretending precision.",
       },
     ],
     techDetails: [
