@@ -439,14 +439,14 @@ export const PRICING_TIERS: PricingTier[] = [
     features: [
       { text: "Unlimited pages", included: true },
       { text: "Custom web application", included: true },
-      { text: "Full-stack development", included: true },
-      { text: "Cloud infrastructure setup", included: true },
-      { text: "CI/CD & DevOps pipeline", included: true },
+      { text: "Complete front-to-back system build", included: true },
+      { text: "Professional hosting and deployment", included: true },
+      { text: "Automated testing and deployment pipeline", included: true },
       { text: "Dedicated project manager", included: true },
-      { text: "SLA & uptime guarantee", included: true },
+      { text: "Guaranteed uptime with monitoring", included: true },
       { text: "24/7 priority support", included: true },
     ],
-    cta: "Contact Us",
+    cta: "Contact Me",
   },
 ];
 
