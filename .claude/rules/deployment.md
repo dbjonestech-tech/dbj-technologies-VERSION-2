@@ -15,7 +15,14 @@
 
 ## Environment Variables
 - Production env vars live in Vercel dashboard, NOT in .env.local (which is local dev only).
-- Key vars: RESEND_API_KEY, CONTACT_EMAIL, CONTACT_FROM_EMAIL, DATABASE_URL, ANTHROPIC_API_KEY, BROWSERLESS_TOKEN, INNGEST_EVENT_KEY, INNGEST_SIGNING_KEY, CLOUDFLARE_TURNSTILE_SECRET_KEY, NEXT_PUBLIC_TURNSTILE_SITE_KEY
+- Authoritative list of var names lives in .env.example. Verified against the file:
+  - Contact form: CONTACT_EMAIL, CONTACT_FROM_EMAIL
+  - Site: NEXT_PUBLIC_SITE_URL
+  - Pathlight: ANTHROPIC_API_KEY, BROWSERLESS_API_KEY (NOT BROWSERLESS_TOKEN), BROWSERLESS_BASE_URL (optional regional override), PAGESPEED_API_KEY (optional, raises PSI quota), UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, INNGEST_EVENT_KEY, INNGEST_SIGNING_KEY, NEXT_PUBLIC_TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY (NOT CLOUDFLARE_TURNSTILE_SECRET_KEY)
+  - Database: POSTGRES_URL (NOT DATABASE_URL)
+  - Observability: SENTRY_DSN
+  - Email: RESEND_API_KEY, RESEND_FROM_EMAIL ("Pathlight <pathlight@dbjtechnologies.com>")
+  - Calendly: CALENDLY_URL
 - .env.local only has Postgres and Vercel OIDC locally. A local next build may fail on missing env vars that only exist in Vercel.
 - Do NOT modify .env.example or .claude/settings.local.json in implementation prompts.
 

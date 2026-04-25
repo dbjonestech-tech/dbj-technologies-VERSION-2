@@ -10,7 +10,7 @@ Founder: Joshua Jones (Joshy). joshua@dbjtechnologies.com.
 
 ## Tech Stack
 
-- Next.js 16, TypeScript, Tailwind CSS 4, Framer Motion
+- Next.js 16, TypeScript, Tailwind CSS 3.4, Framer Motion
 - Deployed on Vercel via GitHub repo `dbj-technologies-VERSION-2` (remote: `origin main`)
 - Pathlight pipeline: Inngest orchestration, Claude Sonnet 4.6 (vision/remediation/revenue), Claude Haiku 4.5 (chatbot)
 - Browserless headless Chrome for screenshots + Lighthouse

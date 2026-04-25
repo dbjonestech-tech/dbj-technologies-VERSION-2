@@ -14,7 +14,8 @@
 - [ ] Verify About page word spacing and headline fix deployed correctly
 - [ ] Verify homepage white flash is resolved (hard refresh test)
 - [ ] Add Tyler's testimonial to homepage or about page once received
-- [ ] Verify all 24 pages look correct (full visual audit -- Chrome MCP couldn't complete this due to scroll-triggered animations)
+- [ ] Verify all ~24 pages look correct (full visual audit -- Chrome MCP couldn't complete this due to scroll-triggered animations)
+- [ ] Finish "Findability" -> "Search Visibility" rename: lib/work-data.ts:82 (Pathlight case study body) still reads "Findability (15%)" in public copy. The type system + DB alias are done; this is a public copy holdout.
 
 ## Priority 3: Pathlight Hardening
 
@@ -50,7 +51,7 @@
 - [x] Contact form gmail -> Resend migration -- DONE
 - [x] Social links (LinkedIn + GitHub) in footer -- DONE
 - [x] dbjonestech@gmail.com -> joshua@dbjtechnologies.com everywhere -- DONE
-- [x] "Findability" -> "Search Visibility" rename -- DONE
+- [x] "Findability" -> "Search Visibility" rename -- PARTIAL (type system + DB alias done; lib/work-data.ts:82 public case study body still says "Findability (15%)" — see Priority 2)
 - [x] Curated vertical database integration -- DONE (206 entries, 51 high/medium skip API)
 - [x] All five pipeline hardening phases -- DONE
 - [x] Retry logic (Anthropic + PSI) -- DONE

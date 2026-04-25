@@ -25,9 +25,9 @@
 - Each route group has its own layout.tsx.
 
 ## Styling
-- Tailwind CSS 4 with custom CSS variables in globals.css.
-- Dark theme uses #06060a (--bg-primary-dark). Light sections use #FAFAFA.
-- Accent blue is #3b82f6. Brand cyan is #1AD4EA.
+- Tailwind CSS 3.4 with custom CSS variables in globals.css.
+- CSS variables defined in :root: --bg-primary (#FAFAFA), --bg-secondary (#F1F5F9), --accent-blue (#3b82f6), --accent-cyan (#0891b2), --accent-violet (#7c3aed). Dark canvas color #06060a is hardcoded across components and globals.css (no --bg-primary-dark variable).
+- Two cyans coexist: brand cyan #1AD4EA is the DBJ logo mark fill (Footer.tsx, ScanStatus.tsx). Tailwind's accent-cyan / --accent-cyan #0891b2 is the gradient/accent color used in buttons, dividers, hover glows.
 - Print styles live in @media print block in globals.css. Use print-hidden, print-expand, print-grid-expand classes.
 
 ## Web Fetch Caveat
