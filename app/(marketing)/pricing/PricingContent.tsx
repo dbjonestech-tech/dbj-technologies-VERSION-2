@@ -51,7 +51,13 @@ export default function PricingContent() {
 
       {/* Pricing note */}
       <section className="pb-8">
-        <div className="flex flex-col items-center justify-center gap-2 text-center">
+        <div className="flex flex-col items-center justify-center gap-3 text-center">
+          <Link
+            href="/pricing/build"
+            className="inline-flex items-center gap-2 rounded-full border border-accent-blue/30 bg-accent-blue/10 px-5 py-2 text-sm font-semibold text-accent-blue hover:bg-accent-blue/15 transition-colors"
+          >
+            Not sure which package? Build a custom package →
+          </Link>
           <span className="text-sm text-text-muted">
             All prices are per-engagement, fixed before development begins
           </span>

@@ -1,16 +1,85 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MapPin, Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { MapPin, Send, CheckCircle2, AlertCircle, Loader2, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { GridBackground } from "@/components/effects/GridBackground";
 import { GradientBlob } from "@/components/effects/GradientBlob";
 import { SITE, BUDGET_OPTIONS, PROJECT_TYPE_OPTIONS } from "@/lib/constants";
+import { getAddOnBySlug } from "@/lib/pricing-data";
+
+const TIER_LABELS: Record<string, { name: string; basePrice: number; priceLabel: string }> = {
+  starter: { name: "Starter", basePrice: 4500, priceLabel: "$4,500" },
+  professional: { name: "Professional", basePrice: 9500, priceLabel: "$9,500" },
+  enterprise: { name: "Enterprise", basePrice: 15000, priceLabel: "$15,000+" },
+};
+
+interface PackageSelection {
+  tierSlug: string;
+  tier: { name: string; basePrice: number; priceLabel: string };
+  addons: { slug: string; name: string; qty: number; lineTotal: number; perUnit: boolean; priceValue: number }[];
+  estimate: number;
+  message: string;
+}
+
+function buildSelection(searchParams: URLSearchParams): PackageSelection | null {
+  const packageSlug = searchParams.get("package");
+  if (!packageSlug || !TIER_LABELS[packageSlug]) return null;
+
+  const tier = TIER_LABELS[packageSlug];
+  const addonsParam = searchParams.get("addons");
+  const slugs = addonsParam ? addonsParam.split(",").filter(Boolean) : [];
+
+  const addons = slugs
+    .map((slug) => {
+      const addon = getAddOnBySlug(slug);
+      if (!addon) return null;
+      const qtyRaw = searchParams.get(`qty_${slug}`);
+      const parsed = qtyRaw ? parseInt(qtyRaw, 10) : 1;
+      const qty = addon.perUnit ? Math.max(1, Math.min(20, isNaN(parsed) ? 1 : parsed)) : 1;
+      const lineTotal = addon.priceValue * qty;
+      return {
+        slug: addon.slug,
+        name: addon.name,
+        qty,
+        lineTotal,
+        perUnit: addon.perUnit,
+        priceValue: addon.priceValue,
+      };
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
+
+  const estimateParam = searchParams.get("estimate");
+  const parsedEstimate = estimateParam ? parseInt(estimateParam, 10) : NaN;
+  const computed = tier.basePrice + addons.reduce((sum, a) => sum + a.lineTotal, 0);
+  const estimate = !isNaN(parsedEstimate) && parsedEstimate > 0 ? parsedEstimate : computed;
+
+  const addonSentence =
+    addons.length > 0
+      ? addons
+          .map((a) => (a.perUnit && a.qty > 1 ? `${a.qty} ${a.name}` : a.name))
+          .join(", ")
+      : "";
+
+  const message = addonSentence
+    ? `I am interested in the ${tier.name} package (${tier.priceLabel}) with ${addonSentence}. Estimated total: $${estimate.toLocaleString()}.`
+    : `I am interested in the ${tier.name} package (${tier.priceLabel}). Estimated total: $${estimate.toLocaleString()}.`;
+
+  return {
+    tierSlug: packageSlug,
+    tier,
+    addons,
+    estimate,
+    message,
+  };
+}
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -27,6 +96,12 @@ type FormData = z.infer<typeof schema>;
 
 export default function ContactContent() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const searchParams = useSearchParams();
+
+  const selection = useMemo(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    return buildSelection(params);
+  }, [searchParams]);
 
   const {
     register,
@@ -35,6 +110,7 @@ export default function ContactContent() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: selection ? { message: selection.message } : undefined,
   });
 
   const onSubmit = async (data: FormData) => {
@@ -96,12 +172,75 @@ export default function ContactContent() {
       <section className="py-20">
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-5">
-            {/* Form */}
+            {/* Form column */}
+            <div className="lg:col-span-3 space-y-6">
+              {selection && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 }}
+                  className="glass-card p-6 ring-1 ring-accent-blue/20"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-widest text-accent-blue mb-2 font-mono">
+                        Your Selected Package
+                      </p>
+                      <p className="font-display text-lg font-bold">
+                        {selection.tier.name} Package · {selection.tier.priceLabel}
+                      </p>
+                    </div>
+                    <Link
+                      href="/pricing/build"
+                      className="inline-flex shrink-0 items-center gap-1.5 text-xs font-medium text-text-muted hover:text-accent-blue transition-colors"
+                    >
+                      <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                      Modify
+                    </Link>
+                  </div>
+
+                  {selection.addons.length > 0 && (
+                    <div className="mt-4 space-y-1.5">
+                      <p className="text-xs uppercase tracking-widest text-text-muted">
+                        Add-ons
+                      </p>
+                      <ul className="space-y-1">
+                        {selection.addons.map((a) => (
+                          <li
+                            key={a.slug}
+                            className="flex items-baseline justify-between gap-3 text-sm"
+                          >
+                            <span className="text-text-secondary">
+                              {a.perUnit && a.qty > 1
+                                ? `${a.qty}× ${a.name}`
+                                : a.name}
+                            </span>
+                            <span className="font-mono text-xs text-text-muted">
+                              +${a.lineTotal.toLocaleString()}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="mt-4 pt-4 border-t border-white/[0.08] flex items-baseline justify-between gap-3">
+                    <span className="text-xs uppercase tracking-widest text-text-muted">
+                      Estimated Total
+                    </span>
+                    <span className="font-display text-xl font-bold">
+                      ${selection.estimate.toLocaleString()}
+                      {selection.tierSlug === "enterprise" ? "+" : ""}
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="lg:col-span-3 glass-card p-8 md:p-10"
+              className="glass-card p-8 md:p-10"
             >
               {status === "success" ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -122,7 +261,7 @@ export default function ContactContent() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-                  {/* Honeypot — hidden from real users, catches bots */}
+                  {/* Honeypot: hidden from real users, catches bots */}
                   <div className="absolute -left-[9999px]" aria-hidden="true">
                     <label htmlFor="website">Website</label>
                     <input
@@ -232,6 +371,7 @@ export default function ContactContent() {
                 </form>
               )}
             </motion.div>
+            </div>
 
             {/* Info sidebar */}
             <motion.div

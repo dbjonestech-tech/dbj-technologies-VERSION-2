@@ -24,8 +24,12 @@ export interface PricingDetail {
 }
 
 export interface AddOn {
+  slug: string;
   name: string;
   price: string;
+  priceValue: number;
+  perUnit: boolean;
+  unitLabel?: string;
   description: string;
   tiers: string[];
 }
@@ -254,90 +258,132 @@ export const PRICING_DETAILS: PricingDetail[] = [
 
 export const ADD_ONS: AddOn[] = [
   {
+    slug: "cms",
     name: "Content Management System",
     price: "+$500",
+    priceValue: 500,
+    perUnit: false,
     description:
       "Update your own text, images, and pages anytime without needing a developer.",
     tiers: ["starter"],
   },
   {
+    slug: "additional-pages",
     name: "Additional Pages",
     price: "+$300/page",
+    priceValue: 300,
+    perUnit: true,
+    unitLabel: "page",
     description:
       "Extra pages beyond what is included in your package, built to the same quality and speed standards.",
     tiers: ["starter", "professional"],
   },
   {
+    slug: "blog-setup",
     name: "Blog Setup",
     price: "+$400",
+    priceValue: 400,
+    perUnit: false,
     description:
       "A fully designed blog section where you can publish articles, news, or updates to attract search traffic.",
     tiers: ["starter", "professional"],
   },
   {
+    slug: "booking",
     name: "Online Booking and Scheduling",
     price: "+$800",
+    priceValue: 800,
+    perUnit: false,
     description:
       "Let customers book appointments, consultations, or services directly from your website.",
     tiers: ["starter", "professional"],
   },
   {
+    slug: "ecommerce",
     name: "E-Commerce and Online Store",
     price: "+$1,500",
+    priceValue: 1500,
+    perUnit: false,
     description:
       "Sell products or services online with a custom storefront, cart, and secure checkout.",
     tiers: ["starter", "professional"],
   },
   {
+    slug: "email-marketing",
     name: "Email Marketing Integration",
     price: "+$300",
+    priceValue: 300,
+    perUnit: false,
     description:
       "Connect your website to Mailchimp, ConvertKit, or your email platform so new leads go straight to your list.",
     tiers: ["starter", "professional", "enterprise"],
   },
   {
+    slug: "custom-animations",
     name: "Custom Animations and Interactions",
     price: "+$400",
+    priceValue: 400,
+    perUnit: false,
     description:
       "Scroll effects, hover animations, and interactive elements that make your site feel polished and memorable.",
     tiers: ["professional", "enterprise"],
   },
   {
+    slug: "analytics",
     name: "Analytics and Conversion Tracking",
     price: "+$200",
+    priceValue: 200,
+    perUnit: false,
     description:
       "Know exactly how many people visit your site, where they come from, and what they do. Tracks form submissions, calls, and purchases.",
     tiers: ["starter", "professional"],
   },
   {
+    slug: "gbp-setup",
     name: "Google Business Profile Setup",
     price: "+$200",
+    priceValue: 200,
+    perUnit: false,
     description:
       "Set up and optimize your Google Business listing so you show up in local search results and Google Maps.",
     tiers: ["starter", "professional", "enterprise"],
   },
   {
+    slug: "content-writing",
     name: "Content Writing",
     price: "+$150/page",
+    priceValue: 150,
+    perUnit: true,
+    unitLabel: "page",
     description:
       "Professional copywriting for your website pages, written to convert visitors into customers.",
     tiers: ["starter", "professional"],
   },
   {
+    slug: "multi-language",
     name: "Multi-Language Support",
     price: "+$800",
+    priceValue: 800,
+    perUnit: false,
     description:
       "Serve your website in two or more languages to reach a broader customer base.",
     tiers: ["professional", "enterprise"],
   },
   {
+    slug: "client-portal",
     name: "Client Portal",
     price: "+$1,200",
+    priceValue: 1200,
+    perUnit: false,
     description:
       "A secure login area where your customers can view orders, track progress, manage their account, or access documents.",
     tiers: ["professional", "enterprise"],
   },
 ];
+
+export function getAddOnBySlug(slug: string): AddOn | undefined {
+  return ADD_ONS.find((a) => a.slug === slug);
+}
 
 export function getPricingBySlug(slug: string): PricingDetail | undefined {
   return PRICING_DETAILS.find((p) => p.slug === slug);
