@@ -143,12 +143,14 @@ export const SERVICES: ServiceItem[] = [
     title: "Website Design & Development",
     tagline: "Custom websites built for speed, trust, and conversion. Not templates.",
     description:
-      "I design and implement component-driven frontend architectures using Next.js, React, and TypeScript. Every system ships with strict type safety, server-side rendering strategies, and sub-second load times as baseline requirements.",
+      "I design and build custom websites from scratch. No templates, no page builders, no shortcuts. Every site is engineered for speed, mobile responsiveness, and conversion. You get a website that loads fast, looks professional, and actually turns visitors into customers.",
     features: [
-      "Next.js App Router & Server Components",
-      "Design system & component library engineering",
-      "SSR, SSG, and ISR rendering strategies",
-      "Accessibility-first (WCAG AA+) by default",
+      "Custom design tailored to your brand and your customers",
+      "Mobile-first: looks and works perfectly on phones, tablets, and desktops",
+      "Built for speed: pages load in under 2 seconds",
+      "Conversion-focused: clear calls to action, easy contact paths, trust signals",
+      "SEO-ready structure so search engines can find and rank your pages",
+      "You own the code. No lock-in. No monthly platform fees to keep your site alive.",
     ],
   },
   {
@@ -157,12 +159,14 @@ export const SERVICES: ServiceItem[] = [
     title: "Business Systems & Integrations",
     tagline: "Connect your tools, automate workflows, and let the system handle the busywork.",
     description:
-      "I build backend systems that are typed end-to-end, rigorously tested, and designed for zero-downtime deployments. From RESTful APIs to real-time WebSocket services, every endpoint is instrumented, documented, and ready for scale.",
+      "I build the systems behind the scenes that make your business run smoother. CRM connections, appointment scheduling, payment processing, email automation, form routing, and custom tools that eliminate manual work. If you are copy-pasting data between apps or losing leads because nothing talks to each other, this is what I fix.",
     features: [
-      "Node.js, Python & Go microservices",
-      "REST & GraphQL API design",
-      "Authentication & authorization systems",
-      "Real-time data with WebSockets & SSE",
+      "Connect your website to your CRM, calendar, payment processor, and email",
+      "Automated lead routing so inquiries go to the right person instantly",
+      "Custom dashboards and admin tools built around your workflow",
+      "Secure data handling with proper authentication and access controls",
+      "APIs that let your systems share data without manual entry",
+      "Built to grow with your business without needing a rebuild",
     ],
   },
   {
@@ -171,12 +175,14 @@ export const SERVICES: ServiceItem[] = [
     title: "Hosting & Reliability",
     tagline: "Your site stays online, loads fast everywhere, and handles traffic spikes without breaking.",
     description:
-      "I architect cloud-native infrastructure on AWS, Vercel, and GCP that auto-scales under load, recovers from failure automatically, and costs only what you use. Every deployment is repeatable, monitored, and hardened from day one.",
+      "I set up hosting and infrastructure so your site stays online, loads fast from anywhere, and handles traffic spikes without breaking. No shared hosting. No downtime surprises. I use the same infrastructure that powers sites handling millions of visitors, scaled down to your actual needs and budget.",
     features: [
-      "AWS, Vercel & GCP architecture",
-      "Docker & container orchestration",
-      "CI/CD pipeline automation",
-      "Monitoring, alerting & incident response",
+      "99.9%+ uptime with automatic failover and redundancy",
+      "Global edge deployment so your site loads fast for any visitor, anywhere",
+      "Automatic scaling: handles a normal Tuesday and a viral Monday the same way",
+      "SSL certificates, security headers, and DDoS protection included",
+      "Monitoring and alerts so I know about problems before you do",
+      "No surprise hosting bills. Predictable costs based on real usage.",
     ],
   },
   {
@@ -185,12 +191,14 @@ export const SERVICES: ServiceItem[] = [
     title: "User Experience & Conversion",
     tagline: "Every page guides visitors toward calls, forms, quotes, or purchases.",
     description:
-      "I engineer interfaces where every animation serves a purpose, every transition communicates state, and every interaction feels instantaneous. Design systems, micro-interactions, and scroll-driven narratives built with production-grade motion libraries.",
+      "I engineer the experience your visitors have from the moment they land on your site. Where their eyes go first. How they find your phone number. Whether the page feels trustworthy in the first 3 seconds. Every interaction is designed to move visitors toward contacting you, booking an appointment, or making a purchase.",
     features: [
-      "Framer Motion & GSAP animation systems",
-      "Interactive prototypes & design QA",
-      "Design system implementation",
-      "Responsive, device-tested interfaces",
+      "Conversion architecture: every page has a clear purpose and a clear next step",
+      "Trust signals placed where visitors look first: reviews, credentials, guarantees",
+      "Forms that are short enough to complete and smart enough to qualify",
+      "Page layouts tested against how real people actually scan websites",
+      "Smooth interactions that feel responsive and professional",
+      "Accessibility built in so no visitor is excluded",
     ],
   },
   {
@@ -199,12 +207,14 @@ export const SERVICES: ServiceItem[] = [
     title: "E-Commerce & Custom Applications",
     tagline: "Online stores, booking systems, client portals, and business tools that work.",
     description:
-      "I build commerce platforms where every millisecond of load time impacts revenue. From headless Shopify storefronts to custom checkout flows with Stripe, every element is optimized for conversion rate and average order value.",
+      "I build online stores, booking platforms, client portals, and business tools that handle real transactions. Not a Shopify theme with a logo swap. Custom systems designed around how your business actually operates, with the checkout flow, inventory logic, and customer experience built specifically for your products and services.",
     features: [
-      "Headless Shopify & custom storefronts",
-      "Stripe & payment gateway engineering",
-      "Inventory sync & order management",
-      "Conversion-optimized checkout flows",
+      "Custom storefronts designed around your products and brand",
+      "Checkout flows optimized to reduce abandoned carts",
+      "Inventory, pricing, and shipping logic that matches your actual business",
+      "Client portals where customers can track orders, view history, and manage accounts",
+      "Booking and scheduling systems for service-based businesses",
+      "Payment processing with Stripe, Square, or your preferred provider",
     ],
   },
   {
@@ -213,12 +223,14 @@ export const SERVICES: ServiceItem[] = [
     title: "Speed & Search Performance",
     tagline: "Fast sites rank higher, convert better, and cost less to run.",
     description:
-      "I audit, diagnose, and resolve performance bottlenecks at every layer, from render-blocking resources and layout shifts to slow server responses and unoptimized assets. Every engagement delivers measurable, auditable improvements to Core Web Vitals.",
+      "I make websites fast. Not 'looks fine on my laptop' fast. Measurably fast, verified by Google's own tools. Slow websites lose visitors, rank lower in search results, and cost more in advertising. I audit your current performance, identify what is slowing things down, and fix it. Every project I deliver scores 90+ on Google Lighthouse.",
     features: [
-      "Core Web Vitals optimization (LCP, CLS, INP)",
-      "Bundle analysis & code splitting",
-      "Image, font & asset optimization",
-      "Lighthouse & WebPageTest audit reports",
+      "Google Lighthouse scores of 90+ across Performance, Accessibility, SEO, and Best Practices",
+      "Core Web Vitals optimization for better Google search rankings",
+      "Image, font, and code optimization so pages load in under 2 seconds",
+      "Mobile performance tuning for the 60%+ of visitors on phones",
+      "Ongoing monitoring so performance stays high after launch",
+      "Detailed before-and-after reporting so you can see exactly what improved",
     ],
   },
 ];
