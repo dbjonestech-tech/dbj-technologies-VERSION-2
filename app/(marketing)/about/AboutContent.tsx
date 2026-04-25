@@ -139,12 +139,16 @@ function ScrollWordBatch({
              trailing whitespace inside the box, which ate the space
              after the last word of each batch and produced
              "smartdecisions", "buriedby", etc. on the live site.
-             The component only animates opacity and color, both of
-             which work fine on inline elements. */
+             Single concatenated text child (not two adjacent
+             children): two text children inside motion.span produced
+             an intermittent hydration mismatch ("Failed to execute
+             'insertBefore'") because React 18's text-marker
+             insertion is unreliable through framer-motion's
+             forwardRef wrapper. One string = one DOM text node = no
+             mismatch. */
           className="inline"
         >
-          {word}
-          {i < words.length - 1 ? "\u00A0" : " "}
+          {word + (i < words.length - 1 ? "\u00A0" : " ")}
         </motion.span>
       ))}
     </>
