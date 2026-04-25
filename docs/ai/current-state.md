@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: April 25, 2026 (pricing detail pages refactor pending commit)
+Last updated: April 25, 2026
 
 ## DBJ Technologies Site (dbjtechnologies.com)
 
