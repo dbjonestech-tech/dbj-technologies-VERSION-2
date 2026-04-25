@@ -74,3 +74,15 @@ Before large changes, read these docs:
 3. docs/ai/do-not-break.md
 4. docs/ai/session-handoff.md
 5. docs/ai/backlog.md
+
+## After Every Code Change
+
+After completing any implementation task (before committing), also update whichever of these files are affected by the change:
+- docs/ai/session-handoff.md — what changed, files edited, next recommended task
+- docs/ai/current-state.md — if the change affects what's deployed, working, or broken
+- docs/ai/backlog.md — if a task was completed or a new issue was discovered
+- docs/ai/decision-log.md — if a meaningful architectural or business decision was made
+
+Include these .md updates in the same commit as the code change. Do not make a separate commit for documentation.
+
+At the end of every session (when the user says "end session", "that's it for today", "let's stop", or similar), proactively update docs/ai/session-handoff.md even if no code was changed, covering: what was discussed, decisions made, current git status, and next recommended task.
