@@ -122,10 +122,10 @@ export function Navbar() {
         {/* CTA + Mobile toggle */}
         <div className="flex items-center gap-4">
           <Link
-            href="/contact"
+            href="/pathlight#scan-form"
             className="btn-primary hidden text-sm xl:inline-flex"
           >
-            Start a Project
+            Run Free Scan
           </Link>
 
           <button
@@ -206,8 +206,8 @@ export function Navbar() {
                 transition={{ delay: 0.3 }}
                 className="mt-4 pt-4 border-t border-gray-200"
               >
-                <Link href="/contact" onClick={() => setIsOpen(false)} className="btn-primary w-full justify-center text-center">
-                  Start a Project
+                <Link href="/pathlight#scan-form" onClick={() => setIsOpen(false)} className="btn-primary w-full justify-center text-center">
+                  Run Free Scan
                 </Link>
               </motion.div>
             </div>

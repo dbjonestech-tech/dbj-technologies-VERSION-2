@@ -57,7 +57,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     notable:
       "The only free tool that translates website problems into dollar signs. 206 industry benchmarks. Zero scan-to-scan variance for covered verticals.",
-    image: "/images/case-studies/pathlight-landing.webp",
+    image: "/images/pathlight-landing.webp",
     heroDescription:
       "A full-stack AI platform built from the ground up to scan any business website and produce a complete intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list. All in minutes, for free. Proof that AI-powered analysis, when properly engineered, delivers genuine business insight instead of generic summaries.",
     sections: [

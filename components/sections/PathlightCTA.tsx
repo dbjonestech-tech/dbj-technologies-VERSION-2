@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { PATHLIGHT_CTA_CONTENT } from "@/lib/constants";
 
@@ -48,6 +49,53 @@ export function PathlightCTA() {
             {PATHLIGHT_CTA_CONTENT.buttonLabel}
             <span aria-hidden="true">→</span>
           </Link>
+        </div>
+      </div>
+
+      {/* Browser-frame product mockup of the Pathlight scan form. The
+          chrome bar uses absolute positioning for the URL pill so the
+          pill remains centered regardless of the dots' width, while the
+          dots stay above it via z-10. The aspect ratio is locked by the
+          Image component's intrinsic width/height; w-full + h-auto on
+          the Image makes it responsive within the framed container. */}
+      <div className="relative mx-auto mt-12 max-w-5xl px-4 sm:mt-16 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-xl border border-white/10 shadow-2xl shadow-cyan-500/10">
+          <div className="relative flex h-9 items-center border-b border-white/5 bg-slate-800/80 px-4">
+            <div className="z-10 flex gap-1.5">
+              <span
+                aria-hidden="true"
+                className="h-3 w-3 rounded-full"
+                style={{ backgroundColor: "#FF5F57" }}
+              />
+              <span
+                aria-hidden="true"
+                className="h-3 w-3 rounded-full"
+                style={{ backgroundColor: "#FEBC2E" }}
+              />
+              <span
+                aria-hidden="true"
+                className="h-3 w-3 rounded-full"
+                style={{ backgroundColor: "#28C840" }}
+              />
+            </div>
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 hidden justify-center sm:flex"
+            >
+              <div className="rounded-full bg-white/5 px-4 py-1 text-xs text-white/40">
+                dbjtechnologies.com/pathlight
+              </div>
+            </div>
+          </div>
+          <Image
+            src="/images/pathlight-landing.webp"
+            alt="Pathlight website audit tool - scan form"
+            width={2400}
+            height={1559}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1100px"
+            quality={85}
+            className="block h-auto w-full"
+          />
         </div>
       </div>
     </section>
