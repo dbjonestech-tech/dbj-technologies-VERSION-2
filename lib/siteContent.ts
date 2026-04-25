@@ -458,7 +458,7 @@ export const PRICING_ADDONS: PricingAddon[] = [
     price: 175,
     unit: "per hour",
     cta: "Book Hours",
-    href: "/contact",
+    href: "/pricing/consulting",
   },
   {
     name: "Maintenance & Support",
@@ -467,7 +467,7 @@ export const PRICING_ADDONS: PricingAddon[] = [
     price: 299,
     unit: "per month",
     cta: "Start Retainer",
-    href: "/contact",
+    href: "/pricing/maintenance",
   },
 ];
 

@@ -1,134 +1,341 @@
-import { PRICING_TIERS } from "./constants";
-
 /* ─── EXTENDED PRICING DATA ────────────────────────── */
+
+export interface PricingDetailSection {
+  heading: string;
+  body: string;
+}
+
+export interface PricingDetailFaq {
+  question: string;
+  answer: string;
+}
 
 export interface PricingDetail {
   slug: string;
-  tierName: string;
-  heroTitle: string;
-  heroHighlight: string;
-  heroDescription: string;
-  idealFor: string[];
-  whatsIncluded: { title: string; description: string }[];
+  name: string;
+  price: string;
   timeline: string;
-  revisions: string;
-  support: string;
-  addOns: { title: string; price: string; description: string }[];
-  faq: { question: string; answer: string }[];
+  heroDescription: string;
+  idealFor: string;
+  sections: PricingDetailSection[];
+  faq: PricingDetailFaq[];
+  ctaText: string;
+  ctaHref: string;
+}
+
+export interface AddOn {
+  title: string;
+  price: string;
+  description: string;
+  tiers: string[];
 }
 
 export const PRICING_DETAILS: PricingDetail[] = [
   {
     slug: "starter",
-    tierName: "Starter",
-    heroTitle: "The Starter Phase:",
-    heroHighlight: "Launch With Precision.",
+    name: "Starter",
+    price: "$4,500",
+    timeline: "3-4 weeks",
     heroDescription:
-      "Everything a business needs to go live with a production-grade, high-performance web presence. No templates, no bloat. Just clean, engineered code built for your specific goals.",
-    idealFor: [
-      "Businesses launching their first production-grade website",
-      "Founders and solo operators who need a professional digital presence",
-      "Startups validating a product or service in-market",
-      "Local businesses upgrading from DIY builders or agency templates",
-    ],
-    whatsIncluded: [
-      { title: "Up to 5 Production Pages", description: "Home, About, Services, Contact, and one additional page, all designed and engineered from scratch with Next.js." },
-      { title: "Mobile-First Responsive Engineering", description: "Engineered mobile-first and tested on real devices. Your site works perfectly across all screen sizes." },
-      { title: "Technical SEO & Structured Data", description: "Meta tags, sitemap, robots.txt, Open Graph tags, and JSON-LD structured data so search engines can find and index your site." },
-      { title: "Contact Form with Validation", description: "A functional, validated contact form with server-side handling that sends submissions directly to your email." },
-      { title: "Performance Baseline: 90+ Lighthouse", description: "Image optimization, code splitting, and rendering strategy tuned to guarantee a 90+ Lighthouse baseline." },
-      { title: "Collaborative Design Review", description: "A focused design review cycle to align on visual direction and refine details before final build." },
-    ],
-    timeline: "3 to 4 weeks from kickoff to launch",
-    revisions: "Collaborative design review cycle included",
-    support: "30 days of post-launch support at no additional cost",
-    addOns: [
-      { title: "CMS Integration", price: "+$500", description: "Add a headless CMS (Sanity, Strapi, or Contentful) so you can update content without touching code." },
-      { title: "Additional Pages", price: "+$300/page", description: "Extra pages beyond the included 5, engineered to match the same architectural standard." },
-      { title: "Custom Animation Systems", price: "+$400", description: "Scroll-triggered animations, hover effects, and micro-interactions with Framer Motion." },
-      { title: "Analytics Setup", price: "+$200", description: "Vercel Analytics or Google Analytics with conversion tracking configured and tested." },
+      "A complete custom website for businesses launching their digital presence or replacing an outdated site. I build it from scratch using the same architecture and performance standards as my larger projects. No templates. No page builders. You get a fast, professional, mobile-ready website that you fully own.",
+    idealFor:
+      "Small businesses, solo professionals, and personal brands that need a polished online presence without enterprise complexity. Restaurants, counselors, fitness studios, consultants, and anyone whose current site is a liability or who has no site at all.",
+    sections: [
+      {
+        heading: "What Is Included",
+        body: "Up to 5 custom-designed pages, responsive layout for all devices, basic SEO setup (meta tags, sitemap, schema markup), a contact form with email routing, and two rounds of design revisions. I handle the hosting setup, domain connection, SSL certificate, and launch checklist. You get the source code and full ownership on day one.",
+      },
+      {
+        heading: "How It Works",
+        body: "I start with a discovery conversation to understand your business, your customers, and what success looks like. Then I design and build the site in focused sprints, sharing progress along the way. Most Starter projects are live within 3-4 weeks of kickoff.",
+      },
+      {
+        heading: "What You Get at the End",
+        body: "A live, fast, fully responsive website with a 90+ Google Lighthouse score. Source code delivered to your GitHub or repository of choice. 30 days of post-launch support included for any issues or adjustments.",
+      },
     ],
     faq: [
-      { question: "Is the Starter phase right for me?", answer: "If you need a clean, production-grade website with up to 5 pages and don't require a CMS or complex custom features, Starter is the ideal starting point. It's designed to get you live quickly with engineering-grade quality." },
-      { question: "Can I upgrade to Professional later?", answer: "Absolutely. Every Starter engagement is built on the same modern architecture as Professional and Enterprise phases. Adding pages, CMS, or advanced features later is straightforward with no rewrites needed." },
-      { question: "What if I need more design review cycles?", answer: "Additional review cycles are available for $400 each. Most Starter clients find that one focused cycle is sufficient when the discovery phase is thorough." },
+      {
+        question: "Can I upgrade to Professional later?",
+        answer:
+          "Yes. The Starter site is built on the same architecture as Professional and Enterprise. Adding pages, features, or integrations later is straightforward because nothing needs to be rebuilt from scratch.",
+      },
+      {
+        question: "Do I need to pay monthly after launch?",
+        answer:
+          "The $4,500 covers the full design, development, and launch. After that, hosting costs are typically $0-20/month. I offer an optional $299/month maintenance plan for ongoing updates, monitoring, and support.",
+      },
+      {
+        question: "What if I need more than 5 pages?",
+        answer:
+          "The Professional tier at $9,500 includes up to 15 pages plus CMS integration, custom animations, and performance optimization. If you only need 6-7 pages, I can scope a custom quote between the two tiers.",
+      },
     ],
+    ctaText: "Start a Project",
+    ctaHref: "/contact",
   },
   {
     slug: "professional",
-    tierName: "Professional",
-    heroTitle: "The Professional Phase:",
-    heroHighlight: "Engineered for Growth.",
+    name: "Professional",
+    price: "$9,500",
+    timeline: "5-8 weeks",
     heroDescription:
-      "For growing businesses that need advanced architecture, CMS-driven content, custom interaction design, and priority support. This is the most common engagement tier.",
-    idealFor: [
-      "Growing companies that need more than a basic website",
-      "Businesses requiring CMS-managed content and blog systems",
-      "Companies that want custom animation and interaction design",
-      "Businesses that need priority support and faster iteration cycles",
-    ],
-    whatsIncluded: [
-      { title: "Up to 15 Production Pages", description: "A comprehensive site with service pages, landing pages, blog templates, and more, all custom engineered." },
-      { title: "Mobile-First Responsive Engineering", description: "Pixel-perfect engineering across all devices with custom breakpoint optimization and real-device testing." },
-      { title: "Advanced SEO, Analytics & Schema", description: "Complete SEO setup, schema markup, analytics integration, conversion tracking, and search console configuration." },
-      { title: "Headless CMS Integration", description: "Full content management system so you can update pages, blog posts, and media without developer help." },
-      { title: "Custom Animation & Interaction Systems", description: "Scroll-triggered animations, parallax effects, hover states, and micro-interactions engineered with Framer Motion." },
-      { title: "Collaborative Design Review Cycles", description: "Multiple collaborative review cycles to ensure every detail meets your standards. No arbitrary 'revision rounds.'" },
-      { title: "Performance Target: 95+ Lighthouse", description: "Advanced optimization including image CDN, code splitting, prefetching, and 95+ Lighthouse scores guaranteed." },
-      { title: "Priority Support Channel (48h SLA)", description: "Post-launch issues and questions addressed within 48 hours through a dedicated support channel." },
-    ],
-    timeline: "5 to 8 weeks from kickoff to launch",
-    revisions: "Collaborative design review cycles included throughout",
-    support: "30 days of priority post-launch support, then optional maintenance retainer",
-    addOns: [
-      { title: "Blog System", price: "+$800", description: "Full blog with categories, tags, author pages, and RSS feed, all CMS-managed." },
-      { title: "E-Commerce Integration (up to 50 products)", price: "+$2,000", description: "Shopify or custom e-commerce integration with payment processing and product management." },
-      { title: "Multi-Language Support", price: "+$1,200", description: "i18n setup with language switcher and CMS-managed translations." },
-      { title: "Custom API Integrations", price: "+$600/integration", description: "CRM, marketing automation, scheduling, or any third-party API connected to your site." },
+      "For businesses that need more than a brochure site. I build a high-performance website with content management, custom interactions, advanced SEO, and analytics. This is what I recommend for businesses that are actively growing and need their website to work as hard as they do.",
+    idealFor:
+      "Growing businesses, multi-location companies, and established brands that need a site with real functionality. Law firms, dental practices, contractors, auto shops, and service businesses with 5+ employees that are investing in growth.",
+    sections: [
+      {
+        heading: "What Is Included",
+        body: "Up to 15 custom-designed pages, CMS integration so you can update content without a developer, custom animations and interactions, advanced SEO with analytics dashboards, performance optimization targeting 95+ Lighthouse scores, and three rounds of design revisions. I also set up conversion tracking so you can measure what the site is actually doing for your business.",
+      },
+      {
+        heading: "How It Works",
+        body: "Same discovery process as Starter, but with deeper competitive analysis and conversion strategy. I map out the user journey before designing a single page. Build happens in focused sprints with weekly check-ins. Most Professional projects launch in 5-8 weeks.",
+      },
+      {
+        heading: "What You Get at the End",
+        body: "A complete digital presence with a CMS you can manage yourself, analytics tracking conversions, priority support with 48-hour response time, and a 30-day post-launch support window. Full source code ownership.",
+      },
     ],
     faq: [
-      { question: "Why is Professional the most common engagement?", answer: "It hits the sweet spot for most businesses. Enough pages for a comprehensive site, CMS so you stay independent, custom animations that make a strong impression, and priority support for peace of mind." },
-      { question: "What CMS do you recommend?", answer: "For most Professional engagements, I recommend Sanity for its flexibility and developer experience. I also work with Strapi, Contentful, and headless WordPress depending on your needs." },
-      { question: "Can I add e-commerce later?", answer: "Yes. The Professional architecture supports adding e-commerce functionality as an upgrade at any time without rebuilding the foundation." },
+      {
+        question: "What CMS do you use?",
+        answer:
+          "It depends on your needs. Most projects use a headless CMS that gives you a clean editing interface without slowing down the site. I recommend the best fit during discovery.",
+      },
+      {
+        question: "Can I add e-commerce later?",
+        answer:
+          "Yes. The Professional architecture supports adding a store, booking system, or client portal without rebuilding the foundation.",
+      },
+      {
+        question: "What does priority support mean?",
+        answer:
+          "Issues and requests are addressed within 48 hours. You have a direct line to me, not a support queue.",
+      },
     ],
+    ctaText: "Start a Project",
+    ctaHref: "/contact",
   },
   {
     slug: "enterprise",
-    tierName: "Enterprise",
-    heroTitle: "The Enterprise Phase:",
-    heroHighlight: "Full-Scale Digital Engineering.",
+    name: "Enterprise",
+    price: "Starting at $15,000",
+    timeline: "8-16 weeks",
     heroDescription:
-      "Custom application engineering, cloud infrastructure, dedicated architectural oversight, and white-glove delivery. For organizations that need technology to be a competitive advantage.",
-    idealFor: [
-      "Organizations needing custom web applications or SaaS platforms",
-      "Companies requiring cloud infrastructure and DevOps engineering",
-      "Businesses with complex integrations and data requirements",
-      "Businesses that need dedicated architectural oversight throughout the engagement",
-    ],
-    whatsIncluded: [
-      { title: "Unlimited Pages & Application Views", description: "No page limits. I build as many pages, views, and application screens as your project requires." },
-      { title: "Custom Full-Stack Application", description: "Full-stack application engineering with user authentication, dashboards, data management, and custom business logic." },
-      { title: "API Design & Backend Engineering", description: "Frontend, backend, API design, and database architecture, all typed end-to-end and tested at every boundary." },
-      { title: "Cloud Infrastructure & DevOps", description: "Production-grade cloud architecture on AWS or Vercel with auto-scaling, security hardening, and monitoring." },
-      { title: "CI/CD Pipeline & Staging Environments", description: "Automated build, test, and deployment pipelines with staging environments and rollback capabilities." },
-      { title: "Dedicated Architectural Oversight", description: "I serve as your principal architect throughout the engagement. One point of contact, one standard of quality." },
-      { title: "SLA & Uptime Guarantees", description: "Contractual uptime guarantees with defined response times and escalation procedures." },
-      { title: "Priority Support with Guaranteed Response Times", description: "Rapid-response support with guaranteed SLA response times for critical issues." },
-    ],
-    timeline: "8 to 20 weeks depending on scope (defined during paid discovery)",
-    revisions: "Continuous collaborative iteration within agreed project scope",
-    support: "Dedicated ongoing support with custom SLA",
-    addOns: [
-      { title: "AI/ML Integration", price: "Custom", description: "AI-powered features including recommendations, natural language processing, and predictive analytics." },
-      { title: "Data Migration", price: "Custom", description: "Migration of existing data, users, and content from legacy systems with validation and rollback plans." },
-      { title: "Training & Documentation", price: "Included", description: "Comprehensive documentation and hands-on training so you can manage and extend the platform." },
-      { title: "Ongoing Managed Services", price: "Custom", description: "Fully managed infrastructure, updates, monitoring, and feature development on a monthly retainer." },
+      "For businesses that need a complete digital system, not just a website. Custom web applications, complex integrations, multi-user platforms, and infrastructure that scales. I scope every Enterprise project through a paid discovery phase so the architecture is right before a single line of code is written.",
+    idealFor:
+      "Businesses building custom platforms, SaaS products, multi-location operations, or complex internal tools. Companies that have outgrown template solutions and need systems-level architecture.",
+    sections: [
+      {
+        heading: "What Is Included",
+        body: "Unlimited pages, custom web application development, complete front-to-back system build, professional hosting and deployment, automated testing pipeline, dedicated project management, guaranteed uptime with monitoring, and 24/7 priority support. The scope is defined during a paid discovery phase ($1,500-$3,000) that produces a detailed technical specification and project plan before development begins.",
+      },
+      {
+        heading: "How Discovery Works",
+        body: "I spend 1-2 weeks understanding your business requirements, technical constraints, integration needs, and growth plans. The output is a comprehensive specification document, architecture diagram, timeline, and fixed-price quote. If you proceed, the discovery fee is credited toward the project.",
+      },
+      {
+        heading: "What You Get at the End",
+        body: "A production-grade system built to your exact specifications, fully documented, with source code ownership, deployment infrastructure, monitoring, and ongoing support. The system is built to run independently. You are never locked in.",
+      },
     ],
     faq: [
-      { question: "How is Enterprise pricing determined?", answer: "Enterprise engagements are scoped and priced based on a paid discovery phase. I define the technical requirements, architecture, timeline, and deliverables, then provide a detailed, fixed-price proposal." },
-      { question: "Do I get dedicated attention?", answer: "Yes. As a solo principal architect, every Enterprise client gets my direct attention throughout the engagement. No junior handoffs, no rotating resources, no communication layers." },
-      { question: "What does the SLA cover?", answer: "SLAs define uptime guarantees (typically 99.9%), response times for different severity levels, and escalation procedures. Terms are customized based on your operational requirements." },
+      {
+        question: "Why does Enterprise require paid discovery?",
+        answer:
+          "Complex systems fail when the scope is unclear. The discovery phase protects both sides: you get a detailed plan and fixed price before committing, and I get the clarity needed to build it right the first time.",
+      },
+      {
+        question: "What is the typical timeline?",
+        answer:
+          "8-16 weeks depending on complexity. The discovery phase produces an accurate timeline before any development commitment.",
+      },
+      {
+        question: "Can I start with Professional and upgrade?",
+        answer:
+          "Sometimes. If your needs are genuinely complex from the start, trying to fit them into a Professional scope creates problems. I will be honest about which tier is the right fit during the initial conversation.",
+      },
     ],
+    ctaText: "Contact Me",
+    ctaHref: "/contact",
+  },
+  {
+    slug: "maintenance",
+    name: "Maintenance",
+    price: "$299/month",
+    timeline: "Ongoing",
+    heroDescription:
+      "Your website is not finished when it launches. It needs updates, security patches, performance monitoring, and content changes. I handle all of it for a flat monthly fee so you can focus on running your business instead of worrying about whether your site is working.",
+    idealFor:
+      "Any business with a live website that needs ongoing care. Especially valuable for businesses that do not have an in-house developer and do not want to scramble to find one when something breaks.",
+    sections: [
+      {
+        heading: "What Is Included",
+        body: "Monthly software updates and security patches, uptime monitoring with immediate response, performance monitoring to catch slowdowns before they affect visitors, automated backups with tested restore procedures, content updates (text, images, minor layout changes), quarterly Pathlight re-scan to track your site's health over time, and priority support with same-day response for urgent issues.",
+      },
+      {
+        heading: "Why It Matters",
+        body: "An unmonitored website gradually degrades. Software gets outdated, security vulnerabilities appear, performance slows as content grows, and small problems compound into expensive emergencies. The $299/month prevents all of that.",
+      },
+      {
+        heading: "What Is Not Included",
+        body: "Major feature additions, full page redesigns, and new integrations are scoped as separate projects. The maintenance plan covers keeping your existing site healthy, fast, and current.",
+      },
+    ],
+    faq: [
+      {
+        question: "Can I cancel anytime?",
+        answer:
+          "Yes. Month-to-month, no long-term contract. I keep clients by delivering value, not by locking them in.",
+      },
+      {
+        question: "What if I need a bigger change?",
+        answer:
+          "Anything beyond routine updates gets scoped as a mini-project with a fixed quote. The maintenance relationship means I already know your codebase, so those projects are faster and cheaper than starting cold.",
+      },
+      {
+        question: "Do I need this if I just launched?",
+        answer:
+          "The first 30 days of post-launch support are included with every project. After that, the maintenance plan is optional but recommended. Most clients sign up after the first time they need a change and realize they do not want to do it themselves.",
+      },
+    ],
+    ctaText: "Get Started",
+    ctaHref: "/contact",
+  },
+  {
+    slug: "consulting",
+    name: "Consulting",
+    price: "$175/hour",
+    timeline: "2-hour minimum",
+    heroDescription:
+      "Sometimes you do not need a full project. You need an experienced architect to look at what you have, tell you what is wrong, and give you a plan. I offer hourly consulting for businesses that need expert guidance without a long-term commitment.",
+    idealFor:
+      "Businesses that already have a website or development team but need senior-level guidance. Second opinions on agency proposals, technical audits, architecture reviews, vendor evaluations, and strategic planning for digital initiatives.",
+    sections: [
+      {
+        heading: "What I Cover",
+        body: "Website and application audits, performance analysis, conversion strategy, architecture reviews, vendor and platform evaluations, technical due diligence, and strategic planning for digital projects. I can also review proposals from other agencies or developers and tell you whether the scope, price, and approach make sense.",
+      },
+      {
+        heading: "How It Works",
+        body: "Book a session through my calendar. Minimum engagement is 2 hours. I review your materials beforehand so the time is used well. You get a written summary of recommendations after every session.",
+      },
+      {
+        heading: "When Consulting Becomes a Project",
+        body: "If the consulting reveals work that needs to be done, I can scope it as a Starter, Professional, or Enterprise project. Consulting hours already spent are credited toward the project fee.",
+      },
+    ],
+    faq: [
+      {
+        question: "Is there a minimum?",
+        answer:
+          "2 hours minimum per engagement. Most initial consultations run 2-3 hours.",
+      },
+      {
+        question: "Can I book recurring sessions?",
+        answer:
+          "Yes. Some clients book monthly advisory sessions to keep a senior architect on call without a full-time hire.",
+      },
+      {
+        question: "What if I just need a quick question answered?",
+        answer:
+          "If it is truly quick (under 15 minutes), email me at joshua@dbjtechnologies.com. I will answer if I can or suggest a session if it needs deeper discussion.",
+      },
+    ],
+    ctaText: "Book a Consultation",
+    ctaHref: "/contact",
+  },
+];
+
+/* ─── ADD-ONS (TIER-AWARE) ─────────────────────────── */
+/* Filtered at render time by tier slug. Maintenance and consulting
+   pages do not surface add-ons. */
+
+export const ADD_ONS: AddOn[] = [
+  {
+    title: "CMS Integration",
+    price: "+$500",
+    description:
+      "Add a headless CMS (Sanity, Strapi, or Contentful) so you can update content without touching code.",
+    tiers: ["starter"],
+  },
+  {
+    title: "Additional Pages",
+    price: "+$300/page",
+    description:
+      "Extra pages beyond the included 5, engineered to match the same architectural standard.",
+    tiers: ["starter"],
+  },
+  {
+    title: "Custom Animation Systems",
+    price: "+$400",
+    description:
+      "Scroll-triggered animations, hover effects, and micro-interactions with Framer Motion.",
+    tiers: ["starter"],
+  },
+  {
+    title: "Analytics Setup",
+    price: "+$200",
+    description:
+      "Vercel Analytics or Google Analytics with conversion tracking configured and tested.",
+    tiers: ["starter"],
+  },
+  {
+    title: "Blog System",
+    price: "+$800",
+    description:
+      "Full blog with categories, tags, author pages, and RSS feed, all CMS-managed.",
+    tiers: ["professional"],
+  },
+  {
+    title: "E-Commerce Integration (up to 50 products)",
+    price: "+$2,000",
+    description:
+      "Shopify or custom e-commerce integration with payment processing and product management.",
+    tiers: ["professional"],
+  },
+  {
+    title: "Multi-Language Support",
+    price: "+$1,200",
+    description:
+      "i18n setup with language switcher and CMS-managed translations.",
+    tiers: ["professional"],
+  },
+  {
+    title: "Custom API Integrations",
+    price: "+$600/integration",
+    description:
+      "CRM, marketing automation, scheduling, or any third-party API connected to your site.",
+    tiers: ["professional"],
+  },
+  {
+    title: "AI/ML Integration",
+    price: "Custom",
+    description:
+      "AI-powered features including recommendations, natural language processing, and predictive analytics.",
+    tiers: ["enterprise"],
+  },
+  {
+    title: "Data Migration",
+    price: "Custom",
+    description:
+      "Migration of existing data, users, and content from legacy systems with validation and rollback plans.",
+    tiers: ["enterprise"],
+  },
+  {
+    title: "Training & Documentation",
+    price: "Included",
+    description:
+      "Comprehensive documentation and hands-on training so you can manage and extend the platform.",
+    tiers: ["enterprise"],
+  },
+  {
+    title: "Ongoing Managed Services",
+    price: "Custom",
+    description:
+      "Fully managed infrastructure, updates, monitoring, and feature development on a monthly retainer.",
+    tiers: ["enterprise"],
   },
 ];
 
@@ -140,6 +347,6 @@ export function getPricingSlugs(): string[] {
   return PRICING_DETAILS.map((p) => p.slug);
 }
 
-export function getPricingTierByName(name: string) {
-  return PRICING_TIERS.find((t) => t.name === name);
+export function getAddOnsByTier(slug: string): AddOn[] {
+  return ADD_ONS.filter((a) => a.tiers.includes(slug));
 }

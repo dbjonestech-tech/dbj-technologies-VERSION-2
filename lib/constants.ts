@@ -85,7 +85,7 @@ export const FOOTER_NAV_LINKS = [
 
 /* ─── SUPPORT LINKS (FOOTER) ──────────────────────── */
 export const SUPPORT_LINKS = [
-  { label: "Maintenance & Support", href: "/maintenance-support" },
+  { label: "Maintenance & Support", href: "/pricing/maintenance" },
   { label: "Why DBJ", href: "/why-dbj" },
 ] as const;
 

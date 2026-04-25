@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {
-  getPricingBySlug,
-  getPricingSlugs,
-  getPricingTierByName,
-} from "@/lib/pricing-data";
+import { getPricingBySlug, getPricingSlugs } from "@/lib/pricing-data";
 import { PricingDetailLayout } from "@/components/templates/PricingDetailLayout";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -22,11 +18,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${detail.tierName} Package`,
+    title: `${detail.name} Package`,
     description: detail.heroDescription,
     alternates: { canonical: `https://dbjtechnologies.com/pricing/${slug}` },
     openGraph: {
-      title: `${detail.tierName} Package | DBJ Technologies`,
+      title: `${detail.name} Package | DBJ Technologies`,
       description: detail.heroDescription,
     },
   };
@@ -40,11 +36,5 @@ export default async function PricingDetailPage({ params }: Props) {
     notFound();
   }
 
-  const tier = getPricingTierByName(detail.tierName);
-
-  if (!tier) {
-    notFound();
-  }
-
-  return <PricingDetailLayout detail={detail} tier={tier} />;
+  return <PricingDetailLayout detail={detail} />;
 }

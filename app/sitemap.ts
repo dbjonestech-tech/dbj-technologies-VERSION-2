@@ -17,7 +17,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/pathlight",
     "/faq",
     "/contact",
-    "/maintenance-support",
     "/why-dbj",
     "/privacy",
     "/terms",

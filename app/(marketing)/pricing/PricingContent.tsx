@@ -58,7 +58,7 @@ export default function PricingContent() {
           <span className="text-sm text-text-muted">
             Looking for post-launch care?{" "}
             <Link
-              href="/maintenance-support"
+              href="/pricing/maintenance"
               className="text-accent-blue hover:underline"
             >
               See maintenance &amp; support plans →
