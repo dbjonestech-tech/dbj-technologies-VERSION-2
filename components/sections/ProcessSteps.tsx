@@ -11,8 +11,8 @@ export function ProcessSteps() {
     <section className="relative py-32 overflow-hidden">
       <SectionHeading
         label="My Process"
-        title="From Diagnosis to Deployment"
-        description="A four-phase engineering framework that eliminates guesswork and delivers production-grade results on time, every time."
+        title="How Every Project Works"
+        description="A clear four-step process so you always know what is happening and what comes next."
       />
 
       <div className="mx-auto max-w-6xl px-6 lg:px-8">

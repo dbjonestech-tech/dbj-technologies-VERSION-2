@@ -11,8 +11,8 @@ export function ServicesSection() {
     <section className="relative py-32">
       <SectionHeading
         label="Capabilities"
-        title="Engineering Disciplines"
-        description="Six core disciplines, one architectural standard. Every engagement is scoped, engineered, and delivered with production-grade precision."
+        title="What We Build"
+        description="Every project is custom-built around your business goals, not pulled from a template library."
       />
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
