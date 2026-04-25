@@ -175,7 +175,7 @@ function buildFollowUp48h(data: EmailMergeData): BuiltEmail {
           <div style="color: ${MUTED_COLOR}; font-size: 15px; line-height: 22px;">${topProblem}</div>
         </div>
         <p style="margin: 16px 0;">A meaningful share of your estimated <strong style="color: ${ACCENT_COLOR};">${revenueDisplay}/mo</strong> in lost revenue traces back to this single issue. Fixing it looks like: ${topFix}</p>
-        <p style="margin: 16px 0;">If you'd like to talk through what a focused rebuild would cost and how fast we could ship it, grab 15 minutes.</p>
+        <p style="margin: 16px 0;">If you'd like to talk through what a focused rebuild would cost and how fast I could ship it, grab 15 minutes.</p>
         ${button("Book a 15-Minute Discovery Call", data.calendlyUrl)}
         <p style="margin: 16px 0; color: ${MUTED_COLOR}; font-size: 14px;">No obligation. Just a focused conversation.</p>
         <p style="margin: 24px 0 8px;">Joshua</p>
@@ -219,7 +219,7 @@ function buildFollowUp5d(data: EmailMergeData): BuiltEmail {
       <td style="padding: 8px 32px 0; font-family: ${FONT_STACK}; font-size: 16px; line-height: 24px; color: ${TEXT_COLOR};">
         <p style="margin: 16px 0;">${greeting(data.businessName)}</p>
         <p style="margin: 16px 0;">Quick story that matches what Pathlight showed on ${data.url}.</p>
-        <p style="margin: 16px 0;">A Richardson auto repair shop (Star Auto Service) ran their site through Pathlight. Same gaps we found on yours. We rebuilt the entire site from scratch in one 6-hour session.</p>
+        <p style="margin: 16px 0;">A Richardson auto repair shop (Star Auto Service) ran their site through Pathlight. Same gaps I found on yours. I rebuilt the entire site from scratch in one 6-hour session.</p>
         <p style="margin: 16px 0;"><strong>Result:</strong> perfect Lighthouse 100s on desktop and mobile, stronger trust signals, and a clear path to more customers.</p>
         <p style="margin: 16px 0;">That's the exact gap Pathlight is showing you right now. The fix isn't years of work. It's one focused rebuild.</p>
         ${button("See What a DBJ Rebuild Looks Like", data.calendlyUrl)}
@@ -233,7 +233,7 @@ function buildFollowUp5d(data: EmailMergeData): BuiltEmail {
     "",
     `Quick story that matches what Pathlight showed on ${data.url}.`,
     "",
-    "A Richardson auto repair shop (Star Auto Service) ran their site through Pathlight. Same gaps we found on yours. We rebuilt the entire site from scratch in one 6-hour session.",
+    "A Richardson auto repair shop (Star Auto Service) ran their site through Pathlight. Same gaps I found on yours. I rebuilt the entire site from scratch in one 6-hour session.",
     "",
     "Result: perfect Lighthouse 100s on desktop and mobile, stronger trust signals, and a clear path to more customers.",
     "",

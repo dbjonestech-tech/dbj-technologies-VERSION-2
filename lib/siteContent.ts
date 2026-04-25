@@ -342,9 +342,9 @@ export const ABOUT_STORY = {
   },
   whoThisIsFor: {
     heading: "Who This Is For",
-    body: "I work with business owners who need one thing built right, not an agency retainer that never ends. I choose my clients carefully and I’m selective about the work I take on. If you need a website, a product, or a digital system and you want to own it completely when it’s done, we should talk.",
+    body: "I work with business owners who need one thing built right, not an agency retainer that never ends. I choose my clients carefully and I’m selective about the work I take on. If you need a website, a product, or a digital system and you want to own it completely when it’s done, I’d like to hear from you.",
   },
-  personal: "Based in Dallas. I seek to love Jesus. Husband to Sarah, a licensed professional counselor. Father of two. We live on a farm where we raise sheep and are building an orchard and vineyard. Professional musician, conversational in French and Spanish, and currently writing a novel. I build wooden structures for fun.",
+  personal: "Based in Dallas. I seek to love Jesus. Husband to Sarah, a licensed professional counselor. Father of two. I live on a farm with Sarah and the kids, raising sheep and building an orchard and vineyard. Professional musician, conversational in French and Spanish, and currently writing a novel. I build wooden structures for fun.",
 };
 
 /* ─── PORTFOLIO / WORK ─────────────────────────────── */
@@ -508,7 +508,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "Billing",
     question: "How does your pricing work?",
     answer:
-      "We offer fixed-price project packages with clear deliverables and timelines. Every project begins with a paid discovery phase that includes a detailed scope, timeline, and cost breakdown before development begins. We also offer hourly consulting for specific needs and monthly retainers for ongoing maintenance and support.",
+      "I offer fixed-price project packages with clear deliverables and timelines. Every project begins with a paid discovery phase that includes a detailed scope, timeline, and cost breakdown before development begins. I also offer hourly consulting for specific needs and monthly retainers for ongoing maintenance and support.",
   },
   {
     category: "Billing",
@@ -520,7 +520,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: "Billing",
     question: "Are there ongoing costs after launch?",
     answer:
-      "Hosting and domain fees are minimal (typically $20–50/month). We offer a Maintenance & Support retainer at $299/month that includes updates, monitoring, backups, security patches, and priority support.",
+      "Hosting and domain fees are minimal (typically $20–50/month). I offer a Maintenance & Support retainer at $299/month that includes updates, monitoring, backups, security patches, and priority support.",
   },
   {
     category: "Support",
