@@ -25,12 +25,17 @@ export default function HeroCinema({
 
   /* ─── Skip if already revealed or reduced motion ─── */
   useEffect(() => {
-    /* Remove the SSR static fallback overlay (rendered by app/layout.tsx
-       only on the homepage). The cinema's own overlay also lives at
-       z:100 and is now mounted, so the slot transitions from static
-       dark fill to animated dark fill with no perceptible seam. */
+    /* Hide (do not remove) the SSR static fallback overlay. The fallback
+       is rendered by app/layout.tsx, a server component, so React tracks
+       it as a child of <body>. Calling .remove() on a React-rendered
+       node desyncs the reconciler tree from the DOM and produces
+       NotFoundError: insertBefore / removeChild crashes on later commits
+       and on cross-route navigation (RSC re-render of root layout with
+       isHome=false expects the node still present).
+       The cinema's own animated overlay covers the same z:100 slot, so
+       hiding the fallback is visually identical to removing it. */
     const fallback = document.getElementById("hero-cinema-fallback");
-    if (fallback) fallback.remove();
+    if (fallback) fallback.style.display = "none";
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -51,7 +56,7 @@ export default function HeroCinema({
     } catch {
       /* sessionStorage blocked */
     }
-    // Cinematic is going to run — emit initial phase
+    // Cinematic is going to run, emit initial phase
     onPhaseChange?.("blueprint");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -242,7 +247,7 @@ export default function HeroCinema({
         className={`hero-cinema-viewport${shaking ? " hero-shake" : ""}`}
         style={{
           // Fixed positioning + flex centering inlined so the viewport is
-          // out of document flow from the very first paint — any paint
+          // out of document flow from the very first paint, so any paint
           // inside this subtree cannot be attributed as a shift to the
           // parent <section>'s layout.
           position: "fixed",

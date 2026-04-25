@@ -7,28 +7,35 @@ import { usePathname } from "next/navigation";
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
-  /* `initial={{ opacity: 0 }}` SSRs as `style="opacity:0"` on the wrapper,
-     which hides the entire page during the hydration window. On the
-     homepage that produces a blank period after CSS loads but before
-     framer-motion finishes hydrating — long enough to read as a flash.
-     Suppress the initial state on the very first render and turn it on
-     after mount, so subsequent in-app navigations still get the fade. */
+  /* The wrapper element must render identically on server and client.
+     A prior version returned a Fragment for reduced-motion users, so
+     the motion.div existed in SSR HTML but disappeared on the first
+     client render. That wrapper-vs-no-wrapper structural mismatch
+     desynced React 19's reconciler from the DOM and produced
+     NotFoundError: insertBefore / removeChild crashes on later commits
+     across /, /about, /contact, /pathlight.
+     `initial={false}` short-circuits framer-motion's animation on
+     first mount and for reduced-motion users, so the page paints its
+     final state immediately. Subsequent in-app navigations remount via
+     `key={pathname}` and animate normally. */
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  if (prefersReducedMotion) {
-    return <>{children}</>;
-  }
+  const shouldAnimate = hasMounted && !prefersReducedMotion;
 
   return (
     <motion.div
       key={pathname}
-      initial={hasMounted ? { opacity: 0, y: 8 } : false}
+      initial={shouldAnimate ? { opacity: 0, y: 8 } : false}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+      transition={
+        shouldAnimate
+          ? { duration: 0.3, ease: [0.25, 1, 0.5, 1] }
+          : { duration: 0 }
+      }
     >
       {children}
     </motion.div>
