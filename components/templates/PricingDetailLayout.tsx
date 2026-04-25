@@ -123,14 +123,14 @@ export function PricingDetailLayout({ detail }: PricingDetailLayoutProps) {
         <section className="py-20">
           <SectionHeading
             label="Add-Ons"
-            title="Optional Enhancements"
-            description="Available extensions you can layer onto this package."
+            title="Enhance Your Package"
+            description="Optional add-ons to extend your project."
           />
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid gap-6 sm:grid-cols-2">
               {addOns.map((addon, i) => (
                 <motion.div
-                  key={addon.title}
+                  key={addon.name}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -138,7 +138,7 @@ export function PricingDetailLayout({ detail }: PricingDetailLayoutProps) {
                   className="glass-card p-6"
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-display text-lg font-bold">{addon.title}</h3>
+                    <h3 className="font-display text-lg font-bold">{addon.name}</h3>
                     <span className="rounded-full bg-accent-blue/10 border border-accent-blue/20 px-3 py-0.5 text-xs font-medium text-accent-blue">
                       {addon.price}
                     </span>

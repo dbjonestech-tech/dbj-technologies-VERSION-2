@@ -24,7 +24,7 @@ export interface PricingDetail {
 }
 
 export interface AddOn {
-  title: string;
+  name: string;
   price: string;
   description: string;
   tiers: string[];
@@ -254,88 +254,88 @@ export const PRICING_DETAILS: PricingDetail[] = [
 
 export const ADD_ONS: AddOn[] = [
   {
-    title: "CMS Integration",
+    name: "Content Management System",
     price: "+$500",
     description:
-      "Add a headless CMS (Sanity, Strapi, or Contentful) so you can update content without touching code.",
+      "Update your own text, images, and pages anytime without needing a developer.",
     tiers: ["starter"],
   },
   {
-    title: "Additional Pages",
+    name: "Additional Pages",
     price: "+$300/page",
     description:
-      "Extra pages beyond the included 5, engineered to match the same architectural standard.",
-    tiers: ["starter"],
+      "Extra pages beyond what is included in your package, built to the same quality and speed standards.",
+    tiers: ["starter", "professional"],
   },
   {
-    title: "Custom Animation Systems",
+    name: "Blog Setup",
     price: "+$400",
     description:
-      "Scroll-triggered animations, hover effects, and micro-interactions with Framer Motion.",
-    tiers: ["starter"],
+      "A fully designed blog section where you can publish articles, news, or updates to attract search traffic.",
+    tiers: ["starter", "professional"],
   },
   {
-    title: "Analytics Setup",
-    price: "+$200",
-    description:
-      "Vercel Analytics or Google Analytics with conversion tracking configured and tested.",
-    tiers: ["starter"],
-  },
-  {
-    title: "Blog System",
+    name: "Online Booking and Scheduling",
     price: "+$800",
     description:
-      "Full blog with categories, tags, author pages, and RSS feed, all CMS-managed.",
-    tiers: ["professional"],
+      "Let customers book appointments, consultations, or services directly from your website.",
+    tiers: ["starter", "professional"],
   },
   {
-    title: "E-Commerce Integration (up to 50 products)",
-    price: "+$2,000",
+    name: "E-Commerce and Online Store",
+    price: "+$1,500",
     description:
-      "Shopify or custom e-commerce integration with payment processing and product management.",
-    tiers: ["professional"],
+      "Sell products or services online with a custom storefront, cart, and secure checkout.",
+    tiers: ["starter", "professional"],
   },
   {
-    title: "Multi-Language Support",
+    name: "Email Marketing Integration",
+    price: "+$300",
+    description:
+      "Connect your website to Mailchimp, ConvertKit, or your email platform so new leads go straight to your list.",
+    tiers: ["starter", "professional", "enterprise"],
+  },
+  {
+    name: "Custom Animations and Interactions",
+    price: "+$400",
+    description:
+      "Scroll effects, hover animations, and interactive elements that make your site feel polished and memorable.",
+    tiers: ["professional", "enterprise"],
+  },
+  {
+    name: "Analytics and Conversion Tracking",
+    price: "+$200",
+    description:
+      "Know exactly how many people visit your site, where they come from, and what they do. Tracks form submissions, calls, and purchases.",
+    tiers: ["starter", "professional"],
+  },
+  {
+    name: "Google Business Profile Setup",
+    price: "+$200",
+    description:
+      "Set up and optimize your Google Business listing so you show up in local search results and Google Maps.",
+    tiers: ["starter", "professional", "enterprise"],
+  },
+  {
+    name: "Content Writing",
+    price: "+$150/page",
+    description:
+      "Professional copywriting for your website pages, written to convert visitors into customers.",
+    tiers: ["starter", "professional"],
+  },
+  {
+    name: "Multi-Language Support",
+    price: "+$800",
+    description:
+      "Serve your website in two or more languages to reach a broader customer base.",
+    tiers: ["professional", "enterprise"],
+  },
+  {
+    name: "Client Portal",
     price: "+$1,200",
     description:
-      "i18n setup with language switcher and CMS-managed translations.",
-    tiers: ["professional"],
-  },
-  {
-    title: "Custom API Integrations",
-    price: "+$600/integration",
-    description:
-      "CRM, marketing automation, scheduling, or any third-party API connected to your site.",
-    tiers: ["professional"],
-  },
-  {
-    title: "AI/ML Integration",
-    price: "Custom",
-    description:
-      "AI-powered features including recommendations, natural language processing, and predictive analytics.",
-    tiers: ["enterprise"],
-  },
-  {
-    title: "Data Migration",
-    price: "Custom",
-    description:
-      "Migration of existing data, users, and content from legacy systems with validation and rollback plans.",
-    tiers: ["enterprise"],
-  },
-  {
-    title: "Training & Documentation",
-    price: "Included",
-    description:
-      "Comprehensive documentation and hands-on training so you can manage and extend the platform.",
-    tiers: ["enterprise"],
-  },
-  {
-    title: "Ongoing Managed Services",
-    price: "Custom",
-    description:
-      "Fully managed infrastructure, updates, monitoring, and feature development on a monthly retainer.",
-    tiers: ["enterprise"],
+      "A secure login area where your customers can view orders, track progress, manage their account, or access documents.",
+    tiers: ["professional", "enterprise"],
   },
 ];
 
