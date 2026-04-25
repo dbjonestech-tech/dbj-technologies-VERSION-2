@@ -745,3 +745,30 @@ select:focus-visible {
     border: 1px solid #d1d5db !important;
   }
 }
+
+/* ─── ABOUT PAGE: AMBIENT PARTICLES ──────────────── */
+/* Single keyframe set; per-particle motion comes from --dx / --dy CSS
+   custom properties set inline. GPU-composited transform only. */
+@keyframes about-particle-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(var(--dx, 0), var(--dy, 0), 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-particle { animation: none !important; }
+}
+
+/* ─── ABOUT PAGE: DARK CTA WRAPPER ───────────────── */
+/* Scoped override so the shared CTASection renders dark on /about
+   without affecting any other page. Targets the section background,
+   blob tints, and text colors only when nested under .about-cta-dark. */
+.about-cta-dark {
+  background-color: #06060a;
+}
+.about-cta-dark > section {
+  background-color: #06060a;
+}
+.about-cta-dark > section > div:first-child {
+  background: transparent !important;
+}
+.about-cta-dark .text-section { color: #ffffff; }
+.about-cta-dark .text-text-secondary { color: #9ca3af !important; }
