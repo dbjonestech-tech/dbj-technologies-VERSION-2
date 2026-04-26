@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ironclad Air · 24/7 Emergency HVAC · Arlington, TX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --steel: #1B2838;
+    --steel-deep: #151F2E;
+    --steel-soft: #233246;
+    --white: #FFFFFF;
+    --bone: #F8FAFC;
+    --mist: #E2E8F0;
+    --orange: #F97316;
+    --orange-deep: #EA580C;
+    --orange-pale: rgba(249,115,22,0.12);
+    --ink: #1E293B;
+    --slate: #475569;
+    --slate-light: #64748B;
+    --gray-on-dark: #CBD5E1;
+    --gray-dim: #94A3B8;
+    --hairline-light: rgba(30,41,59,0.10);
+    --hairline-dark: rgba(255,255,255,0.08);
+    --shadow-soft: 0 2px 14px rgba(30,41,59,0.08);
+    --shadow-lift: 0 12px 30px rgba(30,41,59,0.18);
+
+    --fs-display: clamp(2.4rem, 5vw, 4rem);
+    --fs-h2: clamp(1.85rem, 3vw, 2.6rem);
+    --fs-h3: 1.3rem;
+    --fs-body: 1.0625rem;
+    --fs-eyebrow: 0.78rem;
+
+    --section-pad: clamp(4rem, 7vw, 6rem) clamp(1.25rem, 5vw, 3rem);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--white);
+    color: var(--ink);
+    font-family: 'Source Sans 3', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    font-size: var(--fs-body);
+    line-height: 1.7;
+    font-feature-settings: 'kern', 'liga';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  img { max-width: 100%; display: block; }
+
+  a { color: inherit; text-decoration: none; }
+
+  h1, h2, h3, h4 {
+    font-family: 'Barlow Condensed', 'Barlow', Impact, sans-serif;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: 0.005em;
+    margin: 0;
+  }
+
+  p { margin: 0; }
+
+  .tnum { font-feature-settings: 'kern','liga','tnum'; font-variant-numeric: tabular-nums; }
+
+  .eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: var(--fs-eyebrow);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    display: inline-block;
+    margin-bottom: 0.9rem;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  /* ------- Buttons ------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 1rem 1.85rem;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease;
+    white-space: nowrap;
+  }
+
+  .btn--orange {
+    background: var(--orange);
+    color: var(--white);
+  }
+  .btn--orange:hover {
+    background: var(--orange-deep);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .btn--ghost {
+    background: transparent;
+    color: var(--white);
+    border-color: rgba(255,255,255,0.55);
+  }
+  .btn--ghost:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: var(--white);
+  }
+
+  .btn--white {
+    background: var(--white);
+    color: var(--ink);
+  }
+  .btn--white:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  }
+
+  /* ------- NAV ------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--steel);
+    border-bottom: 1px solid var(--hairline-dark);
+  }
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 1rem clamp(1.25rem, 3vw, 2.25rem);
+    max-width: 1320px;
+    margin: 0 auto;
+  }
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .wordmark__bar {
+    width: 24px;
+    height: 3px;
+    background: var(--orange);
+    display: inline-block;
+  }
+  .wordmark__text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .nav__links {
+    display: flex;
+    gap: 1.85rem;
+    align-items: center;
+  }
+  .nav__links a {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 600;
+    color: var(--gray-on-dark);
+    font-size: 0.95rem;
+    transition: color 140ms ease;
+  }
+  .nav__links a:hover { color: var(--white); }
+
+  .nav__phone {
+    background: var(--orange);
+    color: var(--white);
+    padding: 0.75rem 1.25rem;
+    border-radius: 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    font-size: 1.05rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+    transition: background 180ms ease;
+  }
+  .nav__phone:hover { background: var(--orange-deep); }
+  .nav__phone .icon { color: var(--white); }
+
+  /* ------- HERO ------- */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    background: var(--steel);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    color: var(--white);
+    padding: clamp(5rem, 10vh, 7rem) clamp(1.25rem, 5vw, 3rem) clamp(4rem, 8vh, 6rem);
+  }
+  .hero__bg-img {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(27,40,56,0.92), rgba(27,40,56,0.92)),
+      url("https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1920&q=80");
+    background-size: cover;
+    background-position: center;
+    filter: saturate(0.4);
+    z-index: 0;
+  }
+  .hero__dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 22px 22px;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .hero__rule {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--hairline-dark);
+    z-index: 2;
+  }
+  .hero__inner {
+    position: relative;
+    z-index: 3;
+    max-width: 1240px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .hero__content {
+    max-width: 720px;
+  }
+  .hero h1 {
+    font-size: var(--fs-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+    color: var(--white);
+    margin-bottom: 1.4rem;
+  }
+  .hero__sub {
+    color: var(--gray-on-dark);
+    font-size: 1.1rem;
+    line-height: 1.75;
+    max-width: 580px;
+    margin-bottom: 2rem;
+  }
+  .hero__ctas {
+    display: flex;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .hero__trust {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.9rem;
+    font-size: 0.9rem;
+    color: var(--white);
+    font-weight: 600;
+  }
+  .hero__trust .sep {
+    color: var(--orange);
+    font-weight: 700;
+  }
+  .hero__phone-icon { color: var(--white); }
+
+  /* ------- EMERGENCY STRIP ------- */
+  .emergency {
+    background: var(--orange);
+    border-bottom: 2px solid var(--orange-deep);
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem clamp(1.25rem, 5vw, 3rem);
+  }
+  .emergency__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+  .emergency__line {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .emergency__dot {
+    width: 8px;
+    height: 8px;
+    background: var(--white);
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .emergency__line .tnum { font-variant-numeric: tabular-nums; }
+
+  /* ------- SECTIONS ------- */
+  section { padding: var(--section-pad); }
+  .section--bone { background: var(--bone); }
+  .section--steel { background: var(--steel); color: var(--white); }
+
+  .section-head {
+    max-width: 760px;
+    margin-bottom: 3rem;
+  }
+  .section-head h2 {
+    font-size: var(--fs-h2);
+    text-transform: uppercase;
+    color: var(--ink);
+    letter-spacing: 0.005em;
+  }
+  .section--steel .section-head h2 { color: var(--white); }
+  .section-head p {
+    color: var(--slate);
+    font-size: 1.05rem;
+    margin-top: 1rem;
+    line-height: 1.75;
+  }
+  .section--steel .section-head p { color: var(--gray-on-dark); }
+
+  /* ------- SERVICES GRID ------- */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .service-card {
+    position: relative;
+    background: var(--white);
+    border-radius: 6px;
+    padding: 1.65rem 1.75rem 1.75rem;
+    box-shadow: var(--shadow-soft);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--orange);
+  }
+  .service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+  }
+  .service-card__icon {
+    color: var(--orange);
+    font-size: 1.6rem;
+    line-height: 1;
+    margin-bottom: 0.85rem;
+  }
+  .service-card h3 {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    margin-bottom: 0.65rem;
+  }
+  .service-card p {
+    color: var(--slate);
+    font-size: 0.98rem;
+    line-height: 1.65;
+    margin-bottom: 1rem;
+  }
+  .service-card__more {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: gap 160ms ease;
+  }
+  .service-card__more:hover { gap: 0.6rem; color: var(--orange-deep); }
+
+  /* ------- WHY IRONCLAD ------- */
+  .why-list {
+    max-width: 980px;
+  }
+  .why-block {
+    position: relative;
+    padding: 1.75rem 0 1.75rem 1.5rem;
+    border-bottom: 1px solid var(--hairline-light);
+  }
+  .why-block:last-child { border-bottom: 0; }
+  .why-block::before {
+    content: "";
+    position: absolute;
+    top: 1.75rem;
+    bottom: 1.75rem;
+    left: 0;
+    width: 4px;
+    background: var(--orange);
+  }
+  .why-block h3 {
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55rem;
+  }
+  .why-block h3 .check {
+    color: var(--orange);
+    font-weight: 700;
+  }
+  .why-block p {
+    color: var(--slate);
+    line-height: 1.75;
+    font-size: 1.02rem;
+    max-width: 780px;
+  }
+
+  /* ------- SERVICE AREA ------- */
+  .city-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  .city-pill {
+    background: var(--bone);
+    border: 1px solid var(--hairline-light);
+    border-radius: 4px;
+    padding: 0.7rem 1rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    font-size: 1rem;
+    transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+  }
+  .city-pill:hover {
+    border-color: var(--orange);
+    background: var(--white);
+    transform: translateY(-1px);
+  }
+  .city-pill__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .city-pill__star { color: var(--orange); font-size: 0.95rem; }
+  .city-pill__suffix {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 600;
+    color: var(--slate-light);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'kern','liga','tnum';
+  }
+  .city-fallback {
+    text-align: center;
+    margin-top: 2.25rem;
+    color: var(--slate);
+  }
+  .city-fallback strong { color: var(--ink); font-weight: 600; }
+
+  /* ------- REVIEWS ------- */
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .review-card {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .review-stars {
+    color: var(--orange);
+    letter-spacing: 0.18em;
+    font-size: 1.05rem;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .review-card blockquote {
+    margin: 0;
+    color: var(--slate);
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+  .review-card cite {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--orange);
+    font-size: 0.82rem;
+    margin-top: auto;
+  }
+
+  /* ------- FINANCING CTA ------- */
+  .financing {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  .financing__copy h2 {
+    font-size: var(--fs-h2);
+    color: var(--white);
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+  }
+  .financing__copy p {
+    color: var(--gray-on-dark);
+    line-height: 1.75;
+    margin-bottom: 1.4rem;
+    max-width: 540px;
+  }
+  .financing__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    align-items: center;
+    color: var(--orange);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.85rem;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .financing__chips .chip-sep { color: var(--orange); }
+
+  .financing__card {
+    background: var(--orange);
+    color: var(--white);
+    border-radius: 6px;
+    padding: 2.5rem;
+    box-shadow: 0 16px 40px rgba(249,115,22,0.25);
+  }
+  .financing__card h3 {
+    font-size: 1.7rem;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 0.85rem;
+  }
+  .financing__card p {
+    color: rgba(255,255,255,0.95);
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ------- FOOTER ------- */
+  footer.footer {
+    background: var(--steel-deep);
+    color: var(--gray-on-dark);
+    padding: clamp(3.5rem, 6vw, 5rem) clamp(1.25rem, 5vw, 3rem) 1.5rem;
+  }
+  .footer__cols {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: 2.25rem;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+  .footer__brand .wordmark__text { font-size: 1.55rem; }
+  .footer__tag {
+    margin-top: 0.85rem;
+    color: var(--gray-dim);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    max-width: 280px;
+  }
+  .footer-col h4 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .footer-col ul a {
+    color: var(--gray-on-dark);
+    font-size: 0.95rem;
+    transition: color 140ms ease;
+  }
+  .footer-col ul a:hover { color: var(--orange); }
+  .footer__hours-line {
+    color: var(--gray-on-dark);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .footer__license {
+    max-width: 1240px;
+    margin: 2.5rem auto 0;
+    padding: 1.5rem 0 0;
+    border-top: 1px solid var(--hairline-dark);
+    text-align: center;
+    color: var(--orange);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.82rem;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .footer__bottom {
+    max-width: 1240px;
+    margin: 1.5rem auto 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--orange);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    color: var(--gray-dim);
+    font-size: 0.78rem;
+  }
+  .footer__bottom a { color: var(--gray-dim); transition: color 140ms ease; }
+  .footer__bottom a:hover { color: var(--white); }
+
+  /* ------- RESPONSIVE ------- */
+  @media (max-width: 1024px) {
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .reviews-grid { grid-template-columns: 1fr; }
+    .city-grid { grid-template-columns: repeat(3, 1fr); }
+    .financing { grid-template-columns: 1fr; gap: 2.25rem; }
+    .footer__cols { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .nav__inner { flex-wrap: wrap; gap: 0.75rem; }
+    .nav__links { display: none; }
+    .nav__phone { padding: 0.6rem 0.95rem; font-size: 0.95rem; }
+    .wordmark__text { font-size: 1.2rem; }
+
+    .hero { min-height: auto; padding-top: 4rem; padding-bottom: 4rem; }
+    .hero__ctas .btn { width: 100%; justify-content: center; }
+    .hero__ctas { flex-direction: column; align-items: stretch; }
+    .hero__trust { justify-content: flex-start; }
+
+    .emergency { padding: 1.5rem 1.25rem; }
+    .emergency__inner { flex-direction: column; gap: 0.85rem; }
+    .emergency__dot { display: none; }
+    .emergency__line { font-size: 1rem; text-align: center; justify-content: center; }
+
+    .services-grid { grid-template-columns: 1fr; }
+    .city-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .footer__cols { grid-template-columns: 1fr; }
+    .footer__bottom { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+    .service-card:hover, .btn:hover, .city-pill:hover { transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== NAV ========== -->
+<header class="nav">
+  <div class="nav__inner">
+    <a href="#top" class="wordmark" aria-label="Ironclad Air home">
+      <span class="wordmark__bar" aria-hidden="true"></span>
+      <span class="wordmark__text">Ironclad Air</span>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#services">Services</a>
+      <a href="#why">Why Ironclad</a>
+      <a href="#area">Service Area</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#financing">Financing</a>
+    </nav>
+    <a href="tel:+18175550193" class="nav__phone tnum" aria-label="Call Ironclad Air at (817) 555-0193">
+      <span class="icon" aria-hidden="true">&#9742;</span>
+      <span class="tnum">(817) 555-0193</span>
+    </a>
+  </div>
+</header>
+
+<!-- ========== HERO ========== -->
+<section class="hero" id="top">
+  <div class="hero__bg-img" aria-hidden="true"></div>
+  <div class="hero__dots" aria-hidden="true"></div>
+  <div class="hero__inner">
+    <div class="hero__content">
+      <span class="eyebrow">24/7 Emergency HVAC Service &middot; DFW Metroplex</span>
+      <h1>Your AC Broke. We're Already On The Way.</h1>
+      <p class="hero__sub">Licensed, bonded, insured. Same-day service across Dallas-Fort Worth. We show up on time, explain the problem in plain English, and fix it right the first time. No surprises on the invoice.</p>
+      <div class="hero__ctas">
+        <a href="#financing" class="btn btn--orange">Schedule Service</a>
+        <a href="tel:+18175550193" class="btn btn--ghost"><span class="hero__phone-icon" aria-hidden="true">&#9742;</span> <span class="tnum">(817) 555-0193</span></a>
+      </div>
+      <div class="hero__trust">
+        <span>Licensed &amp; Insured</span>
+        <span class="sep" aria-hidden="true">&middot;</span>
+        <span>BBB A+ Rated</span>
+        <span class="sep" aria-hidden="true">&middot;</span>
+        <span class="tnum">2,500+ 5&#9733; Reviews</span>
+        <span class="sep" aria-hidden="true">&middot;</span>
+        <span>Same-Day Available</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero__rule" aria-hidden="true"></div>
+</section>
+
+<!-- ========== EMERGENCY STRIP ========== -->
+<section class="emergency" aria-label="Emergency availability">
+  <div class="emergency__inner">
+    <span class="emergency__line">AC Emergency? We Answer 24/7.</span>
+    <span class="emergency__dot" aria-hidden="true"></span>
+    <span class="emergency__line">Including Weekends and Holidays.</span>
+    <span class="emergency__dot" aria-hidden="true"></span>
+    <span class="emergency__line">Average Response: <span class="tnum">90 Minutes</span>.</span>
+  </div>
+</section>
+
+<!-- ========== SERVICES ========== -->
+<section id="services">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">What We Do</span>
+      <h2>Residential and Commercial HVAC Services.</h2>
+      <p>Cooling, heating, indoor air, and emergency response across the DFW metroplex. One crew, one truck, one invoice. Built for Texas summers and the occasional ice storm we pretend won't come.</p>
+    </div>
+
+    <div class="services-grid">
+      <article class="service-card">
+        <div class="service-card__icon" aria-hidden="true">&#10052;</div>
+        <h3>AC Repair</h3>
+        <p>Diagnostic in 30 minutes, fix on the same visit when parts allow. Capacitors, contactors, refrigerant, blower motors, control boards. We carry the inventory the other guys promise tomorrow.</p>
+        <a href="#financing" class="service-card__more">Learn More &rarr;</a>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" aria-hidden="true">&#10052;</div>
+        <h3>AC Installation</h3>
+        <p>Carrier, Trane, Lennox. Right-sized for your square footage and ductwork, not your salesperson's quota. Free in-home estimate, manual J load calc, written warranty. Installed in a day.</p>
+        <a href="#financing" class="service-card__more">Learn More &rarr;</a>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" aria-hidden="true">&#128293;</div>
+        <h3>Heating Repair</h3>
+        <p>Gas furnaces, heat pumps, dual-fuel systems. We test combustion, check heat exchangers for cracks, and tell you straight whether it's a fix or a replacement. No scare tactics.</p>
+        <a href="#financing" class="service-card__more">Learn More &rarr;</a>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" aria-hidden="true">&#9889;</div>
+        <h3>Maintenance Plans</h3>
+        <p>Two visits a year, priority dispatch, 15% off repairs, no after-hours fees. Catches the small stuff before it kills your unit during the August heat dome. Two systems? Bundled rate.</p>
+        <a href="#financing" class="service-card__more">Learn More &rarr;</a>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" aria-hidden="true">&#9889;</div>
+        <h3>Commercial HVAC</h3>
+        <p>Restaurants, retail, medical offices, light industrial. Rooftop units, split systems, refrigeration. We work after hours so your dining room stays open. Service contracts available.</p>
+        <a href="#financing" class="service-card__more">Learn More &rarr;</a>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" aria-hidden="true">&#10052;</div>
+        <h3>Indoor Air Quality</h3>
+        <p>Whole-home filtration, UV lamps, fresh-air ventilators, duct sealing. If anyone in the house has allergies or your AC bill is climbing year over year, this is where the savings hide.</p>
+        <a href="#financing" class="service-card__more">Learn More &rarr;</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========== WHY IRONCLAD ========== -->
+<section class="section--bone" id="why">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Why Ironclad</span>
+      <h2>What Sets Us Apart From Every Other HVAC Company.</h2>
+      <p>The HVAC industry has a reputation problem. We built this company to be the opposite of that reputation. Here's how.</p>
+    </div>
+
+    <div class="why-list">
+      <div class="why-block">
+        <h3><span class="check" aria-hidden="true">&#10003;</span> Flat-Rate Pricing</h3>
+        <p>Every job priced before we start the work. The number you approve is the number on the invoice. No labor padding, no mystery fees, no "while we were in there" surprises. If the job goes long, that's our problem, not yours.</p>
+      </div>
+      <div class="why-block">
+        <h3><span class="check" aria-hidden="true">&#10003;</span> Background-Checked Technicians</h3>
+        <p>Every tech on staff is a W-2 employee, drug-tested, background-checked, NATE-certified, and uniformed. No subcontractors, no day labor. The person at your door has been with Ironclad an average of seven years.</p>
+      </div>
+      <div class="why-block">
+        <h3><span class="check" aria-hidden="true">&#10003;</span> We Don't Upsell</h3>
+        <p>If your 14-year-old unit has another summer in it, we'll tell you. If a $40 capacitor solves the problem, we replace the capacitor. Our techs work on salary plus tenure bonus, not commission. There is nothing to gain from selling you something you don't need.</p>
+      </div>
+      <div class="why-block">
+        <h3><span class="check" aria-hidden="true">&#10003;</span> Texas Heat Specialists</h3>
+        <p>We've been doing this in DFW since 2004. We know which neighborhoods have the worst attic insulation, which subdivisions Builder X cheaped out on duct sizing, and exactly how a 105 degree afternoon punishes an undersized condenser. Local knowledge saves you money.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SERVICE AREA ========== -->
+<section id="area">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Service Area</span>
+      <h2>Serving The Entire DFW Metroplex.</h2>
+      <p>From Denton to Waxahachie, McKinney to Weatherford. One call, one truck, same-day service.</p>
+    </div>
+
+    <div class="city-grid">
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Arlington</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Dallas</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Fort Worth</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Plano</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Frisco</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> McKinney</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Denton</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Irving</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Grand Prairie</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Mansfield</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Southlake</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Keller</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Grapevine</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Richardson</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Garland</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Mesquite</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Weatherford</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Waxahachie</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Allen</span><span class="city-pill__suffix tnum">DFW</span></span>
+      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Prosper</span><span class="city-pill__suffix tnum">DFW</span></span>
+    </div>
+
+    <p class="city-fallback"><strong>Don't see your city?</strong> Call us. If you're in DFW, we can get to you.</p>
+  </div>
+</section>
+
+<!-- ========== REVIEWS ========== -->
+<section class="section--bone" id="reviews">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">What Our Customers Say</span>
+      <h2><span class="tnum">2,500+</span> Five-Star Reviews And Counting.</h2>
+      <p>Aggregated across Google, Facebook, BBB, and Nextdoor. The full archive is linked in our footer.</p>
+    </div>
+
+    <div class="reviews-grid">
+      <article class="review-card">
+        <div class="review-stars" aria-label="Five star review">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>"Our AC died at 6pm on the Fourth of July. Three other companies had us on a waitlist. Ironclad answered, dispatched a tech in 45 minutes, and had cold air running before fireworks started. The bill was exactly what they quoted on the phone."</blockquote>
+        <cite>Rachel M. &middot; Fort Worth</cite>
+      </article>
+
+      <article class="review-card">
+        <div class="review-stars" aria-label="Five star review">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>"The previous company told me I needed a full system replacement at $14,000. Ironclad came out for a second opinion and identified a single bad capacitor. $312 later the system has been running fine for two summers. That kind of honesty is rare."</blockquote>
+        <cite>David T. &middot; Plano</cite>
+      </article>
+
+      <article class="review-card">
+        <div class="review-stars" aria-label="Five star review">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>"I manage four restaurants in the metroplex. Ironclad services all of them. They show up on time, communicate clearly, and never try to upsell my owners on equipment we don't need. They're the only HVAC company I trust with commercial work."</blockquote>
+        <cite>Marcus L. &middot; Restaurant Group GM</cite>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FINANCING CTA ========== -->
+<section class="section--steel" id="financing">
+  <div class="container">
+    <div class="financing">
+      <div class="financing__copy">
+        <span class="eyebrow">Financing Available</span>
+        <h2>New System? We Make It Affordable.</h2>
+        <p>0% financing for 36 months on qualifying installations. No money down. Credit decisions in minutes. Because a new AC system shouldn't drain your savings.</p>
+        <div class="financing__chips">
+          <span class="tnum">0% APR</span>
+          <span class="chip-sep" aria-hidden="true">&middot;</span>
+          <span class="tnum">36 Months</span>
+          <span class="chip-sep" aria-hidden="true">&middot;</span>
+          <span>No Prepayment Penalty</span>
+        </div>
+      </div>
+
+      <aside class="financing__card">
+        <h3>Ready To Get Started?</h3>
+        <p>Call <span class="tnum">(817) 555-0193</span> for a free in-home estimate. No pressure, no obligation.</p>
+        <a href="tel:+18175550193" class="btn btn--white">Get Free Estimate</a>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <div class="footer__cols">
+    <div class="footer__brand">
+      <div class="wordmark">
+        <span class="wordmark__bar" aria-hidden="true"></span>
+        <span class="wordmark__text">Ironclad Air</span>
+      </div>
+      <p class="footer__tag">Trusted HVAC since <span class="tnum">2004</span> &middot; Arlington, TX. Family-owned, employee-staffed, customer-obsessed.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#services">AC Repair</a></li>
+        <li><a href="#services">AC Installation</a></li>
+        <li><a href="#services">Heating Repair</a></li>
+        <li><a href="#services">Maintenance Plans</a></li>
+        <li><a href="#services">Commercial HVAC</a></li>
+        <li><a href="#services">Indoor Air Quality</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Service Area</h4>
+      <ul>
+        <li><a href="#area">Arlington</a></li>
+        <li><a href="#area">Dallas</a></li>
+        <li><a href="#area">Fort Worth</a></li>
+        <li><a href="#area">Plano</a></li>
+        <li><a href="#area">Frisco</a></li>
+        <li><a href="#area">McKinney</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Hours</h4>
+      <p class="footer__hours-line">Mon&ndash;Fri 7am&ndash;7pm</p>
+      <p class="footer__hours-line">Sat 8am&ndash;5pm</p>
+      <p class="footer__hours-line">Emergency 24/7</p>
+    </div>
+  </div>
+
+  <p class="footer__license">TACLA License #<span class="tnum">12345</span> &middot; BBB A+ Accredited &middot; Carrier Factory Authorized Dealer</p>
+
+  <div class="footer__bottom">
+    <span>&copy; <span class="tnum">2026</span> Ironclad Air. All rights reserved.</span>
+    <span>Website by <a href="https://dbjtechnologies.com">DBJ Technologies</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

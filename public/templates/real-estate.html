@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Lauren Prescott · Luxury Residential · Dallas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Karla:ital,wght@0,300;0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0A0A0A;
+    --black-soft: #141414;
+    --ivory: #F5F1EB;
+    --cream: #FAF7F2;
+    --copper: #B87333;
+    --copper-deep: #A06428;
+    --copper-pale: rgba(184,115,51,0.12);
+    --warm-gray: #7A7067;
+    --warm-gray-light: #A09890;
+    --on-dark: #E8E2D7;
+    --on-dark-dim: #968E80;
+    --hairline-copper: rgba(184,115,51,0.18);
+    --hairline-light: rgba(10,10,10,0.08);
+    --shadow-soft: 0 2px 18px rgba(10,10,10,0.06);
+    --shadow-lift: 0 14px 36px rgba(10,10,10,0.10);
+
+    --fs-display: clamp(2.8rem, 5vw, 4.4rem);
+    --fs-h2: clamp(2rem, 3.2vw, 2.8rem);
+    --fs-h3: 1.4rem;
+    --fs-body: 1.0625rem;
+    --fs-eyebrow: 0.72rem;
+    --fs-price: clamp(2.4rem, 3.5vw, 3.4rem);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  body {
+    margin: 0;
+    background: var(--ivory);
+    color: var(--warm-gray);
+    font-family: 'Karla', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: var(--fs-body);
+    font-weight: 400;
+    line-height: 1.85;
+    font-feature-settings: 'kern', 'liga', 'onum';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-weight: 400;
+    line-height: 1.05;
+    color: var(--black);
+    margin: 0;
+    font-feature-settings: 'kern', 'liga';
+  }
+
+  p { margin: 0; }
+
+  a { color: inherit; text-decoration: none; }
+
+  .eyebrow {
+    font-family: 'Karla', sans-serif;
+    font-size: var(--fs-eyebrow);
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--copper);
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  section {
+    padding: clamp(5.5rem, 10vw, 8.5rem) clamp(1.5rem, 6vw, 4rem);
+  }
+
+  /* ======== NAV ======== */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--black);
+    padding: 1.4rem clamp(1.5rem, 6vw, 4rem);
+  }
+  .nav-inner {
+    max-width: 1480px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .wordmark {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    color: var(--ivory);
+    font-size: 0.92rem;
+    letter-spacing: 0.32em;
+    font-weight: 400;
+  }
+  .nav-links {
+    display: flex;
+    gap: 2.4rem;
+    align-items: center;
+  }
+  .nav-links a {
+    font-family: 'Karla', sans-serif;
+    font-weight: 400;
+    color: var(--on-dark);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    transition: color 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--copper); }
+
+  .btn {
+    display: inline-block;
+    background: var(--copper);
+    color: #fff;
+    font-family: 'Karla', sans-serif;
+    font-weight: 400;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 1.05rem 2.4rem;
+    border-radius: 0;
+    border: 1px solid var(--copper);
+    transition: background 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--copper-deep);
+    border-color: var(--copper-deep);
+    transform: translateY(-1px);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--copper);
+    border: 1px solid var(--copper);
+  }
+  .btn-ghost:hover {
+    background: var(--copper-pale);
+    color: var(--copper-deep);
+    border-color: var(--copper-deep);
+  }
+
+  /* ======== HERO ======== */
+  .hero {
+    position: relative;
+    background: var(--black);
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: clamp(6rem, 12vw, 9rem) 0 clamp(6rem, 12vw, 9rem) 0;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    filter: saturate(0.12) blur(0.5px);
+    opacity: 0.05;
+    pointer-events: none;
+  }
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+    padding-left: clamp(2rem, 9vw, 9rem);
+    padding-right: clamp(1.5rem, 4vw, 3rem);
+  }
+  .hero .eyebrow { display: block; margin-bottom: 2rem; }
+  .hero h1 {
+    color: var(--ivory);
+    font-size: var(--fs-display);
+    margin-bottom: 1.75rem;
+  }
+  .hero-sub {
+    color: var(--on-dark-dim);
+    font-size: 1.05rem;
+    line-height: 1.85;
+    max-width: 520px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-cta-row {
+    margin-bottom: 3rem;
+  }
+  .hero-rule {
+    width: 240px;
+    height: 1px;
+    background: var(--copper);
+    opacity: 0.6;
+    margin-bottom: 1.6rem;
+  }
+  .hero-stats {
+    font-family: 'Karla', sans-serif;
+    color: var(--on-dark-dim);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    line-height: 1.9;
+    font-feature-settings: 'tnum';
+  }
+  .hero-stats .sep {
+    color: var(--copper);
+    margin: 0 0.7em;
+  }
+
+  /* ======== SECTION HEADERS ======== */
+  .section-head {
+    max-width: 760px;
+    margin-bottom: clamp(3rem, 5vw, 4.5rem);
+  }
+  .section-head .eyebrow {
+    display: block;
+    margin-bottom: 1.25rem;
+  }
+  .section-head h2 {
+    font-size: var(--fs-h2);
+    margin-bottom: 1.1rem;
+  }
+  .section-head .lead {
+    font-style: italic;
+    color: var(--warm-gray);
+    font-size: 1.05rem;
+  }
+
+  /* ======== PROPERTIES ======== */
+  .properties {
+    background: var(--ivory);
+  }
+  .properties .container { max-width: 1280px; }
+
+  .prop-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  .prop-card {
+    background: var(--cream);
+    padding: 2.5rem 2rem 2rem 2rem;
+    border: none;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 460px;
+  }
+  .prop-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--copper);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .prop-card:hover {
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+  .prop-card:hover::before { opacity: 1; }
+
+  .prop-price {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-weight: 400;
+    color: var(--copper);
+    font-size: var(--fs-price);
+    line-height: 1.05;
+    font-feature-settings: 'kern', 'liga', 'tnum', 'salt';
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.005em;
+  }
+  .prop-rule {
+    width: 60px;
+    height: 1px;
+    background: var(--copper);
+    margin-bottom: 1.5rem;
+  }
+  .prop-address {
+    font-family: 'Karla', sans-serif;
+    font-weight: 500;
+    color: var(--black);
+    font-size: 1.05rem;
+    margin-bottom: 0.55rem;
+    line-height: 1.4;
+  }
+  .prop-meta {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 1.4rem;
+    font-feature-settings: 'tnum';
+  }
+  .prop-desc {
+    color: var(--warm-gray);
+    font-size: 0.97rem;
+    line-height: 1.75;
+    margin-bottom: 1.75rem;
+    flex: 1;
+  }
+  .prop-link {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-style: italic;
+    color: var(--copper);
+    font-size: 1.02rem;
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+  }
+  .prop-link:hover { color: var(--copper-deep); }
+
+  .prop-viewall {
+    text-align: center;
+    margin-top: clamp(3rem, 5vw, 4.5rem);
+  }
+  .prop-viewall a {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-style: italic;
+    color: var(--copper);
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    transition: color 0.3s ease;
+  }
+  .prop-viewall a:hover { color: var(--copper-deep); }
+
+  /* ======== NEIGHBORHOODS ======== */
+  .neighborhoods {
+    background: var(--cream);
+  }
+  .nh-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(2.5rem, 5vw, 4.5rem) clamp(3rem, 6vw, 5rem);
+  }
+  .nh-entry {
+    border-left: 3px solid var(--copper);
+    padding-left: 1.75rem;
+  }
+  .nh-name {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    color: var(--black);
+    line-height: 1.15;
+    margin-bottom: 0.7rem;
+  }
+  .nh-stats {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 1.1rem;
+    font-feature-settings: 'tnum';
+  }
+  .nh-desc {
+    color: var(--warm-gray);
+    font-size: 0.99rem;
+    line-height: 1.85;
+  }
+
+  /* ======== ABOUT / PHILOSOPHY ======== */
+  .about {
+    background: var(--ivory);
+    position: relative;
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(3rem, 7vw, 6rem);
+    align-items: start;
+  }
+  .about-left h2 {
+    font-size: var(--fs-h2);
+    margin-bottom: 2rem;
+  }
+  .about-left .eyebrow {
+    display: block;
+    margin-bottom: 1.25rem;
+  }
+  .about-paragraphs p {
+    color: var(--warm-gray);
+    line-height: 1.95;
+    margin-bottom: 1.4rem;
+    font-size: 1.04rem;
+  }
+  .about-paragraphs p:last-child { margin-bottom: 0; }
+
+  .about-right {
+    position: relative;
+    padding-left: 2.4rem;
+    min-height: 100%;
+  }
+  .about-right::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--copper);
+    opacity: 0.45;
+  }
+  .about-quote-glyph {
+    position: absolute;
+    top: -1.5rem;
+    right: 0;
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-size: 11rem;
+    color: var(--copper);
+    opacity: 0.10;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+  .about-pull {
+    position: relative;
+    color: var(--black);
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-size: 1.5rem;
+    line-height: 1.5;
+    font-style: italic;
+    margin-bottom: 2rem;
+    padding-top: 1rem;
+  }
+  .about-meta {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--copper);
+  }
+  .about-meta .row {
+    display: block;
+    color: var(--warm-gray);
+    margin-top: 0.5rem;
+    font-feature-settings: 'tnum';
+  }
+
+  /* ======== TESTIMONIALS ======== */
+  .testimonials {
+    background: var(--black);
+  }
+  .testimonials .section-head h2 { color: var(--ivory); }
+  .testimonials .section-head .eyebrow { color: var(--copper); }
+  .test-stack {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3rem, 6vw, 5rem);
+    max-width: 880px;
+  }
+  .test-block {
+    position: relative;
+    padding-left: clamp(3rem, 5vw, 4.5rem);
+    padding-top: 1rem;
+  }
+  .test-block::before {
+    content: "\201C";
+    position: absolute;
+    left: 0;
+    top: -0.6rem;
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    color: var(--copper);
+    opacity: 0.22;
+    font-size: 5rem;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .test-quote {
+    font-family: 'Karla', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ivory);
+    font-size: 1.18rem;
+    line-height: 1.6;
+    margin-bottom: 1.6rem;
+  }
+  .test-attribution {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-style: italic;
+    color: var(--copper);
+    font-size: 0.95rem;
+    letter-spacing: 0.16em;
+  }
+
+  /* ======== SELLERS CTA ======== */
+  .sellers {
+    background: var(--cream);
+    text-align: center;
+  }
+  .sellers .container { max-width: 720px; }
+  .sellers .eyebrow {
+    display: block;
+    margin-bottom: 1.25rem;
+  }
+  .sellers h2 {
+    font-size: var(--fs-h2);
+    margin-bottom: 1.5rem;
+  }
+  .sellers-sub {
+    color: var(--warm-gray);
+    max-width: 540px;
+    margin: 0 auto 2.5rem;
+    font-size: 1.05rem;
+    line-height: 1.85;
+  }
+  .sellers-foot {
+    margin-top: 2rem;
+    color: var(--warm-gray-light);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+  }
+  .sellers-foot .sep {
+    color: var(--copper);
+    margin: 0 0.6em;
+  }
+
+  /* ======== FOOTER ======== */
+  footer {
+    background: var(--black);
+    padding: clamp(4rem, 6vw, 5rem) clamp(1.5rem, 6vw, 4rem) 2.5rem;
+  }
+  .footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+    margin-bottom: 3.5rem;
+  }
+  .footer-wordmark {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    color: var(--ivory);
+    font-size: 1rem;
+    letter-spacing: 0.32em;
+    margin-bottom: 0.9rem;
+  }
+  .footer-block {
+    color: var(--on-dark-dim);
+    font-size: 0.92rem;
+    line-height: 1.85;
+  }
+  .footer-block a { color: var(--on-dark-dim); transition: color 0.3s ease; }
+  .footer-block a:hover { color: var(--copper); }
+
+  .footer-broker {
+    font-style: italic;
+    color: var(--on-dark-dim);
+    margin-bottom: 1.25rem;
+    line-height: 1.7;
+  }
+  .footer-credit a {
+    color: var(--copper);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+  }
+  .footer-credit a:hover { color: var(--copper-deep); }
+
+  .footer-rule {
+    height: 1px;
+    background: var(--hairline-copper);
+    margin-bottom: 1.5rem;
+  }
+  .footer-legal {
+    text-align: center;
+    color: var(--on-dark-dim);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ======== RESPONSIVE ======== */
+  @media (max-width: 960px) {
+    .prop-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+    .nh-grid { grid-template-columns: 1fr; gap: 2.75rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .about-right { padding-left: 1.75rem; min-height: 0; }
+    .about-quote-glyph { font-size: 8rem; top: -1rem; }
+    .footer-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  }
+
+  @media (max-width: 768px) {
+    .nav { padding: 1rem 1.25rem; }
+    .nav-links { display: none; }
+    .wordmark { font-size: 0.78rem; letter-spacing: 0.28em; }
+    .btn { padding: 0.85rem 1.6rem; font-size: 0.7rem; letter-spacing: 0.18em; }
+    .hero-inner { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .hero-rule { width: 180px; }
+    .hero-stats .sep { display: inline; margin: 0 0.4em; }
+    section { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
+    .test-block { padding-left: 2.25rem; }
+    .test-block::before { font-size: 3.6rem; top: -0.4rem; }
+    .prop-card { min-height: 0; padding: 2rem 1.5rem 1.75rem; }
+    footer { padding: 3.5rem 1.25rem 2rem; }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: clamp(2.2rem, 9vw, 2.8rem); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav class="nav" aria-label="Primary">
+  <div class="nav-inner">
+    <a href="#" class="wordmark">LAUREN PRESCOTT</a>
+    <div class="nav-links">
+      <a href="#properties">Properties</a>
+      <a href="#neighborhoods">Neighborhoods</a>
+      <a href="#about">About</a>
+      <a href="#sellers">Sellers</a>
+      <a href="#contact">Contact</a>
+      <a href="#contact" class="btn">Schedule Consultation</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <span class="eyebrow">LUXURY RESIDENTIAL &middot; DALLAS</span>
+    <h1>Your Home Should Be as Considered as the Life You&rsquo;ve Built.</h1>
+    <p class="hero-sub">I represent buyers and sellers across Dallas&rsquo;s most distinguished neighborhoods. Every transaction is personal, every strategy is custom, and every detail is handled with the discretion my clients expect.</p>
+    <div class="hero-cta-row">
+      <a href="#contact" class="btn">Begin a Conversation</a>
+    </div>
+    <div class="hero-rule" aria-hidden="true"></div>
+    <div class="hero-stats">
+      $340M Career Volume <span class="sep">&middot;</span> 200+ Transactions <span class="sep">&middot;</span> Park Cities Resident Since 2008
+    </div>
+  </div>
+</header>
+
+<!-- ===== SELECTED PROPERTIES ===== -->
+<section class="properties" id="properties">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">SELECTED PROPERTIES</span>
+      <h2>Currently Representing.</h2>
+      <p class="lead">A small sample of active and recently sold listings.</p>
+    </div>
+
+    <div class="prop-grid">
+      <article class="prop-card">
+        <div class="prop-price">$4,250,000</div>
+        <div class="prop-rule" aria-hidden="true"></div>
+        <div class="prop-address">4907 Lakeside Drive<br>Highland Park</div>
+        <div class="prop-meta">5 Bed &middot; 5.2 Bath &middot; 6,400 SF</div>
+        <p class="prop-desc">A poised stone traditional set behind mature live oaks, with formal garden, library paneled in rift white oak, and a primary suite oriented to the west light. Recently refreshed throughout.</p>
+        <a href="#" class="prop-link">View Listing &rarr;</a>
+      </article>
+
+      <article class="prop-card">
+        <div class="prop-price">$2,875,000</div>
+        <div class="prop-rule" aria-hidden="true"></div>
+        <div class="prop-address">3814 Normandy Avenue<br>University Park</div>
+        <div class="prop-meta">4 Bed &middot; 4.1 Bath &middot; 4,950 SF</div>
+        <p class="prop-desc">A graceful Georgian on a tree-canopied block, walking distance to Highland Park Village. Light, lifted ceilings, a discreet rear-entry motor court, and a kitchen designed for everyday quiet.</p>
+        <a href="#" class="prop-link">View Listing &rarr;</a>
+      </article>
+
+      <article class="prop-card">
+        <div class="prop-price">$6,900,000</div>
+        <div class="prop-rule" aria-hidden="true"></div>
+        <div class="prop-address">9220 Sunnybrook Lane<br>Preston Hollow</div>
+        <div class="prop-meta">6 Bed &middot; 7.2 Bath &middot; 9,100 SF</div>
+        <p class="prop-desc">A private compound on just over an acre, with reflecting pool, guest house, and a wine room of considered scale. Architecturally restrained, materially generous, fully renovated in 2023.</p>
+        <a href="#" class="prop-link">View Listing &rarr;</a>
+      </article>
+    </div>
+
+    <div class="prop-viewall">
+      <a href="#">View All Properties &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== NEIGHBORHOODS ===== -->
+<section class="neighborhoods" id="neighborhoods">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">NEIGHBORHOOD EXPERTISE</span>
+      <h2>I Know These Streets Because I Live on Them.</h2>
+    </div>
+
+    <div class="nh-grid">
+      <div class="nh-entry">
+        <h3 class="nh-name">Highland Park</h3>
+        <div class="nh-stats">MEDIAN $3.4M &middot; 28 TRANSACTIONS YTD</div>
+        <p class="nh-desc">The standard against which Dallas measures itself. Quiet streets, deeply established families, and an inventory that turns mostly off-market. Knowing who is preparing to sell, often a year before the listing, is the entire game here.</p>
+      </div>
+
+      <div class="nh-entry">
+        <h3 class="nh-name">University Park</h3>
+        <div class="nh-stats">MEDIAN $2.1M &middot; 41 TRANSACTIONS YTD</div>
+        <p class="nh-desc">Family-anchored, walkable, and shaped around the university. Buyers care about block-by-block character, school feeders, and the calm rhythm of neighbors who have known each other for decades. I match clients to streets, not just houses.</p>
+      </div>
+
+      <div class="nh-entry">
+        <h3 class="nh-name">Preston Hollow</h3>
+        <div class="nh-stats">MEDIAN $4.2M &middot; 22 TRANSACTIONS YTD</div>
+        <p class="nh-desc">Larger lots, longer setbacks, and a culture of privacy that prefers a quiet phone call to a marketing campaign. Here the work is mostly intuition and relationships. I represent both ends of the table with equal care.</p>
+      </div>
+
+      <div class="nh-entry">
+        <h3 class="nh-name">Prosper &amp; Southlake</h3>
+        <div class="nh-stats">MEDIAN $2.8M &middot; 34 TRANSACTIONS YTD</div>
+        <p class="nh-desc">Newer estates, larger acreage, and clients arriving from the coasts who want space and stillness without leaving Dallas&rsquo;s orbit. The buyer here is decisive, exacting, and rewards an agent who has actually walked the land.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT / PHILOSOPHY ===== -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-left">
+        <span class="eyebrow">ABOUT LAUREN</span>
+        <h2>Real Estate at the Highest Level Is Not About Houses.</h2>
+        <div class="about-paragraphs">
+          <p>It is about reading a room before anyone speaks. It is about understanding what a family is actually trying to build, and which of two beautiful properties will quietly hold that life better. After eighteen years and more than two hundred transactions, that is the work I have learned to do well.</p>
+          <p>I spent the first decade of my career studying Park Cities one block at a time. I know which streets keep their light through the afternoon, which builders age with grace, and which homes are owned by people who will never list publicly but might, given the right call.</p>
+          <p>My practice is intentionally small. I take a limited number of clients each year so that every introduction, negotiation, and closing receives my direct attention. That is the only way I know how to do this honestly.</p>
+        </div>
+      </div>
+
+      <div class="about-right">
+        <span class="about-quote-glyph" aria-hidden="true">&ldquo;</span>
+        <p class="about-pull">Quiet expertise, exact strategy, and a calendar small enough to actually answer the phone.</p>
+        <div class="about-meta">
+          Lauren Prescott
+          <span class="row">Principal &middot; Briggs Freeman Sotheby&rsquo;s</span>
+          <span class="row">Park Cities Resident Since 2008</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="testimonials">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">CLIENT EXPERIENCES</span>
+      <h2>Trust Built on Results.</h2>
+    </div>
+
+    <div class="test-stack">
+      <blockquote class="test-block">
+        <p class="test-quote">Lauren negotiated a sale price two hundred thousand dollars above what three other agents told us was realistic. She read the market correctly and stayed patient with us when our nerves did not. The discretion throughout was extraordinary.</p>
+        <div class="test-attribution">The Sutton Family &middot; Highland Park</div>
+      </blockquote>
+
+      <blockquote class="test-block">
+        <p class="test-quote">She walked us through eleven homes, declined two we loved on sight, and brought us to the twelfth. We have lived in it almost six years now and still cannot imagine the life we would have had in either of the first two. That is intuition you cannot teach.</p>
+        <div class="test-attribution">David &amp; Christine M. &middot; University Park</div>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SELLERS ===== -->
+<section class="sellers" id="sellers">
+  <div class="container">
+    <span class="eyebrow">FOR SELLERS</span>
+    <h2>Considering a Sale?</h2>
+    <p class="sellers-sub">I provide every prospective seller with a confidential market analysis and custom pricing strategy. No obligation, no pressure. Just clarity on what your home is worth and how I would position it.</p>
+    <a href="#contact" class="btn">Request a Private Consultation</a>
+    <p class="sellers-foot">Or call directly (214) 555-0672 <span class="sep">&middot;</span> All inquiries kept confidential</p>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-wordmark">LAUREN PRESCOTT</div>
+        <div class="footer-block">Luxury Residential &middot; Dallas, TX</div>
+      </div>
+
+      <div class="footer-block">
+        <div>(214) 555-0672</div>
+        <div><a href="#">lauren@laurenprescott.com</a></div>
+        <div>3300 Knox Street, Suite 110<br>Dallas, TX 75205</div>
+      </div>
+
+      <div>
+        <p class="footer-broker">Briggs Freeman Sotheby&rsquo;s International Realty</p>
+        <p class="footer-credit"><a href="https://dbjtechnologies.com">Website by DBJ Technologies</a></p>
+      </div>
+    </div>
+
+    <div class="footer-rule" aria-hidden="true"></div>
+    <div class="footer-legal">&copy; 2026 Lauren Prescott. All rights reserved. Equal Housing Opportunity.</div>
+  </div>
+</footer>
+
+</body>
+</html>

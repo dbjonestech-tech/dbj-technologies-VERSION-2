@@ -1,547 +1,1086 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
-<title>Mercer & Associates | Dallas Personal Injury Attorneys</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bauder &amp; Associates, Trial Lawyers · Dallas Personal Injury</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --navy: #0B1628;
-    --charcoal: #1E293B;
-    --charcoal-2: #243044;
+    --navy-soft: #122036;
+    --navy-band: #091222;
+    --cream: #F4EFE3;
+    --paper: #FAF6EC;
     --gold: #C9A84C;
-    --gold-dim: #a98e3f;
-    --white: #F8FAFC;
-    --gray: #94A3B8;
-    --gray-dim: #64748B;
-    --border: rgba(255,255,255,0.06);
-    --border-hot: rgba(201,168,76,0.28);
-  }
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', system-ui, -apple-system, Helvetica, Arial, sans-serif;
-    background: var(--navy);
-    color: var(--gray);
-    line-height: 1.65;
-    font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-  h1, h2, h3, h4 {
-    font-family: 'Playfair Display', Georgia, serif;
-    color: var(--white);
-    font-weight: 700;
-    margin: 0;
-    line-height: 1.15;
-  }
-  p { margin: 0; }
-  a { color: inherit; text-decoration: none; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
-  .eyebrow {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--gold);
+    --gold-dim: #A98A38;
+    --ink: #0B1628;
+    --gray: #C9D0DC;
+    --gray-dim: #8A95A8;
+    --warm-gray: #5C5246;
+    --hairline-gold: rgba(201,168,76,0.22);
+    --hairline-ink: rgba(11,22,40,0.10);
+    --shadow-soft: 0 2px 14px rgba(11,22,40,0.10);
+
+    --fs-display: clamp(2.6rem, 5vw, 4.4rem);
+    --fs-h2: clamp(1.9rem, 3vw, 2.6rem);
+    --fs-h3: 1.25rem;
+    --fs-body: 1.0625rem;
+    --fs-eyebrow: 0.75rem;
   }
 
-  /* ── Nav ─────────────────────────────────────────── */
-  .nav {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: rgba(11,22,40,0.92);
-    backdrop-filter: saturate(140%) blur(8px);
-    -webkit-backdrop-filter: saturate(140%) blur(8px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.1rem 2rem;
-    max-width: 1280px;
-    margin: 0 auto;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-  }
-  .brand-bar {
-    display: inline-block;
-    width: 2px;
-    height: 28px;
-    background: var(--gold);
-  }
-  .brand-name {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-weight: 700;
-    color: var(--white);
-    font-size: 1.05rem;
-    letter-spacing: 0.04em;
-  }
-  .nav-links {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
+  * {
     margin: 0;
     padding: 0;
-    flex-wrap: wrap;
+    box-sizing: border-box;
   }
-  .nav-links a {
-    color: var(--gray);
-    font-size: 0.92rem;
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: var(--fs-body);
+    line-height: 1.75;
+    color: var(--ink);
+    background: var(--cream);
+    font-feature-settings: 'kern', 'liga';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    line-height: 1.1;
     font-weight: 500;
-    transition: color 0.2s ease;
   }
-  .nav-links a:hover { color: var(--white); }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .eyebrow {
     font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    font-size: 0.88rem;
-    letter-spacing: 0.04em;
+    font-weight: 500;
+    font-size: var(--fs-eyebrow);
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    padding: 0.85rem 1.4rem;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    color: var(--gold);
+    display: inline-block;
   }
+
+  .section {
+    padding: clamp(4.5rem, 8vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .container-narrow {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: none;
+  }
+
   .btn-gold {
     background: var(--gold);
     color: var(--navy);
-    box-shadow: 0 4px 14px rgba(201,168,76,0.18);
   }
+
   .btn-gold:hover {
     background: var(--gold-dim);
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(201,168,76,0.28);
+    box-shadow: 0 8px 20px rgba(201,168,76,0.22);
   }
-  .btn-outline {
+
+  .btn-ghost {
     background: transparent;
     color: var(--gold);
-    border-color: var(--gold);
+    border: 1px solid var(--gold);
   }
-  .btn-outline:hover {
+
+  .btn-ghost:hover {
     background: rgba(201,168,76,0.08);
     transform: translateY(-1px);
   }
 
-  /* ── Hero ────────────────────────────────────────── */
-  .hero {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    background:
-      linear-gradient(rgba(11,22,40,0.93), rgba(11,22,40,0.93)),
-      url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&q=80');
-    background-size: cover;
-    background-position: center;
-    padding: 6rem 0 5rem;
-  }
-  .hero-content { max-width: 760px; }
-  .hero h1 {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    margin: 1.1rem 0 1.6rem;
-    letter-spacing: -0.01em;
-  }
-  .hero p.lead {
-    font-size: 1.12rem;
-    color: var(--gray);
-    max-width: 600px;
-    line-height: 1.75;
-  }
-  .hero-cta {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-top: 2.4rem;
-  }
-  .hero-trustline {
-    margin-top: 2rem;
-    font-size: 0.82rem;
-    letter-spacing: 0.1em;
-    color: var(--gray-dim);
-    text-transform: uppercase;
-  }
-  .hero-trustline span { color: var(--gold); margin: 0 0.5rem; }
-
-  /* ── Trust bar ───────────────────────────────────── */
-  .trust {
-    background: var(--charcoal);
-    padding: 4rem 0 4rem;
-    text-align: center;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .trust-rule {
-    width: 80px;
-    height: 2px;
-    background: var(--gold);
-    margin: 0 auto 2.5rem;
-  }
-  .trust-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2.5rem;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 2rem;
-  }
-  .trust-stat { text-align: center; }
-  .trust-icon {
-    color: var(--gold);
-    font-size: 1.8rem;
-    line-height: 1;
-    margin-bottom: 1rem;
-    font-feature-settings: "liga" 0;
-  }
-  .trust-num {
-    font-family: 'Playfair Display', Georgia, serif;
-    color: var(--gold);
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.1;
-    margin-bottom: 0.4rem;
-  }
-  .trust-label {
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gray);
-  }
-
-  /* ── Practice areas ──────────────────────────────── */
-  .practice {
-    padding: 6rem 0 6rem;
-    background: var(--navy);
-  }
-  .section-head {
-    max-width: 720px;
-    margin: 0 auto 3.5rem;
-    text-align: center;
-  }
-  .section-head h2 {
-    font-size: clamp(2rem, 3.5vw, 2.75rem);
-    margin: 0.85rem 0 0;
-  }
-  .practice-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
-  .card {
-    position: relative;
-    background: var(--charcoal);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 2.25rem 2rem 2rem;
-    transition: border-color 0.25s ease, transform 0.25s ease;
-  }
-  .card::before {
-    content: '';
-    position: absolute;
+  /* Nav */
+  .nav {
+    position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--gold);
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+    z-index: 50;
+    background: var(--navy);
+    border-bottom: 1px solid var(--hairline-gold);
   }
-  .card:hover {
-    border-color: var(--border-hot);
-    transform: translateY(-2px);
-  }
-  .card h3 {
-    font-size: 1.4rem;
-    margin: 0.4rem 0 0.85rem;
-  }
-  .card p { font-size: 0.96rem; line-height: 1.7; }
-  .card-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 1.4rem;
-    color: var(--gold);
-    font-weight: 600;
-    font-size: 0.9rem;
-    letter-spacing: 0.04em;
-    transition: gap 0.2s ease;
-  }
-  .card-link:hover { gap: 0.7rem; }
 
-  /* ── Why Choose Us ───────────────────────────────── */
-  .why {
-    padding: 6rem 0;
-    background: var(--charcoal);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+  .nav-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.25rem clamp(1.25rem, 5vw, 3rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
   }
-  .why-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: 4rem;
-    align-items: start;
+
+  .wordmark-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
   }
-  .why h2 {
-    font-size: clamp(2rem, 3.5vw, 2.75rem);
-    margin: 0.85rem 0 2rem;
+
+  .wordmark {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    font-size: 1.0625rem;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
   }
-  .diff-list { list-style: none; padding: 0; margin: 0; }
-  .diff-list li {
+
+  .wordmark-bar {
+    width: 2px;
+    height: 18px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.25rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    color: var(--gray);
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    transition: color 0.2s ease;
+  }
+
+  .nav-links a:hover {
+    color: var(--cream);
+  }
+
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+  }
+
+  .nav-cta .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* Hero */
+  .hero {
+    background:
+      radial-gradient(ellipse at 30% 40%, rgba(201,168,76,0.06), transparent 60%),
+      linear-gradient(180deg, var(--navy) 0%, var(--navy-soft) 100%);
+    color: var(--cream);
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: clamp(5rem, 10vw, 8rem) clamp(1.25rem, 5vw, 3rem);
+  }
+
+  .hero-frame {
+    position: absolute;
+    top: 80px;
+    bottom: 80px;
+    left: 80px;
+    right: 80px;
+    border: 1px solid var(--hairline-gold);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    text-align: center;
+    max-width: 880px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 2rem;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: var(--fs-display);
+    color: var(--gold);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.75rem;
+  }
+
+  .hero-sub {
+    color: var(--gray);
+    max-width: 620px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.85;
+    font-size: 1.0625rem;
+  }
+
+  .hero-ctas {
     display: flex;
     gap: 1rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--border);
-    color: var(--gray);
-    font-size: 1rem;
-    line-height: 1.7;
-  }
-  .diff-list li:last-child { border-bottom: none; }
-  .diff-bullet {
-    flex-shrink: 0;
-    width: 22px;
-    height: 22px;
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    display: inline-flex;
-    align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 700;
-    margin-top: 0.15rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
   }
-  .testimonial-card {
-    background: var(--charcoal-2);
-    border: 1px solid var(--border);
-    border-left: 2px solid var(--gold);
-    padding: 2.5rem 2.25rem;
-    border-radius: 4px;
+
+  .hero-rule {
+    width: 80px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0 auto 1.5rem;
   }
-  .testimonial-quote-mark {
-    font-family: 'Playfair Display', Georgia, serif;
-    color: var(--gold);
-    font-size: 3.5rem;
-    line-height: 0.4;
-    margin-bottom: 1.6rem;
-    opacity: 0.6;
-  }
-  .testimonial-quote {
-    font-style: italic;
-    font-size: 1.08rem;
-    line-height: 1.8;
-    color: var(--white);
-    margin-bottom: 1.6rem;
-  }
-  .testimonial-author {
-    color: var(--gold);
-    font-size: 0.85rem;
-    font-weight: 600;
+
+  .trustline {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--gray-dim);
+    font-size: 0.8125rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
-  /* ── Footer ──────────────────────────────────────── */
-  footer { background: var(--navy); padding: 4rem 0 2rem; border-top: 1px solid var(--border); }
-  .foot-grid {
+  /* Verdicts ledger */
+  .verdicts {
+    background: var(--cream);
+  }
+
+  .section-head {
+    text-align: center;
+    margin-bottom: 3.5rem;
+  }
+
+  .section-head h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    font-size: var(--fs-h2);
+    color: var(--ink);
+    margin: 0.875rem 0 1rem;
+  }
+
+  .section-head p {
+    color: var(--warm-gray);
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  .ledger {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .ledger-row {
+    display: grid;
+    grid-template-columns: 80px 1.4fr 1fr auto;
+    gap: 1.5rem;
+    padding: 1.5rem 0.5rem;
+    border-bottom: 1px solid var(--hairline-gold);
+    align-items: baseline;
+  }
+
+  .ledger-row:first-of-type {
+    border-top: 1px solid var(--hairline-gold);
+  }
+
+  .ledger-row .col-year {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--gold);
+    font-size: 1.125rem;
+    letter-spacing: 0.04em;
+  }
+
+  .ledger-row .col-case {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    font-weight: 500;
+    font-size: 1.0625rem;
+  }
+
+  .ledger-row .col-forum {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--warm-gray);
+    font-size: 0.9375rem;
+    letter-spacing: 0.02em;
+  }
+
+  .ledger-row .col-result {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.5rem;
+    text-align: right;
+    font-feature-settings: 'tnum' on, 'lnum' on, 'kern', 'liga';
+    letter-spacing: -0.01em;
+  }
+
+  .ledger-header {
+    display: grid;
+    grid-template-columns: 80px 1.4fr 1fr auto;
+    gap: 1.5rem;
+    padding: 0 0.5rem 1rem;
+    border-bottom: 1px solid var(--hairline-gold);
+  }
+
+  .ledger-header span {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    font-weight: 500;
+  }
+
+  .ledger-header span:last-child {
+    text-align: right;
+  }
+
+  .ledger-disclosure {
+    text-align: center;
+    color: var(--warm-gray);
+    font-size: 0.875rem;
+    margin-top: 2.5rem;
+    font-style: italic;
+  }
+
+  /* Practice areas */
+  .practice {
+    background: var(--paper);
+  }
+
+  .practice-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .practice-card {
+    background: var(--cream);
+    box-shadow: var(--shadow-soft);
+    border-left: 2px solid var(--gold);
+    padding: 1.75rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .practice-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(11,22,40,0.12);
+  }
+
+  .practice-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.375rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .practice-card p {
+    color: var(--warm-gray);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  /* Why this firm */
+  .why {
+    background: var(--navy);
+    color: var(--cream);
+  }
+
+  .why .section-head h2 {
+    color: var(--cream);
+  }
+
+  .why-list {
+    max-width: 820px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+  }
+
+  .why-row {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .why-row .glyph {
+    color: var(--gold);
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+
+  .why-row h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--cream);
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .why-row p {
+    color: var(--gray);
+    line-height: 1.8;
+  }
+
+  /* Attorneys */
+  .attorneys {
+    background: var(--cream);
+  }
+
+  .attorneys .section-head h2 {
+    color: var(--ink);
+  }
+
+  .attorney-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 3rem;
-    margin-bottom: 3rem;
+    gap: 2.5rem;
+    max-width: 1080px;
+    margin: 0 auto;
   }
-  .foot-col h4 {
+
+  .attorney {
+    border-top: 1px solid var(--hairline-gold);
+    padding-top: 1.75rem;
+  }
+
+  .attorney h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .attorney .post-nominals {
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.78rem;
-    color: var(--gold);
-    letter-spacing: 0.16em;
     text-transform: uppercase;
-    margin: 0 0 1.25rem;
-    font-weight: 700;
+    letter-spacing: 0.18em;
+    font-size: 0.6875rem;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+    display: block;
   }
-  .foot-col p, .foot-col a {
+
+  .attorney p {
+    color: var(--warm-gray);
+    font-size: 0.9875rem;
+    line-height: 1.75;
+  }
+
+  /* Process */
+  .process {
+    background: var(--paper);
+  }
+
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    max-width: 1080px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .process-grid::before {
+    content: '';
+    position: absolute;
+    top: 1.55rem;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: var(--hairline-gold);
+    z-index: 0;
+  }
+
+  .step {
+    position: relative;
+    z-index: 1;
+    padding: 0 0.25rem;
+  }
+
+  .step .num {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    color: var(--gold);
+    line-height: 1;
+    display: inline-block;
+    margin-bottom: 1rem;
+    background: var(--paper);
+    padding-right: 0.875rem;
+  }
+
+  .step h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.25rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .step p {
+    color: var(--warm-gray);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  /* Testimonials */
+  .testimonials {
+    background: var(--navy);
+    color: var(--cream);
+  }
+
+  .testimonials-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4.5rem;
+  }
+
+  .quote {
+    position: relative;
+    padding-left: 4.5rem;
+  }
+
+  .quote::before {
+    content: '\201C';
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: var(--gold);
+    opacity: 0.18;
+    position: absolute;
+    left: 0;
+    top: -1.25rem;
+    line-height: 1;
+  }
+
+  .quote blockquote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--cream);
+    font-size: 1.4rem;
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
+  }
+
+  .quote cite {
+    font-family: 'DM Sans', sans-serif;
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.75rem;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  /* CTA */
+  .cta {
+    background: var(--cream);
+    text-align: center;
+  }
+
+  .cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: var(--fs-h2);
+    color: var(--ink);
+    margin: 0 auto 1.25rem;
+    max-width: 760px;
+  }
+
+  .cta p {
+    color: var(--warm-gray);
+    max-width: 560px;
+    margin: 0 auto 2rem;
+    line-height: 1.8;
+  }
+
+  .cta-call {
+    display: block;
+    margin-top: 1.25rem;
+    color: var(--warm-gray);
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* Footer */
+  .footer {
+    background: var(--navy-band);
     color: var(--gray);
-    font-size: 0.94rem;
+    padding: clamp(3.5rem, 6vw, 5rem) clamp(1.25rem, 5vw, 3rem) 0;
+  }
+
+  .footer-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .footer-col .wordmark {
+    font-size: 1rem;
+    margin-bottom: 0.875rem;
+    display: block;
+  }
+
+  .footer-meta {
+    color: var(--gray-dim);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+
+  .footer-col h4 {
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.6875rem;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .footer-col p,
+  .footer-col a {
+    color: var(--gray);
+    font-size: 0.9375rem;
     line-height: 1.85;
     display: block;
   }
-  .foot-col a:hover { color: var(--white); }
-  .foot-bar {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-    color: var(--gray-dim);
-    font-size: 0.85rem;
-  }
-  .foot-bar a:hover { color: var(--white); }
 
-  /* ── Responsive ──────────────────────────────────── */
-  @media (max-width: 900px) {
-    .trust-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-    .practice-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; gap: 3rem; }
-    .foot-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .footer-col a:hover {
+    color: var(--cream);
   }
-  @media (max-width: 600px) {
-    .nav-inner { padding: 1rem 1.25rem; gap: 1rem; }
-    .nav-links { gap: 1.1rem; }
-    .container { padding: 0 1.25rem; }
-    .hero { padding: 5rem 0 4rem; }
-    .practice, .why { padding: 4rem 0; }
-    .why-grid { gap: 2.5rem; }
+
+  .disclaimer {
+    color: var(--gray-dim);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  .dbj-credit {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--gold);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .dbj-credit:hover {
+    color: var(--gold-dim);
+  }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    border-top: 1px solid var(--hairline-gold);
+    padding: 1.5rem 0 2rem;
+    text-align: center;
+    color: var(--gray-dim);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .hero-frame {
+      top: 40px;
+      bottom: 40px;
+      left: 24px;
+      right: 24px;
+    }
+    .practice-grid {
+      grid-template-columns: 1fr;
+    }
+    .attorney-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .process-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem 1.5rem;
+    }
+    .process-grid::before {
+      display: none;
+    }
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .nav-inner {
+      gap: 1rem;
+    }
+    .nav-links {
+      order: 3;
+      width: 100%;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--hairline-gold);
+    }
+    .nav-cta .btn-ghost {
+      display: none;
+    }
+    .ledger-row,
+    .ledger-header {
+      grid-template-columns: 70px 1fr auto;
+    }
+    .ledger-row .col-forum,
+    .ledger-header span:nth-child(3) {
+      display: none;
+    }
+    .process-grid {
+      grid-template-columns: 1fr;
+    }
+    .quote {
+      padding-left: 3rem;
+    }
+    .quote blockquote {
+      font-size: 1.2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 {
+      font-size: 2.4rem;
+    }
+    .ledger-row {
+      grid-template-columns: 60px 1fr auto;
+      gap: 0.875rem;
+    }
+    .ledger-row .col-result {
+      font-size: 1.25rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition: none !important;
+      animation: none !important;
+      scroll-behavior: auto !important;
+    }
   }
 </style>
 </head>
 <body>
 
-<header class="nav">
+<!-- NAV -->
+<nav class="nav">
   <div class="nav-inner">
-    <div class="brand">
-      <span class="brand-bar" aria-hidden="true"></span>
-      <span class="brand-name">MERCER &amp; ASSOCIATES</span>
-    </div>
+    <a href="#top" class="wordmark-wrap" aria-label="Bauder and Associates home">
+      <span class="wordmark">Bauder &amp; Associates</span>
+      <span class="wordmark-bar" aria-hidden="true"></span>
+    </a>
     <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#practice">Practice Areas</a></li>
-      <li><a href="#results">Results</a></li>
-      <li><a href="#testimonials">Testimonials</a></li>
+      <li><a href="#verdicts">Verdicts</a></li>
+      <li><a href="#practice">Practice</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#attorneys">Attorneys</a></li>
+      <li><a href="#process">Process</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <a href="#contact" class="btn btn-gold">Free Case Evaluation</a>
+    <div class="nav-cta">
+      <a href="tel:2145550184" class="btn btn-ghost">(214) 555-0184</a>
+      <a href="#contact" class="btn btn-gold">Free Consultation</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-frame" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <span class="eyebrow hero-eyebrow">Trial Lawyers · Established 1998</span>
+    <h1>When the Outcome Matters, Bring the Lawyers Who Try the Case.</h1>
+    <p class="hero-sub">We represent people who have been catastrophically injured. Most of our cases settle. The ones that don't, we try. Insurance carriers know which firms walk into a courtroom and which firms don't. We do.</p>
+    <div class="hero-ctas">
+      <a href="#contact" class="btn btn-gold">Free Case Review</a>
+      <a href="tel:2145550184" class="btn btn-ghost">Call (214) 555-0184</a>
+    </div>
+    <div class="hero-rule" aria-hidden="true"></div>
+    <p class="trustline">Board-Certified Personal Injury Trial Law · Texas Bar Foundation Fellow · 25+ Years Trying Cases</p>
   </div>
 </header>
 
-<section class="hero">
-  <div class="container hero-content">
-    <span class="eyebrow">Dallas Personal Injury Attorneys</span>
-    <h1>Injured? You Deserve More Than a Settlement.</h1>
-    <p class="lead">After an accident, the insurance company has a team of lawyers working against you. Now you have one working for you. No fee unless we win your case.</p>
-    <div class="hero-cta">
-      <a href="#contact" class="btn btn-gold">Get Your Free Case Review</a>
-      <a href="tel:2145550147" class="btn btn-outline">Call (214) 555-0147</a>
+<!-- VERDICTS -->
+<section class="section verdicts" id="verdicts">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Recent Results</span>
+      <h2>Verdicts and Settlements.</h2>
+      <p>A representative sample. Past results do not guarantee future outcomes.</p>
     </div>
-    <p class="hero-trustline">Available 24/7 <span>|</span> Hablamos Espa&ntilde;ol <span>|</span> Over $200M Recovered</p>
+    <div class="ledger" role="table" aria-label="Recent verdicts and settlements">
+      <div class="ledger-header" role="row">
+        <span role="columnheader">Year</span>
+        <span role="columnheader">Case Type</span>
+        <span role="columnheader">Forum</span>
+        <span role="columnheader">Result</span>
+      </div>
+      <div class="ledger-row" role="row">
+        <span class="col-year" role="cell">2024</span>
+        <span class="col-case" role="cell">Commercial Trucking Collision</span>
+        <span class="col-forum" role="cell">Dallas County</span>
+        <span class="col-result" role="cell">$8.2M</span>
+      </div>
+      <div class="ledger-row" role="row">
+        <span class="col-year" role="cell">2023</span>
+        <span class="col-case" role="cell">Hospital Negligence</span>
+        <span class="col-forum" role="cell">Tarrant County</span>
+        <span class="col-result" role="cell">$4.6M</span>
+      </div>
+      <div class="ledger-row" role="row">
+        <span class="col-year" role="cell">2023</span>
+        <span class="col-case" role="cell">Premises Liability</span>
+        <span class="col-forum" role="cell">Collin County</span>
+        <span class="col-result" role="cell">$2.1M</span>
+      </div>
+      <div class="ledger-row" role="row">
+        <span class="col-year" role="cell">2022</span>
+        <span class="col-case" role="cell">Auto Negligence</span>
+        <span class="col-forum" role="cell">Dallas County</span>
+        <span class="col-result" role="cell">$1.85M</span>
+      </div>
+      <div class="ledger-row" role="row">
+        <span class="col-year" role="cell">2021</span>
+        <span class="col-case" role="cell">Wrongful Death</span>
+        <span class="col-forum" role="cell">Denton County</span>
+        <span class="col-result" role="cell">$3.4M</span>
+      </div>
+    </div>
+    <p class="ledger-disclosure">Disclosure: results vary based on the unique facts of each case.</p>
   </div>
 </section>
 
-<section class="trust" id="results">
-  <div class="trust-rule" aria-hidden="true"></div>
-  <div class="trust-grid">
-    <div class="trust-stat">
-      <div class="trust-icon" aria-hidden="true">&#x2696;</div>
-      <div class="trust-num">500+</div>
-      <div class="trust-label">Cases Won</div>
-    </div>
-    <div class="trust-stat">
-      <div class="trust-icon" aria-hidden="true">&#x2726;</div>
-      <div class="trust-num">$200M+</div>
-      <div class="trust-label">Recovered for Clients</div>
-    </div>
-    <div class="trust-stat">
-      <div class="trust-icon" aria-hidden="true">&#x2713;</div>
-      <div class="trust-num">No Fee</div>
-      <div class="trust-label">Unless We Win</div>
-    </div>
-    <div class="trust-stat">
-      <div class="trust-icon" aria-hidden="true">&#x25F7;</div>
-      <div class="trust-num">24/7</div>
-      <div class="trust-label">Available Anytime</div>
-    </div>
-  </div>
-</section>
-
-<section class="practice" id="practice">
+<!-- PRACTICE -->
+<section class="section practice" id="practice">
   <div class="container">
     <div class="section-head">
       <span class="eyebrow">Practice Areas</span>
-      <h2>We Fight For You</h2>
+      <h2>What We Handle.</h2>
     </div>
     <div class="practice-grid">
-      <article class="card">
-        <h3>Car Accidents</h3>
-        <p>Rear-end collisions, intersection crashes, rideshare accidents, and highway pileups. I-35 and I-635 see thousands of accidents every year. If you were hurt, we can help.</p>
-        <a href="#" class="card-link">Learn More <span aria-hidden="true">&rarr;</span></a>
-      </article>
-      <article class="card">
-        <h3>Truck Accidents</h3>
-        <p>18-wheeler and commercial vehicle accidents cause catastrophic injuries. Trucking companies have aggressive legal teams. So do we.</p>
-        <a href="#" class="card-link">Learn More <span aria-hidden="true">&rarr;</span></a>
-      </article>
-      <article class="card">
-        <h3>Workplace Injuries</h3>
-        <p>Construction falls, industrial accidents, and repetitive stress injuries. Your employer's insurance company is not on your side.</p>
-        <a href="#" class="card-link">Learn More <span aria-hidden="true">&rarr;</span></a>
-      </article>
-      <article class="card">
+      <div class="practice-card">
+        <h3>Auto and Trucking Collisions</h3>
+        <p>Highway crashes involving commercial vehicles, 18-wheelers, and rideshare drivers. We work with accident reconstructionists, ECM data, and federal trucking regulations to build cases the carriers cannot dismiss as routine fender benders.</p>
+      </div>
+      <div class="practice-card">
+        <h3>Medical Malpractice</h3>
+        <p>Surgical errors, missed diagnoses, hospital negligence, and birth injury. These cases require specialized medical expert review and a willingness to litigate against well-funded defense firms. We do not refer them out.</p>
+      </div>
+      <div class="practice-card">
+        <h3>Premises Liability</h3>
+        <p>Serious falls, negligent security, and unsafe property conditions on commercial sites. We pursue both the immediate operator and the corporate owner, because liability often hides one entity removed from the scene.</p>
+      </div>
+      <div class="practice-card">
         <h3>Wrongful Death</h3>
-        <p>When negligence takes a loved one, no amount of money replaces them. But justice and financial security for your family matter.</p>
-        <a href="#" class="card-link">Learn More <span aria-hidden="true">&rarr;</span></a>
-      </article>
+        <p>Representing surviving spouses, parents, and children when negligence has taken a family member. We handle these cases with the discretion they deserve and the financial preparation they require to make defendants answer at trial.</p>
+      </div>
+      <div class="practice-card">
+        <h3>Catastrophic Injury</h3>
+        <p>Traumatic brain injuries, spinal cord damage, severe burns, and amputations that change a life permanently. We coordinate life-care planning experts to quantify a lifetime of medical, vocational, and personal loss accurately.</p>
+      </div>
+      <div class="practice-card">
+        <h3>Insurance Bad Faith</h3>
+        <p>When carriers refuse to honor coverage they sold in good faith, Texas law provides a separate cause of action. We pursue extra-contractual damages where insurers have delayed, denied, or undervalued legitimate claims.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="why" id="testimonials">
-  <div class="container why-grid">
-    <div>
-      <span class="eyebrow">Why Mercer</span>
-      <h2>The Difference Is Substance.</h2>
-      <ul class="diff-list">
-        <li><span class="diff-bullet" aria-hidden="true">&#x2713;</span><span>Former prosecutors who know how insurance companies think.</span></li>
-        <li><span class="diff-bullet" aria-hidden="true">&#x2713;</span><span>We reject lowball offers and prepare every case for trial.</span></li>
-        <li><span class="diff-bullet" aria-hidden="true">&#x2713;</span><span>You pay nothing unless we recover compensation.</span></li>
-        <li><span class="diff-bullet" aria-hidden="true">&#x2713;</span><span>Exposure to more than 500 trials and arbitrations.</span></li>
-      </ul>
-    </div>
-    <aside class="testimonial-card">
-      <div class="testimonial-quote-mark" aria-hidden="true">&ldquo;</div>
-      <p class="testimonial-quote">After my accident, I didn't know where to turn. Mercer &amp; Associates handled everything while I focused on healing. They recovered three times what the insurance company initially offered.</p>
-      <div class="testimonial-author">Maria R., Dallas</div>
-    </aside>
-  </div>
-</section>
-
-<footer id="contact">
+<!-- WHY -->
+<section class="section why" id="why">
   <div class="container">
-    <div class="foot-grid">
-      <div class="foot-col">
-        <h4>Contact</h4>
-        <p>1900 Pearl Street, Suite 2200<br>Dallas, TX 75201</p>
-        <p><a href="tel:2145550147">(214) 555-0147</a><br><a href="mailto:intake@mercerlaw.com">intake@mercerlaw.com</a></p>
+    <div class="section-head">
+      <span class="eyebrow">Why Bauder</span>
+      <h2>What Sets a Trial Firm Apart from a Settlement Mill.</h2>
+    </div>
+    <div class="why-list">
+      <div class="why-row">
+        <span class="glyph" aria-hidden="true">&#10022;</span>
+        <div>
+          <h3>We try cases.</h3>
+          <p>Roughly 95 percent of personal injury firms settle every case they take. We are not one of them. The carriers who pay our cases know that.</p>
+        </div>
       </div>
-      <div class="foot-col">
-        <h4>Practice Areas</h4>
-        <a href="#">Car Accidents</a>
-        <a href="#">Truck Accidents</a>
-        <a href="#">Workplace Injuries</a>
-        <a href="#">Wrongful Death</a>
+      <div class="why-row">
+        <span class="glyph" aria-hidden="true">&#10022;</span>
+        <div>
+          <h3>We are board-certified.</h3>
+          <p>Texas Board Legal Specialization in Personal Injury Trial Law. Fewer than 2 percent of Texas lawyers hold this certification.</p>
+        </div>
       </div>
-      <div class="foot-col">
-        <h4>Office Hours</h4>
-        <p>Monday to Friday: 8:00 AM to 7:00 PM<br>Saturday: 9:00 AM to 2:00 PM<br>Sunday: By appointment<br><span style="color:var(--gold);">After-hours intake available 24/7.</span></p>
+      <div class="why-row">
+        <span class="glyph" aria-hidden="true">&#10022;</span>
+        <div>
+          <h3>We do not pyramid.</h3>
+          <p>The lawyer who signs your case is the lawyer who tries it. We do not run an intake mill that hands you off to a junior associate after the contract is signed.</p>
+        </div>
       </div>
     </div>
-    <div class="foot-bar">
-      <span>&copy; 2026 Mercer &amp; Associates. All rights reserved.</span>
-      <span>Website by <a href="https://dbjtechnologies.com" style="color:var(--gold);">DBJ Technologies</a></span>
+  </div>
+</section>
+
+<!-- ATTORNEYS -->
+<section class="section attorneys" id="attorneys">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Attorneys</span>
+      <h2>Who Will Represent You.</h2>
     </div>
+    <div class="attorney-grid">
+      <div class="attorney">
+        <h3>Robert L. Bauder</h3>
+        <span class="post-nominals">Founding Partner</span>
+        <p>Founded the firm in 1998 after eight years at a defense litigation firm where he learned how insurers value cases. J.D. from the University of Texas at Austin School of Law. Board-certified in Personal Injury Trial Law by the Texas Board of Legal Specialization.</p>
+      </div>
+      <div class="attorney">
+        <h3>Catherine Holloway</h3>
+        <span class="post-nominals">Senior Trial Attorney</span>
+        <p>Former Dallas County Assistant District Attorney with 14 years of jury trial experience, including more than 60 cases tried to verdict. She brings a courtroom presence that defense counsel respects and a preparation regimen that opposing experts have learned to take seriously.</p>
+      </div>
+      <div class="attorney">
+        <h3>Marcus Yates</h3>
+        <span class="post-nominals">Partner</span>
+        <p>Focuses on commercial trucking litigation and catastrophic personal injury. Holds a graduate engineering background that helps in reconstruction and product cases. Member of the Texas Trial Lawyers Association and the American Association for Justice Trucking Litigation Group.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="section process" id="process">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Working Together</span>
+      <h2>What Happens After You Call.</h2>
+    </div>
+    <div class="process-grid">
+      <div class="step">
+        <span class="num">01</span>
+        <h3>Free Consultation</h3>
+        <p>We listen, review your records, and tell you honestly whether we believe a case can be built. No pressure to sign.</p>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h3>Investigation and Filing</h3>
+        <p>We secure evidence, retain experts, draft pleadings, and file suit when the facts support it. Liability work begins immediately.</p>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h3>Negotiation</h3>
+        <p>Most cases resolve through measured negotiation backed by trial readiness. Carriers settle differently when a firm will try.</p>
+      </div>
+      <div class="step">
+        <span class="num">04</span>
+        <h3>Trial if Necessary</h3>
+        <p>When a fair offer never comes, we go to trial. Prepared witnesses, polished exhibits, and a strategy refined by years of jury work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section testimonials">
+  <div class="container">
+    <div class="testimonials-inner">
+      <figure class="quote">
+        <blockquote>The trucking company's lawyers acted like our case was a nuisance for the first six months. After Mr. Bauder deposed their safety director, the offer arrived within a week. He returned every call I made, and he sat with me at the mediation until it was finished.</blockquote>
+        <cite>Wife of trucking-collision victim, Dallas</cite>
+      </figure>
+      <figure class="quote">
+        <blockquote>My son will need care for the rest of his life. Catherine walked us through every medical opinion and every number, never sugar-coated the hard parts, and held the hospital accountable. The settlement covers his future. That is what we needed.</blockquote>
+        <cite>Father of catastrophically-injured teen, Plano</cite>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section cta" id="contact">
+  <div class="container-narrow">
+    <h2>If You Are Hurt, the Clock Is Already Running.</h2>
+    <p>Texas has a two-year statute of limitations on most personal injury claims. Evidence disappears, witnesses move, and insurance adjusters take statements that hurt cases. Call us today.</p>
+    <a href="#contact" class="btn btn-gold">Schedule Your Free Consultation</a>
+    <span class="cta-call">Or call (214) 555-0184. Available nights and weekends.</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <span class="wordmark">Bauder &amp; Associates</span>
+      <p class="footer-meta">Trial Lawyers · Established 1998</p>
+    </div>
+    <div class="footer-col">
+      <h4>Office</h4>
+      <p>1700 Pacific Avenue, Suite 2400<br>Dallas, TX 75201</p>
+      <a href="tel:2145550184">(214) 555-0184</a>
+      <a href="mailto:intake@bauderlaw.com">intake@bauderlaw.com</a>
+      <p>Monday to Friday, 8am to 6pm</p>
+    </div>
+    <div class="footer-col">
+      <h4>Disclosure</h4>
+      <p class="disclaimer">Not certified by the Texas Board of Legal Specialization unless otherwise noted. The contents of this website do not constitute legal advice. Contacting Bauder &amp; Associates does not create an attorney-client relationship.</p>
+      <a href="https://dbjtechnologies.com" class="dbj-credit" rel="noopener">Website by DBJ Technologies</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; 2026 Bauder &amp; Associates, PLLC. All rights reserved.
   </div>
 </footer>
 

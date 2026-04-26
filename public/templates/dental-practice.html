@@ -2,700 +2,951 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Ridgeview Dental | General &amp; Cosmetic Dentistry in Plano, TX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ridgeview Dental · Modern Family Dentistry in Plano, TX</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --white: #FFFFFF;
-    --cream: #FDF8F4;
-    --teal: #2A9D8F;
-    --teal-deep: #1F8175;
-    --teal-pale: rgba(42,157,143,0.10);
-    --coral: #E76F51;
-    --coral-deep: #C95B40;
-    --charcoal: #264653;
-    --charcoal-soft: #34556A;
-    --warm-gray: #5A6B73;
-    --warm-gray-light: #8896A0;
-    --hairline: rgba(38,70,83,0.10);
-  }
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', system-ui, -apple-system, Helvetica, Arial, sans-serif;
-    background: var(--white);
-    color: var(--warm-gray);
-    line-height: 1.7;
-    font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-  h1, h2, h3, h4 {
-    font-family: 'DM Serif Display', Georgia, serif;
-    color: var(--charcoal);
-    margin: 0;
-    line-height: 1.2;
-    font-weight: 400;
-    letter-spacing: -0.005em;
-  }
-  p { margin: 0; }
-  a { color: inherit; text-decoration: none; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
-  .container-wide { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
-
-  .eyebrow {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.74rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--teal);
+  :root{
+    --white:#FFFFFF;
+    --cream:#FDF8F4;
+    --mist:#F4F8F8;
+    --teal:#2A9D8F;
+    --teal-deep:#1F8175;
+    --teal-pale:rgba(42,157,143,0.10);
+    --teal-pale-solid:#E5F2F0;
+    --coral:#E76F51;
+    --coral-deep:#C95B40;
+    --charcoal:#264653;
+    --charcoal-soft:#34556A;
+    --warm-gray:#5A6B73;
+    --warm-gray-light:#8896A0;
+    --hairline:rgba(38,70,83,0.10);
+    --shadow-soft:0 2px 14px rgba(38,70,83,0.07);
+    --shadow-lift:0 12px 28px rgba(38,70,83,0.10);
+    --fs-display:clamp(2.5rem, 5vw, 4.2rem);
+    --fs-h2:clamp(1.85rem, 3vw, 2.5rem);
+    --fs-h3:1.25rem;
+    --fs-body:1.0625rem;
+    --fs-eyebrow:0.74rem;
   }
 
-  /* ── Nav ─────────────────────────────────────────── */
-  .nav {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: rgba(255,255,255,0.94);
-    backdrop-filter: saturate(140%) blur(8px);
-    -webkit-backdrop-filter: saturate(140%) blur(8px);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'DM Sans',system-ui,sans-serif;
+    font-size:var(--fs-body);
+    line-height:1.75;
+    color:var(--warm-gray);
+    background:var(--white);
+    font-feature-settings:'kern','liga';
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
   }
-  .nav-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.2rem 2rem;
-    max-width: 1320px;
-    margin: 0 auto;
-    gap: 2rem;
-    flex-wrap: wrap;
+  h1,h2,h3,h4{
+    font-family:'DM Serif Display',serif;
+    font-weight:400;
+    line-height:1.1;
+    color:var(--charcoal);
+    margin:0;
   }
-  .brand {
-    font-family: 'DM Serif Display', Georgia, serif;
-    font-size: 1.25rem;
-    color: var(--teal);
-    letter-spacing: 0.02em;
-  }
-  .nav-links {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    flex-wrap: wrap;
-  }
-  .nav-links a {
-    color: var(--charcoal);
-    font-size: 0.92rem;
-    font-weight: 500;
-    transition: color 0.2s ease;
-  }
-  .nav-links a:hover { color: var(--teal); }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    font-size: 0.92rem;
-    letter-spacing: 0.02em;
-    padding: 0.85rem 1.6rem;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  }
-  .btn-coral {
-    background: var(--coral);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(231,111,81,0.18);
-  }
-  .btn-coral:hover {
-    background: var(--coral-deep);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(231,111,81,0.28);
-  }
-  .btn-teal {
-    background: var(--teal);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(42,157,143,0.18);
-  }
-  .btn-teal:hover {
-    background: var(--teal-deep);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(42,157,143,0.28);
-  }
-  .btn-outline-teal {
-    background: transparent;
-    color: var(--teal);
-    border-color: var(--teal);
-  }
-  .btn-outline-teal:hover {
-    background: var(--teal-pale);
-    transform: translateY(-1px);
-  }
-  .btn-on-teal {
-    background: #fff;
-    color: var(--teal);
-  }
-  .btn-on-teal:hover {
-    background: #f3fbf9;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  p{margin:0}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+
+  .eyebrow{
+    font-family:'DM Sans',sans-serif;
+    font-size:var(--fs-eyebrow);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    font-weight:500;
+    color:var(--teal);
   }
 
-  /* ── Hero ────────────────────────────────────────── */
-  .hero {
-    position: relative;
-    overflow: hidden;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    background: var(--cream);
-    padding: 6rem 0 5rem;
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    background: var(--teal);
-    opacity: 0.04;
-    right: -100px;
-    top: -100px;
-    z-index: 0;
-  }
-  .hero::after {
-    content: '';
-    position: absolute;
-    width: 360px;
-    height: 360px;
-    border-radius: 50%;
-    background: var(--coral);
-    opacity: 0.035;
-    left: -120px;
-    bottom: -100px;
-    z-index: 0;
-  }
-  .hero-content {
-    position: relative;
-    z-index: 1;
-    max-width: 700px;
-  }
-  .hero h1 {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    margin: 1.25rem 0 1.6rem;
-  }
-  .hero p.lead {
-    font-size: 1.1rem;
-    color: var(--warm-gray);
-    line-height: 1.75;
-    max-width: 560px;
-  }
-  .hero-cta {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-top: 2.4rem;
-  }
-  .hero-trustline {
-    margin-top: 2rem;
-    font-size: 0.9rem;
-    color: var(--warm-gray);
-    line-height: 1.7;
-  }
-  .hero-trustline .dot {
-    color: var(--teal);
-    margin: 0 0.7rem;
-    font-weight: 700;
+  .container{
+    max-width:1200px;
+    margin:0 auto;
+    padding:clamp(4rem,7vw,6rem) clamp(1.25rem,5vw,3rem);
   }
 
-  /* ── Services ────────────────────────────────────── */
-  .services {
-    background: var(--white);
-    padding: 6.5rem 0;
+  /* Buttons */
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:0.5rem;
+    border:none;
+    border-radius:8px;
+    padding:0.95rem 1.85rem;
+    font-family:'DM Sans',sans-serif;
+    font-size:0.95rem;
+    font-weight:500;
+    letter-spacing:0.04em;
+    cursor:pointer;
+    transition:transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease;
+    white-space:nowrap;
   }
-  .section-head {
-    text-align: center;
-    max-width: 720px;
-    margin: 0 auto 3.5rem;
+  .btn-coral{background:var(--coral);color:var(--white)}
+  .btn-coral:hover{background:var(--coral-deep);transform:translateY(-1px);box-shadow:var(--shadow-lift)}
+  .btn-teal{background:var(--teal);color:var(--white)}
+  .btn-teal:hover{background:var(--teal-deep);transform:translateY(-1px);box-shadow:var(--shadow-lift)}
+  .btn-ghost{
+    background:transparent;
+    color:var(--teal);
+    border:1px solid var(--teal);
   }
-  .section-head h2 {
-    font-size: clamp(2rem, 3.5vw, 2.6rem);
-    margin: 0.85rem 0 0;
-  }
-  .services-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.75rem;
-  }
-  .svc-card {
-    position: relative;
-    background: var(--white);
-    border-top: 2px solid var(--teal);
-    border-radius: 8px;
-    padding: 2rem 1.85rem 1.85rem;
-    box-shadow: 0 1px 3px rgba(38,70,83,0.06), 0 1px 2px rgba(38,70,83,0.04);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-  .svc-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(38,70,83,0.10);
-  }
-  .svc-icon {
-    color: var(--teal);
-    font-size: 1.5rem;
-    line-height: 1;
-    margin-bottom: 1rem;
-    font-feature-settings: "liga" 0;
-  }
-  .svc-card h3 {
-    font-size: 1.35rem;
-    margin: 0 0 0.7rem;
-  }
-  .svc-card p {
-    font-size: 0.96rem;
-    line-height: 1.7;
-    color: var(--warm-gray);
-  }
-  .svc-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 1.25rem;
-    color: var(--teal);
-    font-weight: 600;
-    font-size: 0.88rem;
-    transition: gap 0.2s ease, color 0.2s ease;
-  }
-  .svc-link:hover { gap: 0.7rem; color: var(--teal-deep); }
+  .btn-ghost:hover{background:var(--teal-pale);transform:translateY(-1px)}
 
-  /* ── Why Ridgeview ───────────────────────────────── */
-  .why {
-    background: var(--cream);
-    padding: 6.5rem 0;
+  /* Nav */
+  .nav{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:var(--white);
+    border-bottom:1px solid var(--hairline);
   }
-  .why-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2.25rem;
-    max-width: 1100px;
-    margin: 0 auto;
+  .nav-inner{
+    max-width:1200px;
+    margin:0 auto;
+    padding:0.95rem clamp(1.25rem,5vw,3rem);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:2rem;
   }
-  .diff {
-    display: flex;
-    gap: 1.25rem;
-    background: var(--white);
-    padding: 2rem 1.85rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(38,70,83,0.05);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  .logo{
+    display:inline-flex;
+    align-items:center;
+    gap:0.7rem;
+    font-family:'DM Serif Display',serif;
+    font-size:1.35rem;
+    color:var(--charcoal);
+    letter-spacing:0.005em;
   }
-  .diff:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(38,70,83,0.08);
+  .logo-mark{
+    width:24px;height:24px;
+    border-radius:50%;
+    background:var(--teal);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
   }
-  .diff-check {
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--teal-pale);
-    color: var(--teal);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    font-weight: 700;
+  .logo-mark::after{
+    content:"";
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--coral);
   }
-  .diff h3 {
-    font-size: 1.2rem;
-    margin: 0 0 0.5rem;
+  .nav-links{
+    display:flex;
+    align-items:center;
+    gap:2rem;
+    font-size:0.95rem;
+    color:var(--charcoal-soft);
+    font-weight:500;
   }
-  .diff p {
-    font-size: 0.94rem;
-    line-height: 1.7;
-    color: var(--warm-gray);
+  .nav-links a{transition:color 180ms ease}
+  .nav-links a:hover{color:var(--teal)}
+  .nav-cta{display:flex;gap:0.75rem;align-items:center}
+  .nav-cta .btn{padding:0.7rem 1.2rem;font-size:0.875rem}
+  @media (max-width:900px){
+    .nav-links{display:none}
+  }
+  @media (max-width:600px){
+    .nav-cta .btn-ghost{display:none}
   }
 
-  /* ── Testimonials ────────────────────────────────── */
-  .testi {
-    background: var(--white);
-    padding: 6.5rem 0;
+  /* Hero */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    background:linear-gradient(180deg,#FFFFFF 0%, #F4F8F8 80%);
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
-  .testi-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.75rem;
+  .hero-arc{
+    position:absolute;
+    top:-60vw;
+    right:-40vw;
+    width:120vw;
+    height:120vw;
+    border-radius:50%;
+    border:2px solid var(--teal-pale);
+    pointer-events:none;
   }
-  .testi-card {
-    position: relative;
-    background: var(--cream);
-    border-radius: 10px;
-    padding: 2.25rem 1.85rem 2rem;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  .hero-arc-2{
+    position:absolute;
+    top:-50vw;
+    right:-30vw;
+    width:100vw;
+    height:100vw;
+    border-radius:50%;
+    border:1px solid rgba(42,157,143,0.06);
+    pointer-events:none;
   }
-  .testi-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(38,70,83,0.08);
+  .hero-inner{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    max-width:720px;
+    padding:8rem clamp(1.25rem,5vw,3rem) 6rem;
   }
-  .testi-mark {
-    font-family: 'DM Serif Display', Georgia, serif;
-    color: var(--teal);
-    font-size: 3.5rem;
-    line-height: 0.4;
-    opacity: 0.55;
-    margin-bottom: 1.4rem;
-    display: block;
+  .hero h1{
+    font-size:var(--fs-display);
+    margin:1rem 0 1.5rem;
   }
-  .testi-quote {
-    font-family: 'DM Sans', sans-serif;
-    font-style: italic;
-    color: var(--charcoal);
-    font-size: 1rem;
-    line-height: 1.8;
-    margin-bottom: 1.6rem;
+  .hero-sub{
+    max-width:580px;
+    margin:0 auto 2.25rem;
+    font-size:1.125rem;
+    line-height:1.75;
+    color:var(--warm-gray);
   }
-  .testi-attr {
-    font-size: 0.82rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--teal);
+  .hero-cta{
+    display:inline-flex;
+    gap:0.85rem;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-bottom:3rem;
+  }
+  .trust-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:0.7rem 1.1rem;
+    font-size:0.74rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--charcoal-soft);
+    font-weight:500;
+  }
+  .trust-row .sep{color:var(--teal);font-size:0.85rem}
+
+  /* Section base */
+  section{position:relative}
+  .section-head{
+    text-align:center;
+    max-width:720px;
+    margin:0 auto 3.25rem;
+  }
+  .section-head h2{
+    font-size:var(--fs-h2);
+    margin-top:0.85rem;
+  }
+  .section-head p{
+    margin-top:1rem;
+    color:var(--warm-gray);
   }
 
-  /* ── Insurance / CTA ─────────────────────────────── */
-  .ins {
-    background: var(--cream);
-    padding: 6.5rem 0;
+  /* Services grid */
+  .services{background:var(--white)}
+  .services-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1.5rem;
   }
-  .ins-grid {
-    display: grid;
-    grid-template-columns: 1.05fr 1fr;
-    gap: 3.5rem;
-    align-items: stretch;
+  .service-card{
+    background:var(--white);
+    border-radius:12px;
+    padding:1.75rem;
+    box-shadow:var(--shadow-soft);
+    border:1px solid var(--hairline);
+    transition:transform 220ms ease, box-shadow 220ms ease;
   }
-  .ins h2 {
-    font-size: clamp(1.85rem, 3vw, 2.3rem);
-    margin: 0.85rem 0 1.5rem;
+  .service-card:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-lift);
   }
-  .ins-list {
-    columns: 2;
-    column-gap: 2rem;
-    list-style: none;
-    padding: 0;
-    margin: 0 0 1.75rem;
+  .service-icon{
+    width:36px;height:36px;
+    border-radius:50%;
+    background:var(--teal-pale);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--teal);
+    font-size:1.05rem;
+    margin-bottom:1rem;
   }
-  .ins-list li {
-    padding: 0.65rem 0;
-    color: var(--charcoal);
-    font-weight: 500;
-    font-size: 0.98rem;
-    border-bottom: 1px solid var(--hairline);
-    break-inside: avoid;
+  .service-card h3{
+    font-family:'DM Serif Display',serif;
+    font-size:1.3rem;
+    color:var(--charcoal);
+    margin-bottom:0.55rem;
   }
-  .ins-list li::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--teal);
-    margin-right: 0.7rem;
-    transform: translateY(-2px);
+  .service-card p{
+    color:var(--warm-gray);
+    font-size:1rem;
+    line-height:1.7;
   }
-  .ins-note {
-    font-size: 0.94rem;
-    color: var(--warm-gray);
-    line-height: 1.7;
+  @media (max-width:900px){
+    .services-grid{grid-template-columns:repeat(2,1fr)}
   }
-  .ins-cta {
-    background: var(--teal);
-    color: #fff;
-    border-radius: 12px;
-    padding: 3rem 2.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    box-shadow: 0 14px 40px rgba(42,157,143,0.22);
-  }
-  .ins-cta h3 {
-    color: #fff;
-    font-size: clamp(1.65rem, 2.6vw, 2rem);
-    margin: 0 0 1rem;
-  }
-  .ins-cta p {
-    color: rgba(255,255,255,0.92);
-    font-size: 1rem;
-    line-height: 1.75;
-    margin-bottom: 1.75rem;
-  }
-  .ins-cta .btn {
-    align-self: flex-start;
+  @media (max-width:600px){
+    .services-grid{grid-template-columns:1fr}
   }
 
-  /* ── Footer ──────────────────────────────────────── */
-  footer {
-    background: var(--charcoal);
-    color: rgba(255,255,255,0.78);
-    padding: 4.5rem 0 2rem;
+  /* First visit timeline */
+  .first-visit{background:var(--mist)}
+  .timeline{
+    position:relative;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1.5rem;
+    max-width:1080px;
+    margin:0 auto;
+    padding:0;
+    list-style:none;
   }
-  .foot-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3rem;
-    margin-bottom: 3rem;
+  .timeline::before{
+    content:"";
+    position:absolute;
+    top:28px;
+    left:12.5%;
+    right:12.5%;
+    height:2px;
+    background:var(--teal);
+    opacity:0.45;
+    z-index:0;
   }
-  .foot-col h4 {
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 700;
-    font-size: 0.78rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    margin: 0 0 1.25rem;
+  .step{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    padding:0 0.5rem;
+    list-style:none;
   }
-  .foot-col p, .foot-col a {
-    color: rgba(255,255,255,0.78);
-    font-size: 0.94rem;
-    line-height: 1.95;
-    display: block;
+  .step-circle{
+    width:56px;height:56px;
+    border-radius:50%;
+    background:var(--white);
+    border:2px solid var(--teal);
+    box-shadow:var(--shadow-soft);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'DM Serif Display',serif;
+    color:var(--teal);
+    font-size:1.35rem;
+    margin-bottom:1.25rem;
+    font-feature-settings:'kern','liga','tnum';
   }
-  .foot-col a:hover { color: #fff; }
-  .foot-bar {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.55);
-    font-size: 0.85rem;
+  .step h3{
+    font-family:'DM Serif Display',serif;
+    font-size:1.15rem;
+    color:var(--charcoal);
+    margin-bottom:0.5rem;
+    line-height:1.25;
   }
-  .foot-bar a { color: rgba(255,255,255,0.85); }
-  .foot-bar a:hover { color: #fff; }
+  .step p{
+    font-size:0.95rem;
+    line-height:1.65;
+    color:var(--warm-gray);
+  }
+  @media (max-width:768px){
+    .timeline{
+      grid-template-columns:1fr;
+      gap:2.5rem;
+      max-width:420px;
+    }
+    .timeline::before{
+      top:0;
+      bottom:0;
+      left:50%;
+      right:auto;
+      width:2px;
+      height:auto;
+      transform:translateX(-50%);
+    }
+  }
 
-  /* ── Responsive ──────────────────────────────────── */
-  @media (max-width: 980px) {
-    .services-grid { grid-template-columns: repeat(2, 1fr); }
-    .testi-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-    .ins-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-    .foot-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  /* Why Ridgeview */
+  .why{background:var(--white)}
+  .why-grid{
+    display:grid;
+    grid-template-columns:1fr 1.3fr;
+    gap:4rem;
+    align-items:start;
   }
-  @media (max-width: 640px) {
-    .nav-inner { padding: 1rem 1.25rem; gap: 1rem; }
-    .nav-links { gap: 1.25rem; }
-    .container, .container-wide { padding: 0 1.25rem; }
-    .hero { padding: 5rem 0 4rem; }
-    .services, .why, .testi, .ins { padding: 4.5rem 0; }
-    .services-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; }
-    .ins-list { columns: 1; }
+  .why-grid h2{font-size:var(--fs-h2);margin-top:0.85rem}
+  .why-list{display:flex;flex-direction:column;gap:2.25rem}
+  .why-item{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:1rem;
+    align-items:start;
+  }
+  .why-item-glyph{
+    color:var(--coral);
+    font-size:1.2rem;
+    line-height:1.4;
+    margin-top:0.15rem;
+  }
+  .why-item h3{
+    font-family:'DM Serif Display',serif;
+    font-size:1.3rem;
+    color:var(--charcoal);
+    margin-bottom:0.45rem;
+  }
+  .why-item p{color:var(--warm-gray);font-size:1.025rem;line-height:1.7}
+  @media (max-width:900px){
+    .why-grid{grid-template-columns:1fr;gap:2.5rem}
+  }
+
+  /* Doctor */
+  .doctor{background:var(--cream)}
+  .doctor-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:4rem;
+    align-items:center;
+  }
+  .doctor h2{font-size:var(--fs-h2);margin-top:0.85rem}
+  .doctor-bio{
+    color:var(--warm-gray);
+    font-size:1.05rem;
+    line-height:1.75;
+    margin:1.25rem 0 1.5rem;
+  }
+  .credential-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.5rem 1rem;
+    font-size:0.74rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--teal);
+    font-weight:500;
+  }
+  .credential-row .sep{color:var(--teal);opacity:0.6}
+  .blockquote{
+    position:relative;
+    max-width:380px;
+    margin:0 0 0 auto;
+    padding:0.5rem 0 0.5rem 2.5rem;
+  }
+  .blockquote::before{
+    content:"\201C";
+    position:absolute;
+    top:-1.5rem;
+    left:-0.5rem;
+    font-family:'DM Serif Display',serif;
+    font-size:8rem;
+    color:var(--coral);
+    opacity:0.18;
+    line-height:1;
+  }
+  .blockquote q{
+    quotes:none;
+    font-family:'DM Serif Display',serif;
+    font-style:italic;
+    font-size:1.4rem;
+    color:var(--charcoal);
+    line-height:1.5;
+    display:block;
+  }
+  .blockquote q::before,
+  .blockquote q::after{content:""}
+  .blockquote .attribution{
+    margin-top:1.5rem;
+    font-family:'DM Sans',sans-serif;
+    font-size:0.74rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--teal);
+    font-weight:500;
+  }
+  @media (max-width:900px){
+    .doctor-grid{grid-template-columns:1fr;gap:3rem}
+    .blockquote{margin:0;max-width:none}
+  }
+
+  /* Testimonials */
+  .testimonials{background:var(--white)}
+  .testimonial-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1.5rem;
+  }
+  .testimonial-card{
+    background:var(--white);
+    border-radius:12px;
+    padding:1.75rem;
+    box-shadow:var(--shadow-soft);
+    border:1px solid var(--hairline);
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    transition:transform 220ms ease, box-shadow 220ms ease;
+  }
+  .testimonial-card:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-lift);
+  }
+  .stars{
+    color:var(--coral);
+    letter-spacing:0.15em;
+    font-size:0.95rem;
+  }
+  .testimonial-card q{
+    quotes:none;
+    font-size:1.05rem;
+    color:var(--warm-gray);
+    line-height:1.7;
+    flex:1;
+  }
+  .testimonial-card q::before,
+  .testimonial-card q::after{content:""}
+  .testimonial-card .attribution{
+    font-size:0.74rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--teal);
+    font-weight:500;
+  }
+  @media (max-width:900px){
+    .testimonial-grid{grid-template-columns:1fr;max-width:520px;margin:0 auto}
+  }
+
+  /* Insurance */
+  .insurance{background:var(--mist)}
+  .insurance-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:3.5rem;
+    align-items:start;
+  }
+  .insurance h2{font-size:var(--fs-h2);margin-top:0.85rem}
+  .insurance p{color:var(--warm-gray);font-size:1.05rem;line-height:1.75;margin-top:1.25rem}
+  .pill-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.6rem;
+  }
+  .pill{
+    background:var(--teal-pale);
+    color:var(--charcoal);
+    padding:0.5rem 0.9rem;
+    border-radius:6px;
+    font-size:0.74rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    font-weight:500;
+  }
+  .insurance-aside{
+    margin-top:1.5rem;
+    font-size:0.95rem;
+    color:var(--warm-gray-light);
+  }
+  @media (max-width:900px){
+    .insurance-grid{grid-template-columns:1fr;gap:2rem}
+  }
+
+  /* CTA */
+  .cta{
+    background:var(--cream);
+    text-align:center;
+  }
+  .cta-inner{
+    max-width:640px;
+    margin:0 auto;
+  }
+  .cta .eyebrow{color:var(--coral)}
+  .cta h2{
+    font-size:var(--fs-h2);
+    margin-top:0.85rem;
+    margin-bottom:1.25rem;
+  }
+  .cta-sub{
+    max-width:540px;
+    margin:0 auto 2rem;
+    color:var(--warm-gray);
+    line-height:1.75;
+  }
+  .cta-meta{
+    margin-top:1.75rem;
+    font-size:0.95rem;
+    color:var(--warm-gray-light);
+  }
+  .cta-meta .dot{color:var(--teal);margin:0 0.4rem}
+
+  /* Footer */
+  .footer{
+    background:var(--charcoal-soft);
+    color:rgba(255,255,255,0.78);
+    padding:4rem clamp(1.25rem,5vw,3rem) 1.75rem;
+  }
+  .footer-inner{
+    max-width:1200px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:1.4fr 1fr 1.1fr 1fr;
+    gap:3rem;
+  }
+  .footer-col h4{
+    font-family:'DM Sans',sans-serif;
+    font-size:0.74rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.55);
+    margin-bottom:1rem;
+    font-weight:500;
+  }
+  .footer .logo{color:var(--white);margin-bottom:1rem}
+  .footer-tag{
+    color:rgba(255,255,255,0.7);
+    font-size:0.95rem;
+    line-height:1.6;
+    max-width:260px;
+  }
+  .footer-list{
+    display:flex;
+    flex-direction:column;
+    gap:0.6rem;
+    font-size:0.95rem;
+    color:rgba(255,255,255,0.78);
+  }
+  .footer-list a:hover{color:var(--white)}
+  .credit{
+    margin-top:1rem;
+    font-size:0.74rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--teal);
+    font-weight:500;
+  }
+  .credit a:hover{color:var(--white)}
+  .footer-bottom{
+    max-width:1200px;
+    margin:3.5rem auto 0;
+    padding-top:1.5rem;
+    border-top:1px solid rgba(42,157,143,0.35);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:0.825rem;
+    color:var(--warm-gray-light);
+    flex-wrap:wrap;
+    gap:0.75rem;
+  }
+  @media (max-width:900px){
+    .footer-inner{grid-template-columns:1fr 1fr;gap:2.25rem}
+  }
+  @media (max-width:600px){
+    .footer-inner{grid-template-columns:1fr}
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+      animation-duration:0.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.001ms !important;
+      scroll-behavior:auto !important;
+    }
+    .btn:hover{transform:none}
+    .service-card:hover,.testimonial-card:hover{transform:none}
   }
 </style>
 </head>
 <body>
 
-<header class="nav">
+<!-- Nav -->
+<header class="nav" role="banner">
   <div class="nav-inner">
-    <span class="brand">Ridgeview Dental</span>
-    <ul class="nav-links">
-      <li><a href="#services">Services</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#patient-info">Patient Info</a></li>
-      <li><a href="#reviews">Reviews</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <a href="#contact" class="btn btn-coral">Book Appointment</a>
+    <a href="#" class="logo" aria-label="Ridgeview Dental home">
+      <span class="logo-mark" aria-hidden="true"></span>
+      Ridgeview Dental
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#services">Services</a>
+      <a href="#first-visit">First Visit</a>
+      <a href="#doctor">Dr. Parker</a>
+      <a href="#insurance">Insurance</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-ghost">Patient Login</a>
+      <a href="#contact" class="btn btn-coral">Book Appointment</a>
+    </div>
   </div>
 </header>
 
-<section class="hero">
-  <div class="container hero-content">
-    <span class="eyebrow">General &amp; Cosmetic Dentistry &nbsp;|&nbsp; Plano, TX</span>
-    <h1>A Dental Experience You'll Actually Look Forward To.</h1>
-    <p class="lead">Modern care in a comfortable setting. Whether it's been six months or six years since your last visit, Ridgeview Dental is a judgment-free practice where your comfort comes first.</p>
+<!-- Hero -->
+<section class="hero" aria-labelledby="hero-heading">
+  <span class="hero-arc" aria-hidden="true"></span>
+  <span class="hero-arc-2" aria-hidden="true"></span>
+  <div class="hero-inner">
+    <p class="eyebrow">General <span style="color:var(--teal)">·</span> Cosmetic <span style="color:var(--teal)">·</span> Family Dentistry</p>
+    <h1 id="hero-heading">Modern Care in a Comfortable Setting.</h1>
+    <p class="hero-sub">Whether it has been six months or six years since your last visit, Ridgeview Dental is a judgment-free practice where your comfort comes first. Same-day appointments. Most insurance accepted. We will tell you what you need and what can wait.</p>
     <div class="hero-cta">
-      <a href="#contact" class="btn btn-teal">Schedule Your Visit</a>
-      <a href="tel:9725550234" class="btn btn-outline-teal">Call (972) 555-0234</a>
+      <a href="#contact" class="btn btn-coral">Book an Appointment</a>
+      <a href="tel:9725550149" class="btn btn-ghost">Call (972) 555-0149</a>
     </div>
-    <p class="hero-trustline">Accepting New Patients <span class="dot" aria-hidden="true">&middot;</span> Most Insurance Accepted <span class="dot" aria-hidden="true">&middot;</span> Same-Day Emergency Appointments</p>
+    <div class="trust-row">
+      <span>Same-Day Emergencies</span>
+      <span class="sep" aria-hidden="true">✦</span>
+      <span>In-Network with Most Insurance</span>
+      <span class="sep" aria-hidden="true">✦</span>
+      <span>4.9★ on Google</span>
+      <span class="sep" aria-hidden="true">✦</span>
+      <span>Sedation Available</span>
+    </div>
   </div>
 </section>
 
-<section class="services" id="services">
-  <div class="container-wide">
+<!-- Services -->
+<section class="services" id="services" aria-labelledby="services-heading">
+  <div class="container">
     <div class="section-head">
-      <span class="eyebrow">What We Do</span>
-      <h2>Complete Care for the Whole Family</h2>
+      <p class="eyebrow">What We Offer</p>
+      <h2 id="services-heading">Care for Every Stage of Life.</h2>
     </div>
     <div class="services-grid">
-      <article class="svc-card">
-        <div class="svc-icon" aria-hidden="true">&#x2726;</div>
-        <h3>Preventive Care</h3>
-        <p>Cleanings, exams, digital X-rays, and oral cancer screenings. The foundation of everything we do. Most visits take less than an hour.</p>
-        <a href="#" class="svc-link">Learn More <span aria-hidden="true">&rarr;</span></a>
+      <article class="service-card">
+        <span class="service-icon" aria-hidden="true">✦</span>
+        <h3>Preventive Cleanings &amp; Exams</h3>
+        <p>Twice-yearly cleanings, digital X-rays, oral cancer screenings, and gentle hygienists who actually listen.</p>
       </article>
-      <article class="svc-card">
-        <div class="svc-icon" aria-hidden="true">&#x2726;</div>
-        <h3>Cosmetic Dentistry</h3>
-        <p>Whitening, veneers, and smile makeovers. We use digital previews so you can see your results before we start.</p>
-        <a href="#" class="svc-link">Learn More <span aria-hidden="true">&rarr;</span></a>
+      <article class="service-card">
+        <span class="service-icon" aria-hidden="true">◆</span>
+        <h3>Cosmetic Dentistry &amp; Whitening</h3>
+        <p>Professional whitening, bonding, and porcelain veneers that look like your teeth on their best day.</p>
       </article>
-      <article class="svc-card">
-        <div class="svc-icon" aria-hidden="true">&#x2726;</div>
-        <h3>Dental Implants</h3>
-        <p>Permanent replacements that look and feel like natural teeth. From single tooth replacement to full-arch restoration.</p>
-        <a href="#" class="svc-link">Learn More <span aria-hidden="true">&rarr;</span></a>
+      <article class="service-card">
+        <span class="service-icon" aria-hidden="true">✦</span>
+        <h3>Clear Aligners</h3>
+        <p>Invisible aligner therapy planned and monitored in-house, with shorter timelines for adults and teens.</p>
       </article>
-      <article class="svc-card">
-        <div class="svc-icon" aria-hidden="true">&#x2726;</div>
-        <h3>Invisalign</h3>
-        <p>Clear aligners for teens and adults. Straighten your teeth without metal brackets. Free consultations available.</p>
-        <a href="#" class="svc-link">Learn More <span aria-hidden="true">&rarr;</span></a>
+      <article class="service-card">
+        <span class="service-icon" aria-hidden="true">◆</span>
+        <h3>Crowns, Bridges &amp; Implants</h3>
+        <p>Same-visit crowns when possible. Implant restorations planned with our trusted local oral surgeons.</p>
       </article>
-      <article class="svc-card">
-        <div class="svc-icon" aria-hidden="true">&#x2726;</div>
-        <h3>Emergency Dental</h3>
-        <p>Broken tooth, severe pain, or a knocked-out tooth? We reserve same-day slots for emergencies. Call us, don't wait.</p>
-        <a href="#" class="svc-link">Learn More <span aria-hidden="true">&rarr;</span></a>
-      </article>
-      <article class="svc-card">
-        <div class="svc-icon" aria-hidden="true">&#x2726;</div>
+      <article class="service-card">
+        <span class="service-icon" aria-hidden="true">✦</span>
         <h3>Pediatric Dentistry</h3>
-        <p>Kid-friendly care from first tooth to first braces. We make dental visits fun so your children grow up without dental anxiety.</p>
-        <a href="#" class="svc-link">Learn More <span aria-hidden="true">&rarr;</span></a>
+        <p>A dedicated kids' room with its own books and playlist. Gentle first visits as early as age one.</p>
+      </article>
+      <article class="service-card">
+        <span class="service-icon" aria-hidden="true">◆</span>
+        <h3>Sedation Dentistry</h3>
+        <p>Nitrous, oral sedation, and IV sedation available. We help nervous patients get back into a chair.</p>
       </article>
     </div>
   </div>
 </section>
 
-<section class="why" id="about">
+<!-- First Visit Timeline -->
+<section class="first-visit" id="first-visit" aria-labelledby="first-visit-heading">
   <div class="container">
     <div class="section-head">
-      <span class="eyebrow">Why Patients Choose Us</span>
-      <h2>Dentistry That Respects Your Time and Your Comfort</h2>
+      <p class="eyebrow">Your First Visit</p>
+      <h2 id="first-visit-heading">Step by Step, So There Are No Surprises.</h2>
     </div>
+    <ol class="timeline">
+      <li class="step">
+        <span class="step-circle" aria-hidden="true">01</span>
+        <h3>Welcome and Paperwork</h3>
+        <p>We send paperwork ahead of time so you spend less time in the waiting room.</p>
+      </li>
+      <li class="step">
+        <span class="step-circle" aria-hidden="true">02</span>
+        <h3>Comprehensive Exam and X-Rays</h3>
+        <p>Including digital scans, oral cancer screening, and a periodontal evaluation.</p>
+      </li>
+      <li class="step">
+        <span class="step-circle" aria-hidden="true">03</span>
+        <h3>Treatment Conversation</h3>
+        <p>We walk through what we found, what is urgent, what can wait, and what it costs.</p>
+      </li>
+      <li class="step">
+        <span class="step-circle" aria-hidden="true">04</span>
+        <h3>Cleaning Same Day if Time Allows</h3>
+        <p>Most new patients are in and out in under 90 minutes.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- Why Ridgeview -->
+<section class="why" aria-labelledby="why-heading">
+  <div class="container">
     <div class="why-grid">
-      <div class="diff">
-        <div class="diff-check" aria-hidden="true">&#x2713;</div>
-        <div>
-          <h3>Same-Day Appointments</h3>
-          <p>We hold emergency slots every day. When something hurts, you shouldn't have to wait a week.</p>
-        </div>
-      </div>
-      <div class="diff">
-        <div class="diff-check" aria-hidden="true">&#x2713;</div>
-        <div>
-          <h3>Judgment-Free Care</h3>
-          <p>Haven't been in years? No lectures. We meet you where you are and build a plan that works for you.</p>
-        </div>
-      </div>
-      <div class="diff">
-        <div class="diff-check" aria-hidden="true">&#x2713;</div>
-        <div>
-          <h3>Modern Technology</h3>
-          <p>Digital X-rays, intraoral cameras, and 3D scanning. Less radiation, better accuracy, faster treatment.</p>
-        </div>
-      </div>
-      <div class="diff">
-        <div class="diff-check" aria-hidden="true">&#x2713;</div>
-        <div>
-          <h3>Transparent Pricing</h3>
-          <p>We explain costs before treatment begins and work with your insurance to maximize your benefits.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="testi" id="reviews">
-  <div class="container-wide">
-    <div class="section-head">
-      <span class="eyebrow">Patient Stories</span>
-      <h2>What Our Patients Say</h2>
-    </div>
-    <div class="testi-grid">
-      <article class="testi-card">
-        <span class="testi-mark" aria-hidden="true">&ldquo;</span>
-        <p class="testi-quote">I hadn't been to a dentist in eight years. I was embarrassed, but Dr. Chen made me feel completely at ease. No judgment, just a plan to get healthy.</p>
-        <div class="testi-attr">Sarah M., Plano</div>
-      </article>
-      <article class="testi-card">
-        <span class="testi-mark" aria-hidden="true">&ldquo;</span>
-        <p class="testi-quote">My son used to cry before every dental visit. At Ridgeview, he actually asks when his next appointment is. That says everything.</p>
-        <div class="testi-attr">David K., Richardson</div>
-      </article>
-      <article class="testi-card">
-        <span class="testi-mark" aria-hidden="true">&ldquo;</span>
-        <p class="testi-quote">They found a cracked molar on a Tuesday and had me in a crown by Thursday. My old dentist would have taken three weeks.</p>
-        <div class="testi-attr">Angela R., Frisco</div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="ins" id="patient-info">
-  <div class="container">
-    <div class="ins-grid">
       <div>
-        <span class="eyebrow">Patient Info</span>
-        <h2>Insurance We Accept</h2>
-        <ul class="ins-list">
-          <li>Delta Dental</li>
-          <li>Cigna</li>
-          <li>Aetna</li>
-          <li>MetLife</li>
-          <li>United Healthcare</li>
-          <li>Guardian</li>
-          <li>BlueCross BlueShield</li>
-          <li>Humana</li>
-        </ul>
-        <p class="ins-note">Don't see your plan? Call us. We work with most PPO plans and offer affordable self-pay rates for patients without insurance.</p>
+        <p class="eyebrow">Why Ridgeview</p>
+        <h2 id="why-heading">What Makes the Difference.</h2>
       </div>
-      <div class="ins-cta">
-        <h3>Ready to Schedule?</h3>
-        <p>New patients can book online or call (972) 555-0234. Your first visit includes a full exam, digital X-rays, and a personalized treatment plan, all in about an hour.</p>
-        <a href="#contact" class="btn btn-on-teal">Book Your First Visit</a>
+      <div class="why-list">
+        <div class="why-item">
+          <span class="why-item-glyph" aria-hidden="true">✦</span>
+          <div>
+            <h3>We do not upsell.</h3>
+            <p>If you do not need it, we will tell you. Our hygienists are not on commission and our recommendations are based on clinical findings, not quarterly targets.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <span class="why-item-glyph" aria-hidden="true">✦</span>
+          <div>
+            <h3>We treat anxiety seriously.</h3>
+            <p>Nitrous, oral sedation, and IV sedation are all available. Same-day if scheduled in advance. We have patients who finally got back into a chair after 20 years away.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <span class="why-item-glyph" aria-hidden="true">✦</span>
+          <div>
+            <h3>We are family-built.</h3>
+            <p>Our pediatric room has its own waiting area, its own books, and its own playlist. Children become teenagers become parents. We try to be the office that earns those decades.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<footer id="contact">
+<!-- Doctor -->
+<section class="doctor" id="doctor" aria-labelledby="doctor-heading">
   <div class="container">
-    <div class="foot-grid">
-      <div class="foot-col">
-        <h4>Contact</h4>
-        <p>4521 Legacy Dr, Suite 200<br>Plano, TX 75024</p>
-        <p><a href="tel:9725550234">(972) 555-0234</a><br><a href="mailto:hello@ridgeviewdental.com">hello@ridgeviewdental.com</a></p>
+    <div class="doctor-grid">
+      <div>
+        <p class="eyebrow">Meet Dr. Parker</p>
+        <h2 id="doctor-heading">Dr. Sarah Parker, DDS</h2>
+        <p class="doctor-bio">Dr. Parker received her DDS from Baylor College of Dentistry in 2011 and completed advanced training in restorative and cosmetic dentistry at Spear Education. She has practiced in Plano since 2013 and lives in West Plano with her husband and two children. She is a member of the American Dental Association, the Texas Dental Association, and the Greater Dallas Dental Society.</p>
+        <div class="credential-row">
+          <span>Baylor DDS</span>
+          <span class="sep" aria-hidden="true">·</span>
+          <span>Spear Education</span>
+          <span class="sep" aria-hidden="true">·</span>
+          <span>ADA Member</span>
+        </div>
       </div>
-      <div class="foot-col">
-        <h4>Quick Links</h4>
-        <a href="#services">Services</a>
-        <a href="#about">About</a>
+      <figure class="blockquote">
+        <q>I went to dental school because my own dentist made every visit feel safe when I was a kid. That is what I want this office to be for someone else's kid.</q>
+        <figcaption class="attribution">Dr. Sarah Parker</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials" aria-labelledby="testimonials-heading">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">What Our Patients Say</p>
+      <h2 id="testimonials-heading">Stories from the Chair.</h2>
+    </div>
+    <div class="testimonial-grid">
+      <article class="testimonial-card">
+        <div class="stars" aria-label="Five out of five stars">★ ★ ★ ★ ★</div>
+        <q>I avoided the dentist for almost a decade because of anxiety. Dr. Parker walked me through every step before she did it, and I actually fell asleep during my crown. I cried in the parking lot afterward, in a good way.</q>
+        <div class="attribution">Lauren M., Plano <span style="opacity:0.55">·</span> Patient since 2019</div>
+      </article>
+      <article class="testimonial-card">
+        <div class="stars" aria-label="Five out of five stars">★ ★ ★ ★ ★</div>
+        <q>My daughter used to cry the whole drive over. Now she asks if it is a Ridgeview day. The pediatric room and the way the staff talks to her made all the difference. My son followed her in without a fuss.</q>
+        <div class="attribution">James T., Frisco <span style="opacity:0.55">·</span> Father of two</div>
+      </article>
+      <article class="testimonial-card">
+        <div class="stars" aria-label="Five out of five stars">★ ★ ★ ★ ★</div>
+        <q>Chipped a front tooth at 9pm on a Sunday. Dr. Parker called us back within fifteen minutes and met us at the office Monday at 7am. Bonded it so well I forget which one it was. We are patients for life now.</q>
+        <div class="attribution">The Velasquez Family <span style="opacity:0.55">·</span> West Plano</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Insurance -->
+<section class="insurance" id="insurance" aria-labelledby="insurance-heading">
+  <div class="container">
+    <div class="insurance-grid">
+      <div>
+        <p class="eyebrow">Insurance and Costs</p>
+        <h2 id="insurance-heading">We Will Always Be Honest About What Things Cost.</h2>
+        <p>We are in-network with most major PPO plans. We will run your benefits before you arrive so you have an estimate going in, not a surprise going out. If you do not have insurance, ask about our in-house savings plan.</p>
+        <p class="insurance-aside">No-insurance savings plan from $29 per month for adults, $19 per month for kids.</p>
+      </div>
+      <div>
+        <div class="pill-grid" role="list" aria-label="Accepted insurance plans">
+          <span class="pill" role="listitem">Delta Dental</span>
+          <span class="pill" role="listitem">Cigna</span>
+          <span class="pill" role="listitem">MetLife</span>
+          <span class="pill" role="listitem">Aetna</span>
+          <span class="pill" role="listitem">United</span>
+          <span class="pill" role="listitem">BCBS</span>
+          <span class="pill" role="listitem">Guardian</span>
+          <span class="pill" role="listitem">Humana</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="contact" aria-labelledby="cta-heading">
+  <div class="container">
+    <div class="cta-inner">
+      <p class="eyebrow">Book Your Appointment</p>
+      <h2 id="cta-heading">We Have a Chair Open for You This Week.</h2>
+      <p class="cta-sub">Same-day appointments are usually available for emergencies. Routine cleanings book about a week out. We will work around your schedule, including early mornings and Saturday cleanings.</p>
+      <a href="#" class="btn btn-coral">Book Your Appointment</a>
+      <p class="cta-meta">
+        Or call (972) 555-0149 <span class="dot" aria-hidden="true">·</span> 5701 Legacy Drive, Suite 240, Plano
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <a href="#" class="logo" aria-label="Ridgeview Dental">
+        <span class="logo-mark" aria-hidden="true"></span>
+        Ridgeview Dental
+      </a>
+      <p class="footer-tag">Modern, comfortable family dentistry in West Plano.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Hours</h4>
+      <div class="footer-list">
+        <span>Mon to Thu, 7am to 6pm</span>
+        <span>Fri, 7am to 2pm</span>
+        <span>Sat, 8am to 1pm</span>
+        <span>Sun, Closed</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <div class="footer-list">
+        <span>5701 Legacy Drive, Suite 240</span>
+        <span>Plano, TX 75024</span>
+        <a href="tel:9725550149">(972) 555-0149</a>
+        <a href="mailto:hello@ridgeviewdental.com">hello@ridgeviewdental.com</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <div class="footer-list">
         <a href="#">Patient Forms</a>
-        <a href="#patient-info">Insurance</a>
-        <a href="#contact">Contact</a>
+        <a href="#">Financing</a>
+        <a href="#">Insurance</a>
+        <a href="#">Privacy</a>
       </div>
-      <div class="foot-col">
-        <h4>Office Hours</h4>
-        <p>Monday to Thursday: 8:00 AM to 5:00 PM<br>Friday: 8:00 AM to 2:00 PM<br>Saturday: By appointment<br>Sunday: Closed</p>
-      </div>
+      <p class="credit"><a href="https://dbjtechnologies.com" rel="noopener">Website by DBJ Technologies</a></p>
     </div>
-    <div class="foot-bar">
-      <span>&copy; 2026 Ridgeview Dental. All rights reserved.</span>
-      <span>Website by <a href="https://dbjtechnologies.com">DBJ Technologies</a></span>
-    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Ridgeview Dental. All rights reserved.</span>
+    <span>Plano, TX</span>
   </div>
 </footer>
 
