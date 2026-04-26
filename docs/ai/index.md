@@ -8,8 +8,10 @@ Before large changes, read these files:
 4. **docs/ai/current-state.md** -- what currently works, what's broken, what's deployed
 5. **docs/ai/decision-log.md** -- major decisions already made (do not relitigate)
 6. **docs/ai/do-not-break.md** -- fragile or critical areas that require extra caution
-7. **docs/ai/session-handoff.md** -- where the last session left off, what's in progress
+7. **docs/ai/session-handoff.md** -- compact snapshot of the last session: themes shipped, durable lessons, unresolved issues, next tasks, current git status
 8. **docs/ai/backlog.md** -- prioritized task list
+
+Older session detail (full diagnostic trails) lives under `docs/ai/history/`. See `docs/ai/history/index.md`. These files are NOT auto-loaded; read them only when a current task needs the historical detail.
 
 ## Scoped Rules (loaded automatically by Claude Code when relevant)
 
@@ -23,7 +25,7 @@ Before large changes, read these files:
 
 **Before major changes:** Also read decision-log.md and do-not-break.md.
 
-**End of session:** Update session-handoff.md with what changed, files edited, decisions made, bugs found, and next recommended task.
+**End of session:** Update session-handoff.md with what changed, files edited, decisions made, bugs found, and next recommended task. When the live handoff crosses ~30 KB (the `dbjcontext` audit threshold fires), archive it to `docs/ai/history/YYYY-MM-DD.md`, add an entry to `docs/ai/history/index.md`, and reset session-handoff.md to a compact summary that points back to the archive.
 
 **After durable decisions:** Add entries to decision-log.md so future sessions don't relitigate settled questions.
 
@@ -40,6 +42,7 @@ The `dbjcontext` zsh alias copies a curated context pack to the macOS clipboard 
 - Legacy email `dbjonestech@gmail.com` beyond the baseline of 2 known structural references
 
 **Maintenance triggers:**
-- When session-handoff.md crosses 30 KB, archive older session summaries to `docs/ai/history/` so the latest session stays prominent.
+- When session-handoff.md crosses 30 KB, archive its contents to `docs/ai/history/YYYY-MM-DD.md`, add an entry to `docs/ai/history/index.md`, and replace the live handoff with a compact summary.
 - When the legacy-email or em-dash baseline changes, update the constants at the top of `scripts/dbj-context.sh`.
 - When a new long-lived doc is added under `docs/ai/` or `.claude/rules/`, add it to the FILES array in the script.
+- `docs/ai/history/` is intentionally excluded from the pack. If a portal-chat task needs historical detail, paste the relevant dated file separately.

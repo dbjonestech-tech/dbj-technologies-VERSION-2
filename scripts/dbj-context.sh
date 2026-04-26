@@ -14,6 +14,10 @@
 #
 # Audit warnings printed at the end flag drift in the docs themselves
 # (size growth, em dash creep, missing files).
+#
+# docs/ai/history/ is intentionally excluded from the pack. When the live
+# session-handoff.md grows past 30 KB, archive it to history/YYYY-MM-DD.md
+# and reset the live handoff to a compact summary (see docs/ai/index.md).
 
 set -euo pipefail
 
@@ -75,14 +79,18 @@ if [ "${#MISSING[@]}" -gt 0 ]; then
 fi
 
 # session-handoff.md grows every session. At ~30 KB it starts to dominate the pack;
-# archive older sessions to docs/ai/history/ when this fires.
+# archive its contents to docs/ai/history/YYYY-MM-DD.md and reset the live
+# handoff to a compact summary that points back to the archive.
 if [ -f "docs/ai/session-handoff.md" ]; then
   HANDOFF_BYTES=$(wc -c < "docs/ai/session-handoff.md" | tr -d ' ')
   HANDOFF_KB=$(( (HANDOFF_BYTES + 1023) / 1024 ))
   if [ "$HANDOFF_KB" -gt 30 ]; then
     echo ""
-    echo "WARNING: session-handoff.md is ${HANDOFF_KB} KB. Consider archiving older sessions"
-    echo "to docs/ai/history/ so the latest session stays prominent in the pack."
+    echo "WARNING: session-handoff.md is ${HANDOFF_KB} KB. Archive workflow:"
+    echo "  1. cp docs/ai/session-handoff.md docs/ai/history/\$(date +%Y-%m-%d).md"
+    echo "  2. Add an entry to docs/ai/history/index.md"
+    echo "  3. Replace docs/ai/session-handoff.md with a compact summary"
+    echo "     (themes shipped, durable lessons, unresolved, next tasks, git status)"
     WARNINGS=$((WARNINGS + 1))
   fi
 fi
