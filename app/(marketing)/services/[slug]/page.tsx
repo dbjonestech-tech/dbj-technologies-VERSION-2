@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {
-  getServiceBySlug,
-  getServiceSlugs,
-  SERVICE_DETAILS,
-} from "@/lib/service-data";
+import { getServiceBySlug, getServiceSlugs } from "@/lib/service-data";
+import { SERVICES } from "@/lib/siteContent";
 import { ServicePageLayout } from "@/components/templates/ServicePageLayout";
 import { JsonLd } from "@/components/layout/JsonLd";
 
@@ -36,7 +33,7 @@ export default async function ServiceDetailPage({ params }: Props) {
   if (!service) notFound();
 
   const relatedServices = service.relatedSlugs
-    .map((rs) => SERVICE_DETAILS.find((s) => s.slug === rs))
+    .map((rs) => SERVICES.find((s) => s.slug === rs))
     .filter((s): s is NonNullable<typeof s> => s != null)
     .map(({ slug, title, tagline }) => ({ slug, title, tagline }));
 
