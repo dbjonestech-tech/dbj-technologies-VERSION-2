@@ -8,6 +8,12 @@ const SCREENSHOT_TIMEOUT_MS = 45_000;
 // that media query (including dbjtechnologies.com's HeroCinema) skip
 // interaction-gated entrance animations so the captured frame shows real
 // content instead of a permanent blueprint overlay.
+//
+// After navigation we try to dismiss any GDPR/CCPA cookie banner by
+// matching common accept-button text and aria-labels. If no banner is
+// found the click silently no-ops. We then wait for document.fonts.ready
+// so type renders before capture, and finally apply the existing 3s
+// settle window for any tail animations.
 const SCREENSHOT_FUNCTION = `
 export default async function ({ page, context }) {
   const { url, width, height } = context;
@@ -23,7 +29,33 @@ export default async function ({ page, context }) {
     await page.setViewport({ width, height });
   }
   await page.goto(url, { waitUntil: "networkidle0", timeout: 25000 });
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+
+  try {
+    await page.evaluate(() => {
+      const ACCEPT_RE = /^(accept|agree|allow|got it|ok|i understand|i accept|continue|consent)( all| cookies| & close)?$/i;
+      const ARIA_RE = /(accept|agree|allow|consent|close.*cookie)/i;
+      const candidates = Array.from(
+        document.querySelectorAll('button, a[role="button"], [role="button"], input[type="button"], input[type="submit"]')
+      );
+      for (const el of candidates) {
+        const text = (el.textContent || el.value || '').trim();
+        const aria = el.getAttribute('aria-label') || '';
+        if (ACCEPT_RE.test(text) || ARIA_RE.test(aria)) {
+          try { el.click(); return true; } catch (_e) { /* keep trying */ }
+        }
+      }
+      return false;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 600));
+  } catch (_err) { /* banner dismissal is best-effort */ }
+
+  try {
+    await page.evaluate(() =>
+      document.fonts && document.fonts.ready ? document.fonts.ready : null
+    );
+  } catch (_err) { /* fonts.ready unavailable on some pages */ }
+
+  await new Promise((resolve) => setTimeout(resolve, 2500));
   const buffer = await page.screenshot({
     type: "jpeg",
     quality: 80,
