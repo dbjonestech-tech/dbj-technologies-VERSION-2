@@ -1,12 +1,51 @@
 import { SITE, SERVICES, SOCIAL_LINKS } from "@/lib/constants";
 
 interface JsonLdProps {
-  type?: "organization" | "localBusiness" | "website" | "faq" | "service";
+  type?:
+    | "organization"
+    | "localBusiness"
+    | "website"
+    | "faq"
+    | "service"
+    | "serviceItem"
+    | "creativeWork"
+    | "offer"
+    | "breadcrumb";
   faqItems?: { question: string; answer: string }[];
+  service?: { slug: string; name: string; description: string };
+  creativeWork?: {
+    slug: string;
+    name: string;
+    description: string;
+    image?: string;
+    category?: string;
+  };
+  offer?: { slug: string; name: string; description: string; price: string };
+  breadcrumb?: { name: string; url: string }[];
 }
 
-export function JsonLd({ type = "organization", faqItems }: JsonLdProps) {
-  const schemas: Record<string, object> = {
+/* Parse the leading numeric value out of a price string.
+   Handles "$4,500", "Starting at $15,000", "$299/month", "$175/hour". */
+function parsePriceUSD(price: string): string | null {
+  const match = price.replace(/,/g, "").match(/\$(\d+(?:\.\d+)?)/);
+  return match ? match[1] : null;
+}
+
+const provider = {
+  "@type": "Organization",
+  name: SITE.name,
+  url: SITE.url,
+};
+
+export function JsonLd({
+  type = "organization",
+  faqItems,
+  service,
+  creativeWork,
+  offer,
+  breadcrumb,
+}: JsonLdProps) {
+  const schemas: Record<string, object | null> = {
     organization: {
       "@context": "https://schema.org",
       "@type": "Organization",
@@ -14,6 +53,7 @@ export function JsonLd({ type = "organization", faqItems }: JsonLdProps) {
       url: SITE.url,
       logo: `${SITE.url}/brand/dbj_logo_horizontal.svg`,
       description: SITE.description,
+      email: SITE.email,
       address: {
         "@type": "PostalAddress",
         addressLocality: "Dallas",
@@ -28,6 +68,7 @@ export function JsonLd({ type = "organization", faqItems }: JsonLdProps) {
       name: SITE.name,
       url: SITE.url,
       description: SITE.description,
+      email: SITE.email,
       address: {
         "@type": "PostalAddress",
         addressLocality: "Dallas",
@@ -88,13 +129,72 @@ export function JsonLd({ type = "organization", faqItems }: JsonLdProps) {
           "@type": "Service",
           name: s.title,
           description: s.description,
-          provider: {
-            "@type": "Organization",
-            name: SITE.name,
-          },
+          provider,
         },
       })),
     },
+    serviceItem: service
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          name: service.name,
+          description: service.description,
+          url: `${SITE.url}/services/${service.slug}`,
+          serviceType: service.name,
+          provider,
+          areaServed: {
+            "@type": "Country",
+            name: "United States",
+          },
+        }
+      : null,
+    creativeWork: creativeWork
+      ? {
+          "@context": "https://schema.org",
+          "@type": "CreativeWork",
+          name: creativeWork.name,
+          description: creativeWork.description,
+          url: `${SITE.url}/work/${creativeWork.slug}`,
+          ...(creativeWork.image
+            ? {
+                image: creativeWork.image.startsWith("http")
+                  ? creativeWork.image
+                  : `${SITE.url}${creativeWork.image}`,
+              }
+            : {}),
+          ...(creativeWork.category ? { about: creativeWork.category } : {}),
+          creator: provider,
+        }
+      : null,
+    offer: offer
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Offer",
+          name: offer.name,
+          description: offer.description,
+          url: `${SITE.url}/pricing/${offer.slug}`,
+          ...(parsePriceUSD(offer.price)
+            ? {
+                price: parsePriceUSD(offer.price),
+                priceCurrency: "USD",
+              }
+            : {}),
+          category: "Service",
+          seller: provider,
+        }
+      : null,
+    breadcrumb: breadcrumb
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: breadcrumb.map((b, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: b.name,
+            item: b.url,
+          })),
+        }
+      : null,
   };
 
   const schema = schemas[type];
