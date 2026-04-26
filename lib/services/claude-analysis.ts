@@ -387,6 +387,19 @@ const visionAuditSchema = z.object({
     .describe(
       "Operational footprint. single-location = one storefront or service area. regional = multiple locations within a state or metro. national = household-name brand operating across most of a country (e.g. Whole Foods, Walmart, Target). global = multinational megabrand (e.g. Google, Amazon, Apple, Microsoft)."
     ),
+  screenshotHealth: z
+    .enum([
+      "clean",
+      "cookie-banner-overlay",
+      "loading-or-skeleton",
+      "auth-wall",
+      "minimal-content",
+    ])
+    .optional()
+    .default("clean")
+    .describe(
+      "What the screenshot actually shows. clean = real homepage content visible. cookie-banner-overlay = a consent or privacy modal covers most of the page. loading-or-skeleton = pre-hydration spinners or skeleton placeholders. auth-wall = login, signup, or paywall is the dominant content. minimal-content = the page rendered but is genuinely sparse (likely a placeholder or under-construction site)."
+    ),
 });
 
 const remediationSchema = z.object({
@@ -458,6 +471,15 @@ Determine the operational footprint visible from the website and the URL/domain.
 
 Be honest. If the URL is a known megabrand (e.g. google.com, amazon.com, wholefoodsmarket.com, walmart.com, apple.com), classify as national or global even if the homepage looks simple. Default to single-location only when there is clear evidence of a small local operation.
 
+SCREENSHOT HEALTH:
+Before scoring anything else, decide what the screenshot actually shows. The audit is meaningless if the capture is dominated by a cookie consent dialog, a login wall, or a loading skeleton.
+- clean: real homepage content is visible and judgeable.
+- cookie-banner-overlay: a GDPR/CCPA consent or privacy modal covers most of the page. Score conservatively and call this out.
+- loading-or-skeleton: pre-hydration spinners, gray placeholder boxes, or a near-empty page that the page text suggests should have content. Treat scores as low-confidence.
+- auth-wall: login, signup, or paywall is the dominant content. The user pasted a URL that requires authentication.
+- minimal-content: the page rendered fully but is genuinely sparse (placeholder, under-construction, or coming-soon).
+When health is anything other than clean, lower confidence in your scores and mention the issue in the relevant observations.
+
 GUIDELINES
 - Each sub-score must include a 1-2 sentence observation grounded in what you actually see in the screenshots or read in the page text.
 - Do NOT hallucinate elements that are not visible. If something cannot be judged from the screenshots and page text, score it conservatively and say so in the observation.
@@ -489,7 +511,8 @@ Return ONE JSON object, no markdown, no preamble. Exact shape:
   "businessModel": "B2B" | "B2C" | "mixed",
   "inferredVertical": "<specific vertical label>",
   "inferredVerticalParent": "<one of the parent categories listed above>",
-  "businessScale": "single-location" | "regional" | "national" | "global"
+  "businessScale": "single-location" | "regional" | "national" | "global",
+  "screenshotHealth": "clean" | "cookie-banner-overlay" | "loading-or-skeleton" | "auth-wall" | "minimal-content"
 }`;
 
 const REMEDIATION_SYSTEM_PROMPT = `You are a senior web strategist producing a prioritized fix list for a {{INDUSTRY}} website in {{CITY}}.
@@ -502,7 +525,13 @@ For each item:
 - problem: 1-2 sentences describing what is wrong today, grounded in the provided scores and observations.
 - improvement: 1-2 sentences describing what the site gains once this is fixed (business outcome, not a code change).
 - impact: "high" | "medium" | "low" (must be declining or equal across the 3 items).
-- difficulty: "easy" | "moderate" | "hard" — honest assessment of the effort for a small business to execute.
+- difficulty: "easy" | "moderate" | "hard" (honest assessment of the effort for a small business to execute).
+
+QUALITY RULES (do not violate):
+- Ground every recommendation in a SPECIFIC sub-score that is below 7/10 or in a Lighthouse failure listed above. Cite the metric in the problem field.
+- Do NOT recommend improvements to areas already scoring 8 or higher. If hero_impact is 9, do not propose hero changes; pick a weaker area.
+- Do NOT produce generic copy like "improve your CTA" or "add testimonials" without referencing what specifically is broken on this site (use observations from the scores). If you cannot tie a recommendation to a concrete observation, omit that item and return fewer than 3 fixes.
+- If fewer than 3 sub-scores are below 7, return only as many remediation items as there are real problems. The schema accepts 1-5 items; do not pad to reach 3 if the site is genuinely strong.
 
 OUTPUT FORMAT
 Return ONE JSON object, no markdown, no preamble. Exact shape:

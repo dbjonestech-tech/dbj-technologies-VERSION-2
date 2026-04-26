@@ -17,6 +17,7 @@ import type {
   RemediationResult,
   RevenueImpactResult,
   ScanStatus as ScanStatusValue,
+  ScreenshotHealth,
 } from "@/lib/types/scan";
 
 type InitialScanState = {
@@ -49,6 +50,7 @@ type ApiReport = {
   lighthouseScores: LighthouseCategoryScores | null;
   industryBenchmark: IndustryBenchmark | null;
   businessScale?: BusinessScale;
+  screenshotHealth?: ScreenshotHealth;
 };
 
 const ACTIVE_STATUSES = new Set<string>(["pending", "scanning", "analyzing"]);
@@ -470,6 +472,9 @@ function Report({
   return (
     <section className="pathlight-report flex flex-col gap-16 py-12">
       {isPartial ? <PartialNotice /> : null}
+      {report.screenshotHealth && report.screenshotHealth !== "clean" ? (
+        <ScreenshotHealthNotice health={report.screenshotHealth} />
+      ) : null}
 
       {hasScore ? (
         <ScoreHero
@@ -543,6 +548,31 @@ function PartialNotice() {
     >
       Some analysis steps could not be completed. The available results are
       shown below.
+    </div>
+  );
+}
+
+function ScreenshotHealthNotice({ health }: { health: ScreenshotHealth }) {
+  const message: Record<Exclude<ScreenshotHealth, "clean">, string> = {
+    "cookie-banner-overlay":
+      "The screenshot shows a cookie or privacy consent dialog covering most of the page. Design and positioning scores are based on what was visible behind the overlay and should be read with extra caution.",
+    "loading-or-skeleton":
+      "The screenshot captured the page in a pre-render or loading state. Scores are based on the available content and should be treated as low-confidence. Re-run the scan in a few minutes for a cleaner capture.",
+    "auth-wall":
+      "The URL points to a login, signup, or paywall page rather than a public homepage. Pathlight scored what was visible, but the meaningful audit lives behind the auth gate. Paste the public homepage URL for a calibrated report.",
+    "minimal-content":
+      "The page rendered fully but contained very little content (likely a placeholder, under-construction, or coming-soon page). Scores reflect the sparse capture rather than a finished site.",
+  };
+  return (
+    <div
+      className="rounded-2xl border p-5 text-sm"
+      style={{
+        borderColor: "rgba(245,158,11,0.35)",
+        backgroundColor: "rgba(120,53,15,0.15)",
+        color: "#fcd34d",
+      }}
+    >
+      {message[health as Exclude<ScreenshotHealth, "clean">]}
     </div>
   );
 }

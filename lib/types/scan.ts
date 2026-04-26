@@ -74,6 +74,13 @@ export type BusinessScale =
   | "national"
   | "global";
 
+export type ScreenshotHealth =
+  | "clean"
+  | "cookie-banner-overlay"
+  | "loading-or-skeleton"
+  | "auth-wall"
+  | "minimal-content";
+
 export type VisionAuditResult = {
   design: DesignScores;
   positioning: PositioningScores;
@@ -81,6 +88,7 @@ export type VisionAuditResult = {
   inferredVertical?: string;
   inferredVerticalParent?: string;
   businessScale?: BusinessScale;
+  screenshotHealth?: ScreenshotHealth;
 };
 
 export type RemediationImpact = "high" | "medium" | "low";
@@ -174,6 +182,7 @@ export type PathlightReport = {
   inferredVertical?: string;
   inferredVerticalParent?: string;
   businessScale?: BusinessScale;
+  screenshotHealth?: ScreenshotHealth;
   error: string | null;
   duration: number | null;
   createdAt: string;

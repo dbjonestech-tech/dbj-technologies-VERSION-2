@@ -295,6 +295,7 @@ function coerceVisionAudit(v: unknown): VisionAuditResult | null {
     return null;
   }
   const scale = o.businessScale;
+  const health = o.screenshotHealth;
   return {
     design: o.design as DesignScores,
     positioning: o.positioning as PositioningScores,
@@ -307,6 +308,14 @@ function coerceVisionAudit(v: unknown): VisionAuditResult | null {
       scale === "national" ||
       scale === "global"
         ? scale
+        : undefined,
+    screenshotHealth:
+      health === "clean" ||
+      health === "cookie-banner-overlay" ||
+      health === "loading-or-skeleton" ||
+      health === "auth-wall" ||
+      health === "minimal-content"
+        ? health
         : undefined,
   };
 }
@@ -496,6 +505,7 @@ export async function getFullScanReport(
     inferredVertical: vision?.inferredVertical,
     inferredVerticalParent: vision?.inferredVerticalParent,
     businessScale: vision?.businessScale,
+    screenshotHealth: vision?.screenshotHealth,
     error: scan.error_message,
     duration: scan.scan_duration_ms,
     createdAt: scan.created_at,

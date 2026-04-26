@@ -327,6 +327,15 @@ export function lookupVertical(
 
   const best = scored[0];
   if (best.score < 0.55) return null;
+  if (best.score < 0.75) {
+    console.warn(
+      `[vertical-lookup] Borderline fuzzy match: input="${inferredVertical}" matched="${best.entry.name}" score=${best.score.toFixed(2)} confidence=${best.entry.confidence}. Review if downstream estimates look off.`
+    );
+  } else {
+    console.log(
+      `[vertical-lookup] Match: input="${inferredVertical}" matched="${best.entry.name}" score=${best.score.toFixed(2)} confidence=${best.entry.confidence}`
+    );
+  }
   return best.entry;
 }
 

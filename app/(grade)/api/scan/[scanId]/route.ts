@@ -44,6 +44,7 @@ export async function GET(
       lighthouseScores: report.lighthouseScores ?? null,
       industryBenchmark: report.industryBenchmark ?? null,
       businessScale: report.businessScale,
+      screenshotHealth: report.screenshotHealth,
     },
     { headers: { "Cache-Control": "no-cache" } }
   );
