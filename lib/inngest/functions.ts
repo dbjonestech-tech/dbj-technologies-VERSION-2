@@ -483,6 +483,16 @@ export const scanRequested = inngest.createFunction(
             });
             return;
           }
+          const suppression = await shouldSuppressFollowup(scanId);
+          if (suppression.suppress) {
+            await logEmailEvent({
+              scanId,
+              emailType: "followup_48h",
+              status: "skipped",
+              errorMessage: `suppressed:${suppression.reason}`,
+            });
+            return;
+          }
           await sendFollowUp(scanId, 2);
         } catch (err) {
           await logEmailEvent({
@@ -507,6 +517,16 @@ export const scanRequested = inngest.createFunction(
             });
             return;
           }
+          const suppression = await shouldSuppressFollowup(scanId);
+          if (suppression.suppress) {
+            await logEmailEvent({
+              scanId,
+              emailType: "followup_5d",
+              status: "skipped",
+              errorMessage: `suppressed:${suppression.reason}`,
+            });
+            return;
+          }
           await sendFollowUp(scanId, 3);
         } catch (err) {
           await logEmailEvent({
@@ -528,6 +548,16 @@ export const scanRequested = inngest.createFunction(
               scanId,
               emailType: "breakup_8d",
               status: "skipped",
+            });
+            return;
+          }
+          const suppression = await shouldSuppressFollowup(scanId);
+          if (suppression.suppress) {
+            await logEmailEvent({
+              scanId,
+              emailType: "breakup_8d",
+              status: "skipped",
+              errorMessage: `suppressed:${suppression.reason}`,
             });
             return;
           }
@@ -569,4 +599,56 @@ async function lookupScanEmail(scanId: string): Promise<string | null> {
     SELECT email FROM scans WHERE id = ${scanId} LIMIT 1
   `) as { email: string }[];
   return rows[0]?.email ?? null;
+}
+
+const FOLLOWUP_SUPPRESS_EMAIL_DOMAINS = new Set([
+  "dbjtechnologies.com",
+]);
+
+const FOLLOWUP_HIGH_SCORE_THRESHOLD = 90;
+
+async function shouldSuppressFollowup(scanId: string): Promise<{
+  suppress: boolean;
+  reason?: string;
+}> {
+  const sql = getDb();
+  const rows = (await sql`
+    SELECT s.email, sr.pathlight_score, sr.ai_analysis
+    FROM scans s
+    LEFT JOIN scan_results sr ON sr.scan_id = s.id
+    WHERE s.id = ${scanId}
+    LIMIT 1
+  `) as {
+    email: string | null;
+    pathlight_score: number | null;
+    ai_analysis: unknown;
+  }[];
+  const row = rows[0];
+  if (!row) return { suppress: false };
+
+  if (row.email) {
+    const domain = row.email.toLowerCase().split("@")[1] ?? "";
+    if (FOLLOWUP_SUPPRESS_EMAIL_DOMAINS.has(domain)) {
+      return { suppress: true, reason: `internal-domain:${domain}` };
+    }
+  }
+
+  if (
+    typeof row.pathlight_score === "number" &&
+    row.pathlight_score >= FOLLOWUP_HIGH_SCORE_THRESHOLD
+  ) {
+    return {
+      suppress: true,
+      reason: `high-score:${row.pathlight_score}`,
+    };
+  }
+
+  if (row.ai_analysis && typeof row.ai_analysis === "object") {
+    const scale = (row.ai_analysis as Record<string, unknown>).businessScale;
+    if (scale === "national" || scale === "global") {
+      return { suppress: true, reason: `out-of-scope:${scale}` };
+    }
+  }
+
+  return { suppress: false };
 }

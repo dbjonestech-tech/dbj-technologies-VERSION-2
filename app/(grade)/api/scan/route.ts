@@ -86,6 +86,26 @@ export async function POST(request: Request) {
 
     const sql = getDb();
 
+    // De-dupe: if the same (email, url) already has a scan started in the
+    // last 24 hours, return that scanId instead of triggering a new pipeline
+    // run. Stops accidental duplicate submissions and bot replays from
+    // burning PSI quota, Browserless minutes, and Anthropic spend.
+    const dedupeRows = (await sql`
+      SELECT id FROM scans
+      WHERE email = ${email}
+        AND url = ${url}
+        AND created_at > now() - interval '24 hours'
+        AND status <> 'failed'
+      ORDER BY created_at DESC
+      LIMIT 1
+    `) as { id: string }[];
+    if (dedupeRows.length > 0) {
+      return NextResponse.json(
+        { scanId: dedupeRows[0]!.id, status: "deduped" },
+        { status: 200 }
+      );
+    }
+
     const scanRows = (await sql`
       INSERT INTO scans (url, email, business_name, city, status)
       VALUES (${url}, ${email}, ${businessName ?? null}, ${city}, 'pending')

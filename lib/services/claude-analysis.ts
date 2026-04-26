@@ -125,7 +125,10 @@ export function extractPageTextContent(lighthouseData: unknown): PageTextContent
 
 function industryLabel(industry: string | null | undefined): string {
   const value = (industry ?? "").trim().toLowerCase();
-  if (!value || value === "general") return "small-to-medium local business";
+  // When no industry was supplied, stay neutral instead of pre-biasing the
+  // prompt toward "small local business". The vision audit infers vertical,
+  // businessModel, and businessScale on its own.
+  if (!value || value === "general") return "business website";
   return industry!.trim();
 }
 
