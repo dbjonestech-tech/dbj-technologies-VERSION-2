@@ -288,12 +288,20 @@ function coerceVisionAudit(v: unknown): VisionAuditResult | null {
   ) {
     return null;
   }
+  const scale = o.businessScale;
   return {
     design: o.design as DesignScores,
     positioning: o.positioning as PositioningScores,
     businessModel: (o.businessModel as "B2B" | "B2C" | "mixed") ?? undefined,
     inferredVertical: (o.inferredVertical as string) ?? undefined,
     inferredVerticalParent: (o.inferredVerticalParent as string) ?? undefined,
+    businessScale:
+      scale === "single-location" ||
+      scale === "regional" ||
+      scale === "national" ||
+      scale === "global"
+        ? scale
+        : undefined,
   };
 }
 
@@ -481,6 +489,7 @@ export async function getFullScanReport(
     businessModel: vision?.businessModel,
     inferredVertical: vision?.inferredVertical,
     inferredVerticalParent: vision?.inferredVerticalParent,
+    businessScale: vision?.businessScale,
     error: scan.error_message,
     duration: scan.scan_duration_ms,
     createdAt: scan.created_at,

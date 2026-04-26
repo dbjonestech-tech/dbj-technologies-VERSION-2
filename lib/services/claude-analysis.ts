@@ -380,6 +380,13 @@ const visionAuditSchema = z.object({
     .describe(
       "The broad parent category. One of: 'Home Services & Trades', 'Automotive', 'Health & Wellness', 'Legal', 'Financial Services', 'Food & Beverage', 'Professional Services / B2B', 'Retail & E-Commerce', 'Real Estate', 'Education & Childcare', 'Beauty & Personal Care', 'Technology / SaaS', 'Construction & Materials', 'Fitness & Recreation', 'Pet Services', 'Events & Entertainment', 'Travel & Hospitality', 'Agriculture & Landscaping', 'Nonprofit', 'Other'."
     ),
+  businessScale: z
+    .enum(["single-location", "regional", "national", "global"])
+    .optional()
+    .default("single-location")
+    .describe(
+      "Operational footprint. single-location = one storefront or service area. regional = multiple locations within a state or metro. national = household-name brand operating across most of a country (e.g. Whole Foods, Walmart, Target). global = multinational megabrand (e.g. Google, Amazon, Apple, Microsoft)."
+    ),
 });
 
 const remediationSchema = z.object({
@@ -442,6 +449,15 @@ Identify the specific business vertical from the homepage content. Use the most 
 
 For inferredVerticalParent, use exactly one of these categories: Home Services & Trades, Automotive, Health & Wellness, Legal, Financial Services, Food & Beverage, Professional Services / B2B, Retail & E-Commerce, Real Estate, Education & Childcare, Beauty & Personal Care, Technology / SaaS, Construction & Materials, Fitness & Recreation, Pet Services, Events & Entertainment, Travel & Hospitality, Agriculture & Landscaping, Nonprofit, Other.
 
+BUSINESS SCALE CLASSIFICATION:
+Determine the operational footprint visible from the website and the URL/domain. This drives whether revenue estimates are even meaningful, since Pathlight is calibrated for small and regional businesses, not multinational brands.
+- single-location: one storefront, office, or service area. Local family business.
+- regional: a chain or service business with multiple locations within a state or metro area.
+- national: household-name brand operating across most of a country. Examples: Whole Foods, Walmart, Target, Home Depot, Chipotle, Best Buy, Marriott, Starbucks.
+- global: multinational megabrand with worldwide presence. Examples: Google, Amazon, Apple, Microsoft, Meta, Netflix, Coca-Cola, Nike.
+
+Be honest. If the URL is a known megabrand (e.g. google.com, amazon.com, wholefoodsmarket.com, walmart.com, apple.com), classify as national or global even if the homepage looks simple. Default to single-location only when there is clear evidence of a small local operation.
+
 GUIDELINES
 - Each sub-score must include a 1-2 sentence observation grounded in what you actually see in the screenshots or read in the page text.
 - Do NOT hallucinate elements that are not visible. If something cannot be judged from the screenshots and page text, score it conservatively and say so in the observation.
@@ -472,7 +488,8 @@ Return ONE JSON object, no markdown, no preamble. Exact shape:
   },
   "businessModel": "B2B" | "B2C" | "mixed",
   "inferredVertical": "<specific vertical label>",
-  "inferredVerticalParent": "<one of the parent categories listed above>"
+  "inferredVerticalParent": "<one of the parent categories listed above>",
+  "businessScale": "single-location" | "regional" | "national" | "global"
 }`;
 
 const REMEDIATION_SYSTEM_PROMPT = `You are a senior web strategist producing a prioritized fix list for a {{INDUSTRY}} website in {{CITY}}.

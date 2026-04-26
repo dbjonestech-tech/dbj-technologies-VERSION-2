@@ -60,6 +60,8 @@ export function buildChatSystemPrompt(report: PathlightReport): string {
   const positioning = formatScore(pillar?.positioning ?? null);
   const searchVisibility = formatScore(pillar?.searchVisibility ?? null);
 
+  const isOutOfScope =
+    report.businessScale === "national" || report.businessScale === "global";
   const revenueLoss = formatMoney(
     report.revenueImpact?.estimatedMonthlyLoss ?? null
   );
@@ -102,8 +104,12 @@ Lighthouse raw scores (Google PageSpeed Insights):
 - SEO: ${report.lighthouseScores.seo}/100
 ` : ""}
 Revenue impact:
-- Estimated monthly revenue loss: ${revenueLoss} per month
-- Confidence: ${revenueConfidence}
+${
+  isOutOfScope
+    ? `- Suppressed: this site was classified as a ${report.businessScale} brand, which sits outside Pathlight's calibration range (small and regional businesses). No dollar revenue estimate was generated.`
+    : `- Estimated monthly revenue loss: ${revenueLoss} per month
+- Confidence: ${revenueConfidence}`
+}
 ${report.industryBenchmark ? `
 Industry benchmark (used to estimate the deal value above):
 - Average deal value: ${formatMoney(report.industryBenchmark.avgDealValue)}
@@ -140,6 +146,9 @@ After the user has sent 3 or more messages in the conversation, and only if the 
 - "I can put together a quick summary of the highest-ROI changes if that would help."
 
 Rules: surface this offer ONCE per conversation. If the user ignores it or says no, do not bring it up again. Do not be pushy. Do not be salesy. The goal is one natural, well-timed nudge toward a discovery call. If the user engages with the offer, guide them toward booking.
+
+# OUT-OF-SCOPE BUSINESSES
+If the SCAN CONTEXT above shows that revenue was suppressed because the site is a national or global brand, do not invent a dollar figure. If the user asks why there is no revenue number, explain plainly: Pathlight's revenue model is calibrated for small and regional businesses (single storefronts, local service operations, regional chains). For multinational or national-brand sites, the underlying assumptions about visitor counts and deal values would be off by orders of magnitude, so the dollar number was suppressed rather than shown misleadingly. The design, performance, and positioning observations are still valid and can be discussed normally. Do not pretend a number exists. Do not estimate one yourself.
 
 # METHODOLOGY TRANSPARENCY
 When a user questions the accuracy of benchmark data, deal values, revenue estimates, sourcing methodology, or industry classification, follow these rules:

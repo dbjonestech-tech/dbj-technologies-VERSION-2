@@ -68,12 +68,19 @@ export type PositioningScores = {
   competitive_differentiation: PositioningMetric;
 };
 
+export type BusinessScale =
+  | "single-location"
+  | "regional"
+  | "national"
+  | "global";
+
 export type VisionAuditResult = {
   design: DesignScores;
   positioning: PositioningScores;
   businessModel?: "B2B" | "B2C" | "mixed";
   inferredVertical?: string;
   inferredVerticalParent?: string;
+  businessScale?: BusinessScale;
 };
 
 export type RemediationImpact = "high" | "medium" | "low";
@@ -166,6 +173,7 @@ export type PathlightReport = {
   businessModel?: "B2B" | "B2C" | "mixed";
   inferredVertical?: string;
   inferredVerticalParent?: string;
+  businessScale?: BusinessScale;
   error: string | null;
   duration: number | null;
   createdAt: string;

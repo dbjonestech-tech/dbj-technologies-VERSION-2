@@ -222,6 +222,7 @@ export const scanRequested = inngest.createFunction(
       const benchmarkStep: {
         ok: boolean;
         benchmark: IndustryBenchmark | null;
+        outOfScope?: boolean;
         error?: string;
       } = await step.run("research-benchmark", async () => {
         try {
@@ -232,6 +233,18 @@ export const scanRequested = inngest.createFunction(
               error: "no context",
               benchmark: null as IndustryBenchmark | null,
             };
+
+          const scale = ctx.visionAudit?.businessScale;
+          if (scale === "national" || scale === "global") {
+            console.log(
+              `[research-benchmark] businessScale=${scale}, out of Pathlight scope, skipping benchmark research`
+            );
+            return {
+              ok: true,
+              outOfScope: true,
+              benchmark: null as IndustryBenchmark | null,
+            };
+          }
 
           const curatedMatch = lookupVertical(
             ctx.visionAudit?.inferredVertical,
@@ -296,6 +309,9 @@ export const scanRequested = inngest.createFunction(
         async () => {
           if (!visionStep.ok) {
             return { ok: false, error: "skipped: vision audit did not succeed" };
+          }
+          if (benchmarkStep.outOfScope) {
+            return { ok: true };
           }
           if (!remediationStep.ok) {
             return { ok: false, error: "skipped: remediation plan unavailable" };

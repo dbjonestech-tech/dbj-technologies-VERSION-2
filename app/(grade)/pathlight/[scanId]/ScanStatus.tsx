@@ -6,6 +6,7 @@ import { ScanningCore } from "./ScanningCore";
 import AskPathlightLoader from "./AskPathlightLoader";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
+  BusinessScale,
   DesignScores,
   IndustryBenchmark,
   LighthouseCategoryScores,
@@ -47,6 +48,7 @@ type ApiReport = {
   pillarScores: PillarScores | null;
   lighthouseScores: LighthouseCategoryScores | null;
   industryBenchmark: IndustryBenchmark | null;
+  businessScale?: BusinessScale;
 };
 
 const ACTIVE_STATUSES = new Set<string>(["pending", "scanning", "analyzing"]);
@@ -449,7 +451,9 @@ function Report({
     !!report.screenshotDesktop || !!report.screenshotMobile;
   const hasFixes =
     !!report.remediation && report.remediation.items.length > 0;
-  const hasRevenue = !!report.revenueImpact;
+  const isOutOfScope =
+    report.businessScale === "national" || report.businessScale === "global";
+  const hasRevenue = !isOutOfScope && !!report.revenueImpact;
 
   const fixItems = report.remediation?.items ?? [];
   const [openIndices, setOpenIndices] = useState<Set<number>>(new Set());
@@ -505,7 +509,9 @@ function Report({
         />
       ) : null}
 
-      {hasRevenue ? (
+      {isOutOfScope ? (
+        <OutOfScopeNotice scale={report.businessScale as "national" | "global"} />
+      ) : hasRevenue ? (
         <RevenueImpactBlock
           impact={report.revenueImpact!}
           benchmark={report.industryBenchmark}
@@ -972,6 +978,48 @@ function DifficultyBadge({
     >
       {difficulty}
     </span>
+  );
+}
+
+/* ─────────── Out-of-Scope Notice ─────────── */
+
+function OutOfScopeNotice({ scale }: { scale: "national" | "global" }) {
+  const label = scale === "global" ? "global brand" : "national brand";
+  return (
+    <section>
+      <h2
+        className="text-xs uppercase tracking-[0.25em]"
+        style={{ color: "#6b7280" }}
+      >
+        Revenue impact
+      </h2>
+      <div
+        className="mt-4 rounded-2xl border p-6"
+        style={{
+          borderColor: "rgba(255,255,255,0.08)",
+          backgroundColor: "rgba(10,12,18,0.7)",
+        }}
+      >
+        <div
+          className="font-display text-2xl font-bold sm:text-3xl"
+          style={{ color: "#e7ebf2" }}
+        >
+          Calibrated for small and regional businesses
+        </div>
+        <p className="mt-4 text-sm leading-relaxed" style={{ color: "#c5ccd8" }}>
+          This site reads as a {label}, which sits outside the audience
+          Pathlight is built for. Revenue estimates here would compare a
+          single-storefront benchmark to a multi-location operation, so the
+          number was suppressed rather than shown misleadingly. The design,
+          performance, positioning, and remediation findings above still apply
+          and can be read directionally.
+        </p>
+        <p className="mt-3 text-sm leading-relaxed" style={{ color: "#c5ccd8" }}>
+          Run Pathlight on your own business website to see a calibrated
+          revenue estimate.
+        </p>
+      </div>
+    </section>
   );
 }
 
