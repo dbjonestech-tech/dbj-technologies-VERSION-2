@@ -455,7 +455,11 @@ function Report({
     !!report.remediation && report.remediation.items.length > 0;
   const isOutOfScope =
     report.businessScale === "national" || report.businessScale === "global";
-  const hasRevenue = !isOutOfScope && !!report.revenueImpact;
+  // Revenue and benchmark only make sense when the design audit also ran.
+  // Defensive guard: if a stale state ever leaves revenue without design,
+  // do not render the dollar headline.
+  const hasDesign = !!report.design;
+  const hasRevenue = !isOutOfScope && hasDesign && !!report.revenueImpact;
 
   const fixItems = report.remediation?.items ?? [];
   const [openIndices, setOpenIndices] = useState<Set<number>>(new Set());
