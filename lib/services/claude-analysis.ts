@@ -1058,12 +1058,31 @@ Search for "${industryLabel} average job ticket value" or "${industryLabel} aver
       result.avgDealValue = Math.max(result.avgDealValue, 500);
     }
 
+    // Sanity check: B2C deal values below $25 are below the price of a coffee.
+    if (businessModel === "B2C" && result.avgDealValue < 25) {
+      console.warn(
+        `[Benchmark] Suspiciously low B2C deal value: $${result.avgDealValue} for ${inferredVertical}. Clamping to minimum $25.`
+      );
+      result.avgDealValue = Math.max(result.avgDealValue, 25);
+    }
+
     // Sanity check: Any deal value below $10 is almost certainly wrong
     if (result.avgDealValue < 10) {
       console.warn(
         `[Benchmark] Deal value below $10: $${result.avgDealValue} for ${inferredVertical}. Clamping to $50.`
       );
       result.avgDealValue = Math.max(result.avgDealValue, 50);
+    }
+
+    // Sanity check: visitors below 50/month suggest the model bailed
+    // (a real active site that someone bothered to scan has more than this).
+    if (result.avgMonthlyVisitors < 50) {
+      console.warn(
+        `[Benchmark] Suspiciously low monthly visitors: ${result.avgMonthlyVisitors} for ${inferredVertical}. Clamping to minimum 50.`
+      );
+      result.avgMonthlyVisitors = 50;
+      result.visitorsLow = Math.max(result.visitorsLow, 35);
+      result.visitorsHigh = Math.max(result.visitorsHigh, 70);
     }
 
     return result;

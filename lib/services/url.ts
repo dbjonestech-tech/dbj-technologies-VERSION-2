@@ -9,6 +9,30 @@ export type UrlValidationResult = {
 
 const ALLOWED_PROTOCOLS = new Set(["http:", "https:"]);
 
+const SENSITIVE_QUERY_PARAM_NAMES = new Set([
+  "token",
+  "access_token",
+  "auth",
+  "auth_token",
+  "api_key",
+  "apikey",
+  "jwt",
+  "session",
+  "session_id",
+  "sessionid",
+  "key",
+  "secret",
+  "password",
+  "passwd",
+  "pwd",
+  "code",
+  "id_token",
+  "refresh_token",
+  "bearer",
+  "signature",
+  "sig",
+]);
+
 export function normalizeUrl(raw: string): string {
   let input = (raw ?? "").trim();
   if (!input) {
@@ -30,6 +54,21 @@ export function normalizeUrl(raw: string): string {
     throw new Error("URL uses an unsupported protocol.");
   }
 
+  if (parsed.username || parsed.password) {
+    throw new Error(
+      "URL contains embedded credentials. Remove the username and password before scanning."
+    );
+  }
+
+  for (const key of parsed.searchParams.keys()) {
+    if (SENSITIVE_QUERY_PARAM_NAMES.has(key.toLowerCase())) {
+      throw new Error(
+        "URL contains an authentication or session token. Paste the public homepage URL instead."
+      );
+    }
+  }
+
+  parsed.search = "";
   parsed.hash = "";
   const path = parsed.pathname.replace(/\/+$/g, "");
   parsed.pathname = path === "" ? "/" : path;
@@ -143,7 +182,16 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
         return { valid: false, error: `URL is not reachable (HTTP ${res.status}).` };
       }
 
-      return { valid: true, resolvedUrl: current };
+      let resolved = current;
+      try {
+        const u = new URL(current);
+        u.search = "";
+        u.hash = "";
+        resolved = u.toString().replace(/\/$/, "");
+      } catch {
+        /* keep current if reparse fails */
+      }
+      return { valid: true, resolvedUrl: resolved };
     }
 
     return { valid: false, error: "URL redirected too many times." };
