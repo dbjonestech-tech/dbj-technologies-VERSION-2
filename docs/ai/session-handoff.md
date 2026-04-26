@@ -3,7 +3,20 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 25, 2026
+## Last Session: April 26, 2026
+
+### Themes Shipped
+
+- **Memory-system reorg** (b5e1105). Live `session-handoff.md` archived to `docs/ai/history/2026-04-25.md` and replaced with a compact summary, since it had grown past the 30 KB `dbjcontext` audit threshold. New `docs/ai/history/index.md` is the chronological pointer; `docs/ai/history/` is intentionally excluded from the portal context pack. `docs/ai/index.md` and `scripts/dbj-context.sh` updated to describe the archive workflow. Pack 79 KB to 53 KB; live handoff 37 KB to 10 KB. Audit clean.
+- **Service detail pages and pricing subtitle rewritten for business owners** (433fb82). All 6 service detail page heroes (eyebrow, H1, hero description, body paragraph) and CTA labels rewritten in plain business language; CTAs standardized to "Start a Project". The redundant Process section ("How I Deliver" four-phase framework, identical to homepage and `/process`) removed from the service layout, and the dead `process` field removed from the `ServiceDetail` interface and every entry in `lib/service-data.ts`. Related Services cards rewired to source title/tagline from `SERVICES` in `lib/siteContent.ts` instead of `SERVICE_DETAILS`, so future copy edits to `SERVICES` propagate automatically. Pricing page subtitle first sentence swapped from "Engineering-phase engagements with transparent pricing." to "Every project starts with a clear scope and a fixed price." (second sentence preserved). Hero secondary CTA, benefit cards, tech list, deliverables list, FAQ, and bottom CTASection deliberately untouched.
+
+### Notes for Future Edits
+
+- The hero H1 on each service detail page is split across two fields: `heroTitle` is the lead-in, `heroHighlight` is the gradient highlight rendered after a `<br>`. When rewriting H1s, decide the split intentionally (the highlight should be the closing beat of the sentence).
+- `SERVICES` (in `lib/siteContent.ts`) is the canonical source for service title + tagline as displayed on cards. `SERVICE_DETAILS` (in `lib/service-data.ts`) holds detail-page-only fields (hero, longDescription, benefits, technologies, deliverables, faq). After 433fb82, related-services cards and the page eyebrow both use the title from these two sources but they are intentionally aligned. If you change a card title, update both.
+- Browser tab `<title>` per detail page comes from `service.title` via `generateMetadata` + the root `%s | DBJ Technologies` template. No separate metadata override per page.
+
+## Previous Session: April 25, 2026
 
 Full diagnostic trail: [`history/2026-04-25.md`](history/2026-04-25.md).
 26 distinct work items; the headlines and durable lessons are below.
@@ -80,4 +93,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `b5e1105` (chore: archive April 25 session and compact session-handoff), pushed to `origin main`. Working tree clean after the snapshot follow-up commit. The reorg moved verbatim April 25 detail to `docs/ai/history/2026-04-25.md`; this file is now the compact form going forward.
+`main` is at `433fb82` (feat: rewrite service detail pages and pricing subtitle for business owners), pushed to `origin main`. Working tree clean after this snapshot follow-up commit. Today's chain: `5a97a26` (April 25 handoff snapshot) → `b5e1105` (history archive + compact handoff) → `433fb82` (service detail pages + pricing subtitle).
