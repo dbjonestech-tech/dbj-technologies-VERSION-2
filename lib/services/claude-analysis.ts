@@ -222,6 +222,23 @@ type AnthropicMessageResponse = {
   content: Array<TextContentBlock | { type: string; [k: string]: unknown }>;
 };
 
+// Anthropic prompt caching threshold: only wrap system prompts in a
+// cache_control block when they are large enough that the cache hit
+// outweighs the per-write overhead. Below ~1024 tokens (~4000 chars at
+// 4 chars/token) caching is not worth the complexity.
+const CACHE_MIN_CHARS = 4000;
+
+function buildCacheableSystem(system: string): string | unknown[] {
+  if (system.length < CACHE_MIN_CHARS) return system;
+  return [
+    {
+      type: "text",
+      text: system,
+      cache_control: { type: "ephemeral" },
+    },
+  ];
+}
+
 async function callClaude(
   system: string,
   messages: ChatMessage[],
@@ -239,7 +256,9 @@ async function callClaude(
           {
             model: MODEL,
             max_tokens: maxTokens,
-            system,
+            system: buildCacheableSystem(system) as unknown as Parameters<
+              typeof client.messages.create
+            >[0]["system"],
             messages: messages as unknown as Parameters<
               typeof client.messages.create
             >[0]["messages"],
@@ -431,8 +450,7 @@ const revenueImpactSchema = z.object({
   }),
 });
 
-const VISION_SYSTEM_PROMPT = `You are a senior brand and conversion strategist auditing a {{INDUSTRY}} website in {{CITY}}.
-The site is {{URL}}{{BUSINESS_NAME}}. Reference the domain and business name naturally in observations when relevant.
+const VISION_SYSTEM_PROMPT = `You are a senior brand and conversion strategist. The user message will provide the site URL, business name, industry, city, and other context. Reference the domain and business name naturally in observations when relevant.
 
 Your job is to analyze two screenshots (desktop and mobile home page) and the supporting page text, and output a strictly-scored audit. You are opinionated, concrete, and conservative: when evidence is weak, score lower, not higher.
 
@@ -518,8 +536,7 @@ Return ONE JSON object, no markdown, no preamble. Exact shape:
   "screenshotHealth": "clean" | "cookie-banner-overlay" | "loading-or-skeleton" | "auth-wall" | "minimal-content"
 }`;
 
-const REMEDIATION_SYSTEM_PROMPT = `You are a senior web strategist producing a prioritized fix list for a {{INDUSTRY}} website in {{CITY}}.
-The site is {{URL}}{{BUSINESS_NAME}}. Reference the business name in fix descriptions to make recommendations specific rather than generic.
+const REMEDIATION_SYSTEM_PROMPT = `You are a senior web strategist producing a prioritized fix list for a website. The user message will provide the site URL, business name, industry, city, design + positioning scores, and Lighthouse performance metrics. Reference the business name in fix descriptions to make recommendations specific rather than generic.
 
 You will receive the design scores, positioning scores, and Lighthouse performance metrics. Return exactly 3 fixes, ordered by impact (high → low), respecting sensible dependencies: fix structural or imagery issues before tweaking CTA copy; fix performance blockers before layering new marketing features.
 
@@ -546,8 +563,7 @@ Return ONE JSON object, no markdown, no preamble. Exact shape:
   ]
 }`;
 
-const REVENUE_SYSTEM_PROMPT = `You are a conservative revenue analyst estimating the monthly revenue a {{INDUSTRY}} website in {{CITY}} is leaving on the table due to the issues identified in the audit.
-The site is {{URL}}{{BUSINESS_NAME}}. Use the business name in the methodology narrative. Factor the URL domain quality (professional vs. generic, subdomain vs. root) into your confidence assessment.
+const REVENUE_SYSTEM_PROMPT = `You are a conservative revenue analyst estimating the monthly revenue a website is leaving on the table due to issues identified in the audit. The user message will provide the site URL, business name, industry, city, performance scores, design + positioning scores, the top 3 remediation items, and (when available) industry benchmark data. Use the business name in the methodology narrative. Factor the URL domain quality (professional vs. generic, subdomain vs. root) into your confidence assessment.
 
 You will receive the design + positioning scores, the top 3 remediation items, the business industry/city, and Lighthouse performance scores. Produce a DIRECTIONAL, CONSERVATIVE dollar estimate that can be defended by its assumptions.
 Lighthouse performance scores are provided. Factor site speed into your revenue model: slow sites (LCP > 4s, poor CLS) lose significantly more visitors than fast ones.
@@ -1137,6 +1153,25 @@ export async function runRevenueImpact(
 ): Promise<RevenueImpactResult> {
   const lighthouseDetails = extractLighthouseAuditDetails(lighthouseData);
 
+  const benchmarkBlock = benchmark
+    ? [
+        ``,
+        `BENCHMARK DATA (from automated research, may contain errors):`,
+        `- Average Deal Value: $${benchmark.avgDealValue}`,
+        `- Benchmark Confidence: ${benchmark.confidence ?? "unknown"}`,
+        `- Benchmark Source: ${benchmark.source || "not specified"}`,
+        `- Business Model: ${auditResult.businessModel ?? "B2C"}`,
+        `- Inferred Vertical: ${auditResult.inferredVertical ?? "general"}`,
+        ``,
+        `INSTRUCTIONS FOR USING BENCHMARK DATA:`,
+        `1. Use the provided deal value as your starting point, but apply critical judgment.`,
+        `2. If the benchmark confidence is "low" or "unknown", treat the deal value as a rough estimate and note this uncertainty in your output.`,
+        `3. Sanity-check the deal value against the business type. If it seems implausible for the stated vertical and business model, adjust toward a more reasonable estimate and explain your reasoning.`,
+        `4. If you adjust the deal value, state both the original benchmark value and your adjusted value with reasoning.`,
+        `5. Never present the revenue estimate as precise; it is an informed approximation.`,
+      ].join("\n")
+    : "";
+
   const user = [
     renderSiteInformation(url, businessName),
     ``,
@@ -1162,30 +1197,14 @@ export async function runRevenueImpact(
           `${i + 1}. ${it.title} (impact=${it.impact}, difficulty=${it.difficulty})\n   problem: ${it.problem}\n   improvement: ${it.improvement}`
       )
       .join("\n"),
+    benchmarkBlock,
     ``,
     `Respond with ONLY a valid JSON object matching the schema above. No backticks, no markdown, no explanation.`,
   ].join("\n");
 
-  const benchmarkOverride = benchmark
-    ? `\n\nBENCHMARK DATA (from automated research — may contain errors):
-- Average Deal Value: $${benchmark.avgDealValue}
-- Benchmark Confidence: ${benchmark.confidence ?? "unknown"}
-- Benchmark Source: ${benchmark.source || "not specified"}
-- Business Model: ${auditResult.businessModel ?? "B2C"}
-- Inferred Vertical: ${auditResult.inferredVertical ?? "general"}
-
-INSTRUCTIONS FOR USING BENCHMARK DATA:
-1. Use the provided deal value as your starting point, but apply critical judgment.
-2. If the benchmark confidence is "low" or "unknown", treat the deal value as a rough estimate and note this uncertainty in your output.
-3. Sanity-check the deal value against the business type. If it seems implausible for the stated vertical and business model, adjust toward a more reasonable estimate and explain your reasoning.
-4. If you adjust the deal value, state both the original benchmark value and your adjusted value with reasoning.
-5. Never present the revenue estimate as precise — it is an informed approximation.`
-    : "";
-
   const claude = await callClaudeWithJsonSchema(
     "revenue-impact",
-    renderPrompt(REVENUE_SYSTEM_PROMPT, industry, city, url, businessName) +
-      benchmarkOverride,
+    renderPrompt(REVENUE_SYSTEM_PROMPT, industry, city, url, businessName),
     user,
     revenueImpactSchema,
     1500,

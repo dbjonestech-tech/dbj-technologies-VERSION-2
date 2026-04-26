@@ -68,12 +68,26 @@ export async function POST(request: Request): Promise<Response> {
   const system = buildChatSystemPrompt(report);
   const client = new Anthropic({ apiKey });
 
+  // Wrap the per-conversation system prompt in a cacheable block so each
+  // turn after the first within a 5-minute window hits Anthropic's prompt
+  // cache instead of re-billing the full system prompt input. Caching is
+  // only effective when the prompt is identical across calls; the chat
+  // system prompt is constant for a given scanId, so every turn in one
+  // conversation shares the same cache key.
+  const cacheableSystem = [
+    {
+      type: "text" as const,
+      text: system,
+      cache_control: { type: "ephemeral" as const },
+    },
+  ];
+
   let stream: ReturnType<typeof client.messages.stream>;
   try {
     stream = client.messages.stream({
       model: CHAT_MODEL,
       max_tokens: MAX_TOKENS,
-      system,
+      system: cacheableSystem,
       messages,
     });
   } catch (err) {
