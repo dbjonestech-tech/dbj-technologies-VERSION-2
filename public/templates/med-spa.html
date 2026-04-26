@@ -235,7 +235,9 @@
     .hero {
       position: relative;
       min-height: 100svh;
-      background: var(--bg);
+      background:
+        linear-gradient(rgba(250,250,250,0.85), rgba(254,246,243,0.88)),
+        url('images/med-spa-hero.jpg') center/cover no-repeat;
       display: flex;
       align-items: center;
       padding: clamp(6rem, 10vw, 9rem) 0 clamp(5rem, 8vw, 7rem);
@@ -246,12 +248,11 @@
       content: "";
       position: absolute;
       inset: 0;
-      background-image: url("https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1920&q=80");
-      background-size: cover;
-      background-position: center;
-      filter: saturate(0.18) blur(0.5px);
-      opacity: 0.05;
+      background: transparent;
+      filter: saturate(0.7);
+      opacity: 1;
       z-index: 0;
+      pointer-events: none;
     }
 
     .hero-content {
@@ -370,6 +371,76 @@
       text-transform: uppercase;
       color: var(--rose);
       font-weight: 500;
+    }
+
+    /* Editorial inline images */
+    .editorial-img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: 0;
+    }
+
+    .philosophy-figure {
+      margin: 0.4rem 0 1.6rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--hairline-rose);
+    }
+
+    .philosophy-figure img {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      display: block;
+      border-radius: 0;
+    }
+
+    .philosophy-figure figcaption {
+      font-family: 'Outfit', sans-serif;
+      font-style: italic;
+      font-size: 0.78rem;
+      color: var(--taupe);
+      letter-spacing: 0.06em;
+      margin-top: 0.85rem;
+    }
+
+    .results-figure {
+      margin: 3rem 0 0;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--hairline-rose);
+    }
+
+    .results-figure img {
+      width: 100%;
+      height: 360px;
+      object-fit: cover;
+      display: block;
+      border-radius: 0;
+    }
+
+    .provider-portrait {
+      margin: 0 0 1.6rem;
+      max-width: 280px;
+    }
+
+    .provider-portrait img {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      display: block;
+      border-radius: 0;
+    }
+
+    .cta-accent {
+      margin: 0 auto 2rem;
+      max-width: 200px;
+    }
+
+    .cta-accent img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 0;
     }
 
     /* TREATMENTS */
@@ -752,6 +823,12 @@
       <div class="philosophy-grid">
         <div class="philosophy-body">
           <p class="dropcap">Every face tells a story. Our role is not to rewrite it but to edit with precision. We approach aesthetics the way a skilled retoucher approaches a portrait, the goal is to enhance what is already beautiful, not to change who you are.</p>
+
+          <figure class="philosophy-figure">
+            <img src="images/med-spa-treatment.jpg" alt="Close-up of a serene skincare treatment under soft natural light" width="800" height="1000" loading="lazy">
+            <figcaption>Treatment room &middot; Highland Park</figcaption>
+          </figure>
+
           <p>Dr. Whitfield personally performs every injectable treatment. No hand-offs, no rotating providers, no surprises. The person you consult with is the person who treats you.</p>
           <p>We limit our schedule intentionally. Fewer patients per day means unhurried appointments, thorough consultations, and results we are proud to stand behind.</p>
         </div>
@@ -839,6 +916,10 @@
         </article>
       </div>
 
+      <figure class="results-figure">
+        <img src="images/med-spa-interior.jpg" alt="Quiet treatment lounge with soft linen, candles, and orchids in warm afternoon light" width="1600" height="900" loading="lazy">
+      </figure>
+
       <p class="trust-line">American Board of Dermatology &middot; American Society for Dermatologic Surgery &middot; 4.9&#9733; on Google (200+ Reviews)</p>
     </div>
   </section>
@@ -861,6 +942,10 @@
         </div>
 
         <div class="provider-right">
+          <figure class="provider-portrait">
+            <img src="images/med-spa-portrait.jpg" alt="Editorial portrait of Dr. Elaine Whitfield in soft natural light" width="560" height="700" loading="lazy">
+          </figure>
+
           <p>Dr. Whitfield trained in Manhattan before returning home to Texas to build a quieter kind of practice. Her work has been featured in editorial coverage of medical aesthetics, but her preference is the room itself, slow consultations, careful photography, and treatment plans written for one face at a time. She believes restraint is the most underrated skill in the field, and that a good aesthetic outcome is one that compounds across decades rather than catches the light for a season.</p>
 
           <p class="kicker">&ldquo;I have always believed that aesthetic medicine should be a quiet conversation, not a sales pitch.&rdquo;
@@ -876,6 +961,9 @@
     <span class="pagenum" aria-hidden="true">06</span>
     <div class="wrap-inner">
       <div class="cta-inner">
+        <figure class="cta-accent">
+          <img src="images/med-spa-products.jpg" alt="Minimal arrangement of medical-grade skincare on a soft neutral surface" width="400" height="500" loading="lazy">
+        </figure>
         <h2>Your Consultation Is the First Treatment.</h2>
         <p>Every relationship begins with a conversation. We listen first, assess second, and only recommend treatments that align with your goals. No obligation, no pressure.</p>
         <a href="#" class="btn">Book Your Consultation</a>

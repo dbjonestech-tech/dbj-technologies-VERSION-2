@@ -213,7 +213,9 @@
   .hero {
     position: relative;
     min-height: 100svh;
-    background: var(--espresso);
+    background:
+      linear-gradient(rgba(28,18,16,0.72), rgba(28,18,16,0.85)),
+      url('images/restaurant-hero.jpg') center/cover no-repeat;
     color: var(--cream);
     display: flex;
     align-items: center;
@@ -226,12 +228,11 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&q=80');
-    background-size: cover;
-    background-position: center;
-    opacity: 0.06;
-    filter: saturate(0.32) sepia(0.18);
+    background: url('images/restaurant-hero.jpg') center/cover no-repeat;
+    filter: saturate(0.6) sepia(0.18);
+    opacity: 0.35;
     pointer-events: none;
+    z-index: 0;
   }
 
   .hero::after {
@@ -433,6 +434,50 @@
     font-size: 0.9rem;
     line-height: 1.6;
     margin-top: 0.35rem;
+  }
+
+  .menu-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1rem, 3vw, 2rem);
+    margin-top: 4rem;
+  }
+
+  .menu-images img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+    border-radius: 0;
+    max-width: 100%;
+  }
+
+  .wine-strip {
+    width: 100%;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .wine-strip img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    display: block;
+    border-radius: 0;
+    max-width: 100%;
+  }
+
+  .interior-strip {
+    width: 100%;
+    line-height: 0;
+  }
+
+  .interior-strip img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    display: block;
+    border-radius: 0;
+    max-width: 100%;
   }
 
   .menu-foot {
@@ -744,6 +789,22 @@
       grid-template-columns: 1fr;
     }
 
+    .menu-images {
+      grid-template-columns: 1fr;
+    }
+
+    .menu-images img {
+      height: 240px;
+    }
+
+    .wine-strip img {
+      height: 240px;
+    }
+
+    .interior-strip img {
+      height: 260px;
+    }
+
     .wine-copy {
       text-align: center;
     }
@@ -965,6 +1026,11 @@
       </div>
     </div>
 
+    <div class="menu-images">
+      <img src="images/restaurant-dish1.jpg" alt="Plated seasonal entree with herbs and roasted vegetables on a ceramic plate" width="1600" height="1067" loading="lazy">
+      <img src="images/restaurant-dish2.jpg" alt="Hand-rolled pasta with slow-braised ragu and fresh herbs in a shallow bowl" width="1600" height="1067" loading="lazy">
+    </div>
+
     <div class="menu-foot">
       <a href="#">View Full Menu &rarr;</a>
     </div>
@@ -974,6 +1040,9 @@
 <!-- ============ WINE PROGRAM ============ -->
 <section class="wine section-linen" id="wine">
   <div class="section-inner">
+    <div class="wine-strip">
+      <img src="images/restaurant-bar.jpg" alt="Amber-lit cocktail bar with backlit bottles and brass fixtures" width="1600" height="900" loading="lazy">
+    </div>
     <div class="wine-grid">
       <div class="wine-copy">
         <div class="ornament" aria-hidden="true">
@@ -1054,6 +1123,11 @@
     <p class="trust-line">4.8&#9733; on Google (380+ Reviews) &middot; OpenTable Diners&rsquo; Choice 2025 &middot; D Magazine Best New Restaurant</p>
   </div>
 </section>
+
+<!-- ============ INTERIOR STRIP ============ -->
+<div class="interior-strip" aria-hidden="false">
+  <img src="images/restaurant-interior.jpg" alt="Candlelit dining room with white tablecloths, brass pendant lamps, and softly blurred guests" width="1600" height="900" loading="lazy">
+</div>
 
 <!-- ============ RESERVATION CTA ============ -->
 <section class="reserve section-linen center" id="reserve">

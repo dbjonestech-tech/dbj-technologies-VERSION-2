@@ -165,7 +165,9 @@
   .hero{
     position:relative;
     min-height:100svh;
-    background:linear-gradient(180deg,#FFFFFF 0%, #F4F8F8 80%);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(244,248,248,0.88) 80%),
+      url('images/dental-hero.jpg') center/cover no-repeat;
     overflow:hidden;
     display:flex;
     align-items:center;
@@ -296,6 +298,29 @@
 
   /* First visit timeline */
   .first-visit{background:var(--mist)}
+  .first-visit-photo{
+    width:100%;
+    height:360px;
+    object-fit:cover;
+    object-position:center;
+    border-radius:12px;
+    box-shadow:var(--shadow-soft);
+    display:block;
+    margin:0 auto 1rem;
+  }
+  .first-visit-caption{
+    text-align:center;
+    font-family:'DM Sans',sans-serif;
+    font-size:var(--fs-eyebrow);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--teal);
+    font-weight:500;
+    margin:0 auto 2.75rem;
+  }
+  @media (max-width:600px){
+    .first-visit-photo{height:240px}
+  }
   .timeline{
     position:relative;
     display:grid;
@@ -403,6 +428,42 @@
 
   /* Doctor */
   .doctor{background:var(--cream)}
+  .doctor-photo-wrap{
+    margin:0 0 0 auto;
+    max-width:100%;
+    width:100%;
+  }
+  .doctor-photo{
+    width:100%;
+    height:auto;
+    aspect-ratio:4/5;
+    object-fit:cover;
+    object-position:center;
+    border-radius:12px;
+    box-shadow:var(--shadow-soft);
+    display:block;
+  }
+  .doctor-photo-caption{
+    margin-top:1.5rem;
+    font-family:'DM Serif Display',serif;
+    font-style:italic;
+    font-size:1.05rem;
+    line-height:1.55;
+    color:var(--charcoal);
+    text-align:left;
+  }
+  .doctor-photo-attribution{
+    margin-top:0.85rem;
+    font-family:'DM Sans',sans-serif;
+    font-size:0.74rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--teal);
+    font-weight:500;
+  }
+  @media (max-width:900px){
+    .doctor-photo-wrap{margin:0;max-width:none}
+  }
   .doctor-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -518,6 +579,19 @@
 
   /* Insurance */
   .insurance{background:var(--mist)}
+  .insurance-photo{
+    width:100%;
+    height:280px;
+    object-fit:cover;
+    object-position:center;
+    border-radius:12px;
+    box-shadow:var(--shadow-soft);
+    display:block;
+    margin:0 auto 3rem;
+  }
+  @media (max-width:600px){
+    .insurance-photo{height:200px;margin-bottom:2rem}
+  }
   .insurance-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -749,6 +823,8 @@
 <!-- First Visit Timeline -->
 <section class="first-visit" id="first-visit" aria-labelledby="first-visit-heading">
   <div class="container">
+    <img class="first-visit-photo" src="images/dental-operatory.jpg" alt="Modern dental operatory with a clean treatment chair and natural light" width="1600" height="900" loading="lazy" decoding="async">
+    <p class="first-visit-caption">Modern Operatory <span aria-hidden="true">·</span> Natural Light</p>
     <div class="section-head">
       <p class="eyebrow">Your First Visit</p>
       <h2 id="first-visit-heading">Step by Step, So There Are No Surprises.</h2>
@@ -829,9 +905,12 @@
           <span>ADA Member</span>
         </div>
       </div>
-      <figure class="blockquote">
-        <q>I went to dental school because my own dentist made every visit feel safe when I was a kid. That is what I want this office to be for someone else's kid.</q>
-        <figcaption class="attribution">Dr. Sarah Parker</figcaption>
+      <figure class="doctor-photo-wrap">
+        <img class="doctor-photo" src="images/dental-doctor.jpg" alt="Dr. Sarah Parker, a warm and professional family dentist" width="800" height="1000" loading="lazy" decoding="async">
+        <figcaption>
+          <p class="doctor-photo-caption">"I went to dental school because my own dentist made every visit feel safe when I was a kid. That is what I want this office to be for someone else's kid."</p>
+          <p class="doctor-photo-attribution">Dr. Sarah Parker</p>
+        </figcaption>
       </figure>
     </div>
   </div>
@@ -867,6 +946,7 @@
 <!-- Insurance -->
 <section class="insurance" id="insurance" aria-labelledby="insurance-heading">
   <div class="container">
+    <img class="insurance-photo" src="images/dental-reception.jpg" alt="Comfortable, welcoming reception area at Ridgeview Dental" width="1600" height="900" loading="lazy" decoding="async">
     <div class="insurance-grid">
       <div>
         <p class="eyebrow">Insurance and Costs</p>

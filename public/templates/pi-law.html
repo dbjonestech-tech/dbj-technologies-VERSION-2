@@ -201,7 +201,8 @@
   .hero {
     background:
       radial-gradient(ellipse at 30% 40%, rgba(201,168,76,0.06), transparent 60%),
-      linear-gradient(180deg, var(--navy) 0%, var(--navy-soft) 100%);
+      linear-gradient(180deg, rgba(11,22,40,0.82) 0%, rgba(18,32,54,0.92) 100%),
+      url('images/pi-law-hero.jpg') center/cover no-repeat;
     color: var(--cream);
     min-height: 100svh;
     display: flex;
@@ -469,6 +470,17 @@
     color: var(--ink);
   }
 
+  .attorneys-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 4rem;
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    border-bottom: 1px solid var(--hairline-gold);
+  }
+
   .attorney-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -480,6 +492,34 @@
   .attorney {
     border-top: 1px solid var(--hairline-gold);
     padding-top: 1.75rem;
+  }
+
+  .attorney-portrait {
+    width: 180px;
+    height: 180px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .attorney-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .attorney-portrait-placeholder {
+    width: 180px;
+    height: 180px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    background: transparent;
   }
 
   .attorney h3 {
@@ -566,8 +606,11 @@
 
   /* Testimonials */
   .testimonials {
-    background: var(--navy);
+    background:
+      linear-gradient(rgba(11,22,40,0.92), rgba(11,22,40,0.94)),
+      url('images/pi-law-courtroom.jpg') center/cover no-repeat;
     color: var(--cream);
+    position: relative;
   }
 
   .testimonials-inner {
@@ -977,22 +1020,28 @@
 <!-- ATTORNEYS -->
 <section class="section attorneys" id="attorneys">
   <div class="container">
+    <img class="attorneys-image" src="images/pi-law-office.jpg" alt="Quiet downtown law office interior with dark wood paneling, leather chairs, and a long conference table" width="1600" height="360" loading="lazy">
     <div class="section-head">
       <span class="eyebrow">Attorneys</span>
       <h2>Who Will Represent You.</h2>
     </div>
     <div class="attorney-grid">
       <div class="attorney">
+        <div class="attorney-portrait">
+          <img src="images/pi-law-attorney.jpg" alt="Senior trial attorney in dark suit reviewing case files at a library table" width="180" height="180" loading="lazy">
+        </div>
         <h3>Robert L. Bauder</h3>
         <span class="post-nominals">Founding Partner</span>
         <p>Founded the firm in 1998 after eight years at a defense litigation firm where he learned how insurers value cases. J.D. from the University of Texas at Austin School of Law. Board-certified in Personal Injury Trial Law by the Texas Board of Legal Specialization.</p>
       </div>
       <div class="attorney">
+        <div class="attorney-portrait-placeholder" aria-hidden="true">&#10022;</div>
         <h3>Catherine Holloway</h3>
         <span class="post-nominals">Senior Trial Attorney</span>
         <p>Former Dallas County Assistant District Attorney with 14 years of jury trial experience, including more than 60 cases tried to verdict. She brings a courtroom presence that defense counsel respects and a preparation regimen that opposing experts have learned to take seriously.</p>
       </div>
       <div class="attorney">
+        <div class="attorney-portrait-placeholder" aria-hidden="true">&#10022;</div>
         <h3>Marcus Yates</h3>
         <span class="post-nominals">Partner</span>
         <p>Focuses on commercial trucking litigation and catastrophic personal injury. Holds a graduate engineering background that helps in reconstruction and product cases. Member of the Texas Trial Lawyers Association and the American Association for Justice Trucking Litigation Group.</p>

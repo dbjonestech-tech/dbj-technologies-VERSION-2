@@ -218,11 +218,11 @@
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(27,40,56,0.92), rgba(27,40,56,0.92)),
-      url("https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1920&q=80");
+      linear-gradient(rgba(27,40,56,0.88), rgba(27,40,56,0.94)),
+      url("images/hvac-hero.jpg");
     background-size: cover;
     background-position: center;
-    filter: saturate(0.4);
+    filter: none;
     z-index: 0;
   }
   .hero__dots {
@@ -411,6 +411,42 @@
   .service-card__more:hover { gap: 0.6rem; color: var(--orange-deep); }
 
   /* ------- WHY IRONCLAD ------- */
+  .why-photo {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 2.5rem;
+    display: block;
+    box-shadow: var(--shadow-soft);
+  }
+  .area-photo {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+    margin-top: 2.5rem;
+    box-shadow: var(--shadow-soft);
+  }
+  .area-photo-caption {
+    margin-top: 0.85rem;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+  }
+  .team-strip {
+    display: block;
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 0;
+  }
+
   .why-list {
     max-width: 980px;
   }
@@ -837,6 +873,7 @@
 <!-- ========== WHY IRONCLAD ========== -->
 <section class="section--bone" id="why">
   <div class="container">
+    <img src="images/hvac-service.jpg" alt="Ironclad Air technician in uniform diagnosing an indoor HVAC control unit." width="1600" height="900" class="why-photo">
     <div class="section-head">
       <span class="eyebrow">Why Ironclad</span>
       <h2>What Sets Us Apart From Every Other HVAC Company.</h2>
@@ -897,6 +934,9 @@
     </div>
 
     <p class="city-fallback"><strong>Don't see your city?</strong> Call us. If you're in DFW, we can get to you.</p>
+
+    <img src="images/hvac-equipment.jpg" alt="Bank of rooftop AC condenser units installed on a commercial building serviced by Ironclad Air." width="1600" height="900" class="area-photo">
+    <p class="area-photo-caption">Carrier Factory Authorized Equipment</p>
   </div>
 </section>
 
@@ -956,6 +996,9 @@
     </div>
   </div>
 </section>
+
+<!-- ========== TEAM TRANSITION STRIP ========== -->
+<img src="images/hvac-team.jpg" alt="An Ironclad Air service van staged for the next residential dispatch across the DFW metroplex." width="1600" height="900" class="team-strip">
 
 <!-- ========== FOOTER ========== -->
 <footer class="footer">

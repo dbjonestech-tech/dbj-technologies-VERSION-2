@@ -218,12 +218,11 @@
     .hero {
       position: relative;
       min-height: 100svh;
-      background: var(--charcoal);
-      background-image: repeating-linear-gradient(
-        135deg,
-        rgba(247,243,239,0.025) 0 1px,
-        transparent 1px 28px
-      );
+      background:
+        repeating-linear-gradient(135deg, rgba(247,243,239,0.025) 0 1px, transparent 1px 28px),
+        linear-gradient(rgba(45,41,38,0.88), rgba(45,41,38,0.94)),
+        url('images/financial-hero.jpg') center/cover no-repeat;
+      background-color: var(--charcoal);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -455,6 +454,58 @@
       color: var(--warm-stone);
       font-size: 0.95rem;
       line-height: 1.75;
+    }
+
+    /* ---------- Office figure (philosophy) ---------- */
+    .office-figure {
+      margin: 2.4rem 0 0;
+    }
+    .office-figure img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 2px;
+      box-shadow: var(--shadow-soft);
+      max-width: 100%;
+      display: block;
+    }
+    .office-figure figcaption {
+      margin-top: 0.9rem;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+    }
+
+    /* ---------- Leadership transition strip ---------- */
+    .leaders-strip {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto 3rem;
+    }
+    .leaders-strip img {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      border-radius: 0;
+      display: block;
+      max-width: 100%;
+    }
+
+    /* ---------- Press accent image ---------- */
+    .press-accent {
+      max-width: 240px;
+      margin: 0 auto 2rem;
+    }
+    .press-accent img {
+      width: 100%;
+      height: auto;
+      border-radius: 2px;
+      box-shadow: var(--shadow-soft);
+      display: block;
+      max-width: 100%;
     }
 
     /* ---------- Leadership ---------- */
@@ -726,6 +777,9 @@
       .testimonial::before { left: 0.4rem; font-size: 4rem; }
       .press-name { font-size: 1.05rem; }
       .footer-bottom { font-size: 11px; }
+      .office-figure img { height: 220px; }
+      .leaders-strip img { height: 240px; }
+      .press-accent { max-width: 200px; }
     }
 
     /* ---------- Reduced motion ---------- */
@@ -852,6 +906,11 @@
           <p>
             That structure removes the conflicts of interest that quietly shape advice at the wirehouses and broker-dealers. It is the simplest way we know to ensure that the recommendation you receive is the recommendation we believe is right for you.
           </p>
+
+          <figure class="office-figure">
+            <img src="images/financial-office.jpg" alt="Mahogany executive desk with brass banker's lamp and leather Chesterfield chair" width="1600" height="900" loading="lazy" decoding="async">
+            <figcaption>Our Turtle Creek Office &middot; By Appointment</figcaption>
+          </figure>
         </div>
 
         <aside class="commitments" aria-label="Our commitments">
@@ -875,6 +934,9 @@
   <!-- ============ LEADERSHIP ============ -->
   <section class="section section-parchment" id="team">
     <div class="section-inner">
+      <div class="leaders-strip" aria-hidden="true">
+        <img src="images/financial-team.jpg" alt="Senior advisor in tailored suit reviewing portfolio documents in a wood-paneled boardroom" width="1600" height="900" loading="lazy" decoding="async">
+      </div>
       <div class="section-head">
         <span class="eyebrow">Leadership</span>
         <h2>Experience You Can Verify.</h2>
@@ -941,6 +1003,9 @@
   <!-- ============ PRESS LOCKUP ============ -->
   <section class="section section-linen" id="insights">
     <div class="section-inner press-band">
+      <figure class="press-accent">
+        <img src="images/financial-detail.jpg" alt="Fountain pen resting on signed financial documents beside reading glasses" width="1600" height="1067" loading="lazy" decoding="async">
+      </figure>
       <span class="eyebrow">As Seen In</span>
       <div class="press-row" aria-label="Press mentions">
         <span class="press-name">Wall Street Journal</span>

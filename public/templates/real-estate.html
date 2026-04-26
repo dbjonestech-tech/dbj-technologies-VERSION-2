@@ -164,7 +164,10 @@
   /* ======== HERO ======== */
   .hero {
     position: relative;
-    background: var(--black);
+    background:
+      linear-gradient(rgba(10,10,10,0.72), rgba(10,10,10,0.85)),
+      url('images/real-estate-hero.jpg') center/cover no-repeat;
+    background-color: var(--black);
     min-height: 100svh;
     display: flex;
     align-items: center;
@@ -175,11 +178,11 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80');
+    background-image: url('images/real-estate-hero.jpg');
     background-size: cover;
     background-position: center;
-    filter: saturate(0.12) blur(0.5px);
-    opacity: 0.05;
+    filter: saturate(0.4) blur(0.5px);
+    opacity: 0;
     pointer-events: none;
   }
   .hero-inner {
@@ -258,7 +261,7 @@
   }
   .prop-card {
     background: var(--cream);
-    padding: 2.5rem 2rem 2rem 2rem;
+    padding: 0 0 2rem 0;
     border: none;
     box-shadow: var(--shadow-soft);
     position: relative;
@@ -266,6 +269,26 @@
     display: flex;
     flex-direction: column;
     min-height: 460px;
+  }
+  .prop-photo {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 0;
+    margin: 0;
+  }
+  .prop-photo-rule {
+    height: 1px;
+    background: var(--copper);
+    opacity: 0.6;
+    margin: 0;
+  }
+  .prop-body {
+    padding: 2rem 2rem 0 2rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
   .prop-card::before {
     content: "";
@@ -507,6 +530,17 @@
     letter-spacing: 0.16em;
   }
 
+  /* ======== NEIGHBORHOOD TRANSITION STRIP ======== */
+  .nh-strip {
+    display: block;
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+  }
+
   /* ======== SELLERS CTA ======== */
   .sellers {
     background: var(--cream);
@@ -617,7 +651,10 @@
     section { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
     .test-block { padding-left: 2.25rem; }
     .test-block::before { font-size: 3.6rem; top: -0.4rem; }
-    .prop-card { min-height: 0; padding: 2rem 1.5rem 1.75rem; }
+    .prop-card { min-height: 0; padding: 0 0 1.75rem 0; }
+    .prop-body { padding: 1.75rem 1.5rem 0 1.5rem; }
+    .prop-photo { height: 200px; }
+    .nh-strip { height: 240px; }
     footer { padding: 3.5rem 1.25rem 2rem; }
   }
 
@@ -670,30 +707,42 @@
 
     <div class="prop-grid">
       <article class="prop-card">
-        <div class="prop-price">$4,250,000</div>
-        <div class="prop-rule" aria-hidden="true"></div>
-        <div class="prop-address">4907 Lakeside Drive<br>Highland Park</div>
-        <div class="prop-meta">5 Bed &middot; 5.2 Bath &middot; 6,400 SF</div>
-        <p class="prop-desc">A poised stone traditional set behind mature live oaks, with formal garden, library paneled in rift white oak, and a primary suite oriented to the west light. Recently refreshed throughout.</p>
-        <a href="#" class="prop-link">View Listing &rarr;</a>
+        <img class="prop-photo" src="images/real-estate-listing1.jpg" alt="Highland Park living room with floor-to-ceiling windows and natural afternoon light" width="1600" height="1067" style="max-width:100%; height:auto; display:block;">
+        <div class="prop-photo-rule" aria-hidden="true"></div>
+        <div class="prop-body">
+          <div class="prop-price">$4,250,000</div>
+          <div class="prop-rule" aria-hidden="true"></div>
+          <div class="prop-address">4907 Lakeside Drive<br>Highland Park</div>
+          <div class="prop-meta">5 Bed &middot; 5.2 Bath &middot; 6,400 SF</div>
+          <p class="prop-desc">A poised stone traditional set behind mature live oaks, with formal garden, library paneled in rift white oak, and a primary suite oriented to the west light. Recently refreshed throughout.</p>
+          <a href="#" class="prop-link">View Listing &rarr;</a>
+        </div>
       </article>
 
       <article class="prop-card">
-        <div class="prop-price">$2,875,000</div>
-        <div class="prop-rule" aria-hidden="true"></div>
-        <div class="prop-address">3814 Normandy Avenue<br>University Park</div>
-        <div class="prop-meta">4 Bed &middot; 4.1 Bath &middot; 4,950 SF</div>
-        <p class="prop-desc">A graceful Georgian on a tree-canopied block, walking distance to Highland Park Village. Light, lifted ceilings, a discreet rear-entry motor court, and a kitchen designed for everyday quiet.</p>
-        <a href="#" class="prop-link">View Listing &rarr;</a>
+        <img class="prop-photo" src="images/real-estate-listing2.jpg" alt="University Park designer kitchen with marble counters and warm fixtures" width="1600" height="1067" style="max-width:100%; height:auto; display:block;">
+        <div class="prop-photo-rule" aria-hidden="true"></div>
+        <div class="prop-body">
+          <div class="prop-price">$2,875,000</div>
+          <div class="prop-rule" aria-hidden="true"></div>
+          <div class="prop-address">3814 Normandy Avenue<br>University Park</div>
+          <div class="prop-meta">4 Bed &middot; 4.1 Bath &middot; 4,950 SF</div>
+          <p class="prop-desc">A graceful Georgian on a tree-canopied block, walking distance to Highland Park Village. Light, lifted ceilings, a discreet rear-entry motor court, and a kitchen designed for everyday quiet.</p>
+          <a href="#" class="prop-link">View Listing &rarr;</a>
+        </div>
       </article>
 
       <article class="prop-card">
-        <div class="prop-price">$6,900,000</div>
-        <div class="prop-rule" aria-hidden="true"></div>
-        <div class="prop-address">9220 Sunnybrook Lane<br>Preston Hollow</div>
-        <div class="prop-meta">6 Bed &middot; 7.2 Bath &middot; 9,100 SF</div>
-        <p class="prop-desc">A private compound on just over an acre, with reflecting pool, guest house, and a wine room of considered scale. Architecturally restrained, materially generous, fully renovated in 2023.</p>
-        <a href="#" class="prop-link">View Listing &rarr;</a>
+        <img class="prop-photo" src="images/real-estate-listing3.jpg" alt="Preston Hollow primary bedroom with poised neutral palette and west light" width="1600" height="1067" style="max-width:100%; height:auto; display:block;">
+        <div class="prop-photo-rule" aria-hidden="true"></div>
+        <div class="prop-body">
+          <div class="prop-price">$6,900,000</div>
+          <div class="prop-rule" aria-hidden="true"></div>
+          <div class="prop-address">9220 Sunnybrook Lane<br>Preston Hollow</div>
+          <div class="prop-meta">6 Bed &middot; 7.2 Bath &middot; 9,100 SF</div>
+          <p class="prop-desc">A private compound on just over an acre, with reflecting pool, guest house, and a wine room of considered scale. Architecturally restrained, materially generous, fully renovated in 2023.</p>
+          <a href="#" class="prop-link">View Listing &rarr;</a>
+        </div>
       </article>
     </div>
 
@@ -787,6 +836,9 @@
     </div>
   </div>
 </section>
+
+<!-- ===== NEIGHBORHOOD TRANSITION STRIP ===== -->
+<img class="nh-strip" src="images/real-estate-neighborhood.jpg" alt="Tree-canopied Park Cities residential street with established estate homes" width="1600" height="900" style="max-width:100%; height:auto; display:block;">
 
 <!-- ===== SELLERS ===== -->
 <section class="sellers" id="sellers">
