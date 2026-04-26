@@ -651,7 +651,8 @@ function PillarBreakdown({ scores }: { scores: PillarScores }) {
       <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {PILLAR_CONFIG.map((p) => {
           const value = scores[p.key];
-          const color = scoreColor(value);
+          const isNull = value === null;
+          const color = isNull ? "#6b7280" : scoreColor(value as number);
           return (
             <div
               key={p.key}
@@ -676,13 +677,15 @@ function PillarBreakdown({ scores }: { scores: PillarScores }) {
                 className="mt-3 font-display text-3xl font-bold"
                 style={{ color }}
               >
-                {value}
-                <span
-                  className="ml-1 text-xs font-normal"
-                  style={{ color: "#6b7280" }}
-                >
-                  /100
-                </span>
+                {isNull ? "n/a" : value}
+                {!isNull ? (
+                  <span
+                    className="ml-1 text-xs font-normal"
+                    style={{ color: "#6b7280" }}
+                  >
+                    /100
+                  </span>
+                ) : null}
               </div>
               <div
                 className="mt-3 h-1.5 w-full overflow-hidden rounded-full"
@@ -690,7 +693,10 @@ function PillarBreakdown({ scores }: { scores: PillarScores }) {
               >
                 <div
                   className="h-full rounded-full"
-                  style={{ width: `${value}%`, backgroundColor: color }}
+                  style={{
+                    width: isNull ? "0%" : `${value as number}%`,
+                    backgroundColor: color,
+                  }}
                 />
               </div>
             </div>

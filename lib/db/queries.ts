@@ -261,19 +261,25 @@ function coercePillarScores(v: unknown): PillarScores | null {
   if (
     typeof o.design !== "number" ||
     typeof o.performance !== "number" ||
-    typeof o.positioning !== "number" ||
-    (typeof o.searchVisibility !== "number" && typeof o.findability !== "number")
+    typeof o.positioning !== "number"
   ) {
     return null;
+  }
+  let searchVisibility: number | null;
+  if (o.searchVisibility === null) {
+    searchVisibility = null;
+  } else if (typeof o.searchVisibility === "number") {
+    searchVisibility = o.searchVisibility;
+  } else if (typeof o.findability === "number") {
+    searchVisibility = o.findability;
+  } else {
+    searchVisibility = null;
   }
   return {
     design: o.design,
     performance: o.performance,
     positioning: o.positioning,
-    searchVisibility:
-      typeof o.searchVisibility === "number"
-        ? o.searchVisibility
-        : (o.findability as number),
+    searchVisibility,
   };
 }
 

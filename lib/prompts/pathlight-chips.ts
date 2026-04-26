@@ -24,6 +24,7 @@ function pickLowestPillar(
   let lowestScore = Number.POSITIVE_INFINITY;
   for (const key of PILLAR_TIEBREAK_ORDER) {
     const score = pillarScores[key];
+    if (score === null) continue;
     if (score < lowestScore) {
       lowestScore = score;
       lowestKey = key;

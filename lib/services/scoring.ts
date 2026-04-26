@@ -46,20 +46,28 @@ export function normalizePositioningScore(scores: PositioningScores): number {
 }
 
 export function calculateSearchVisibilityScore(
-  seoScore: number,
-  accessibilityScore: number
-): number {
-  const seo = clamp(seoScore, 0, 100);
-  const a11y = clamp(accessibilityScore, 0, 100);
-  return clamp(Math.round(seo * 0.7 + a11y * 0.3), 0, 100);
+  seoScore: number | null,
+  accessibilityScore: number | null
+): number | null {
+  const hasSeo = typeof seoScore === "number" && Number.isFinite(seoScore);
+  const hasA11y =
+    typeof accessibilityScore === "number" && Number.isFinite(accessibilityScore);
+  if (!hasSeo && !hasA11y) return null;
+  if (hasSeo && hasA11y) {
+    const seo = clamp(seoScore!, 0, 100);
+    const a11y = clamp(accessibilityScore!, 0, 100);
+    return clamp(Math.round(seo * 0.7 + a11y * 0.3), 0, 100);
+  }
+  if (hasSeo) return clamp(Math.round(seoScore!), 0, 100);
+  return clamp(Math.round(accessibilityScore!), 0, 100);
 }
 
 export function calculatePathlightScore(
   designScores: DesignScores,
   performanceScore: number,
   positioningScores: PositioningScores,
-  lighthouseSeoScore: number,
-  lighthouseAccessibilityScore: number
+  lighthouseSeoScore: number | null,
+  lighthouseAccessibilityScore: number | null
 ): { pathlightScore: number; pillarScores: PillarScores } {
   const design = normalizeDesignScore(designScores);
   const performance = clamp(Math.round(performanceScore), 0, 100);
@@ -69,13 +77,35 @@ export function calculatePathlightScore(
     lighthouseAccessibilityScore
   );
 
-  const pathlightScore = clamp(
-    Math.round(
-      design * 0.35 + performance * 0.25 + positioning * 0.25 + searchVisibility * 0.15
-    ),
-    0,
-    100
-  );
+  // When search visibility is missing, redistribute its 0.15 weight
+  // proportionally across the remaining three pillars so the composite
+  // stays on a 0-100 scale instead of being silently dragged down.
+  const baseWeights = { design: 0.35, performance: 0.25, positioning: 0.25, searchVisibility: 0.15 };
+  let pathlightScore: number;
+  if (searchVisibility === null) {
+    const remaining = baseWeights.design + baseWeights.performance + baseWeights.positioning;
+    pathlightScore = clamp(
+      Math.round(
+        (design * baseWeights.design +
+          performance * baseWeights.performance +
+          positioning * baseWeights.positioning) /
+          remaining
+      ),
+      0,
+      100
+    );
+  } else {
+    pathlightScore = clamp(
+      Math.round(
+        design * baseWeights.design +
+          performance * baseWeights.performance +
+          positioning * baseWeights.positioning +
+          searchVisibility * baseWeights.searchVisibility
+      ),
+      0,
+      100
+    );
+  }
 
   return {
     pathlightScore,

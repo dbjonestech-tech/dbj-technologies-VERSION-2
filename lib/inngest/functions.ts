@@ -29,6 +29,10 @@ import {
   lookupVertical,
 } from "../services/vertical-lookup";
 import {
+  getCachedBenchmark,
+  setCachedBenchmark,
+} from "../services/benchmark-cache";
+import {
   logEmailEvent,
   sendFollowUp,
   sendPathlightReport,
@@ -270,8 +274,28 @@ export const scanRequested = inngest.createFunction(
             return { ok: true, benchmark: curatedBenchmark };
           }
           console.log(
-            `[research-benchmark] ${curatedMatch ? `Single-source match: "${curatedMatch.name}" — using web research` : "No curated match — using web research"}`
+            `[research-benchmark] ${curatedMatch ? `Single-source match: "${curatedMatch.name}", using web research` : "No curated match, using web research"}`
           );
+
+          const cached = await getCachedBenchmark(
+            ctx.visionAudit?.inferredVertical,
+            ctx.visionAudit?.businessModel,
+            ctx.visionAudit?.inferredVerticalParent
+          );
+          if (cached) {
+            console.log(
+              `[research-benchmark] Cache hit for vertical="${ctx.visionAudit?.inferredVertical}" model=${ctx.visionAudit?.businessModel}`
+            );
+            try {
+              await updateScanIndustryBenchmark(scanId, cached);
+            } catch (dbErr) {
+              console.error(
+                "[research-benchmark] DB write failed (cached benchmark still available in closure):",
+                describeError(dbErr)
+              );
+            }
+            return { ok: true, benchmark: cached };
+          }
 
           const businessName = await lookupBusinessName(scanId);
           const siteUrl = ctx.resolvedUrl ?? ctx.url;
@@ -293,6 +317,12 @@ export const scanRequested = inngest.createFunction(
                 describeError(dbErr)
               );
             }
+            await setCachedBenchmark(
+              ctx.visionAudit?.inferredVertical,
+              ctx.visionAudit?.businessModel,
+              ctx.visionAudit?.inferredVerticalParent,
+              benchmark
+            );
           }
           return { ok: true, benchmark };
         } catch (err) {
@@ -360,13 +390,17 @@ export const scanRequested = inngest.createFunction(
               return { ok: false, error: "missing prerequisites" };
             }
 
-            let seo = audit.scores.overall;
-            let accessibility = audit.scores.overall;
             const lhData = ctx.lighthouseData as Record<string, any> | null;
             const rawSeo = lhData?.categories?.seo?.score;
             const rawA11y = lhData?.categories?.accessibility?.score;
-            seo = typeof rawSeo === "number" && isFinite(rawSeo) ? Math.round(rawSeo * 100) : audit.scores.overall;
-            accessibility = typeof rawA11y === "number" && isFinite(rawA11y) ? Math.round(rawA11y * 100) : audit.scores.overall;
+            const seo: number | null =
+              typeof rawSeo === "number" && isFinite(rawSeo)
+                ? Math.round(rawSeo * 100)
+                : null;
+            const accessibility: number | null =
+              typeof rawA11y === "number" && isFinite(rawA11y)
+                ? Math.round(rawA11y * 100)
+                : null;
 
             const { pathlightScore, pillarScores } = calculatePathlightScore(
               ctx.visionAudit.design,
