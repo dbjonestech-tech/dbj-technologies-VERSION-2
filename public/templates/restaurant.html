@@ -28,7 +28,7 @@
     --hairline-light: rgba(28,18,16,0.10);
     --shadow-soft: 0 4px 18px rgba(28,18,16,0.10);
     --shadow-warm: 0 12px 32px rgba(28,18,16,0.20);
-    --fs-display: clamp(2.8rem, 5vw, 4.6rem);
+    --fs-display: clamp(3rem, 5vw, 4.8rem);
     --fs-h2: clamp(2rem, 3.5vw, 3rem);
     --fs-h3: 1.4rem;
     --fs-body: 1.06rem;
@@ -63,6 +63,7 @@
     font-size: var(--fs-body);
     line-height: 1.85;
     font-feature-settings: 'kern', 'liga', 'onum';
+    overflow-x: hidden;
   }
 
   a {
@@ -149,7 +150,7 @@
     transform: translateY(-1px);
   }
 
-  /* ============ NAV (split signature) ============ */
+  /* ============ NAV (centered split signature) ============ */
   .nav {
     position: sticky;
     top: 0;
@@ -175,9 +176,10 @@
     align-items: center;
     font-family: 'Nunito Sans', sans-serif;
     font-weight: 500;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: var(--cream);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
   }
 
   .nav-left {
@@ -202,37 +204,27 @@
   .wordmark {
     font-family: 'Fraunces', serif;
     font-weight: 500;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     letter-spacing: 0.18em;
     color: var(--cream);
     text-transform: uppercase;
     white-space: nowrap;
   }
 
-  /* ============ HERO ============ */
+  /* ============ HERO (full-bleed bartender atmosphere) ============ */
   .hero {
     position: relative;
-    min-height: 100svh;
+    min-height: 92vh;
     background:
-      linear-gradient(rgba(28,18,16,0.72), rgba(28,18,16,0.85)),
-      url('images/restaurant-hero.jpg') center/cover no-repeat;
+      linear-gradient(rgba(28,18,16,0.62), rgba(28,18,16,0.72)),
+      url('images/people/restaurant-bartender.jpg') center/cover no-repeat;
+    background-blend-mode: multiply;
     color: var(--cream);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 6vw, 4rem);
-  }
-
-  .hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('images/restaurant-hero.jpg') center/cover no-repeat;
-    filter: saturate(0.6) sepia(0.18);
-    opacity: 0.35;
-    pointer-events: none;
-    z-index: 0;
   }
 
   .hero::after {
@@ -265,7 +257,7 @@
     font-weight: 400;
     color: var(--on-dark-dim);
     line-height: 1.85;
-    max-width: 560px;
+    max-width: 580px;
     margin: 0 auto 2.4rem;
     font-size: 1.05rem;
   }
@@ -347,6 +339,79 @@
     max-width: 620px;
     margin: 0 auto 1.4rem;
     font-size: 1.04rem;
+  }
+
+  /* ============ CHEF SECTION (From the Kitchen) ============ */
+  .chef {
+    background: var(--linen);
+    padding: 0;
+  }
+
+  .chef-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    min-height: 500px;
+  }
+
+  .chef-photo {
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    filter: saturate(1.08) sepia(0.04);
+  }
+
+  .chef-copy {
+    padding: clamp(3rem, 7vw, 6rem) clamp(2rem, 5vw, 4.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .chef-copy .ornament {
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+
+  .chef-copy h2 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--espresso);
+    font-size: clamp(1.9rem, 2.8vw, 2.6rem);
+    margin: 0 0 1rem;
+  }
+
+  .chef-credentials {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--burgundy);
+    font-size: 0.74rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin: 0 0 1.8rem;
+  }
+
+  .chef-bio {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--umber);
+    line-height: 1.95;
+    margin: 0 0 1.8rem;
+    font-size: 1rem;
+  }
+
+  .chef-quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--burgundy);
+    font-size: 1.3rem;
+    line-height: 1.45;
+    margin: 0;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--hairline-amber);
   }
 
   /* ============ MENU ============ */
@@ -436,48 +501,42 @@
     margin-top: 0.35rem;
   }
 
-  .menu-images {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(1rem, 3vw, 2rem);
-    margin-top: 4rem;
-  }
-
-  .menu-images img {
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-    display: block;
-    border-radius: 0;
-    max-width: 100%;
-  }
-
-  .wine-strip {
-    width: 100%;
+  /* ============ MENU INTERMISSION (full-bleed pause) ============ */
+  .menu-intermission {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
     margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    padding: clamp(2.5rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 3rem);
+    background:
+      repeating-linear-gradient(
+        45deg,
+        rgba(28,18,16,0.018) 0px,
+        rgba(28,18,16,0.018) 2px,
+        transparent 2px,
+        transparent 6px
+      ),
+      var(--paper);
+    text-align: center;
   }
 
-  .wine-strip img {
-    width: 100%;
-    height: 320px;
-    object-fit: cover;
-    display: block;
-    border-radius: 0;
-    max-width: 100%;
+  .menu-intermission .glyph {
+    color: var(--amber);
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    line-height: 1;
+    margin-bottom: 1rem;
   }
 
-  .interior-strip {
-    width: 100%;
-    line-height: 0;
-  }
-
-  .interior-strip img {
-    width: 100%;
-    height: 360px;
-    object-fit: cover;
-    display: block;
-    border-radius: 0;
-    max-width: 100%;
+  .menu-intermission .quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--espresso);
+    font-size: 1.6rem;
+    line-height: 1.4;
+    margin: 0 auto;
+    max-width: 640px;
   }
 
   .menu-foot {
@@ -497,6 +556,54 @@
 
   .menu-foot a:hover {
     color: var(--cream);
+  }
+
+  /* ============ BAR STRIP (full-bleed atmosphere band) ============ */
+  .bar-strip {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    height: 320px;
+    background:
+      linear-gradient(rgba(28,18,16,0.42), rgba(28,18,16,0.58)),
+      url('images/people/restaurant-bartender.jpg') center 80%/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 6vw, 4rem);
+    color: var(--cream);
+  }
+
+  .bar-strip-inner {
+    text-align: center;
+    max-width: 540px;
+  }
+
+  .bar-strip-inner .glyph {
+    color: var(--amber);
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    line-height: 1;
+    margin-bottom: 0.9rem;
+    display: block;
+  }
+
+  .bar-strip-inner h3 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--cream);
+    font-size: 1.6rem;
+    line-height: 1.2;
+    margin: 0 0 1rem;
+    letter-spacing: 0;
+  }
+
+  .bar-strip-inner p {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--on-dark-dim);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    margin: 0 auto;
   }
 
   /* ============ WINE PROGRAM ============ */
@@ -694,6 +801,21 @@
     max-width: 760px;
   }
 
+  /* ============ INTERIOR STRIP ============ */
+  .interior-strip {
+    width: 100%;
+    line-height: 0;
+  }
+
+  .interior-strip img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    display: block;
+    border-radius: 0;
+    max-width: 100%;
+  }
+
   /* ============ RESERVATION CTA ============ */
   .reserve h2 {
     font-family: 'Fraunces', serif;
@@ -789,20 +911,17 @@
       grid-template-columns: 1fr;
     }
 
-    .menu-images {
+    .chef-grid {
       grid-template-columns: 1fr;
     }
 
-    .menu-images img {
-      height: 240px;
+    .chef-photo {
+      min-height: 360px;
+      height: 360px;
     }
 
-    .wine-strip img {
-      height: 240px;
-    }
-
-    .interior-strip img {
-      height: 260px;
+    .chef-copy {
+      padding: clamp(2.5rem, 6vw, 4rem) clamp(1.5rem, 6vw, 3rem);
     }
 
     .wine-copy {
@@ -813,6 +932,18 @@
     .wine-copy .eyebrow {
       justify-content: center;
       text-align: center;
+    }
+
+    .interior-strip img {
+      height: 260px;
+    }
+
+    .bar-strip {
+      height: 240px;
+    }
+
+    .menu-intermission .quote {
+      font-size: 1.3rem;
     }
   }
 
@@ -857,7 +988,7 @@
     .nav-left,
     .nav-right {
       gap: 1.2rem;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
     }
   }
 
@@ -880,7 +1011,7 @@
 </head>
 <body>
 
-<!-- ============ NAV (split signature) ============ -->
+<!-- ============ NAV (centered split signature) ============ -->
 <nav class="nav" aria-label="Primary">
   <div class="nav-inner">
     <div class="nav-left">
@@ -895,7 +1026,7 @@
   </div>
 </nav>
 
-<!-- ============ HERO ============ -->
+<!-- ============ HERO (full-bleed bartender atmosphere) ============ -->
 <header class="hero" id="top">
   <div class="hero-inner">
     <div class="ornament" aria-hidden="true">
@@ -927,6 +1058,25 @@
     <p>Our menu changes with what is good right now. In October, that means roots and stone fruit and the last of the heirloom tomatoes. In February, citrus and brassicas and slow braises. We do not chase trends. We cook what tastes best on the day you sit down.</p>
     <p>Chef Marcus Cole spent a decade in New York and the Bay Area before coming home to Dallas. He learned to cook in kitchens that respected the ingredient, that did not bury good food under technique, that knew when to step back.</p>
     <p>The best compliment we get is that the food tastes like itself. The carrot tastes like a carrot. The fish tastes like the gulf. We work hard to make that happen, and we work hard to make it look effortless.</p>
+  </div>
+</section>
+
+<!-- ============ CHEF SECTION (From the Kitchen) ============ -->
+<section class="chef" aria-labelledby="chef-heading">
+  <div class="chef-grid">
+    <img class="chef-photo" src="images/people/restaurant-chef.jpg" alt="Chef Marcus Cole at the pass, plating a dish with tweezers in a focused moment" width="1800" height="967" loading="lazy">
+    <div class="chef-copy">
+      <div class="ornament" aria-hidden="true">
+        <span>&#10022;</span>
+        <span>&#10022;</span>
+        <span>&#10022;</span>
+      </div>
+      <p class="eyebrow">From the Kitchen</p>
+      <h2 id="chef-heading">Chef Marcus Cole</h2>
+      <p class="chef-credentials">12 Years &middot; New York &middot; San Francisco &middot; Dallas</p>
+      <p class="chef-bio">Marcus spent twelve years in fine-dining kitchens across New York and San Francisco before coming home to Dallas. Ember &amp; Vine is the restaurant he always wanted to open: serious food without the stiffness, plated by a chef who still works the line every service. Most nights, that is him at the pass with the tweezers.</p>
+      <p class="chef-quote">&ldquo;Cooking for strangers is the most generous thing I can think of.&rdquo;</p>
+    </div>
   </div>
 </section>
 
@@ -1026,9 +1176,10 @@
       </div>
     </div>
 
-    <div class="menu-images">
-      <img src="images/restaurant-dish1.jpg" alt="Plated seasonal entree with herbs and roasted vegetables on a ceramic plate" width="1600" height="1067" loading="lazy">
-      <img src="images/restaurant-dish2.jpg" alt="Hand-rolled pasta with slow-braised ragu and fresh herbs in a shallow bowl" width="1600" height="1067" loading="lazy">
+    <!-- Menu intermission (full-bleed pause between starts and entrees) -->
+    <div class="menu-intermission" aria-hidden="false">
+      <div class="glyph" aria-hidden="true">&#10022;</div>
+      <p class="quote">&ldquo;If you have had a tomato salad here in August, you understand.&rdquo;</p>
     </div>
 
     <div class="menu-foot">
@@ -1037,12 +1188,18 @@
   </div>
 </section>
 
+<!-- ============ BAR STRIP (full-bleed atmosphere band) ============ -->
+<section class="bar-strip" aria-label="The bar at Ember and Vine">
+  <div class="bar-strip-inner">
+    <span class="glyph" aria-hidden="true">&#10022;</span>
+    <h3>The Bar</h3>
+    <p>Aperol spritzes from 5pm. House Negronis aged in Texas oak for thirty days. A short list of what the bartender thinks pairs with what you ordered. Ask.</p>
+  </div>
+</section>
+
 <!-- ============ WINE PROGRAM ============ -->
 <section class="wine section-linen" id="wine">
   <div class="section-inner">
-    <div class="wine-strip">
-      <img src="images/restaurant-bar.jpg" alt="Amber-lit cocktail bar with backlit bottles and brass fixtures" width="1600" height="900" loading="lazy">
-    </div>
     <div class="wine-grid">
       <div class="wine-copy">
         <div class="ornament" aria-hidden="true">

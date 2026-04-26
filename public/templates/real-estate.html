@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Lauren Prescott · Luxury Residential · Dallas</title>
+<title>Lauren Prescott &middot; Luxury Residential &middot; Dallas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Karla:ital,wght@0,300;0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
     --shadow-soft: 0 2px 18px rgba(10,10,10,0.06);
     --shadow-lift: 0 14px 36px rgba(10,10,10,0.10);
 
-    --fs-display: clamp(2.8rem, 5vw, 4.4rem);
+    --fs-display: clamp(2.6rem, 5vw, 4.4rem);
     --fs-h2: clamp(2rem, 3.2vw, 2.8rem);
     --fs-h3: 1.4rem;
     --fs-body: 1.0625rem;
@@ -34,7 +34,10 @@
     --fs-price: clamp(2.4rem, 3.5vw, 3.4rem);
   }
 
-  *, *::before, *::after { box-sizing: border-box; }
+  *, *::before, *::after {
+    box-sizing: border-box;
+    font-feature-settings: 'kern', 'liga';
+  }
 
   html { scroll-behavior: smooth; }
 
@@ -98,7 +101,8 @@
     top: 0;
     z-index: 50;
     background: var(--black);
-    padding: 1.4rem clamp(1.5rem, 6vw, 4rem);
+    padding: 1.5rem clamp(1.5rem, 6vw, 4rem);
+    border-bottom: 1px solid var(--copper);
   }
   .nav-inner {
     max-width: 1480px;
@@ -111,21 +115,22 @@
   .wordmark {
     font-family: 'Libre Caslon Display', Georgia, serif;
     color: var(--ivory);
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     letter-spacing: 0.32em;
     font-weight: 400;
   }
   .nav-links {
     display: flex;
-    gap: 2.4rem;
+    gap: 2.8rem;
     align-items: center;
   }
   .nav-links a {
     font-family: 'Karla', sans-serif;
     font-weight: 400;
     color: var(--on-dark);
-    font-size: 0.9rem;
-    letter-spacing: 0.04em;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
     transition: color 0.3s ease;
   }
   .nav-links a:hover { color: var(--copper); }
@@ -150,53 +155,31 @@
     border-color: var(--copper-deep);
     transform: translateY(-1px);
   }
-  .btn-ghost {
-    background: transparent;
-    color: var(--copper);
-    border: 1px solid var(--copper);
-  }
-  .btn-ghost:hover {
-    background: var(--copper-pale);
-    color: var(--copper-deep);
-    border-color: var(--copper-deep);
-  }
 
   /* ======== HERO ======== */
   .hero {
     position: relative;
     background:
-      linear-gradient(rgba(10,10,10,0.72), rgba(10,10,10,0.85)),
-      url('images/real-estate-hero.jpg') center/cover no-repeat;
-    background-color: var(--black);
-    min-height: 100svh;
+      radial-gradient(circle at 75% 60%, rgba(184,115,51,0.18), transparent 55%),
+      linear-gradient(135deg, #0A0A0A 0%, #1A1310 60%, #2A1F18 100%);
+    min-height: 92vh;
     display: flex;
     align-items: center;
     overflow: hidden;
-    padding: clamp(6rem, 12vw, 9rem) 0 clamp(6rem, 12vw, 9rem) 0;
-  }
-  .hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: url('images/real-estate-hero.jpg');
-    background-size: cover;
-    background-position: center;
-    filter: saturate(0.4) blur(0.5px);
-    opacity: 0;
-    pointer-events: none;
+    padding: clamp(2rem, 8vw, 8rem);
   }
   .hero-inner {
     position: relative;
     z-index: 1;
+    width: 100%;
     max-width: 640px;
-    padding-left: clamp(2rem, 9vw, 9rem);
-    padding-right: clamp(1.5rem, 4vw, 3rem);
   }
   .hero .eyebrow { display: block; margin-bottom: 2rem; }
   .hero h1 {
     color: var(--ivory);
-    font-size: var(--fs-display);
+    font-size: clamp(2.6rem, 5vw, 4.4rem);
     margin-bottom: 1.75rem;
+    font-weight: 400;
   }
   .hero-sub {
     color: var(--on-dark-dim);
@@ -210,6 +193,7 @@
   }
   .hero-rule {
     width: 240px;
+    max-width: 240px;
     height: 1px;
     background: var(--copper);
     opacity: 0.6;
@@ -227,6 +211,69 @@
   .hero-stats .sep {
     color: var(--copper);
     margin: 0 0.7em;
+  }
+
+  /* ======== AGENT SECTION ======== */
+  .agent {
+    background: var(--ivory);
+    padding: clamp(5rem, 9vw, 7.5rem) clamp(1.5rem, 6vw, 4rem);
+  }
+  .agent-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 55fr 45fr;
+    gap: clamp(3rem, 6vw, 5rem);
+    align-items: start;
+  }
+  .agent-left .eyebrow {
+    display: block;
+    margin-bottom: 1.25rem;
+  }
+  .agent-left h2 {
+    font-size: var(--fs-h2);
+    margin-bottom: 2rem;
+    color: var(--black);
+  }
+  .agent-paragraphs p {
+    color: var(--warm-gray);
+    line-height: 1.95;
+    margin-bottom: 1.4rem;
+    font-size: 1.04rem;
+  }
+  .agent-paragraphs p:last-child { margin-bottom: 0; }
+  .agent-credentials {
+    display: block;
+    margin-top: 2.4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--hairline-copper);
+    font-family: 'Karla', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--copper);
+    line-height: 1.85;
+  }
+  .agent-right {
+    position: relative;
+  }
+  .agent-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 550px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 0;
+  }
+  .agent-caption {
+    margin-top: 1.1rem;
+    font-family: 'Karla', sans-serif;
+    font-style: italic;
+    color: var(--warm-gray-light);
+    font-size: 0.88rem;
+    letter-spacing: 0.04em;
   }
 
   /* ======== SECTION HEADERS ======== */
@@ -251,6 +298,7 @@
   /* ======== PROPERTIES ======== */
   .properties {
     background: var(--ivory);
+    overflow: visible;
   }
   .properties .container { max-width: 1280px; }
 
@@ -258,9 +306,9 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
+    align-items: start;
   }
   .prop-card {
-    background: var(--cream);
     padding: 0 0 2rem 0;
     border: none;
     box-shadow: var(--shadow-soft);
@@ -269,6 +317,23 @@
     display: flex;
     flex-direction: column;
     min-height: 460px;
+  }
+  .prop-card-1 {
+    background: linear-gradient(135deg, #FAF7F2 0%, #F0E8DC 100%);
+  }
+  .prop-card-3 {
+    background: linear-gradient(135deg, #F5F1EB 0%, #E8DDC9 100%);
+  }
+  .prop-card-featured {
+    background: linear-gradient(135deg, #2A1F18 0%, #1A1310 100%);
+    transform: scale(1.06);
+    margin-top: -30px;
+    z-index: 2;
+    box-shadow: 0 24px 56px rgba(10,10,10,0.28);
+  }
+  .prop-card-featured:hover {
+    transform: scale(1.06) translateY(-2px);
+    box-shadow: 0 28px 64px rgba(10,10,10,0.32);
   }
   .prop-photo {
     display: block;
@@ -303,6 +368,7 @@
     box-shadow: var(--shadow-lift);
     transform: translateY(-2px);
   }
+  .prop-card-featured:hover { box-shadow: 0 28px 64px rgba(10,10,10,0.32); }
   .prop-card:hover::before { opacity: 1; }
 
   .prop-price {
@@ -355,6 +421,14 @@
   }
   .prop-link:hover { color: var(--copper-deep); }
 
+  /* Featured (dark) card text overrides */
+  .prop-card-featured .prop-address { color: var(--on-dark); }
+  .prop-card-featured .prop-meta { color: var(--on-dark-dim); }
+  .prop-card-featured .prop-desc { color: var(--on-dark-dim); }
+  .prop-card-featured .prop-rule { background: var(--copper); opacity: 0.8; }
+  .prop-card-featured .prop-link { color: var(--copper); }
+  .prop-card-featured .prop-link:hover { color: var(--ivory); }
+
   .prop-viewall {
     text-align: center;
     margin-top: clamp(3rem, 5vw, 4.5rem);
@@ -404,84 +478,6 @@
     color: var(--warm-gray);
     font-size: 0.99rem;
     line-height: 1.85;
-  }
-
-  /* ======== ABOUT / PHILOSOPHY ======== */
-  .about {
-    background: var(--ivory);
-    position: relative;
-  }
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(3rem, 7vw, 6rem);
-    align-items: start;
-  }
-  .about-left h2 {
-    font-size: var(--fs-h2);
-    margin-bottom: 2rem;
-  }
-  .about-left .eyebrow {
-    display: block;
-    margin-bottom: 1.25rem;
-  }
-  .about-paragraphs p {
-    color: var(--warm-gray);
-    line-height: 1.95;
-    margin-bottom: 1.4rem;
-    font-size: 1.04rem;
-  }
-  .about-paragraphs p:last-child { margin-bottom: 0; }
-
-  .about-right {
-    position: relative;
-    padding-left: 2.4rem;
-    min-height: 100%;
-  }
-  .about-right::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: var(--copper);
-    opacity: 0.45;
-  }
-  .about-quote-glyph {
-    position: absolute;
-    top: -1.5rem;
-    right: 0;
-    font-family: 'Libre Caslon Display', Georgia, serif;
-    font-size: 11rem;
-    color: var(--copper);
-    opacity: 0.10;
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-  }
-  .about-pull {
-    position: relative;
-    color: var(--black);
-    font-family: 'Libre Caslon Display', Georgia, serif;
-    font-size: 1.5rem;
-    line-height: 1.5;
-    font-style: italic;
-    margin-bottom: 2rem;
-    padding-top: 1rem;
-  }
-  .about-meta {
-    font-family: 'Karla', sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--copper);
-  }
-  .about-meta .row {
-    display: block;
-    color: var(--warm-gray);
-    margin-top: 0.5rem;
-    font-feature-settings: 'tnum';
   }
 
   /* ======== TESTIMONIALS ======== */
@@ -632,11 +628,16 @@
 
   /* ======== RESPONSIVE ======== */
   @media (max-width: 960px) {
+    .agent-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .agent-right { order: -1; }
+    .agent-photo { min-height: 420px; }
     .prop-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+    .prop-card-featured {
+      transform: none;
+      margin-top: 0;
+    }
+    .prop-card-featured:hover { transform: translateY(-2px); }
     .nh-grid { grid-template-columns: 1fr; gap: 2.75rem; }
-    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
-    .about-right { padding-left: 1.75rem; min-height: 0; }
-    .about-quote-glyph { font-size: 8rem; top: -1rem; }
     .footer-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   }
 
@@ -645,10 +646,12 @@
     .nav-links { display: none; }
     .wordmark { font-size: 0.78rem; letter-spacing: 0.28em; }
     .btn { padding: 0.85rem 1.6rem; font-size: 0.7rem; letter-spacing: 0.18em; }
-    .hero-inner { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .hero { padding: clamp(3rem, 10vw, 5rem) 1.5rem; min-height: 88vh; }
     .hero-rule { width: 180px; }
     .hero-stats .sep { display: inline; margin: 0 0.4em; }
     section { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
+    .agent { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
+    .agent-photo { min-height: 360px; }
     .test-block { padding-left: 2.25rem; }
     .test-block::before { font-size: 3.6rem; top: -0.4rem; }
     .prop-card { min-height: 0; padding: 0 0 1.75rem 0; }
@@ -675,7 +678,6 @@
       <a href="#about">About</a>
       <a href="#sellers">Sellers</a>
       <a href="#contact">Contact</a>
-      <a href="#contact" class="btn">Schedule Consultation</a>
     </div>
   </div>
 </nav>
@@ -696,6 +698,27 @@
   </div>
 </header>
 
+<!-- ===== AGENT (MEET LAUREN) ===== -->
+<section class="agent" id="about">
+  <div class="agent-grid">
+    <div class="agent-left">
+      <span class="eyebrow">MEET LAUREN</span>
+      <h2>Real Estate at the Highest Level Is Not About Houses.</h2>
+      <div class="agent-paragraphs">
+        <p>It is about reading a room before anyone speaks. It is about understanding what a family is actually trying to build, and which of two beautiful properties will quietly hold that life better. After eighteen years and more than two hundred transactions, that is the work I have learned to do well.</p>
+        <p>I spent the first decade of my career studying Park Cities one block at a time. I know which streets keep their light through the afternoon, which builders age with grace, and which homes are owned by people who will never list publicly but might, given the right call. I think about real estate the way a good interior designer thinks about a room, in proportion, restraint, and the quiet logic of how a life actually unfolds inside walls.</p>
+        <p>My practice is intentionally small. I take a limited number of clients each year so that every introduction, negotiation, and closing receives my direct attention. That is the only way I know how to do this honestly.</p>
+      </div>
+      <span class="agent-credentials">LICENSED IN TEXAS &middot; BRIGGS FREEMAN SOTHEBY&rsquo;S INTERNATIONAL REALTY &middot; MEMBER, NRLS</span>
+    </div>
+
+    <div class="agent-right">
+      <img class="agent-photo" src="images/people/realestate-agent.jpg" alt="Lauren Prescott in a sunlit Park Cities foyer" width="1800" height="967">
+      <div class="agent-caption"><em>Park Cities &middot; Highland Park</em></div>
+    </div>
+  </div>
+</section>
+
 <!-- ===== SELECTED PROPERTIES ===== -->
 <section class="properties" id="properties">
   <div class="container">
@@ -706,8 +729,8 @@
     </div>
 
     <div class="prop-grid">
-      <article class="prop-card">
-        <img class="prop-photo" src="images/real-estate-listing1.jpg" alt="Highland Park living room with floor-to-ceiling windows and natural afternoon light" width="1600" height="1067" style="max-width:100%; height:auto; display:block;">
+      <article class="prop-card prop-card-1">
+        <img class="prop-photo" src="images/real-estate-listing1.jpg" alt="Highland Park living room with floor-to-ceiling windows and natural afternoon light" width="1600" height="1067">
         <div class="prop-photo-rule" aria-hidden="true"></div>
         <div class="prop-body">
           <div class="prop-price">$4,250,000</div>
@@ -719,8 +742,8 @@
         </div>
       </article>
 
-      <article class="prop-card">
-        <img class="prop-photo" src="images/real-estate-listing2.jpg" alt="University Park designer kitchen with marble counters and warm fixtures" width="1600" height="1067" style="max-width:100%; height:auto; display:block;">
+      <article class="prop-card prop-card-featured">
+        <img class="prop-photo" src="images/real-estate-listing2.jpg" alt="University Park designer kitchen with marble counters and warm fixtures" width="1600" height="1067">
         <div class="prop-photo-rule" aria-hidden="true"></div>
         <div class="prop-body">
           <div class="prop-price">$2,875,000</div>
@@ -732,8 +755,8 @@
         </div>
       </article>
 
-      <article class="prop-card">
-        <img class="prop-photo" src="images/real-estate-listing3.jpg" alt="Preston Hollow primary bedroom with poised neutral palette and west light" width="1600" height="1067" style="max-width:100%; height:auto; display:block;">
+      <article class="prop-card prop-card-3">
+        <img class="prop-photo" src="images/real-estate-listing3.jpg" alt="Preston Hollow primary bedroom with poised neutral palette and west light" width="1600" height="1067">
         <div class="prop-photo-rule" aria-hidden="true"></div>
         <div class="prop-body">
           <div class="prop-price">$6,900,000</div>
@@ -788,33 +811,6 @@
   </div>
 </section>
 
-<!-- ===== ABOUT / PHILOSOPHY ===== -->
-<section class="about" id="about">
-  <div class="container">
-    <div class="about-grid">
-      <div class="about-left">
-        <span class="eyebrow">ABOUT LAUREN</span>
-        <h2>Real Estate at the Highest Level Is Not About Houses.</h2>
-        <div class="about-paragraphs">
-          <p>It is about reading a room before anyone speaks. It is about understanding what a family is actually trying to build, and which of two beautiful properties will quietly hold that life better. After eighteen years and more than two hundred transactions, that is the work I have learned to do well.</p>
-          <p>I spent the first decade of my career studying Park Cities one block at a time. I know which streets keep their light through the afternoon, which builders age with grace, and which homes are owned by people who will never list publicly but might, given the right call.</p>
-          <p>My practice is intentionally small. I take a limited number of clients each year so that every introduction, negotiation, and closing receives my direct attention. That is the only way I know how to do this honestly.</p>
-        </div>
-      </div>
-
-      <div class="about-right">
-        <span class="about-quote-glyph" aria-hidden="true">&ldquo;</span>
-        <p class="about-pull">Quiet expertise, exact strategy, and a calendar small enough to actually answer the phone.</p>
-        <div class="about-meta">
-          Lauren Prescott
-          <span class="row">Principal &middot; Briggs Freeman Sotheby&rsquo;s</span>
-          <span class="row">Park Cities Resident Since 2008</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ===== TESTIMONIALS ===== -->
 <section class="testimonials">
   <div class="container">
@@ -838,7 +834,7 @@
 </section>
 
 <!-- ===== NEIGHBORHOOD TRANSITION STRIP ===== -->
-<img class="nh-strip" src="images/real-estate-neighborhood.jpg" alt="Tree-canopied Park Cities residential street with established estate homes" width="1600" height="900" style="max-width:100%; height:auto; display:block;">
+<img class="nh-strip" src="images/real-estate-neighborhood.jpg" alt="Tree-canopied Park Cities residential street with established estate homes" width="1600" height="900">
 
 <!-- ===== SELLERS ===== -->
 <section class="sellers" id="sellers">
