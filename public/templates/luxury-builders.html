@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Whitmore Custom Homes | Dallas-Fort Worth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --warm-white: #FAF9F6;
+    --off-white: #F5F0EB;
+    --sage: #7C856B;
+    --sage-deep: #5F6750;
+    --sage-pale: rgba(124,133,107,0.18);
+    --charcoal: #1A1A1A;
+    --warm-gray: #6B6B6B;
+    --warm-gray-light: #9A9A9A;
+    --hairline: rgba(26,26,26,0.08);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', system-ui, -apple-system, Helvetica, Arial, sans-serif;
+    background: var(--warm-white);
+    color: var(--warm-gray);
+    line-height: 1.8;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+    color: var(--charcoal);
+    margin: 0;
+    line-height: 1.2;
+    font-weight: 400;
+  }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem; }
+  .container-wide { max-width: 1320px; margin: 0 auto; padding: 0 2.5rem; }
+
+  .eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--sage);
+  }
+
+  /* ── Nav ─────────────────────────────────────────── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(250,249,246,0.92);
+    backdrop-filter: saturate(140%) blur(8px);
+    -webkit-backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.6rem 2.5rem;
+    max-width: 1320px;
+    margin: 0 auto;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .brand-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    color: var(--charcoal);
+    font-size: 1.05rem;
+    letter-spacing: 0.32em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+  .nav-links a {
+    color: var(--warm-gray);
+    font-size: 0.86rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    transition: color 0.25s ease;
+  }
+  .nav-links a:hover { color: var(--charcoal); }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 1rem 2rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .btn-sage {
+    background: var(--sage);
+    color: #fff;
+  }
+  .btn-sage:hover {
+    background: var(--sage-deep);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(95,103,80,0.18);
+  }
+
+  /* ── Hero ────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: var(--warm-white);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.06;
+    filter: saturate(0.3);
+    z-index: 0;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    padding: 8rem 0 6rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.75rem, 5vw, 4.5rem);
+    font-weight: 300;
+    margin: 1.5rem 0 2rem;
+    letter-spacing: -0.005em;
+  }
+  .hero p.lead {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.08rem;
+    color: var(--warm-gray);
+    line-height: 1.85;
+    max-width: 560px;
+  }
+  .hero-cta { margin-top: 2.6rem; }
+  .hero-rule {
+    width: 400px;
+    max-width: 100%;
+    height: 1px;
+    background: var(--hairline);
+    margin: 3rem 0 1.5rem;
+  }
+  .hero-stats {
+    color: var(--warm-gray-light);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .hero-stats span {
+    color: var(--sage);
+    margin: 0 0.55rem;
+    font-weight: 500;
+  }
+
+  /* ── Process ─────────────────────────────────────── */
+  .process {
+    background: var(--off-white);
+    padding: 8rem 0 8rem;
+  }
+  .section-head {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 5rem;
+  }
+  .section-head h2 {
+    font-size: clamp(2.25rem, 4vw, 3rem);
+    margin: 1rem 0 0;
+  }
+  .process-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .process-row::before {
+    content: '';
+    position: absolute;
+    top: 1.6rem;
+    left: 5%;
+    right: 5%;
+    height: 1px;
+    background: var(--sage);
+    opacity: 0.4;
+    z-index: 0;
+  }
+  .step { position: relative; z-index: 1; padding: 0 0.5rem; }
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--sage);
+    font-size: 4.5rem;
+    line-height: 1;
+    font-weight: 400;
+    opacity: 0.18;
+    margin-bottom: 1.4rem;
+    background: var(--off-white);
+    display: inline-block;
+    padding-right: 0.5rem;
+  }
+  .step h3 {
+    font-size: 1.55rem;
+    font-weight: 500;
+    margin: 0 0 0.85rem;
+  }
+  .step p {
+    font-size: 0.97rem;
+    line-height: 1.8;
+    color: var(--warm-gray);
+  }
+
+  /* ── Project types ───────────────────────────────── */
+  .types {
+    background: var(--warm-white);
+    padding: 8rem 0 8rem;
+  }
+  .types-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .type-card {
+    position: relative;
+    background: var(--off-white);
+    padding: 4rem 2.5rem 3.5rem;
+    box-shadow: 0 1px 2px rgba(26,26,26,0.04);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  .type-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--sage);
+  }
+  .type-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(26,26,26,0.07);
+  }
+  .type-card h3 {
+    font-size: 1.85rem;
+    font-weight: 500;
+    margin: 0 0 1.4rem;
+  }
+  .type-card p {
+    font-size: 0.98rem;
+    line-height: 1.85;
+    color: var(--warm-gray);
+  }
+  .type-card .meta {
+    margin-top: 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sage);
+  }
+
+  /* ── Testimonial ─────────────────────────────────── */
+  .quote {
+    background: var(--off-white);
+    padding: 9rem 0 9rem;
+    text-align: center;
+  }
+  .quote-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+  }
+  .quote-mark {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--sage);
+    font-size: 6rem;
+    line-height: 1;
+    opacity: 0.3;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--charcoal);
+    font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+    line-height: 1.55;
+    margin-bottom: 2.5rem;
+  }
+  .quote-attr {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+  }
+
+  /* ── Footer ──────────────────────────────────────── */
+  footer { background: var(--warm-white); padding: 5rem 0 2.5rem; border-top: 1px solid var(--hairline); }
+  .foot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 3rem;
+  }
+  .foot-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    color: var(--charcoal);
+    font-size: 1.05rem;
+    letter-spacing: 0.3em;
+  }
+  .foot-col {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--warm-gray);
+    line-height: 1.95;
+  }
+  .foot-col.center { text-align: center; }
+  .foot-col.right { text-align: right; }
+  .foot-col a:hover { color: var(--charcoal); }
+  .foot-rule {
+    height: 1px;
+    background: var(--sage);
+    opacity: 0.4;
+    margin: 2.5rem 0 1.75rem;
+  }
+  .foot-tag {
+    text-align: center;
+    color: var(--warm-gray-light);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+  }
+  .foot-credit a {
+    color: var(--sage);
+    transition: color 0.25s ease;
+  }
+  .foot-credit a:hover { color: var(--sage-deep); }
+
+  /* ── Responsive ──────────────────────────────────── */
+  @media (max-width: 960px) {
+    .process-row { grid-template-columns: repeat(2, 1fr); gap: 3rem; }
+    .process-row::before { display: none; }
+    .types-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .foot-grid { grid-template-columns: 1fr; gap: 2rem; text-align: center; }
+    .foot-col.right, .foot-col.center { text-align: center; }
+  }
+  @media (max-width: 600px) {
+    .container, .container-wide { padding: 0 1.5rem; }
+    .nav-inner { padding: 1.2rem 1.5rem; gap: 1.25rem; }
+    .nav-links { gap: 1.25rem; }
+    .hero-content { padding: 5rem 0 4rem; }
+    .process, .types { padding: 5rem 0; }
+    .quote { padding: 6rem 0; }
+    .process-row { grid-template-columns: 1fr; }
+    .step-num { font-size: 3.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="brand-mark">WHITMORE</span>
+    <ul class="nav-links">
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="btn btn-sage">Schedule Consultation</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container hero-content">
+    <span class="eyebrow">Custom Homes &nbsp;|&nbsp; DFW</span>
+    <h1>Built Around the Way You Live.</h1>
+    <p class="lead">For over three decades, Whitmore Custom Homes has designed and built residences across Dallas-Fort Worth that reflect how families actually live, entertain, and grow.</p>
+    <div class="hero-cta">
+      <a href="#contact" class="btn btn-sage">Begin Your Home</a>
+    </div>
+    <div class="hero-rule" aria-hidden="true"></div>
+    <p class="hero-stats">35 Years <span>|</span> 120+ Custom Homes <span>|</span> Southlake, Prosper, Westlake</p>
+  </div>
+</section>
+
+<section class="process" id="process">
+  <div class="container-wide">
+    <div class="section-head">
+      <span class="eyebrow">Our Process</span>
+      <h2>From Vision to Foundation to Finish.</h2>
+    </div>
+    <div class="process-row">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Discovery</h3>
+        <p>I sit with you at your kitchen table, walk your lot, and listen. Before I draw a single line, I understand how you live.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Design</h3>
+        <p>Architecture that works with your landscape, your light, and your routines. Every detail reviewed together before ground breaks.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Build</h3>
+        <p>On-site daily. No project managers relaying messages. The person who designed your home is the person building it.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <h3>Deliver</h3>
+        <p>A final walkthrough where every switch, every finish, every sight line is exactly what you imagined. Then the keys are yours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="types" id="portfolio">
+  <div class="container-wide">
+    <div class="section-head">
+      <span class="eyebrow">What I Build</span>
+      <h2>Three Disciplines, One Standard.</h2>
+    </div>
+    <div class="types-grid">
+      <article class="type-card">
+        <h3>Custom Homes</h3>
+        <p>Estate properties in Southlake, Prosper, and Westlake designed from a blank page. 3,500 to 12,000 square feet. Every home one of a kind.</p>
+        <div class="meta">From the ground up</div>
+      </article>
+      <article class="type-card">
+        <h3>Major Renovations</h3>
+        <p>Whole-home transformations for established properties in University Park, Highland Park, and Preston Hollow. Preserving character while modernizing every system.</p>
+        <div class="meta">Heritage neighborhoods</div>
+      </article>
+      <article class="type-card">
+        <h3>Outdoor Living</h3>
+        <p>Resort-grade pools, outdoor kitchens, guest casitas, and landscape architecture. Because in Texas, outdoor space is living space.</p>
+        <div class="meta">Year-round livability</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="quote">
+  <div class="quote-inner">
+    <div class="quote-mark" aria-hidden="true">&ldquo;</div>
+    <p class="quote-text">We interviewed five builders. Whitmore was the only one who asked how we live before asking what we wanted to build. Two years later, this house feels like it was always here.</p>
+    <div class="quote-attr">The Morrison Family, Southlake</div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="container-wide">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <span class="foot-brand">WHITMORE CUSTOM HOMES</span>
+      </div>
+      <div class="foot-col center">
+        2200 Ross Avenue, Suite 4400<br>
+        Dallas, TX 75201<br>
+        <a href="tel:9725550182">(972) 555-0182</a><br>
+        <a href="mailto:design@whitmorehomes.com">design@whitmorehomes.com</a>
+      </div>
+      <div class="foot-col right foot-credit">
+        Website by <a href="https://dbjtechnologies.com">DBJ Technologies</a>
+      </div>
+    </div>
+    <div class="foot-rule" aria-hidden="true"></div>
+    <div class="foot-tag">&copy; 2026 Whitmore Custom Homes</div>
+  </div>
+</footer>
+
+</body>
+</html>

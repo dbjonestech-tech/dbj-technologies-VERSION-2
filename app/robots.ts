@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/monitoring", "/pathlight/"],
+        disallow: ["/api/", "/monitoring", "/pathlight/", "/templates/"],
       },
     ],
     sitemap: "https://dbjtechnologies.com/sitemap.xml",
