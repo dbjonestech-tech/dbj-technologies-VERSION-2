@@ -80,4 +80,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `2181e26` (chore: update session-handoff snapshot for 68c7928), pushed to `origin main`. Working tree was clean at session start; this handoff rewrite + history archive will be the next change set.
+`main` is at `b5e1105` (chore: archive April 25 session and compact session-handoff), pushed to `origin main`. Working tree clean after the snapshot follow-up commit. The reorg moved verbatim April 25 detail to `docs/ai/history/2026-04-25.md`; this file is now the compact form going forward.
