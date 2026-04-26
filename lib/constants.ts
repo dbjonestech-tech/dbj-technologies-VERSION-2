@@ -54,13 +54,12 @@ export const SITE = {
 
 /* ─── NAV LINKS ─────────────────────────────────────── */
 export const NAV_LINKS = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
+  { label: "Pathlight", href: "/pathlight" },
   { label: "Services", href: "/services" },
   { label: "Work", href: "/work" },
-  { label: "Pathlight", href: "/pathlight" },
   { label: "Process", href: "/process" },
   { label: "Pricing", href: "/pricing" },
+  { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;
 

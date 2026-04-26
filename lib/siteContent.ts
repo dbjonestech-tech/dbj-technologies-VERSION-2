@@ -120,8 +120,8 @@ export const HERO_CONTENT: HeroContent = {
   headlineAccent: "Impossible.",
   subheading:
     "Websites and digital systems that generate trust, capture leads, and grow revenue. Built by a solo principal architect in Dallas, TX.",
-  primaryCta: { label: "Start a Project", href: "/contact" },
-  secondaryCta: { label: "See What I Build", href: "/work" },
+  primaryCta: { label: "Run Free Scan", href: "/pathlight#scan-form" },
+  secondaryCta: { label: "Book a Strategy Call", href: "/contact" },
   techTicker: ["React", "Next.js", "TypeScript", "Node.js", "Vercel"],
 };
 

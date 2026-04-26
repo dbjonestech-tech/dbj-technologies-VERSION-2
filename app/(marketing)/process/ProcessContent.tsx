@@ -11,9 +11,9 @@ import { Badge } from "@/components/ui/Badge";
 const phases = [
   {
     step: "01",
-    title: "Diagnose & Strategize",
+    title: "Diagnose and Strategize",
     description:
-      "Every engagement starts with understanding. I learn your business, audit the current state, analyze the competitive landscape, and define measurable goals. The output is a clear project brief that aligns on scope, timeline, and success criteria.",
+      "I start every engagement with a Pathlight scan and hands-on review to find where your website is losing trust, leads, and revenue. Before I write a single line of code, I know exactly what to fix and in what order.",
     activities: [
       "Stakeholder interviews and goal alignment",
       "Competitive landscape analysis",
