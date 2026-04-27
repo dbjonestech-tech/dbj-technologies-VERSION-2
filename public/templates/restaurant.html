@@ -673,7 +673,7 @@
     margin-left: calc(50% - 50vw);
     background:
       linear-gradient(rgba(28,18,16,0.66), rgba(28,18,16,0.80)),
-      url('images/people/restaurant-bartender.jpg') center 60%/cover no-repeat;
+      url('images/restaurant-cocktail.jpg') center 35%/cover no-repeat;
     color: var(--cream);
     padding: clamp(4.5rem, 8vw, 7rem) clamp(1.5rem, 6vw, 4rem);
   }
@@ -731,6 +731,31 @@
     margin-top: 1.6rem;
     padding-top: 1.4rem;
     border-top: 1px solid var(--hairline-amber);
+  }
+  .bar-director {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    margin-top: 1.6rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--hairline-amber);
+  }
+  .bar-director .bar-meta-block {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .bar-director-photo {
+    flex: 0 0 auto;
+    width: 84px;
+    height: 84px;
+    object-fit: cover;
+    object-position: center 30%;
+    border-radius: 50%;
+    border: 1px solid rgba(214, 175, 110, 0.45);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
   }
   .bar-meta-block .bar-meta {
     font-family: 'Nunito Sans', sans-serif;
@@ -1828,7 +1853,7 @@
   </div>
 
   <div class="hero-letterbox">
-    <img class="hero-letterbox-image" src="images/people/restaurant-bartender.jpg" alt="Amber-lit bar with glass bottles and a bartender pouring a Negroni" width="1800" height="967" loading="eager" decoding="async" fetchpriority="high">
+    <img class="hero-letterbox-image" src="images/restaurant-dish1.jpg" alt="Hand-cut pappardelle in walnut-glazed lamb ragu, plated in a hand-thrown stoneware bowl with shaved Pecorino, oil-poached cherry tomatoes, and torn oregano" width="966" height="894" loading="eager" decoding="async" fetchpriority="high">
     <div class="hero-letterbox-overlay" aria-hidden="true"></div>
     <div class="hero-letterbox-content">
       <div class="hero-inner">
@@ -2005,9 +2030,12 @@
       <p class="bar-tagline">Aperitivo at five. Negroni at midnight.</p>
       <p>The bar at Ember &amp; Vine has its own door, its own menu, and its own opinions. Henry Ramos has been running it since the day we opened, aging Negronis in Texas oak for thirty days and pouring whatever spritz the season calls for.</p>
       <p>Sit at the marble counter, order the cocktail of the week, and let Henry tell you about the producer who grew the orange peel.</p>
-      <div class="bar-meta-block">
-        <p class="bar-meta">Henry Ramos &middot; Bar Director</p>
-        <p class="bar-meta">Open until 11pm Tuesday through Thursday, until midnight Friday and Saturday. Walk-ins welcome at the counter.</p>
+      <div class="bar-director">
+        <img class="bar-director-photo" src="images/people/restaurant-bartender.jpg" alt="Henry Ramos at the marble bar pouring a Negroni at Ember and Vine" width="180" height="180" loading="lazy" decoding="async">
+        <div class="bar-meta-block">
+          <p class="bar-meta">Henry Ramos &middot; Bar Director</p>
+          <p class="bar-meta">Open until 11pm Tuesday through Thursday, until midnight Friday and Saturday. Walk-ins welcome at the counter.</p>
+        </div>
       </div>
     </div>
 

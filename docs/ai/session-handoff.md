@@ -6,7 +6,150 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
-## Last Session: April 27, 2026 -- Admin Stage 3: operational tools (scans, leads, audit, database)
+## Last Session: April 27, 2026 -- Image swap + hero polish across all 8 portfolio templates
+
+### What shipped
+
+Replaced ten template image assets with new Gemini-generated photography (cropped manually, watermark removed) and rebuilt several hero compositions to make each template's first impression authentic, premium, and visually distinct from the others. Image-asset blocker from the prior critique pass is now cleared. All 8 templates are visibly improved and ready for the next round of critique.
+
+**Image swaps** (10 files, all converted PNG -> JPG at q88-90, sRGB, progressive, EXIF stripped):
+
+- `images/people/dental-dentist.jpg` -- new female dentist in a sage-and-cream operatory, replacing the previously-mismatched masked-male photo. Used for both hero and the Dr. Sarah Parker doctor section.
+- `images/people/financial-advisor-1.jpg` -- new founder profile portrait of James Beckett, ivory studio backdrop, three-quarter view, navy suit.
+- `images/people/builders-principal.jpg` -- new William Ashworth portrait at a finished walnut kitchen island in a Park Cities residence, replacing the under-construction timber-frame shot.
+- `images/people/hvac-technician.jpg` -- new Carlos R. portrait with clean shirt embroidery and consistent Ironclad Air branding (the AI-text artifacts you flagged in the prior critique are gone).
+- `images/med-spa-hero.jpg` -- new editorial hero portrait (woman in cream silk robe, peony, soft natural light through arched window) to fill the previously-empty top of the med-spa hero.
+- `images/real-estate-hero.jpg` -- new Park Cities estate at golden hour, replacing the prior generic dusk-home shot.
+- `images/restaurant-dish1.jpg` -- new overhead pappardelle with lamb ragu, Pecorino, oil-poached cherry tomatoes, oxblood napkin. Promoted to the hero (replacing the bartender).
+- `images/restaurant-cocktail.jpg` -- NEW file, smoked old fashioned with single large cube and orange peel. Used as the bar-section background.
+- `images/pi-law-courthouse.jpg` -- NEW file, Old Red Courthouse Dallas County in late afternoon light. Used in the new hero strip.
+- `images/pi-law-detail.jpg` -- NEW file, leather attache case + brass banker's lamp + fountain pen on legal pads. Used in the new hero strip.
+
+**Layout / copy work per template:**
+
+- `dental-practice.html`: removed the colored teal-circle-with-coral-dot logo mark from both nav and footer (you described it as "truly hideous"). Repointed the doctor-section image to the new file and corrected width/height attributes. Wordmark-only branding now.
+- `luxury-builders.html`: removed the round "A" monogram badge from the wordmark for the same reason -- the squarespace-cheap reading was largely the badge. Wordmark-only branding now. Updated principal-photo alt text to match the new finished-kitchen scene.
+- `med-spa.html`: hero converted from single-column text to magazine 2-column spread. Text on the left, new portrait on the right, magazine "01" pagenum overlays the upper-right corner of the image. Soft drop shadow and 1px ivory inner highlight on the photo. Mobile collapses to single column with the image moving to order:2.
+- `financial-advisor.html`: hero restructured from centered-serif (visually too similar to real-estate) to a 2-column grid -- text/CTAs/stats left-aligned on the left, framed founder portrait on the right with ivory studio backdrop, hairline forest border, soft outer shadow, and italic-serif name + Work-Sans title caption. The old separate `advisor-portrait-zone` section was deleted (the portrait is now in the hero) and its dead CSS was cleaned up.
+- `real-estate.html`: hero restructured from centered-stack to 2-column grid with the new Park Cities home occupying the LEFT column at 60vh+, text on the right. The mirror layout (image-left vs. advisor's image-right) plus the warm dusk vs. cool studio mood makes the two templates feel distinct on first glance.
+- `pi-law.html`: gold serif italic h1 reduced in size and weight, color shifted from full gold to cream with a single italic-gold accent on the closing phrase ("Bring the Lawyers Who Try the Case."). Cheap reading addressed. Inserted a new full-width 2-image strip beneath the hero, sitting on the navy ground: courthouse on the left (4:5 portrait), leather-attache still life on the right (4:3), each with a small gold caption block. Restored Espanol diacritics to Espanol across 4 surfaces (urgent strip, contact-modes, FAQ, footer CTA).
+- `restaurant.html`: bartender no longer dominates. Hero image swapped to the pappardelle dish (the bartender lives now as a small 84px circular bar-director portrait next to Henry Ramos's name in the bar section). Bar-section background swapped from bartender to the new smoked-old-fashioned cocktail at center 35%. Added `.bar-director` flex cluster CSS.
+- `hvac-contractor.html`: only image asset swap (no layout change) -- the new technician photo with clean shirt embroidery flows through the existing hero composition.
+
+**Discipline preserved:** every existing CSS variable, type stack, color token, and visual idiom kept. All references resolve. `<meta name="robots" content="noindex, nofollow">` still on every template. Mobile breakpoints extended for every layout change. Em-dash sweep across `public/templates/` + `docs/blueprints/` returns zero matches. `tsc --noEmit` clean.
+
+### Cross-cutting items still pending
+
+These were on the original critique list but were intentionally not addressed in this image-swap pass. They will need a follow-up:
+
+- **Differentiated promo / specials banners** across templates (currently uniform top strips -- need vertical-specific iconography, sizing, sometimes thumbnail imagery, icons that represent the actual day/event of the special).
+- **Google Maps embed** on hero where service-area-relevant (HVAC, restaurant, dental, med-spa, pi-law).
+- **Google reviews widget** on hero where appropriate by tier (skip for luxury builder, agent, RIA).
+- **High-end Dallas magazine review marks** on the restaurant hero (D Magazine, Eater, Texas Monthly, Wine Spectator) with proper editorial typography.
+
+### Known minor items
+
+- Financial-advisor mobile breakpoint: the dead `.advisor-portrait-frame` mobile rule was deleted alongside the desktop CSS; verified no other rules reference it.
+- The new `restaurant-cocktail.jpg`, `pi-law-courthouse.jpg`, and `pi-law-detail.jpg` are NEW files; the other 7 image swaps overwrote existing files in place to preserve all HTML refs.
+
+### Next recommended task
+
+User-led critique pass, template by template. The image asset blocker is cleared, so the next round should focus on the cross-cutting items above (differentiated promo banners, Google Maps + Reviews placements, restaurant magazine marks) plus per-template polish.
+
+## Prior Session: April 27, 2026 -- Admin Stage 5: invitation-based admin users + /invite
+
+### What shipped
+
+Stage 5 closes the admin shell: `/admin/users` is now live, and any new admin can be added by sending an invitation email instead of editing the `ADMIN_EMAILS` env var. The bootstrap allowlist remains as a fallback so a database outage cannot lock you out. The architecture is forward-compatible with the planned client portal (see `docs/ai/portal-strategy.md`); the same invitation machinery will provision client accounts when that initiative starts.
+
+**Database (migration 012):**
+- `admin_users`: email PK, role (CHECK ('admin') for now, expandable to ('admin', 'client')), invited_by, invited_at, accepted_at, last_signin_at, status (active/disabled), created_at. One partial index on (status, email) for active lookups.
+- `admin_invitations`: token PK (UUID via Web Crypto), email, invited_by, expires_at (now + 7 days), used_at, revoked_at, created_at. Two partial indexes (open invitations by email, and recent invitations by created_at).
+
+**Auth flow:**
+- `lib/auth/users.ts`: DB-backed query module (Edge-safe via neon serverless). Exposes isAdminUser, listAdminUsers, getAdminUser, updateLastSignin, disableAdminUser, reactivateAdminUser, hasValidInvitationFor, createInvitation, getInvitationByToken, acceptInvitationFor (single-CTE consume + upsert), listInvitations, revokeInvitation, classifyInvitation.
+- `auth.config.ts` signIn callback now allows three sources in cost order: env allowlist (sync set), admin_users active row, valid pending invitation. JWT callback only sets isAdmin at sign-in time (trigger=signIn or fresh user) and trusts the gate on subsequent refreshes so neither the JWT nor session refresh re-hits the DB.
+- `auth.ts` events.signIn now does DB bookkeeping for non-env users: existing admin_users row -> updateLastSignin; otherwise call acceptInvitationFor (CTE that consumes the most recent valid invitation and upserts admin_users in one statement). audit metadata gains `acceptedInvitation: boolean`. env-allowlist users skip both branches.
+
+**Public invitation acceptance (`/invite/[token]`):**
+- Top-level public route (NOT under /admin layout, so it does not require auth to view). Server component reads the token, classifies state (valid/expired/used/revoked/missing) via classifyInvitation, renders the appropriate UI.
+- Valid state: shows invitee email + inviter + expiry, plus a "Accept and sign in with Google" button that calls `signIn("google", { redirectTo: "/admin" })`. When the OAuth round-trip completes, the signIn callback allows entry (because hasValidInvitationFor matches), and events.signIn consumes the invitation and creates the admin_users row before the redirect lands.
+- Already-signed-in admins are short-circuited to /admin so the page is never visible post-acceptance.
+- Other states render polite messaging and a link back to /signin or /.
+
+**`/admin/users` surface:**
+- Stat cards: bootstrap admins (env count), invited admins, open invitations, disabled.
+- Invite form: email input + server action `inviteAdminAction` that validates format, blocks self-invite, blocks duplicates against env list, blocks duplicates against active admin_users, blocks duplicates against open invitations, creates the invitation, sends the email via Resend, audit-logs success/failure, and revalidates the path.
+- Invited admins table: shows DB-backed users with status badge, invited_by, accepted_at, last_signin_at relative time, plus a Disable / Reactivate action (you cannot disable yourself).
+- Invitations table: 200 most recent across all states, with state badge (open/expired/used/revoked), inviter, sent/expires timestamps, and for open invitations a `<details>` block revealing the public accept URL plus a Revoke button.
+- Flash banner reads `?error=` / `?sent=` / `?delivery=failed|sent` / `?revoked=1` / `?disabled=` / `?reactivated=` from the search params, populated by server-action redirects.
+
+**Email template (`lib/email-templates/admin-invitation.ts`):**
+- White card on zinc background, accent cyan CTA button, reuses the BuiltEmail type. Includes a fallback paste-this-link block for clients that strip the button.
+- `lib/auth/notify.ts` gains `sendAdminInvitationEmail` that THROWS on failure (unlike the new-device email which swallows). The inviting admin needs to know if delivery failed so they can copy the accept link manually.
+
+**Wiring:**
+- `app/admin/layout.tsx`: Users entry no longer disabled.
+- `app/admin/page.tsx`: Users card flipped to live with updated description.
+- `app/robots.ts`: `/invite/` added to disallow list.
+- `middleware.ts`: `/invite` added to CACHE_EXCLUDED_PREFIXES so per-token pages are never cached at the CDN. Pre-existing em-dashes in middleware.ts comments stripped.
+
+### Files added
+
+- `lib/db/migrations/012_admin_users.sql`
+- `lib/auth/users.ts`
+- `lib/email-templates/admin-invitation.ts`
+- `app/admin/users/page.tsx`
+- `app/admin/users/actions.ts`
+- `app/invite/[token]/page.tsx`
+
+### Files modified
+
+- `auth.config.ts` (3-source signIn check, jwt trigger gate)
+- `auth.ts` (events.signIn DB bookkeeping)
+- `lib/auth/notify.ts` (added sendAdminInvitationEmail)
+- `middleware.ts` (CACHE_EXCLUDED_PREFIXES)
+- `app/admin/layout.tsx` (Users live)
+- `app/admin/page.tsx` (Users card live)
+- `app/robots.ts` (/invite/ disallow)
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 em-dashes across all changed files (including middleware.ts comments which had two pre-existing em-dashes; both replaced).
+- Migration 012 applied successfully to the linked Neon branch (5 statements ok).
+
+### Manual verification next
+
+1. Sign in to /admin as bootstrap admin. Visit /admin/users. Send an invite to a second Google address you control.
+2. Confirm the invitation email arrives via Resend.
+3. Open the email link in a private window. Verify /invite/{token} renders with the correct invitee email and inviter.
+4. Click "Accept and sign in with Google". Sign in with the matching account.
+5. Land on /admin. Verify the Audit log shows `signin.success` with `acceptedInvitation: true`.
+6. Back in /admin/users, verify the new admin shows in the Invited admins table with last_signin_at set, and the invitation row is now state=used.
+7. Test denial: try to accept the (now-used) invitation a second time. Should show "already used" copy.
+8. Test mismatch: send an invitation to one email, attempt to accept with a different Google account. Should be denied at signIn callback (lands on /signin?error=AccessDenied).
+9. Test disable: disable the new admin from the Invited admins table. Sign in as them, should be denied.
+
+### Known minor items
+
+- Migration 012 was applied to the dev Postgres which is the same Neon branch as production via POSTGRES_URL. Confirm before next prod deploy that admin_users + admin_invitations tables exist in the production Neon branch.
+- The CHECK on `admin_users.role` only allows 'admin' today. When the client portal initiative starts, alter the constraint to ('admin', 'client') as part of that migration.
+- The disable/reactivate actions immediately flip status, but any active JWT cookie for the disabled user remains valid until natural expiration (8 hours). For instant lockout we would need a session-revocation table; deferred until there is a real reason.
+- The /invite page's `<details>` block shows the accept URL but cannot auto-select on focus (would require a client component). Manual click into the input still works for copy-paste.
+
+### Git status at session pause
+
+Working tree dirty: 7 modified + 6 new files. Not committed yet pending Joshy's review per protocol. Stages 1-3 still at commit `97051ca` on origin/main, plus `f8808ef` snapshot for portal-strategy.md.
+
+### Next recommended task
+
+Per the portal strategy doc: client portal v1 (~2 weeks). New `/portal` route group with its own minimal layout, a `clients` table (or a `role` column on a unified users table) wired to the same invitation flow that just shipped, and a project status dashboard scoped to the signed-in client. Read `docs/ai/portal-strategy.md` for the phased plan, scope warnings, and revenue framing before starting.
+
+---
+
+## Earlier Session: April 27, 2026 -- Admin Stage 3: operational tools (scans, leads, audit, database)
 
 ### What shipped
 
@@ -60,7 +203,7 @@ Working tree clean. Stage 3 shipped in commit `97051ca` (`feat(admin): Stage 3 o
 
 ### Next recommended task
 
-Stage 4 (polish, Tier 4): cmdk command palette, sonner toast notifications, theme toggle (light/dark), keyboard shortcuts. After Stage 4, Stage 5 covers roles + invitation foundation and unlocks the /admin/users surface.
+Stage 5 (admin invitations / Tier 5). The path was re-prioritized in the post-Stage-3 strategy session: skip Stage 4 polish for now and ship Stage 5 because its invitation infrastructure is dual-purpose with the planned white-glove client portal. **Read `docs/ai/portal-strategy.md` first** -- it captures the full discussion of admin invites vs Pathlight customer accounts vs DBJ client portal, why the studio-not-SaaS identity matters, the phased plan (Stage 5 -> client portal v1 -> v2 -> v3), and the architectural reuse argument. Stage 4 polish (cmdk, sonner, theme toggle, keyboard shortcuts) is deferred and can land after the portal initiative.
 
 ---
 

@@ -249,14 +249,19 @@
 
   .hero h1 {
     font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-weight: 700;
-    font-size: var(--fs-display);
-    color: var(--gold);
-    line-height: 1.08;
-    letter-spacing: -0.01em;
+    font-style: normal;
+    font-weight: 500;
+    font-size: clamp(2rem, 3.6vw, 3.2rem);
+    color: var(--cream);
+    line-height: 1.1;
+    letter-spacing: -0.005em;
     margin-bottom: 1.75rem;
-    max-width: 640px;
+    max-width: 600px;
+  }
+  .hero h1 em {
+    color: var(--gold);
+    font-style: italic;
+    font-weight: 500;
   }
 
   .hero-sub {
@@ -289,6 +294,53 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     font-feature-settings: 'tnum' on, 'lnum' on, 'kern', 'liga';
+  }
+
+  /* HERO STRIP: editorial 2-image montage that sits below the hero,
+     showing the civic context (Old Red Courthouse) and the discipline
+     (leather case, banker's lamp, legal pads). */
+  .hero-strip {
+    background: var(--navy);
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(1px, 0.2vw, 4px);
+    padding: 0;
+  }
+  .hero-strip-card {
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+    background: #0a1426;
+  }
+  .hero-strip-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: center;
+  }
+  .hero-strip-card.hero-strip-tall img {
+    aspect-ratio: 4 / 5;
+    object-position: center 35%;
+  }
+  .hero-strip-card figcaption {
+    position: absolute;
+    left: clamp(1rem, 2vw, 1.6rem);
+    bottom: clamp(1rem, 2vw, 1.4rem);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(8, 18, 35, 0.72);
+    padding: 0.55rem 0.85rem;
+    border: 1px solid rgba(201, 168, 76, 0.25);
+    backdrop-filter: blur(2px);
+  }
+  @media (max-width: 768px) {
+    .hero-strip { grid-template-columns: 1fr; }
+    .hero-strip-card.hero-strip-tall img { aspect-ratio: 3 / 2; }
   }
 
   .hero-photo {
@@ -1597,7 +1649,7 @@
     <span class="urgent-strip__sep" aria-hidden="true">·</span>
     <a href="tel:2145550184">(214) 555-0184</a>
     <span class="urgent-strip__sep" aria-hidden="true">·</span>
-    <span class="urgent-strip__bilingual">Hablamos Espanol</span>
+    <span class="urgent-strip__bilingual">Hablamos Español</span>
   </div>
 </div>
 
@@ -1635,7 +1687,7 @@
       <span class="no-fee__text">No Fee Unless We Win Your Case</span>
     </div>
     <span class="eyebrow hero-eyebrow">Trial Lawyers · Established 1998</span>
-    <h1>When the Outcome Matters, Bring the Lawyers Who Try the Case.</h1>
+    <h1>When the Outcome Matters, <em>Bring the Lawyers Who Try the Case.</em></h1>
     <p class="hero-sub">I represent people who have been seriously injured. Most of our cases settle. The ones that do not, we try. Insurance carriers know which firms walk into a courtroom and which firms do not. We do. You pay nothing unless we recover for you.</p>
     <div class="hero-ctas">
       <a href="#intake" class="btn btn-gold">Free Case Review</a>
@@ -1648,6 +1700,18 @@
     <img src="images/people/pi-law-attorney-1.jpg" alt="Lead trial attorney in dark suit photographed in a downtown Dallas law office" width="1800" height="967">
   </div>
 </header>
+
+<!-- HERO IMAGE STRIP: Dallas civic gravitas + the work -->
+<section class="hero-strip" aria-label="The work behind the firm">
+  <figure class="hero-strip-card hero-strip-tall">
+    <img src="images/pi-law-courthouse.jpg" alt="Old Red Courthouse, Dallas County, in late afternoon light" width="907" height="1042" loading="lazy" decoding="async">
+    <figcaption>Dallas County &middot; Old Red Courthouse</figcaption>
+  </figure>
+  <figure class="hero-strip-card">
+    <img src="images/pi-law-detail.jpg" alt="Worn bridle-leather attache case, brass banker's lamp, and a fountain pen on a stack of legal pads" width="968" height="905" loading="lazy" decoding="async">
+    <figcaption>Preparation, Discipline, Evidence</figcaption>
+  </figure>
+</section>
 
 <!-- CREDENTIALS BAR -->
 <section class="credentials-bar" aria-label="Firm credentials">
@@ -2097,7 +2161,7 @@
         <span class="mode__glyph" aria-hidden="true">&#128488;</span>
         <span class="mode__title">Live Chat</span>
         <span class="mode__line">Bilingual Staff</span>
-        <span class="mode__sub">Hablamos Espanol. Real attorneys, not bots.</span>
+        <span class="mode__sub">Hablamos Español. Real attorneys, not bots.</span>
       </a>
     </div>
   </div>
@@ -2169,7 +2233,7 @@
         <div class="faq-answer">Yes. There is no charge to call, no charge to meet, no charge to review records, and no obligation to hire us. If you decide to retain the firm, the engagement agreement is on a no-recovery-no-fee basis.</div>
       </details>
       <details class="faq-item">
-        <summary>Hablan Espanol?</summary>
+        <summary>Hablan Español?</summary>
         <div class="faq-answer">Si. Bilingual staff and attorneys answer the line twenty-four hours a day, including the intake desk and the lead attorney rotation. Confidentiality applies the same way. La consulta es gratis.</div>
       </details>
     </div>
@@ -2182,7 +2246,7 @@
     <h2>If You Are Hurt, the Clock Is Already Running.</h2>
     <p>Texas has a two-year statute of limitations on most personal injury claims. Evidence disappears, witnesses move, and insurance adjusters take statements that hurt cases. Call us today. The consultation is free, and there is no fee unless we recover for you.</p>
     <a href="#intake" class="btn btn-gold">Schedule Your Free Consultation</a>
-    <span class="cta-call">Or call (214) 555-0184. Twenty-four hours. Hablamos Espanol.</span>
+    <span class="cta-call">Or call (214) 555-0184. Twenty-four hours. Hablamos Español.</span>
   </div>
 </section>
 

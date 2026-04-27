@@ -268,17 +268,66 @@
       background: var(--charcoal);
       background-image: var(--pinstripe);
       overflow: visible;
-      padding: clamp(5rem, 12vh, 10rem) clamp(1.5rem, 5vw, 4rem) clamp(7rem, 14vh, 11rem);
-      text-align: center;
+      padding: clamp(5rem, 12vh, 9rem) clamp(1.5rem, 5vw, 4rem) clamp(5rem, 10vh, 8rem);
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(2.5rem, 6vw, 6rem);
+      max-width: 1320px;
+      margin: 0 auto;
     }
     .hero-content {
       position: relative;
       z-index: 1;
       display: flex;
       flex-direction: column;
+      align-items: flex-start;
+      max-width: 640px;
+    }
+    .hero-portrait {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      max-width: 760px;
-      margin: 0 auto;
+      justify-self: end;
+      max-width: 420px;
+    }
+    .hero-portrait img {
+      display: block;
+      width: 100%;
+      max-width: 380px;
+      height: auto;
+      aspect-ratio: 710 / 992;
+      object-fit: cover;
+      object-position: center 18%;
+      border: 1px solid rgba(122, 144, 116, 0.35);
+      box-shadow:
+        0 28px 56px -22px rgba(0, 0, 0, 0.55),
+        0 0 0 6px rgba(245, 240, 232, 0.04);
+    }
+    .hero-portrait figcaption {
+      margin-top: 1.4rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .hero-portrait-name {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--parchment);
+      letter-spacing: 0.005em;
+    }
+    .hero-portrait-title {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
     }
     .hero-eyebrow {
       font-family: 'Work Sans', sans-serif;
@@ -298,28 +347,29 @@
       line-height: 1.06;
       letter-spacing: -0.01em;
       margin: 0 0 1.6rem;
-      max-width: 18ch;
+      max-width: 16ch;
+      text-align: left;
     }
     .hero-sub {
       color: var(--on-dark-dim);
       font-size: 1.05rem;
       line-height: 1.85;
-      max-width: 560px;
+      max-width: 540px;
       margin: 0 0 2.4rem;
     }
     .hero-ctas {
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
-      justify-content: center;
+      justify-content: flex-start;
       margin-bottom: 2.8rem;
     }
 
-    /* AUM tabular row, centered */
+    /* AUM tabular row, left-aligned to match grid hero */
     .hero-stats {
       display: flex;
       align-items: stretch;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 0;
       flex-wrap: wrap;
       max-width: 620px;
@@ -353,47 +403,6 @@
       text-transform: uppercase;
       color: var(--on-dark-dim);
       font-weight: 500;
-    }
-
-    /* Advisor portrait zone: framed portrait that overlaps upward into the hero band above. */
-    .advisor-portrait-zone {
-      background: var(--parchment);
-      text-align: center;
-      padding: 0 clamp(1.25rem, 5vw, 3rem) clamp(4rem, 8vh, 6rem);
-    }
-    .advisor-portrait-frame {
-      position: relative;
-      z-index: 2;
-      max-width: 480px;
-      margin: -120px auto 1.4rem;
-      aspect-ratio: 3 / 4;
-      border: 1px solid var(--forest);
-      background: var(--charcoal-deep);
-      box-shadow: 0 24px 48px rgba(34,31,28,0.28);
-      overflow: hidden;
-    }
-    .advisor-portrait-frame img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center top;
-      display: block;
-    }
-    .advisor-portrait-name {
-      font-family: 'EB Garamond', Georgia, serif;
-      font-weight: 500;
-      font-size: 1.2rem;
-      color: var(--charcoal);
-      margin: 0;
-      letter-spacing: 0.02em;
-    }
-    .advisor-portrait-title {
-      font-family: 'Work Sans', sans-serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--forest);
-      margin: 0.6rem 0 0;
     }
 
     /* ---------- Generic section frame ---------- */
@@ -1564,8 +1573,14 @@
       .nav-links { gap: 0.95rem; }
       .nav-links a { font-size: 0.7rem; letter-spacing: 0.14em; }
 
-      .hero { padding: 4rem 1.25rem 5.5rem; }
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        padding: 4rem 1.25rem 5.5rem;
+      }
       .hero-content { max-width: 100%; }
+      .hero-portrait { justify-self: center; max-width: 320px; order: 2; }
+      .hero-portrait img { max-width: 320px; }
       .hero-ctas { flex-direction: column; align-items: stretch; width: 100%; }
       .hero-ctas .btn { text-align: center; }
       .hero-stats {
@@ -1580,7 +1595,6 @@
         padding: 0.4rem 0 1.1rem !important;
       }
       .hero-stat:last-child { border-bottom: 0; padding-bottom: 0.4rem !important; }
-      .advisor-portrait-frame { max-width: 320px; margin-top: -80px; }
 
       .testimonial { padding: 2rem 1.4rem 1.6rem 2.6rem; }
       .testimonial::before { left: 0.4rem; font-size: 4rem; }
@@ -1669,15 +1683,14 @@
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ============ ADVISOR PORTRAIT REVEAL ============ -->
-  <section class="advisor-portrait-zone" aria-label="Founding partner">
-    <figure class="advisor-portrait-frame">
-      <img src="images/people/financial-advisor-1.jpg" alt="Founding partner James Beckett at a mahogany desk with a brass banker's lamp" width="1800" height="989" loading="eager" decoding="async" fetchpriority="high">
+    <figure class="hero-portrait" aria-label="Founding partner James Beckett">
+      <img src="images/people/financial-advisor-1.jpg" alt="Founding partner James Beckett, CFP, CFA, in three-quarter profile against an ivory studio backdrop" width="710" height="992" fetchpriority="high" decoding="async">
+      <figcaption>
+        <span class="hero-portrait-name">James Beckett, CFP, CFA</span>
+        <span class="hero-portrait-title">Founding Partner</span>
+      </figcaption>
     </figure>
-    <p class="advisor-portrait-name">James Beckett, CFP, CFA</p>
-    <p class="advisor-portrait-title">Founding Partner</p>
   </section>
 
   <!-- ============ FIDUCIARY PLEDGE (signature card) ============ -->

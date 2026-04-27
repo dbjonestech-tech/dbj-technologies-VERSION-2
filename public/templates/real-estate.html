@@ -182,46 +182,49 @@
     background:
       radial-gradient(circle at 50% 110%, rgba(184,115,51,0.10), transparent 50%),
       #0A0A0A;
-    min-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    min-height: 88vh;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: clamp(1.5rem, 3vw, 3rem);
     overflow: hidden;
-    padding: clamp(3.5rem, 8vh, 6rem) clamp(1.5rem, 5vw, 4rem);
-    text-align: center;
+    padding: clamp(2rem, 5vw, 4rem);
   }
   .hero-inner {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto 3rem;
+    max-width: 540px;
+    margin: 0;
+    align-self: center;
+    text-align: left;
+    padding-right: clamp(1rem, 3vw, 2.5rem);
   }
   .hero .eyebrow { display: block; margin-bottom: 1.6rem; }
   .hero h1 {
     color: var(--ivory);
-    font-size: clamp(2.6rem, 5vw, 4.4rem);
+    font-size: clamp(2.4rem, 4.4vw, 4rem);
     margin-bottom: 1.5rem;
     font-weight: 400;
+    line-height: 1.04;
   }
   .hero-sub {
     color: var(--on-dark-dim);
     font-size: 1.05rem;
     line-height: 1.85;
-    max-width: 520px;
-    margin: 0 auto 2.2rem;
+    max-width: 480px;
+    margin: 0 0 2.2rem;
   }
   .hero-cta-row {
     margin-bottom: 2rem;
   }
   .hero-rule {
-    width: 240px;
-    max-width: 240px;
+    width: 200px;
+    max-width: 200px;
     height: 1px;
     background: var(--copper);
     opacity: 0.6;
-    margin: 0 auto 1.4rem;
+    margin: 0 0 1.4rem;
   }
   .hero-stats {
     font-family: 'Karla', sans-serif;
@@ -236,14 +239,16 @@
     color: var(--copper);
     margin: 0 0.7em;
   }
-  /* Gallery frame holding the property photo, presented like a print on a gallery wall */
+  /* Gallery frame holding the property photo, presented like a print on a gallery wall.
+     Sits on the LEFT of the hero so the layout mirrors away from the centered-serif
+     wealth-advisor template. */
   .hero-gallery-frame {
     position: relative;
     z-index: 1;
-    width: 70%;
-    max-width: 900px;
-    height: 45vh;
-    min-height: 320px;
+    order: -1;
+    width: 100%;
+    max-width: none;
+    min-height: 60vh;
     border: 1px solid var(--copper);
     border-radius: 2px;
     overflow: hidden;
@@ -1165,10 +1170,22 @@
     .nav-links { display: none; }
     .wordmark { font-size: 0.78rem; letter-spacing: 0.28em; }
     .btn { padding: 0.85rem 1.6rem; font-size: 0.7rem; letter-spacing: 0.18em; }
-    .hero { padding: clamp(3rem, 10vw, 5rem) 1.25rem; min-height: 88vh; }
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: clamp(3rem, 10vw, 5rem) 1.25rem;
+      min-height: auto;
+    }
+    .hero-inner { max-width: 100%; padding-right: 0; }
     .hero-rule { width: 180px; }
     .hero-stats .sep { display: inline; margin: 0 0.4em; }
-    .hero-gallery-frame { width: 92%; height: 35vh; min-height: 240px; }
+    .hero-gallery-frame {
+      width: 100%;
+      max-width: 100%;
+      min-height: 280px;
+      height: 45vw;
+      order: -1;
+    }
     section { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
     .agent { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
     .agent-photo { min-height: 360px; }

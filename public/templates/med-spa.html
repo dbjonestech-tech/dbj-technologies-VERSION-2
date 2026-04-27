@@ -274,12 +274,14 @@
     /* HERO: editorial full-bleed, left-aligned, no photo */
     .hero {
       position: relative;
-      min-height: 80vh;
+      min-height: 86vh;
       background:
         radial-gradient(1200px 600px at 80% 30%, rgba(196,145,142,0.04), transparent 70%),
         linear-gradient(180deg, #FAFAFA 0%, #FEF6F3 60%, #F8EFEA 100%);
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
       align-items: center;
+      gap: clamp(2rem, 5vw, 5rem);
       padding: clamp(5rem, 9vw, 8rem) 0 clamp(4.5rem, 8vw, 7rem);
       overflow: hidden;
     }
@@ -287,9 +289,45 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 720px;
+      max-width: 640px;
       padding-left: clamp(2rem, 8vw, 8rem);
       padding-right: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    .hero-figure {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      padding-right: clamp(2rem, 6vw, 5rem);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .hero-figure img {
+      display: block;
+      width: 100%;
+      max-width: 540px;
+      height: auto;
+      aspect-ratio: 827 / 1135;
+      object-fit: cover;
+      border-radius: 2px;
+      box-shadow:
+        0 28px 60px -28px rgba(64, 32, 50, 0.25),
+        0 1px 0 0 rgba(255, 255, 255, 0.6) inset;
+    }
+
+    @media (max-width: 1023px) {
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+      .hero-figure {
+        padding-left: clamp(2rem, 6vw, 4rem);
+        padding-right: clamp(2rem, 6vw, 4rem);
+        justify-content: center;
+        order: 2;
+      }
+      .hero-figure img { max-width: 460px; }
     }
 
     .hero-eyebrow {
@@ -1754,6 +1792,9 @@
       <div class="hero-rule" aria-hidden="true"></div>
       <p class="hero-credit">By appointment only &middot; Highland Park Village, Suite 204</p>
     </div>
+    <figure class="hero-figure" aria-hidden="true">
+      <img src="images/med-spa-hero.jpg" alt="" width="827" height="1135" fetchpriority="high" decoding="async">
+    </figure>
   </header>
 
   <!-- PHYSICIAN MAGAZINE SPREAD (02) -->
