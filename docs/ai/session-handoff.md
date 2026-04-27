@@ -141,7 +141,7 @@ Stage 5 closes the admin shell: `/admin/users` is now live, and any new admin ca
 
 ### Git status at session pause
 
-Working tree dirty: 7 modified + 6 new files. Not committed yet pending Joshy's review per protocol. Stages 1-3 still at commit `97051ca` on origin/main, plus `f8808ef` snapshot for portal-strategy.md.
+Working tree clean for Stage 5 work. Stage 5 shipped in commit `fd84067` (`feat(admin): Stage 5 invitation-based admin users + /invite`), pushed to `origin main`. Vercel auto-deploy triggered. `scripts/check-admin-audit-table.mjs` remains untracked (carried over from a prior session, intentionally left out of Stage 5).
 
 ### Next recommended task
 
@@ -687,4 +687,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `551cd6f` (feat(templates): image swap + hero polish across all 8 portfolio templates), confirmed pushed to `origin main`. Working tree NOT clean: a parallel admin / auth workstream is in progress with uncommitted edits to `app/admin/layout.tsx`, `app/admin/page.tsx`, `app/robots.ts`, `auth.config.ts`, `auth.ts`, `lib/auth/notify.ts`, `middleware.ts`, `docs/ai/current-state.md` and untracked `app/admin/users/`, `app/invite/`, `lib/auth/users.ts`, `docs/ai/portal-strategy.md`. Those belong to the parallel admin Stage 5 workstream and were intentionally not staged in this commit. Recent chain (most recent first): `551cd6f` (templates image swap + hero polish) -> `f8808ef` (admin Stage 5 invite-based users) -> earlier admin Stage 3 + Stage 1+2 commits -> `8289370` (5 templates Pass 1 + blueprints) -> `fe5f022` (snapshot for b9b8dfe) -> `b9b8dfe` (monitoring V1+V2) -> `de17ba0` (split moon rotation from libration for smoother motion) -> earlier chain elided in archive.
+`main` is at `fd84067` (feat(admin): Stage 5 invitation-based admin users + /invite), confirmed pushed to `origin main`. Working tree clean except for `scripts/check-admin-audit-table.mjs` (carried over from a prior session, intentionally untracked). Recent chain (most recent first): `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.
