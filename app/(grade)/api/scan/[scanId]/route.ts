@@ -100,6 +100,7 @@ export async function GET(
       pathlightScore: report.pathlightScore,
       pillarScores: report.pillarScores,
       lighthouseScores: report.lighthouseScores ?? null,
+      audioSummaryUrl: report.audioSummaryUrl,
       isOutOfScope,
       outOfScopeLabel: isOutOfScope
         ? report.businessScale === "global"

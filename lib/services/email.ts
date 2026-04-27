@@ -120,6 +120,7 @@ async function buildMergeData(
     revenueLoss: report.revenueImpact?.estimatedMonthlyLoss ?? null,
     topFinding: pickTopFinding(report.remediation?.items ?? null),
     reportUrl: buildReportUrl(report.id, emailType),
+    audioSummaryUrl: report.audioSummaryUrl,
     calendlyUrl: buildCalendlyUrl(emailType),
     unsubscribeUrl: generateUnsubscribeUrl(report.email),
   };

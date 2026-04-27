@@ -40,6 +40,8 @@ type ScanResultsRow = {
   remediation_items: { items?: unknown[] } | null;
   revenue_impact: Record<string, unknown> | null;
   industry_benchmark: unknown;
+  audio_summary_url: string | null;
+  audio_summary_script: string | null;
 };
 
 export async function updateScanStatus(
@@ -163,6 +165,38 @@ export async function updateScanIndustryBenchmark(
     ON CONFLICT (scan_id) DO UPDATE
     SET industry_benchmark = EXCLUDED.industry_benchmark
   `;
+}
+
+export async function updateScanAudioSummary(
+  scanId: string,
+  audioUrl: string,
+  script: string
+): Promise<void> {
+  const sql = getDb();
+  await sql`
+    INSERT INTO scan_results (scan_id, audio_summary_url, audio_summary_script)
+    VALUES (${scanId}, ${audioUrl}, ${script})
+    ON CONFLICT (scan_id) DO UPDATE
+    SET audio_summary_url = EXCLUDED.audio_summary_url,
+        audio_summary_script = EXCLUDED.audio_summary_script
+  `;
+}
+
+export async function getExistingAudioSummary(
+  scanId: string
+): Promise<{ url: string | null; script: string | null }> {
+  const sql = getDb();
+  const rows = (await sql`
+    SELECT audio_summary_url, audio_summary_script
+    FROM scan_results
+    WHERE scan_id = ${scanId}
+    LIMIT 1
+  `) as { audio_summary_url: string | null; audio_summary_script: string | null }[];
+  const row = rows[0];
+  return {
+    url: row?.audio_summary_url ?? null,
+    script: row?.audio_summary_script ?? null,
+  };
 }
 
 export async function updatePathlightScore(
@@ -391,7 +425,8 @@ async function loadScanWithResults(scanId: string): Promise<{
 
   const resultRows = (await sql`
     SELECT lighthouse_data, screenshots, ai_analysis, pathlight_score,
-           pillar_scores, remediation_items, revenue_impact, industry_benchmark
+           pillar_scores, remediation_items, revenue_impact, industry_benchmark,
+           audio_summary_url, audio_summary_script
     FROM scan_results
     WHERE scan_id = ${scanId}
     ORDER BY created_at DESC
@@ -501,6 +536,8 @@ export async function getFullScanReport(
     pillarScores: pillar,
     lighthouseScores,
     industryBenchmark,
+    audioSummaryUrl: result?.audio_summary_url ?? null,
+    audioSummaryScript: result?.audio_summary_script ?? null,
     businessModel: vision?.businessModel,
     inferredVertical: vision?.inferredVertical,
     inferredVerticalParent: vision?.inferredVerticalParent,

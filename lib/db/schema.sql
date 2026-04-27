@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS scan_results (
   remediation_items JSONB,
   revenue_impact JSONB,
   industry_benchmark JSONB,
+  audio_summary_url TEXT,
+  audio_summary_script TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -79,7 +81,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uniq_email_event_resend_id_status
 CREATE TABLE IF NOT EXISTS api_usage_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   scan_id UUID REFERENCES scans(id) ON DELETE SET NULL,
-  provider TEXT NOT NULL CHECK (provider IN ('anthropic', 'browserless', 'pagespeed', 'resend')),
+  provider TEXT NOT NULL CHECK (provider IN ('anthropic', 'browserless', 'pagespeed', 'resend', 'elevenlabs')),
   operation TEXT NOT NULL,
   model TEXT,
   input_tokens INTEGER NOT NULL DEFAULT 0,

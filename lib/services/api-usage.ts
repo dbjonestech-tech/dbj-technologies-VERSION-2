@@ -37,8 +37,25 @@ const ANTHROPIC_RATES_USD_PER_MTOK: Record<string, AnthropicRate> = {
   },
 };
 
-export type ApiProvider = "anthropic" | "browserless" | "pagespeed" | "resend";
+export type ApiProvider =
+  | "anthropic"
+  | "browserless"
+  | "pagespeed"
+  | "resend"
+  | "elevenlabs";
 export type ApiCallStatus = "ok" | "retry" | "fail";
+
+/**
+ * ElevenLabs character-based pricing. Bills run flat-fee at our
+ * volume (Creator plan covers 100k chars/mo for $22), but we still
+ * record a marginal-rate cost estimate so the dashboard's per-scan
+ * column has a number worth comparing across operations.
+ *
+ * eleven_turbo_v2_5 list rate at the Creator plan is approximately
+ * $0.30 per 1000 input characters when you exceed your allotment.
+ * Adjust if we move plans.
+ */
+const ELEVENLABS_USD_PER_1K_CHARS = 0.3;
 
 type AnthropicTokenUsage = {
   input_tokens?: number | null;
@@ -213,5 +230,42 @@ export async function recordPagespeedUsage(
     durationMs: record.durationMs,
     status: record.status,
     attempt: record.attempt ?? 1,
+  });
+}
+
+export type ElevenLabsUsageRecord = {
+  scanId: string | null;
+  operation: string;
+  charactersIn: number;
+  durationMs: number;
+  status: ApiCallStatus;
+  attempt?: number;
+  model?: string | null;
+};
+
+/**
+ * ElevenLabs TTS usage. Stores character count in the
+ * input_tokens column (the table doesn't have a separate
+ * "characters" column, and tokens are the closest analogue), and
+ * computes a marginal cost estimate at log time so the dashboard's
+ * cost rollup includes TTS.
+ */
+export async function recordElevenLabsUsage(
+  record: ElevenLabsUsageRecord
+): Promise<void> {
+  const chars = Number.isFinite(record.charactersIn)
+    ? Math.max(0, Math.round(record.charactersIn))
+    : 0;
+  const costUsd = (chars / 1000) * ELEVENLABS_USD_PER_1K_CHARS;
+  await recordEvent({
+    scanId: record.scanId,
+    provider: "elevenlabs",
+    operation: record.operation,
+    model: record.model ?? null,
+    inputTokens: chars,
+    durationMs: record.durationMs,
+    status: record.status,
+    attempt: record.attempt ?? 1,
+    costUsd: Number.isFinite(costUsd) ? costUsd : 0,
   });
 }

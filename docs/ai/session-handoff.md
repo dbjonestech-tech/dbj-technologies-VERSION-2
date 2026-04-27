@@ -3,7 +3,176 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 27, 2026 -- ChatGPT external-audit triage (SEO/a11y/canonical)
+## Last Session: April 27, 2026 (overnight, latest) -- Voice Report Delivery (Feature #5)
+
+### What shipped
+
+The fifth-priority item from `docs/ai/pathlight-feature-feasibility.md`
+landed: every Pathlight scan now ships with a 60-90 second narrated
+audio summary of the highest-impact finding, voiced by ElevenLabs's
+"Adam" stock voice (warm male, conversational tone, indistinguishable
+from a real consultant in 2026 quality terms). The narration is
+generated post-finalize but pre-email so the link travels in the
+report email.
+
+- **Migration `lib/db/migrations/008_audio_summary.sql`.** Two new
+  nullable columns on `scan_results`: `audio_summary_url` (Vercel
+  Blob CDN URL for the MP3) and `audio_summary_script` (the
+  generated text, kept for observability). Extends the
+  `api_usage_events.provider` CHECK constraint with `elevenlabs`
+  so the cost dashboard at `/internal/cost` shows TTS spend
+  alongside Anthropic / Browserless / PageSpeed / Resend.
+- **`lib/prompts/audio-summary.ts`.** The script-generation prompt
+  with strict TTS-friendly formatting (numbers spelled out,
+  acronyms expanded, no em dashes, no quotation marks, no list
+  structure), structural constraints (single biggest issue not a
+  list, conservative revenue framing, end with one specific next
+  action), 100-130 word target, conversational consultant tone,
+  first-person singular only. Picks the single biggest remediation
+  item by impact + difficulty rank.
+- **`lib/services/voice.ts`.** Three-stage pipeline:
+  1. Haiku 4.5 generates the script (temperature 0.6 for natural
+     variation, 600 max tokens, 60s timeout). Records to
+     `api_usage_events` as `operation: "audio-summary-script"`.
+  2. ElevenLabs `/v1/text-to-speech/{voiceId}` synthesizes MP3 at
+     `mp3_44100_128` quality with voice settings tuned for warm
+     consultant tone (stability 0.45, similarity_boost 0.8, style
+     0, speaker_boost on). 45s timeout. Records to
+     `api_usage_events` as `provider: "elevenlabs"` /
+     `operation: "tts-audio-summary"` with character count and
+     marginal cost estimate.
+  3. Vercel Blob REST PUT (no `@vercel/blob` package needed)
+     uploads to stable path `pathlight-audio/{scanId}.mp3` with
+     `audio/mpeg` content-type and overwrite-on-existing semantics.
+     30s timeout. Returns the public CDN URL.
+  Each stage throws `VoiceSummaryError` with a `stage` discriminator
+  on failure; the caller catches and continues without audio.
+- **`lib/services/api-usage.ts`.** Extended `ApiProvider` to include
+  `"elevenlabs"`. Added `recordElevenLabsUsage` that writes
+  character count to the existing `input_tokens` column and
+  computes a marginal cost estimate at `$0.30/1k chars` (Creator
+  plan overage rate). The flat-fee plan model means dashboard
+  totals slightly understate reality at low volume but rank-order
+  correctly.
+- **`lib/inngest/functions.ts`.** New step `a5` between `s6`
+  (finalize) and `e1` (send-report-email). Runs only after the
+  scan is `complete` or `partial`, skips out-of-scope brands
+  (national/global) and scans with no remediation items, and
+  short-circuits if a prior generation already populated the URL
+  (idempotency for Inngest retries). Failures are logged at
+  `console.warn` level only -- the email and report still ship.
+- **`lib/db/queries.ts`.** `loadScanWithResults` now selects the
+  two new columns. `getFullScanReport` surfaces them as
+  `audioSummaryUrl` / `audioSummaryScript` on `PathlightReport`.
+  New `updateScanAudioSummary` and `getExistingAudioSummary`
+  helpers (the latter for the `a5` step's idempotency check).
+- **`app/(grade)/api/scan/[scanId]/route.ts`.** Returns
+  `audioSummaryUrl` to the client (the script text is kept
+  server-side -- it's an internal artifact and exposing it would
+  let users extract the prompt structure).
+- **`app/(grade)/pathlight/[scanId]/ScanStatus.tsx`.** New
+  `AudioSummary` component renders an HTML5 `<audio controls>`
+  player with a speaker icon eyebrow ("Your 60-second summary")
+  inside a glass card matching the rest of the report. Anchored
+  at `id="summary"` so the email's `#summary` link scrolls
+  directly to it. `print-hidden` so it doesn't survive a Cmd+P
+  or PDF download.
+- **`lib/email-templates/pathlight.ts` + `lib/services/email.ts`.**
+  Report email gets a new conditional line under the
+  "View Your Full Report" button: "Short on time? Listen to your
+  60-second summary on the report page." linking to
+  `${reportUrl}#summary`. Only renders when `audioSummaryUrl` is
+  populated. Plain-text variant gets the same line in array form.
+
+### Voice quality
+
+ElevenLabs `eleven_turbo_v2_5` with the Adam voice is the only
+provider that consistently passes the "is this a real person?"
+test in 2026. The voice settings (stability 0.45, similarity 0.8,
+style 0, speaker_boost on) were chosen for a warm, conversational
+consultant tone -- not a robotic news-reader. Listeners should
+need to be primed that the voice is synthetic to notice.
+
+The script prompt is the other half of quality. It enforces
+spelled-out numbers ("sixty-two," not "62"), expanded acronyms
+("search visibility," not "SEO"), no em dashes, no quotation
+marks, no lists, single-biggest-issue framing, conservative
+revenue language, and one specific next action at the end. Done
+right, the result sounds like a strategist who read the report
+and called the owner with the punchline.
+
+### Cost expectation
+
+Per scan: ~$0.002 Haiku (script) + ~$0.20 ElevenLabs (TTS, ~700-
+800 char script at ~$0.30/1k overage) + $0 Vercel Blob (within
+free tier) = ~$0.20/scan marginal. At 100 scans/month: ~$20-25
+total. The Creator plan ($22/mo flat) covers 100k chars/month
+which fits ~125 scans, so realistic pricing converges to
+~$22/mo flat at this volume.
+
+Visible in `/internal/cost` as `provider: elevenlabs` and a
+separate Haiku row at `provider: anthropic` /
+`operation: audio-summary-script`.
+
+### Manual deploy gates
+
+In order, after the deploy fans out:
+
+1. Apply migration 008 to prod Neon via `npx tsx lib/db/setup.ts`.
+   Idempotent.
+2. Set `ELEVENLABS_API_KEY` in Vercel (Production + Preview).
+   Pull from the ElevenLabs dashboard's API key page.
+3. Set `BLOB_READ_WRITE_TOKEN` in Vercel. Get this from the
+   Vercel Blob storage settings for the project (Storage tab >
+   Blob > Connect Project > tokens). If a Blob store doesn't
+   exist yet, create one first.
+4. Optional: override `ELEVENLABS_VOICE_ID` if you want a voice
+   other than the Adam default `pNInz6obpgDQGcFmaJgB`. Override
+   `ELEVENLABS_MODEL` if you want a model other than
+   `eleven_turbo_v2_5`.
+5. Run a test scan and confirm: (a) the audio player appears
+   above the Pillar Breakdown on the report page, (b) the
+   report email includes the "Listen to your 60-second summary"
+   line, (c) `/internal/cost?pin=...` shows new rows under
+   `provider: elevenlabs`.
+
+### Failure modes (intentionally silent)
+
+If `ELEVENLABS_API_KEY` is unset, `BLOB_READ_WRITE_TOKEN` is
+unset, ElevenLabs is rate-limited or down, Haiku script
+generation fails, or the Blob upload errors -- the `a5` step
+returns `{ ok: false, error }` with a `console.warn`, the
+report email goes out without the audio link, and the report
+page renders normally without the audio player. No user-facing
+error, no broken state.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 NEW em-dashes across all 12 changed/new files.
+- No new npm dependencies. ElevenLabs and Vercel Blob both
+  invoked via REST `fetch()` calls.
+
+### Files changed (9 modified, 3 created)
+
+- `lib/db/migrations/008_audio_summary.sql` (NEW)
+- `lib/db/schema.sql` (mirror of 008)
+- `lib/db/queries.ts` (audio_summary columns + updateScanAudioSummary + getExistingAudioSummary)
+- `lib/types/scan.ts` (audioSummaryUrl + audioSummaryScript on PathlightReport)
+- `lib/prompts/audio-summary.ts` (NEW -- script-generation prompt)
+- `lib/services/voice.ts` (NEW -- three-stage Haiku + ElevenLabs + Blob pipeline)
+- `lib/services/api-usage.ts` (elevenlabs provider + recordElevenLabsUsage)
+- `lib/inngest/functions.ts` (new `a5` step)
+- `app/(grade)/api/scan/[scanId]/route.ts` (return audioSummaryUrl)
+- `app/(grade)/pathlight/[scanId]/ScanStatus.tsx` (AudioSummary component)
+- `lib/email-templates/pathlight.ts` (Listen link in report email)
+- `lib/services/email.ts` (populate audioSummaryUrl in EmailMergeData)
+
+Plus this update to `docs/ai/session-handoff.md` and the
+`docs/ai/backlog.md` entry to come.
+
+## Previous Session: April 27, 2026 -- ChatGPT external-audit triage (SEO/a11y/canonical)
 
 ### What shipped (3 fixes, not yet committed)
 

@@ -9,6 +9,7 @@ export type EmailMergeData = {
   revenueLoss: number | null;
   topFinding: RemediationItem | null;
   reportUrl: string;
+  audioSummaryUrl: string | null;
   calendlyUrl: string;
   unsubscribeUrl: string;
 };
@@ -118,6 +119,11 @@ function buildReportEmail(data: EmailMergeData): BuiltEmail {
         </table>
         <p style="margin: 16px 0;">Your report covers what your customers see, how fast your site loads, where your messaging is working against you, and the top three fixes that would move the needle most on revenue.</p>
         ${button("View Your Full Report", data.reportUrl)}
+        ${
+          data.audioSummaryUrl
+            ? `<p style="margin: 16px 0; font-size: 15px; color: ${MUTED_COLOR};">Short on time? <a href="${data.reportUrl}#summary" style="color: ${ACCENT_COLOR}; font-weight: 600;">Listen to your 60-second summary</a> on the report page.</p>`
+            : ""
+        }
         <p style="margin: 16px 0;">Questions about your report? Just reply to this email. I read every one.</p>
         <p style="margin: 24px 0 8px;">Joshua Jones<br/>
         <span style="color: ${MUTED_COLOR};">Principal Architect, DBJ Technologies</span><br/>
@@ -137,6 +143,9 @@ function buildReportEmail(data: EmailMergeData): BuiltEmail {
     "Your report covers what your customers see, how fast your site loads, where your messaging is working against you, and the top three fixes that would move the needle most on revenue.",
     "",
     `View your full report: ${data.reportUrl}`,
+    ...(data.audioSummaryUrl
+      ? ["", `Short on time? Listen to your 60-second summary: ${data.reportUrl}#summary`]
+      : []),
     "",
     "Questions about your report? Just reply to this email. I read every one.",
     "",

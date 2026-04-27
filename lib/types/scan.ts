@@ -178,6 +178,8 @@ export type PathlightReport = {
   pillarScores: PillarScores | null;
   lighthouseScores: LighthouseCategoryScores | null;
   industryBenchmark: IndustryBenchmark | null;
+  audioSummaryUrl: string | null;
+  audioSummaryScript: string | null;
   businessModel?: "B2B" | "B2C" | "mixed";
   inferredVertical?: string;
   inferredVerticalParent?: string;

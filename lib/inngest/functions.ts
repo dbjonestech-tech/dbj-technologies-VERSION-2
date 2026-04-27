@@ -1,10 +1,13 @@
 import * as Sentry from "@sentry/nextjs";
 import { getDb } from "../db";
 import {
+  getExistingAudioSummary,
+  getFullScanReport,
   getScanPipelineContext,
   markScanComplete,
   updatePathlightScore,
   updateScanAiAnalysis,
+  updateScanAudioSummary,
   updateScanIndustryBenchmark,
   updateScanRemediation,
   updateScanResolvedUrl,
@@ -13,6 +16,7 @@ import {
   updateScanScreenshots,
   updateScanStatus,
 } from "../db/queries";
+import { generateVoiceSummary } from "../services/voice";
 import type { IndustryBenchmark, PerformanceScores } from "@/lib/types/scan";
 import { captureScreenshot } from "../services/browserless";
 import {
@@ -460,6 +464,59 @@ export const scanRequested = inngest.createFunction(
           "complete",
           errors.length > 0 ? errors.join("; ") : undefined
         );
+      });
+
+      // a5: best-effort audio summary generation. Runs after the
+      // report is marked complete and before the report email goes
+      // out so the email can link to the audio. Any failure here
+      // (Haiku, ElevenLabs, Vercel Blob, missing env var) is
+      // swallowed -- the email and report still ship without audio.
+      await step.run("a5", async () => {
+        try {
+          const existing = await getExistingAudioSummary(scanId);
+          if (existing.url) {
+            return { ok: true, skipped: "already-generated" };
+          }
+          const report = await getFullScanReport(scanId);
+          if (!report) return { ok: false, error: "no report" };
+          if (report.status !== "complete" && report.status !== "partial") {
+            return { ok: false, error: `status=${report.status}` };
+          }
+          // Skip out-of-scope (national/global) brands -- the
+          // narration leans on the revenue estimate and that estimate
+          // is intentionally suppressed for those scans.
+          if (
+            report.businessScale === "national" ||
+            report.businessScale === "global"
+          ) {
+            return { ok: true, skipped: `scale=${report.businessScale}` };
+          }
+          // Skip if there's no remediation data to ground the
+          // narration -- no point reading a generic script.
+          if (
+            !report.remediation ||
+            report.remediation.items.length === 0
+          ) {
+            return { ok: true, skipped: "no-remediation" };
+          }
+          const result = await generateVoiceSummary(report);
+          await updateScanAudioSummary(scanId, result.audioUrl, result.script);
+          return {
+            ok: true,
+            audioUrl: result.audioUrl,
+            characters: result.characters,
+            audioBytes: result.audioBytes,
+            durationMs: result.durationMs,
+          };
+        } catch (err) {
+          // Log but never throw; the report email + scan completion
+          // path is the priority here.
+          console.warn(
+            "[a5] audio summary failed (scan still ships):",
+            describeError(err)
+          );
+          return { ok: false, error: describeError(err) };
+        }
       });
 
       await step.run("e1", async () => {
