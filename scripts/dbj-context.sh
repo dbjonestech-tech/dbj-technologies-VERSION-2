@@ -105,12 +105,13 @@ if [ "$EM_DASH_HITS" -gt 0 ]; then
   WARNINGS=$((WARNINGS + 1))
 fi
 
-# dbjonestech@gmail.com is the deprecated address. Two structural references are
+# dbjonestech@gmail.com is the deprecated address. One structural reference is
 # expected and benign:
-#   1. docs/ai/backlog.md "Completed" line documenting the migration
-#   2. .claude/rules/deployment.md pre-commit grep that searches FOR the string
+#   1. .claude/rules/deployment.md pre-commit grep that searches FOR the string
+# The backlog.md "Completed" line was reworded April 27 to drop the literal
+# address, since the migration has been verified clean for months.
 # Anything beyond that baseline is real drift.
-EXPECTED_LEGACY_EMAIL=2
+EXPECTED_LEGACY_EMAIL=1
 LEGACY_EMAIL_HITS=$(printf "%s" "$PACK" | grep -c "dbjonestech@gmail.com" || true)
 if [ "$LEGACY_EMAIL_HITS" -gt "$EXPECTED_LEGACY_EMAIL" ]; then
   echo ""
