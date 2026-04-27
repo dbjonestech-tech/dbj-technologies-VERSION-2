@@ -3,7 +3,64 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 27, 2026 (overnight, latest) -- Voice Report Delivery (Feature #5)
+## Last Session: April 27, 2026 -- Pathlight partial-banner mitigation (schema-repair prompt)
+
+### What shipped
+
+`lib/services/claude-analysis.ts` `callClaudeWithJsonSchema` repair prompt
+now threads the specific `firstAttempt.error` (parse failure or Zod
+validation message) back to Claude, instead of the generic "your
+previous response was not valid JSON." Targets the dominant remaining
+trigger of the report-page "Some analysis steps could not be completed"
+banner: schema-validation failures where the JSON parsed but a field
+type/shape was wrong, and the second attempt repeated the same failure
+because Claude had no signal about what to fix.
+
+No new attempts, no extra branches, no cost increase. Total Claude
+calls per JSON step still capped at 2 (initial plus 1 repair). 5xx/429
+network retries via `callWithRetry` (3 attempts, 15s/30s backoff)
+unchanged.
+
+### Verified visually before this fix
+
+Joshy confirmed in incognito browser that the three April 25 active-fix
+items are working:
+
+- About-page ScrollWordBatch word spacing renders correctly (no more
+  "smartdecisions" word collisions).
+- About headline does not wrap mid-word at any breakpoint.
+- Homepage shows no white flash on first or repeat visits.
+
+Code for all three was already shipped; this was browser-side
+verification only.
+
+### Manual post-deploy verification (per .claude/rules/pathlight.md)
+
+1. Re-scan `dbjtechnologies.com` once the new Vercel deploy lands.
+   Score, revenue estimate, source attribution, and chatbot responses
+   should match the prior baseline (Pathlight Score 78/100, low
+   confidence revenue, honest methodology disclaimer).
+2. Watch Sentry for any new `ClaudeAnalysisError: ${label}: could not
+   parse a valid JSON response after one retry` traces over the next
+   week. Expectation: drop in frequency, since the repair attempt now
+   has actionable signal.
+
+### Files changed (1 modified, 2 docs)
+
+- `lib/services/claude-analysis.ts` -- repair prompt threads
+  `firstAttempt.error` instead of generic copy. Added 4-line WHY
+  comment per project rules.
+- `docs/ai/decision-log.md` -- new dated entry recording the decision
+  and reasoning.
+- `docs/ai/session-handoff.md` -- this entry.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 em-dashes in changed range of `claude-analysis.ts`.
+
+## Earlier Session: April 27, 2026 (overnight, latest) -- Voice Report Delivery (Feature #5)
 
 ### What shipped
 
@@ -171,6 +228,16 @@ error, no broken state.
 
 Plus this update to `docs/ai/session-handoff.md` and the
 `docs/ai/backlog.md` entry to come.
+
+### Commit + push status
+
+Committed at `4f199c5` and pushed to `origin main`. 14 files (10
+modified + 3 new + 1 backlog update). Working tree carries unrelated
+parallel changes from a separate session
+(`docs/ai/decision-log.md`, `lib/services/claude-analysis.ts`)
+which are now part of the partial-banner mitigation entry above
+this one. The voice summary code is in 4f199c5; this snapshot
+follow-up records that fact and does not touch any other files.
 
 ## Previous Session: April 27, 2026 -- ChatGPT external-audit triage (SEO/a11y/canonical)
 
