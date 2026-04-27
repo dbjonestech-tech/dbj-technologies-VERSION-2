@@ -18,6 +18,13 @@ import {
 } from "../db/queries";
 import { generateVoiceSummary } from "../services/voice";
 import { getProviderSpendUsd } from "../services/api-usage";
+import { track } from "../services/monitoring";
+import {
+  MONITORED_PAGES,
+  STRATEGIES,
+  auditAndRecord,
+  getRollingMedians,
+} from "../services/lighthouse-monitor";
 import type { IndustryBenchmark, PerformanceScores } from "@/lib/types/scan";
 import { captureScreenshot } from "../services/browserless";
 import {
@@ -75,6 +82,8 @@ export const scanRequested = inngest.createFunction(
   async ({ event, step }) => {
     const { scanId } = event.data as { scanId: string };
     const startedAt = Date.now();
+
+    await track("scan.started", {}, { scanId });
 
     try {
       const { resolvedUrl } = await step.run("s1", async () => {
@@ -447,6 +456,11 @@ export const scanRequested = inngest.createFunction(
             "failed",
             errors.join("; ") || "Scan produced no data."
           );
+          await track(
+            "scan.failed",
+            { errors, durationMs: Date.now() - startedAt },
+            { scanId, level: "error" }
+          );
           return;
         }
 
@@ -457,6 +471,11 @@ export const scanRequested = inngest.createFunction(
 
         if (!delivered) {
           await markScanComplete(scanId, "partial", errors.join("; "));
+          await track(
+            "scan.partial",
+            { errors, durationMs: Date.now() - startedAt },
+            { scanId, level: "warn" }
+          );
           return;
         }
 
@@ -464,6 +483,11 @@ export const scanRequested = inngest.createFunction(
           scanId,
           "complete",
           errors.length > 0 ? errors.join("; ") : undefined
+        );
+        await track(
+          "scan.complete",
+          { durationMs: Date.now() - startedAt, softErrors: errors.length },
+          { scanId }
         );
       });
 
@@ -530,6 +554,15 @@ export const scanRequested = inngest.createFunction(
           }
           const result = await generateVoiceSummary(report);
           await updateScanAudioSummary(scanId, result.audioUrl, result.script);
+          await track(
+            "audio.generated",
+            {
+              characters: result.characters,
+              audioBytes: result.audioBytes,
+              durationMs: result.durationMs,
+            },
+            { scanId }
+          );
           return {
             ok: true,
             audioUrl: result.audioUrl,
@@ -540,24 +573,37 @@ export const scanRequested = inngest.createFunction(
         } catch (err) {
           // Log but never throw; the report email + scan completion
           // path is the priority here.
+          const message = describeError(err);
           console.warn(
             "[a5] audio summary failed (scan still ships):",
-            describeError(err)
+            message
           );
-          return { ok: false, error: describeError(err) };
+          await track(
+            "audio.failed",
+            { error: message.slice(0, 500) },
+            { scanId, level: "warn" }
+          );
+          return { ok: false, error: message };
         }
       });
 
       await step.run("e1", async () => {
         try {
           await sendPathlightReport(scanId);
+          await track("email.report.sent", {}, { scanId });
         } catch (err) {
+          const message = describeError(err);
           await logEmailEvent({
             scanId,
             emailType: "report_delivery",
             status: "failed",
-            errorMessage: describeError(err),
+            errorMessage: message,
           }).catch(() => {});
+          await track(
+            "email.report.failed",
+            { error: message.slice(0, 500) },
+            { scanId, level: "error" }
+          );
         }
       });
 
@@ -668,6 +714,15 @@ export const scanRequested = inngest.createFunction(
       const message =
         err instanceof Error ? err.message : "Scan pipeline failed.";
       await updateScanStatus(scanId, "failed", message).catch(() => {});
+      await track(
+        "scan.failed",
+        {
+          error: message.slice(0, 500),
+          stage: "pipeline-throw",
+          durationMs: Date.now() - startedAt,
+        },
+        { scanId, level: "error" }
+      ).catch(() => {});
       if (err instanceof ScanValidationError) {
         return { scanId, status: "failed", error: message };
       }
@@ -817,6 +872,347 @@ export const costAlertDaily = inngest.createFunction(
         extra: { totalUsd, totalCalls, breakdown, threshold },
       });
       return { totalUsd, totalCalls, breakdown, alerted: true, level };
+    });
+  }
+);
+
+/**
+ * Daily Lighthouse audit cron. Runs at 09:00 UTC (~04:00 America/Chicago).
+ * Audits each (page, strategy) in MONITORED_PAGES x STRATEGIES, persists
+ * to lighthouse_history, and Sentry-warns on regressions vs the rolling
+ * 7-day median.
+ *
+ * Thresholds:
+ *   * >5pt drop from 7d median        -> warn
+ *   * >15pt drop                       -> error
+ *   * Below MONITORING_LIGHTHOUSE_FLOOR -> error (default floor 90)
+ *   * Audit fail itself                -> warn (single fail), error after 2
+ *
+ * Each (page, strategy) is run sequentially with a small delay to stay
+ * polite to PSI even though the free tier easily covers 14 calls/day.
+ */
+export const lighthouseMonitorDaily = inngest.createFunction(
+  {
+    id: "monitoring-lighthouse-daily",
+    triggers: [{ cron: "0 9 * * *" }],
+    retries: 0,
+  },
+  async ({ step }) => {
+    const floorRaw = process.env.MONITORING_LIGHTHOUSE_FLOOR;
+    const floor = (() => {
+      const parsed = floorRaw ? Number(floorRaw) : NaN;
+      return Number.isFinite(parsed) && parsed > 0 && parsed <= 100
+        ? parsed
+        : 90;
+    })();
+
+    type CategoryDelta = {
+      category: "performance" | "accessibility" | "bestPractices" | "seo";
+      today: number;
+      median: number | null;
+      drop: number | null;
+    };
+
+    for (const page of MONITORED_PAGES) {
+      for (const strategy of STRATEGIES) {
+        const stepId = `lighthouse-${page.path.replace(/\W+/g, "_") || "root"}-${strategy}`;
+        await step.run(stepId, async () => {
+          const result = await auditAndRecord(page, strategy);
+
+          if (!result.ok) {
+            await track(
+              "lighthouse.audit.failed",
+              {
+                page: page.path,
+                strategy,
+                error: (result.errorMessage ?? "").slice(0, 500),
+              },
+              { level: "warn" }
+            );
+            Sentry.captureMessage(
+              `Lighthouse audit failed: ${page.path} (${strategy})`,
+              {
+                level: "warning",
+                tags: { source: "lighthouse-monitor" },
+                extra: { page: page.path, strategy, error: result.errorMessage },
+              }
+            );
+            return { ok: false };
+          }
+
+          const medians = await getRollingMedians(page.path, strategy, 7);
+          const deltas: CategoryDelta[] = [
+            {
+              category: "performance",
+              today: result.performance ?? 0,
+              median: medians.performance,
+              drop:
+                medians.performance !== null && result.performance !== null
+                  ? medians.performance - result.performance
+                  : null,
+            },
+            {
+              category: "accessibility",
+              today: result.accessibility ?? 0,
+              median: medians.accessibility,
+              drop:
+                medians.accessibility !== null &&
+                result.accessibility !== null
+                  ? medians.accessibility - result.accessibility
+                  : null,
+            },
+            {
+              category: "bestPractices",
+              today: result.bestPractices ?? 0,
+              median: medians.bestPractices,
+              drop:
+                medians.bestPractices !== null &&
+                result.bestPractices !== null
+                  ? medians.bestPractices - result.bestPractices
+                  : null,
+            },
+            {
+              category: "seo",
+              today: result.seo ?? 0,
+              median: medians.seo,
+              drop:
+                medians.seo !== null && result.seo !== null
+                  ? medians.seo - result.seo
+                  : null,
+            },
+          ];
+
+          let alertLevel: "info" | "warn" | "error" = "info";
+          const breaches: CategoryDelta[] = [];
+          for (const d of deltas) {
+            // Hard floor takes precedence: if any category falls below
+            // floor, escalate immediately.
+            if (d.today > 0 && d.today < floor) {
+              alertLevel = "error";
+              breaches.push(d);
+              continue;
+            }
+            if (d.drop !== null) {
+              if (d.drop >= 15) {
+                alertLevel = "error";
+                breaches.push(d);
+              } else if (d.drop >= 5 && alertLevel !== "error") {
+                alertLevel = "warn";
+                breaches.push(d);
+              }
+            }
+          }
+
+          if (alertLevel !== "info") {
+            await track(
+              "lighthouse.regression",
+              {
+                page: page.path,
+                strategy,
+                today: {
+                  performance: result.performance,
+                  accessibility: result.accessibility,
+                  bestPractices: result.bestPractices,
+                  seo: result.seo,
+                },
+                medians,
+                breaches,
+                floor,
+              },
+              { level: alertLevel }
+            );
+            Sentry.captureMessage(
+              `Lighthouse regression: ${page.path} (${strategy})`,
+              {
+                level: alertLevel === "error" ? "error" : "warning",
+                tags: { source: "lighthouse-monitor" },
+                extra: {
+                  page: page.path,
+                  strategy,
+                  today: {
+                    performance: result.performance,
+                    accessibility: result.accessibility,
+                    bestPractices: result.bestPractices,
+                    seo: result.seo,
+                  },
+                  medians,
+                  breaches,
+                  floor,
+                },
+              }
+            );
+          }
+
+          return { ok: true, alertLevel, breaches };
+        });
+        // 5s pacing between PSI calls so a transient quota blip on one
+        // page does not cascade across the rest of the run.
+        await step.sleep(`pace-${stepId}`, "5s");
+      }
+    }
+  }
+);
+
+/**
+ * Synthetic canary cron. Runs every 4 hours. Verifies the always-on
+ * external integrations (PSI + Browserless) work end-to-end against a
+ * stable target URL without burning Anthropic / Claude tokens. Hits
+ * thestarautoservice.com because it is owned by us, stable, and shape-
+ * compatible with the Pathlight pipeline (real local business).
+ *
+ * Three checks: PSI desktop, PSI mobile, Browserless desktop screenshot.
+ * Each step records its outcome to monitoring_events. Two consecutive
+ * fails on the same check escalate to a Sentry error.
+ */
+const CANARY_TARGET_URL =
+  process.env.MONITORING_CANARY_URL || "https://thestarautoservice.com/";
+
+export const pathlightSyntheticCheck = inngest.createFunction(
+  {
+    id: "monitoring-synthetic-canary",
+    triggers: [{ cron: "0 */4 * * *" }],
+    retries: 0,
+  },
+  async ({ step }) => {
+    type CheckOutcome = { check: string; ok: boolean; error: string | null };
+    const outcomes: CheckOutcome[] = [];
+
+    outcomes.push(
+      await step.run("canary-psi-desktop", async () => {
+        try {
+          const start = Date.now();
+          const { runPerformanceAudit } = await import("../services/pagespeed");
+          const result = await runPerformanceAudit(CANARY_TARGET_URL, null);
+          await track("canary.ok", {
+            check: "psi-desktop",
+            durationMs: Date.now() - start,
+            performance: result.scores.overall,
+          });
+          return {
+            check: "psi-desktop",
+            ok: true,
+            error: null,
+          } satisfies CheckOutcome;
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          await track(
+            "canary.fail",
+            { check: "psi-desktop", error: message.slice(0, 500) },
+            { level: "error" }
+          );
+          return {
+            check: "psi-desktop",
+            ok: false,
+            error: message,
+          } satisfies CheckOutcome;
+        }
+      })
+    );
+
+    outcomes.push(
+      await step.run("canary-screenshot-desktop", async () => {
+        try {
+          const start = Date.now();
+          const { captureScreenshot } = await import(
+            "../services/browserless"
+          );
+          await captureScreenshot(
+            CANARY_TARGET_URL,
+            { width: 1280, height: 800 },
+            null
+          );
+          await track("canary.ok", {
+            check: "screenshot-desktop",
+            durationMs: Date.now() - start,
+          });
+          return {
+            check: "screenshot-desktop",
+            ok: true,
+            error: null,
+          } satisfies CheckOutcome;
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          await track(
+            "canary.fail",
+            { check: "screenshot-desktop", error: message.slice(0, 500) },
+            { level: "error" }
+          );
+          return {
+            check: "screenshot-desktop",
+            ok: false,
+            error: message,
+          } satisfies CheckOutcome;
+        }
+      })
+    );
+
+    // Two consecutive failures on the same check escalate to Sentry.
+    // Single-shot blips happen often enough on PSI that paging on the
+    // first miss would create alert fatigue.
+    await step.run("canary-escalate", async () => {
+      const failures = outcomes.filter((o) => !o.ok);
+      if (failures.length === 0) return { escalated: false };
+
+      const sql = getDb();
+      for (const f of failures) {
+        const recent = (await sql`
+          SELECT level
+          FROM monitoring_events
+          WHERE event = 'canary.fail'
+            AND payload->>'check' = ${f.check}
+            AND created_at > now() - interval '12 hours'
+          ORDER BY id DESC
+          LIMIT 2
+        `) as { level: string }[];
+        if (recent.length >= 2) {
+          Sentry.captureMessage(
+            `Pathlight canary failing: ${f.check}`,
+            {
+              level: "error",
+              tags: { source: "synthetic-canary" },
+              extra: { check: f.check, error: f.error, target: CANARY_TARGET_URL },
+            }
+          );
+        }
+      }
+      return { escalated: true, failures: failures.length };
+    });
+
+    return { outcomes };
+  }
+);
+
+/**
+ * Monitoring retention cron. Runs daily at 11:00 UTC. Drops events
+ * older than 30 days so the high-write monitoring_events table stays
+ * lean. Also drops lighthouse_history older than 365 days as a soft
+ * cap (we only show 30 days on the dashboard but a year of history
+ * is useful for long-term trend questions).
+ */
+export const monitoringPurgeDaily = inngest.createFunction(
+  {
+    id: "monitoring-purge-daily",
+    triggers: [{ cron: "0 11 * * *" }],
+    retries: 0,
+  },
+  async ({ step }) => {
+    await step.run("purge-events", async () => {
+      const sql = getDb();
+      const rows = (await sql`
+        DELETE FROM monitoring_events
+        WHERE created_at < now() - interval '30 days'
+        RETURNING id
+      `) as { id: string }[];
+      return { dropped: rows.length };
+    });
+    await step.run("purge-lighthouse", async () => {
+      const sql = getDb();
+      const rows = (await sql`
+        DELETE FROM lighthouse_history
+        WHERE created_at < now() - interval '365 days'
+        RETURNING id
+      `) as { id: string }[];
+      return { dropped: rows.length };
     });
   }
 );

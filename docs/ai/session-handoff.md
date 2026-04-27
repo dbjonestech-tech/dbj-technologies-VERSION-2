@@ -6,7 +6,139 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
-## Last Session: April 27, 2026 -- Audio player CSP unblock + post-complete polling extension
+## Last Session: April 27, 2026 -- In-house real-time monitoring (V1 + safe V2 enhancements)
+
+### What shipped (code)
+
+A from-scratch monitoring stack that observes Pathlight + the marketing
+site without leaning on third-party telemetry beyond Sentry (which
+stays for unhandled-exception capture).
+
+**Schema (migration `009_monitoring.sql`, applied to prod Neon):**
+- `monitoring_events` (BIGSERIAL id, event TEXT, level TEXT,
+  scan_id UUID nullable, payload JSONB, created_at TIMESTAMPTZ).
+  Four indexes: created_at, (event, created_at), scan_id partial,
+  (level, created_at) partial for non-info.
+- `lighthouse_history` (BIGSERIAL id, page TEXT, strategy TEXT,
+  performance/accessibility/best_practices/seo INTEGER, duration_ms,
+  status, error_message, created_at). Two indexes: page+strategy
+  trend, created_at sweep.
+
+**Service layer:**
+- `lib/services/monitoring.ts` -- generic `track(event, payload,
+  options?)` writer plus typed readers (`getRecentEvents`,
+  `getEventsAfterId`, `getEventsForScan`, `getFunnelCounts`,
+  `getLevelSummary`, `getLatestLighthousePerPage`,
+  `getLighthouseHistory`, `getCanaryStatus`). Writes are best-effort
+  (failures swallowed) so the monitor cannot cascade into request
+  failures.
+- `lib/services/lighthouse-monitor.ts` -- daily-cron PSI runner. List
+  of monitored pages: /, /about, /work, /services, /pricing,
+  /pathlight, /contact x desktop + mobile = 14 PSI calls/day.
+  `getRollingMedians` returns 7-day medians for regression checks.
+
+**Inngest crons (registered in `app/(grade)/api/inngest/route.ts`):**
+- `lighthouseMonitorDaily` -- cron `0 9 * * *` (09:00 UTC). Audits
+  every (page, strategy), persists row, alerts on >5pt drop from 7d
+  median (warn) or >15pt drop or below `MONITORING_LIGHTHOUSE_FLOOR`
+  (error). Each (page, strategy) is its own Inngest step with 5s
+  pacing between.
+- `pathlightSyntheticCheck` -- cron `0 */4 * * *` (every 4 hours).
+  Narrow synthetic: PSI desktop + Browserless desktop screenshot
+  against `MONITORING_CANARY_URL` (defaults to
+  thestarautoservice.com). No Anthropic, no scans-table writes, no
+  emails. Two consecutive fails on the same check escalate to Sentry
+  error (single-shot blips do not page).
+- `monitoringPurgeDaily` -- cron `0 11 * * *`. Drops
+  monitoring_events older than 30 days, lighthouse_history older than
+  365 days.
+
+**`track()` instrumentation in pipeline + endpoints:**
+- `lib/inngest/functions.ts` -- scan.started (entry), scan.complete /
+  scan.partial / scan.failed (s6 finalize branches), audio.generated
+  / audio.failed (a5 outcomes), email.report.sent / email.report.failed
+  (e1), terminal scan.failed in the outer catch.
+- `app/(grade)/api/scan/route.ts` -- scan.requested,
+  scan.deduped, scan.rate-limited (with `reason: email|ip`).
+- `lib/services/email.ts` -- email.delivered / email.bounced
+  (warn) / email.complained (error) / email.delivery_delayed
+  inside `handleResendWebhookEvent` so the funnel surfaces every
+  webhook outcome.
+- `app/(grade)/api/chat/route.ts` -- chat.message tagged with
+  turn count.
+- `app/(marketing)/api/contact/route.ts` -- contact.submitted (lead
+  signal!) / contact.failed.
+
+**Dashboard (`/internal/monitor`, gated by `INTERNAL_ADMIN_PIN`):**
+- Server component at `app/(marketing)/internal/monitor/page.tsx`.
+  Sections: Synthetic canary status, Funnel (24h/7d/30d) with auto-
+  flagged ratios (red text when bounce rate >2%, partial >20%, etc.),
+  Severity pill counts, Lighthouse latest grid (cells colored by
+  threshold: green >=95, yellow >=90, orange >=75, red <75), and the
+  live event tail seeded with the most recent 50 events.
+- SSE live tail at `app/(marketing)/internal/monitor/api/stream/route.ts`
+  polls `monitoring_events.id > lastSeen` every 2s and pushes deltas.
+  Connection capped at 5 minutes; client `MonitorLive.tsx` reconnects
+  with the latest cursor.
+- Per-scan drill-down at `/internal/monitor/scan/[scanId]` -- click
+  any scanId in the live tail to see all monitoring events +
+  api_usage events for that scan in chronological order.
+
+**Public health endpoint:**
+- `/api/status` returns `{ ok, generatedAt, canary, pathlight }`
+  JSON. 30s edge cache. Designed for external uptime tools
+  (UptimeRobot, BetterStack). Returns 503 when the canary has 2+
+  consecutive failures or DB is unreachable. No internals exposed.
+
+### Migrations applied
+
+Migration 009 was applied directly to prod Neon during this session.
+Verified: both tables present, all 6 indexes plus the 2 PK indexes
+created, INSERT/SELECT/DELETE smoke test passed.
+
+### Files
+
+New (8): `lib/db/migrations/009_monitoring.sql`,
+`lib/services/monitoring.ts`, `lib/services/lighthouse-monitor.ts`,
+`app/(marketing)/internal/monitor/page.tsx`,
+`app/(marketing)/internal/monitor/MonitorLive.tsx`,
+`app/(marketing)/internal/monitor/api/stream/route.ts`,
+`app/(marketing)/internal/monitor/scan/[scanId]/page.tsx`,
+`app/(marketing)/api/status/route.ts`.
+
+Modified (6): `lib/inngest/functions.ts` (3 new crons + 7 track()
+points + lighthouse-monitor import),
+`app/(grade)/api/inngest/route.ts` (register the 3 crons),
+`app/(grade)/api/scan/route.ts` (3 track() points),
+`app/(grade)/api/chat/route.ts` (1 track() point),
+`app/(marketing)/api/contact/route.ts` (2 track() points),
+`lib/services/email.ts` (track() inside webhook handler).
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 em-dashes added in any new line (verified via diff scan).
+- DB migration smoke test: INSERT + SELECT + DELETE on
+  monitoring_events round-trips cleanly.
+
+### Optional env (set in Vercel if desired)
+
+- `MONITORING_LIGHTHOUSE_FLOOR` (default 90) -- absolute floor below
+  which any Lighthouse category drop becomes a Sentry error.
+- `MONITORING_CANARY_URL` (default https://thestarautoservice.com/)
+  -- target URL for the 4-hourly synthetic check.
+
+### V3 (deferred -- consider once V1 has data)
+
+- Deep canary: full end-to-end Pathlight scan once a day with a
+  dedicated email + skip-emails flag, catches Anthropic / scoring
+  regressions the narrow synthetic does not. ~$0.20/run = ~$6/mo.
+- Lighthouse trend sparklines per page on the dashboard.
+- Public `/status` HTML page (vs the JSON endpoint we shipped).
+- Lead-heat scoring layer on top of contact + scan + chat counts.
+
+## Prior Session: April 27, 2026 -- Audio player CSP unblock + post-complete polling extension
 
 ### What shipped (code)
 

@@ -25,6 +25,11 @@
 - [ ] When the script flags new em dashes, replace with hyphens or restructure. Internal docs feed the chat that writes copy, so drift here propagates.
 - [ ] When new long-lived docs are added under docs/ai/ or .claude/rules/, add them to the FILES array in scripts/dbj-context.sh.
 
+## Priority 2.5: Monitoring + Observability (Net New as of April 27)
+
+- [x] In-house real-time monitoring dashboard at /internal/monitor -- DONE April 27. monitoring_events + lighthouse_history tables (migration 009 applied to prod), track() helper in lib/services/monitoring.ts, daily Lighthouse cron, 4-hourly synthetic canary cron, 30-day events purge cron, server-component dashboard with funnel/severity/Lighthouse/SSE-live-tail, per-scan drill-down at /internal/monitor/scan/[scanId], public /api/status JSON endpoint. Gated by INTERNAL_ADMIN_PIN. Optional env: MONITORING_LIGHTHOUSE_FLOOR (default 90), MONITORING_CANARY_URL (default thestarautoservice.com).
+- [ ] V3 monitoring extensions: deep end-to-end Pathlight canary scan (full pipeline) once daily, Lighthouse trend sparklines per page on the dashboard, public /status HTML page (vs the JSON endpoint already shipped), lead-heat scoring layer on top of contact + scan + chat counts.
+
 ## Priority 3: Pathlight Hardening
 
 - [ ] Investigate intermittent "Some analysis steps could not be completed" banner (root cause traced April 27 to `s6` finalize: triggered when ANY of vision/remediation/revenue/score steps fail while audit + screenshots succeed; retry logic handles most cases, root cause for remaining occurrences still unknown)

@@ -13,6 +13,7 @@ import {
 } from "../email-templates/pathlight";
 import type { RemediationItem } from "@/lib/types/scan";
 import { generateUnsubscribeUrl, markUnsubscribed } from "./unsubscribe";
+import { track } from "./monitoring";
 
 export type EmailType =
   | "report_delivery"
@@ -397,6 +398,21 @@ export async function handleResendWebhookEvent(
     VALUES (${scanId}, ${emailType}, ${status}, ${resendId})
     ON CONFLICT (resend_id, status) DO NOTHING
   `;
+
+  // Mirror the email-event into monitoring_events so the funnel + live
+  // tail surface delivery, bounces, and complaints alongside the rest
+  // of the pipeline. Level escalates for negative outcomes.
+  const trackLevel: "info" | "warn" | "error" =
+    status === "complained"
+      ? "error"
+      : status === "bounced"
+        ? "warn"
+        : "info";
+  await track(
+    `email.${status}`,
+    { emailType, resendId },
+    { scanId, level: trackLevel }
+  );
 
   if ((status === "bounced" || status === "complained") && recipient) {
     try {

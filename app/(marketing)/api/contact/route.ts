@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
+import { track } from "@/lib/services/monitoring";
 
 /* ─── HTML SANITIZATION ─────────────────────────── */
 function escapeHtml(unsafe: string): string {
@@ -164,15 +165,29 @@ export async function POST(request: Request) {
     });
     if (sendError) {
       console.error("Resend error:", sendError);
+      await track(
+        "contact.failed",
+        { stage: "resend-send", error: String(sendError).slice(0, 500) },
+        { level: "error" }
+      );
       return NextResponse.json(
         { error: "Failed to send message" },
         { status: 500 }
       );
     }
 
+    await track("contact.submitted", {
+      projectType: safe.projectType,
+      hasBudget: Boolean(safe.budget),
+    });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Contact form error:", error);
+    await track(
+      "contact.failed",
+      { stage: "handler-throw", error: String(error).slice(0, 500) },
+      { level: "error" }
+    );
     return NextResponse.json(
       { error: "Failed to send message" },
       { status: 500 }

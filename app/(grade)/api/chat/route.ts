@@ -5,6 +5,7 @@ import { getFullScanReport } from "@/lib/db/queries";
 import { buildChatSystemPrompt } from "@/lib/prompts/pathlight-chat";
 import { recordAnthropicUsage } from "@/lib/services/api-usage";
 import { chatLimiter, chatScanLimiter, extractIp } from "@/lib/rate-limit";
+import { track } from "@/lib/services/monitoring";
 
 /* runtime/dynamic exports removed; redundant with the default Node.js
    runtime for route handlers in Next 16 and incompatible with the
@@ -108,6 +109,7 @@ export async function POST(request: Request): Promise<Response> {
       system: cacheableSystem,
       messages,
     });
+    await track("chat.message", { turns: messages.length }, { scanId });
   } catch (err) {
     console.error("[chat] failed to start stream", err);
     await recordAnthropicUsage({

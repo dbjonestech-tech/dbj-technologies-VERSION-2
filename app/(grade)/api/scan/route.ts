@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/nextjs";
 import { getDb } from "@/lib/db";
 import { inngest } from "@/lib/inngest/client";
 import { emailLimiter, ipLimiter } from "@/lib/rate-limit";
+import { track } from "@/lib/services/monitoring";
 
 const scanSchema = z.object({
   url: z.string().url(),
@@ -70,6 +71,11 @@ export async function POST(request: Request) {
 
     const emailCheck = await emailLimiter(email);
     if (!emailCheck.success) {
+      await track(
+        "scan.rate-limited",
+        { reason: "email" },
+        { level: "warn" }
+      );
       return NextResponse.json(
         { error: "Too many scans for this email. Try again tomorrow." },
         { status: 429 }
@@ -78,6 +84,11 @@ export async function POST(request: Request) {
 
     const ipCheck = await ipLimiter(ip);
     if (!ipCheck.success) {
+      await track(
+        "scan.rate-limited",
+        { reason: "ip" },
+        { level: "warn" }
+      );
       return NextResponse.json(
         { error: "Too many scans from this location. Try again tomorrow." },
         { status: 429 }
@@ -100,6 +111,11 @@ export async function POST(request: Request) {
       LIMIT 1
     `) as { id: string }[];
     if (dedupeRows.length > 0) {
+      await track(
+        "scan.deduped",
+        {},
+        { scanId: dedupeRows[0]!.id }
+      );
       return NextResponse.json(
         { scanId: dedupeRows[0]!.id, status: "deduped" },
         { status: 200 }
@@ -126,6 +142,8 @@ export async function POST(request: Request) {
       name: "pathlight/scan.requested",
       data: { scanId },
     });
+
+    await track("scan.requested", { url, hasBusinessName: Boolean(businessName) }, { scanId });
 
     return NextResponse.json({ scanId, status: "pending" }, { status: 202 });
   } catch (err) {
