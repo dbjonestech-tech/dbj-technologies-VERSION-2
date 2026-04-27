@@ -24,6 +24,8 @@
     --hairline-gold: rgba(201,168,76,0.22);
     --hairline-ink: rgba(11,22,40,0.10);
     --shadow-soft: 0 2px 14px rgba(11,22,40,0.10);
+    --urgent: #8E1F2C;
+    --urgent-deep: #6E1722;
 
     --fs-display: clamp(2.6rem, 5vw, 4.4rem);
     --fs-h2: clamp(1.9rem, 3vw, 2.6rem);
@@ -849,6 +851,568 @@
     letter-spacing: 0.04em;
   }
 
+  /* URGENT STRIP, above nav */
+  .urgent-strip {
+    background: var(--urgent);
+    border-bottom: 1px solid var(--urgent-deep);
+    color: var(--cream);
+    padding: 0.55rem clamp(1.25rem, 5vw, 3rem);
+  }
+
+  .urgent-strip__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .urgent-strip__inner a {
+    color: var(--cream);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-feature-settings: 'tnum' on, 'lnum' on, 'kern', 'liga';
+  }
+
+  .urgent-strip__sep {
+    color: rgba(244,239,227,0.55);
+  }
+
+  .urgent-strip__bilingual {
+    color: var(--cream);
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 0.875rem;
+  }
+
+  /* HERO no-fee badge cluster */
+  .no-fee {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    background: rgba(201,168,76,0.06);
+    margin-bottom: 1.5rem;
+    align-self: flex-start;
+  }
+
+  .no-fee__mark {
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .no-fee__text {
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.6875rem;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  /* INTAKE FORM, contained card */
+  .intake {
+    background: var(--paper);
+  }
+
+  .intake-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem;
+    max-width: 1080px;
+    margin: 0 auto;
+    align-items: start;
+  }
+
+  .intake-copy h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    font-size: var(--fs-h2);
+    color: var(--ink);
+    margin: 0.875rem 0 1.25rem;
+  }
+
+  .intake-copy p {
+    color: var(--warm-gray);
+    margin-bottom: 1.5rem;
+    line-height: 1.85;
+  }
+
+  .intake-promise {
+    border-left: 2px solid var(--gold);
+    padding: 0.875rem 1.25rem;
+    background: rgba(201,168,76,0.05);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--ink);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+
+  .intake-form {
+    background: var(--cream);
+    border: 1px solid var(--hairline-gold);
+    box-shadow: var(--shadow-soft);
+    padding: clamp(1.75rem, 3vw, 2.25rem);
+    border-radius: 2px;
+  }
+
+  .intake-form h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.375rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .intake-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .intake-row label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    font-weight: 500;
+  }
+
+  .intake-row input,
+  .intake-row textarea,
+  .intake-row select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--hairline-ink);
+    border-radius: 2px;
+    padding: 0.75rem 0.875rem;
+    transition: border-color 0.2s ease;
+  }
+
+  .intake-row input:focus,
+  .intake-row textarea:focus,
+  .intake-row select:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  .intake-row textarea {
+    min-height: 110px;
+    resize: vertical;
+  }
+
+  .intake-form .btn-gold {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .intake-form .fineprint {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--warm-gray);
+    line-height: 1.6;
+  }
+
+  /* PRACTICE: override to 4-column grid for fuller catalog */
+  .practice-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .practice-card.practice-card--wide {
+    grid-column: span 2;
+  }
+
+  /* RESULTS: extended grid of named-ish results below ledger */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1080px;
+    margin: 3rem auto 0;
+  }
+
+  .result-card {
+    background: var(--cream);
+    border-top: 2px solid var(--gold);
+    padding: 1.5rem 1.5rem 1.75rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .result-card .result-amount {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 1.875rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    font-feature-settings: 'tnum' on, 'lnum' on, 'kern', 'liga';
+    letter-spacing: -0.01em;
+  }
+
+  .result-card .result-label {
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.6875rem;
+    color: var(--gold-dim);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .result-card p {
+    color: var(--warm-gray);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  /* AFTER ACCIDENT, numbered checklist */
+  .after-accident {
+    background: var(--cream);
+  }
+
+  .after-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 2.5rem;
+    max-width: 1080px;
+    margin: 0 auto;
+    counter-reset: aa;
+  }
+
+  .after-step {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--hairline-gold);
+    counter-increment: aa;
+  }
+
+  .after-step::before {
+    content: counter(aa, decimal-leading-zero);
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--gold);
+    font-size: 1.5rem;
+    line-height: 1;
+    padding-top: 0.125rem;
+    font-feature-settings: 'tnum' on, 'lnum' on, 'kern', 'liga';
+  }
+
+  .after-step h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.1875rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .after-step p {
+    color: var(--warm-gray);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  .after-download {
+    text-align: center;
+    margin-top: 2.5rem;
+  }
+
+  .after-download p {
+    color: var(--warm-gray);
+    font-size: 0.875rem;
+    margin-top: 0.875rem;
+  }
+
+  /* RECOGNITION badges */
+  .recognition {
+    background: var(--paper);
+  }
+
+  .badges-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .badge {
+    background: var(--cream);
+    border: 1px solid var(--hairline-gold);
+    padding: 1.5rem 1.25rem;
+    text-align: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .badge:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .badge__mark {
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    font-size: 1.75rem;
+    line-height: 1;
+    display: block;
+    margin-bottom: 0.625rem;
+  }
+
+  .badge__name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.0625rem;
+    margin-bottom: 0.375rem;
+    line-height: 1.25;
+  }
+
+  .badge__year {
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.6875rem;
+    color: var(--gold-dim);
+    font-weight: 500;
+  }
+
+  /* MULTI-MODAL CONTACT */
+  .contact-modes {
+    background: var(--navy);
+    color: var(--cream);
+  }
+
+  .contact-modes .section-head h2,
+  .contact-modes .section-head p {
+    color: var(--cream);
+  }
+
+  .contact-modes .section-head p {
+    color: var(--gray);
+  }
+
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .mode {
+    border: 1px solid var(--hairline-gold);
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+    background: rgba(244,239,227,0.02);
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .mode:hover {
+    background: rgba(201,168,76,0.06);
+    border-color: var(--gold);
+  }
+
+  .mode__glyph {
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    font-size: 1.75rem;
+    line-height: 1;
+    display: block;
+    margin-bottom: 0.875rem;
+  }
+
+  .mode__title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--cream);
+    font-size: 1.1875rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .mode__line {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--gold);
+    font-size: 1rem;
+    font-feature-settings: 'tnum' on, 'lnum' on, 'kern', 'liga';
+    letter-spacing: 0.02em;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .mode__sub {
+    color: var(--gray);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+
+  /* OFFICES */
+  .offices {
+    background: var(--cream);
+  }
+
+  .offices-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .office {
+    background: var(--paper);
+    border-left: 2px solid var(--gold);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .office h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.25rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .office p {
+    color: var(--warm-gray);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .office a {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--gold);
+    font-size: 0.9375rem;
+    font-feature-settings: 'tnum' on, 'lnum' on, 'kern', 'liga';
+    display: inline-block;
+    margin-top: 0.25rem;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+  }
+
+  .office a:hover {
+    border-bottom-color: var(--gold);
+  }
+
+  /* FAQ */
+  .faq {
+    background: var(--paper);
+  }
+
+  .faq-list {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  .faq-item {
+    border-top: 1px solid var(--hairline-gold);
+  }
+
+  .faq-item:last-child {
+    border-bottom: 1px solid var(--hairline-gold);
+  }
+
+  .faq-item summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1.5rem 2.25rem 1.5rem 0;
+    position: relative;
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.1875rem;
+    line-height: 1.4;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item summary::after {
+    content: '+';
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+
+  .faq-item[open] summary::after {
+    content: '\2013';
+  }
+
+  .faq-item .faq-answer {
+    padding: 0 0 1.5rem;
+    color: var(--warm-gray);
+    line-height: 1.85;
+    font-size: 1rem;
+  }
+
+  /* STICKY MOBILE CTA BAR */
+  .sticky-cta {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .sticky-cta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
+      box-shadow: 0 -4px 18px rgba(11,22,40,0.18);
+    }
+    .sticky-cta a {
+      padding: 0.95rem 0.5rem;
+      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.8125rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .sticky-cta a.sticky-cta__call {
+      background: var(--gold);
+      color: var(--navy);
+    }
+    .sticky-cta a.sticky-cta__form {
+      background: var(--navy);
+      color: var(--cream);
+    }
+    body {
+      padding-bottom: 56px;
+    }
+  }
+
   /* Responsive */
   @media (max-width: 900px) {
     .hero {
@@ -907,6 +1471,32 @@
       grid-template-columns: 1fr;
       gap: 2.5rem;
     }
+    .intake-grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+    .practice-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .practice-card.practice-card--wide {
+      grid-column: span 1;
+    }
+    .results-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .modes-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .offices-grid {
+      grid-template-columns: 1fr;
+    }
+    .badges-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .after-grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
   }
 
   @media (max-width: 768px) {
@@ -949,6 +1539,25 @@
     .quote blockquote {
       font-size: 1.2rem;
     }
+    .practice-grid {
+      grid-template-columns: 1fr;
+    }
+    .results-grid {
+      grid-template-columns: 1fr;
+    }
+    .modes-grid {
+      grid-template-columns: 1fr;
+    }
+    .badges-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .urgent-strip__inner {
+      font-size: 0.6875rem;
+      letter-spacing: 0.06em;
+    }
+    .urgent-strip__bilingual {
+      font-size: 0.8125rem;
+    }
   }
 
   @media (max-width: 480px) {
@@ -981,12 +1590,23 @@
 </head>
 <body>
 
+<!-- URGENT STRIP: 24/7 + bilingual, above nav -->
+<div class="urgent-strip" role="region" aria-label="Twenty-four hour intake">
+  <div class="urgent-strip__inner">
+    <span>Open 24/7. A Real Attorney Calls You Back Today.</span>
+    <span class="urgent-strip__sep" aria-hidden="true">·</span>
+    <a href="tel:2145550184">(214) 555-0184</a>
+    <span class="urgent-strip__sep" aria-hidden="true">·</span>
+    <span class="urgent-strip__bilingual">Hablamos Espanol</span>
+  </div>
+</div>
+
 <!-- NAV: two rows -->
 <nav class="nav" id="top">
   <div class="nav-top">
     <div class="nav-top-inner">
-      <a href="tel:2145550184" class="nav-phone">(214) 555-0184</a>
-      <a href="#contact" class="btn btn-gold nav-top-cta">Free Consultation</a>
+      <a href="tel:2145550184" class="nav-phone">(214) 555-0184 · 24/7 Live Answer</a>
+      <a href="#intake" class="btn btn-gold nav-top-cta">Free Case Review</a>
     </div>
   </div>
   <div class="nav-bottom">
@@ -996,11 +1616,12 @@
         <span class="wordmark">Bauder &amp; Associates</span>
       </a>
       <ul class="nav-links">
-        <li><a href="#practice">Practice</a></li>
-        <li><a href="#verdicts">Verdicts</a></li>
+        <li><a href="#practice">Practice Areas</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#after-accident">After an Accident</a></li>
         <li><a href="#attorneys">Attorneys</a></li>
-        <li><a href="#process">Process</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#intake">Free Consultation</a></li>
       </ul>
     </div>
   </div>
@@ -1009,11 +1630,15 @@
 <!-- HERO: split 55/45 -->
 <header class="hero">
   <div class="hero-content">
+    <div class="no-fee" role="note" aria-label="Contingency fee policy">
+      <span class="no-fee__mark" aria-hidden="true">&#10022;</span>
+      <span class="no-fee__text">No Fee Unless We Win Your Case</span>
+    </div>
     <span class="eyebrow hero-eyebrow">Trial Lawyers · Established 1998</span>
     <h1>When the Outcome Matters, Bring the Lawyers Who Try the Case.</h1>
-    <p class="hero-sub">We represent people who have been catastrophically injured. Most of our cases settle. The ones that don't, we try. Insurance carriers know which firms walk into a courtroom and which firms don't. We do.</p>
+    <p class="hero-sub">I represent people who have been seriously injured. Most of our cases settle. The ones that do not, we try. Insurance carriers know which firms walk into a courtroom and which firms do not. We do. You pay nothing unless we recover for you.</p>
     <div class="hero-ctas">
-      <a href="#contact" class="btn btn-gold">Free Case Review</a>
+      <a href="#intake" class="btn btn-gold">Free Case Review</a>
       <a href="tel:2145550184" class="btn btn-ghost">Call (214) 555-0184</a>
     </div>
     <div class="hero-rule" aria-hidden="true"></div>
@@ -1031,13 +1656,58 @@
   </div>
 </section>
 
-<!-- VERDICTS -->
-<section class="section verdicts" id="verdicts">
+<!-- INTAKE: free case review form -->
+<section class="section intake" id="intake" aria-labelledby="intake-heading">
+  <div class="container">
+    <div class="intake-grid">
+      <div class="intake-copy">
+        <span class="eyebrow">Free Case Review</span>
+        <h2 id="intake-heading">Tell Us What Happened. A Real Attorney Calls You Back Today.</h2>
+        <p>If you have been hurt in a wreck, on someone's property, or by a doctor who failed you, do not give a recorded statement to an adjuster before you speak with a lawyer. There is no fee for the consultation, and no fee unless we recover for you.</p>
+        <p class="intake-promise">When you submit this form, I personally review every intake. You will hear from a licensed attorney, not a paralegal, the same business day. After hours and weekends, call the number above and a member of the firm answers.</p>
+      </div>
+      <form class="intake-form" aria-label="Free case review form" onsubmit="event.preventDefault(); alert('Demonstration form. In production, this submits to the firm intake queue.');">
+        <h3>Free Case Review</h3>
+        <div class="intake-row">
+          <label for="intake-name">Full Name</label>
+          <input id="intake-name" name="name" type="text" autocomplete="name" required>
+        </div>
+        <div class="intake-row">
+          <label for="intake-phone">Phone</label>
+          <input id="intake-phone" name="phone" type="tel" autocomplete="tel" required>
+        </div>
+        <div class="intake-row">
+          <label for="intake-type">Type of Incident</label>
+          <select id="intake-type" name="case_type">
+            <option>Auto or trucking collision</option>
+            <option>Motorcycle</option>
+            <option>Pedestrian or bicycle</option>
+            <option>Premises liability or slip and fall</option>
+            <option>Work injury</option>
+            <option>Wrongful death</option>
+            <option>Dog bite</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="intake-row">
+          <label for="intake-story">Brief Description</label>
+          <textarea id="intake-story" name="description" placeholder="Date, location, and what happened. Do not share details you would not want a defense attorney to see in writing."></textarea>
+        </div>
+        <button type="submit" class="btn btn-gold">Request Free Case Review</button>
+        <p class="fineprint">Submitting this form does not create an attorney-client relationship. Communications are kept confidential to the extent permitted by law.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- VERDICTS / RESULTS -->
+<section class="section verdicts" id="results" aria-labelledby="results-heading">
+  <span id="verdicts" aria-hidden="true"></span>
   <div class="container">
     <div class="section-head">
       <span class="eyebrow">Recent Results</span>
-      <h2>Verdicts and Settlements.</h2>
-      <p>A representative sample. Past results do not guarantee future outcomes.</p>
+      <h2 id="results-heading">Verdicts and Settlements.</h2>
+      <p>A representative sample of recent recoveries for our clients. Each case is anonymized to protect client privacy. Past results do not guarantee future outcomes.</p>
     </div>
     <div class="ledger" role="table" aria-label="Recent verdicts and settlements">
       <div class="ledger-header" role="row">
@@ -1078,6 +1748,39 @@
       </div>
     </div>
     <p class="ledger-disclosure">Disclosure: results vary based on the unique facts of each case.</p>
+
+    <div class="results-grid">
+      <article class="result-card">
+        <div class="result-amount">$8.2M</div>
+        <span class="result-label">2024 · Trucking Collision</span>
+        <p>18-wheeler rear-end collision on I-635. Carrier denied liability for nine months. Case resolved at mediation after deposition of the safety director.</p>
+      </article>
+      <article class="result-card">
+        <div class="result-amount">$4.6M</div>
+        <span class="result-label">2023 · Hospital Negligence</span>
+        <p>Failure to diagnose a post-surgical infection. Confidential settlement reached the week before trial after expert disclosures were filed.</p>
+      </article>
+      <article class="result-card">
+        <div class="result-amount">$3.4M</div>
+        <span class="result-label">2021 · Wrongful Death</span>
+        <p>Drunk-driver fatality in Denton County. Recovery for surviving spouse and two minor children, including future-loss-of-support component.</p>
+      </article>
+      <article class="result-card">
+        <div class="result-amount">$2.1M</div>
+        <span class="result-label">2023 · Premises Liability</span>
+        <p>Severe fall at a commercial retail property with a known maintenance defect. Trial verdict in Collin County after summary judgment was denied.</p>
+      </article>
+      <article class="result-card">
+        <div class="result-amount">$1.85M</div>
+        <span class="result-label">2022 · Auto Negligence</span>
+        <p>Multi-vehicle collision with a disputed-liability defendant. Policy-limits demand met after filed lawsuit and deposition of the at-fault driver.</p>
+      </article>
+      <article class="result-card">
+        <div class="result-amount">$1.25M</div>
+        <span class="result-label">2024 · Motorcycle</span>
+        <p>Left-turn collision with policy-limits underinsured motorist recovery. Underlying carrier paid full limits within sixty days of demand.</p>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -1090,28 +1793,44 @@
     </div>
     <div class="practice-grid">
       <div class="practice-card">
-        <h3>Auto and Trucking Collisions</h3>
-        <p>Highway crashes involving commercial vehicles, 18-wheelers, and rideshare drivers. We work with accident reconstructionists, ECM data, and federal trucking regulations to build cases the carriers cannot dismiss as routine fender benders.</p>
+        <h3>Auto Accidents</h3>
+        <p>Rear-end collisions, intersection wrecks, and highway pile-ups. We pull police reports, scene photos, and dashcam evidence the day you sign, before the carrier reframes the story.</p>
       </div>
       <div class="practice-card">
-        <h3>Medical Malpractice</h3>
-        <p>Surgical errors, missed diagnoses, hospital negligence, and birth injury. These cases require specialized medical expert review and a willingness to litigate against well-funded defense firms. We do not refer them out.</p>
+        <h3>Truck and 18-Wheeler</h3>
+        <p>Commercial trucking is governed by federal regulations the average defense firm rarely cites. We work with accident reconstructionists, ECM data, and FMCSA logs.</p>
+      </div>
+      <div class="practice-card">
+        <h3>Motorcycle</h3>
+        <p>Left-turn collisions, lane-change crashes, and underinsured motorist claims. Riders deserve a firm that does not start the case from the assumption that the rider was at fault.</p>
+      </div>
+      <div class="practice-card">
+        <h3>Pedestrian and Bicycle</h3>
+        <p>Crosswalk strikes, bike-lane collisions, and hit-and-run cases. Severe injuries are common and policy stacking matters. We pursue every available coverage layer.</p>
       </div>
       <div class="practice-card">
         <h3>Premises Liability</h3>
-        <p>Serious falls, negligent security, and unsafe property conditions on commercial sites. We pursue both the immediate operator and the corporate owner, because liability often hides one entity removed from the scene.</p>
+        <p>Serious falls, negligent security, and unsafe property conditions on commercial sites. We pursue the operator and the corporate owner, because liability often hides one entity removed from the scene.</p>
+      </div>
+      <div class="practice-card">
+        <h3>Work Injury</h3>
+        <p>Construction, oilfield, and warehouse injuries on Texas non-subscriber jobsites. Third-party negligence claims that workers' comp will not address.</p>
       </div>
       <div class="practice-card">
         <h3>Wrongful Death</h3>
-        <p>Representing surviving spouses, parents, and children when negligence has taken a family member. We handle these cases with the discretion they deserve and the financial preparation they require to make defendants answer at trial.</p>
+        <p>Representing surviving spouses, parents, and children when negligence has taken a family member. We handle these cases with the discretion they deserve.</p>
       </div>
       <div class="practice-card">
+        <h3>Dog Bites</h3>
+        <p>Texas premises and one-bite-rule cases against homeowners and renters. Severe bite injuries, especially to children, are pursued under the property owner's insurance.</p>
+      </div>
+      <div class="practice-card practice-card--wide">
         <h3>Catastrophic Injury</h3>
         <p>Traumatic brain injuries, spinal cord damage, severe burns, and amputations that change a life permanently. We coordinate life-care planning experts to quantify a lifetime of medical, vocational, and personal loss accurately.</p>
       </div>
-      <div class="practice-card">
-        <h3>Insurance Bad Faith</h3>
-        <p>When carriers refuse to honor coverage they sold in good faith, Texas law provides a separate cause of action. We pursue extra-contractual damages where insurers have delayed, denied, or undervalued legitimate claims.</p>
+      <div class="practice-card practice-card--wide">
+        <h3>Medical Malpractice and Bad Faith</h3>
+        <p>Surgical errors, missed diagnoses, hospital negligence, and insurance carriers refusing to honor coverage they sold. These cases require expert review and a willingness to litigate against well-funded defense firms. We do not refer them out.</p>
       </div>
     </div>
   </div>
@@ -1235,13 +1954,235 @@
   </div>
 </section>
 
+<!-- AFTER ACCIDENT, lead-magnet steps -->
+<section class="section after-accident" id="after-accident" aria-labelledby="after-heading">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">If You Were Just Hurt</span>
+      <h2 id="after-heading">Seven Things to Do After an Accident.</h2>
+      <p>Most injury cases are won or lost in the first seventy-two hours. Save this list. If you can, do these in order before you talk to any insurance adjuster.</p>
+    </div>
+    <div class="after-grid">
+      <div class="after-step">
+        <div>
+          <h3>Get medical care, immediately.</h3>
+          <p>Even if you feel okay. Adrenaline masks injury. A documented ER or urgent care visit anchors the medical record the carrier will scrutinize later.</p>
+        </div>
+      </div>
+      <div class="after-step">
+        <div>
+          <h3>Call the police and get a report number.</h3>
+          <p>A formal report is hard to dispute. If officers did not respond, file a Texas Peace Officer's Crash Report (CR-2) the same day.</p>
+        </div>
+      </div>
+      <div class="after-step">
+        <div>
+          <h3>Photograph everything, on the scene.</h3>
+          <p>Vehicle damage, the road, skid marks, traffic signals, weather, your injuries. Wide shots and close-ups. Time-stamped from your phone.</p>
+        </div>
+      </div>
+      <div class="after-step">
+        <div>
+          <h3>Get names and numbers for every witness.</h3>
+          <p>Independent witnesses are gold in injury cases. Collect them yourself. By the time the police report arrives, half of them will have moved on.</p>
+        </div>
+      </div>
+      <div class="after-step">
+        <div>
+          <h3>Do not give a recorded statement.</h3>
+          <p>The other driver's insurance company will call within forty-eight hours. They are not on your side. Politely decline until you have spoken with a lawyer.</p>
+        </div>
+      </div>
+      <div class="after-step">
+        <div>
+          <h3>Save every receipt and every record.</h3>
+          <p>Medical bills, prescription costs, mileage to appointments, lost-wage documentation, repair estimates. Damages are proven on paper, not from memory.</p>
+        </div>
+      </div>
+      <div class="after-step">
+        <div>
+          <h3>Call a board-certified injury lawyer, free.</h3>
+          <p>Before you sign a release, before you accept a check, before you give a statement. The consultation costs nothing. Mistakes made early cost everything.</p>
+        </div>
+      </div>
+    </div>
+    <div class="after-download">
+      <a href="#intake" class="btn btn-ghost">Get the Full Checklist by Email</a>
+      <p>We send the printable PDF version, plus the questions to ask any lawyer before you sign.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RECOGNITION badges -->
+<section class="section recognition" id="recognition" aria-labelledby="recognition-heading">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Recognition</span>
+      <h2 id="recognition-heading">Peer-Reviewed Standing.</h2>
+      <p>Recognition reflects peer review and case-result thresholds. It is not a guarantee of any particular outcome.</p>
+    </div>
+    <div class="badges-grid">
+      <div class="badge">
+        <span class="badge__mark" aria-hidden="true">&#10022;</span>
+        <div class="badge__name">Super Lawyers</div>
+        <div class="badge__year">2019 to 2025</div>
+      </div>
+      <div class="badge">
+        <span class="badge__mark" aria-hidden="true">&#10022;</span>
+        <div class="badge__name">Best Lawyers in America</div>
+        <div class="badge__year">2021 to 2025</div>
+      </div>
+      <div class="badge">
+        <span class="badge__mark" aria-hidden="true">&#10022;</span>
+        <div class="badge__name">Multi-Million Dollar Advocates Forum</div>
+        <div class="badge__year">Lifetime Member</div>
+      </div>
+      <div class="badge">
+        <span class="badge__mark" aria-hidden="true">&#10022;</span>
+        <div class="badge__name">Million Dollar Advocates Forum</div>
+        <div class="badge__year">Lifetime Member</div>
+      </div>
+      <div class="badge">
+        <span class="badge__mark" aria-hidden="true">&#10022;</span>
+        <div class="badge__name">Martindale-Hubbell AV Preeminent</div>
+        <div class="badge__year">Peer Rated</div>
+      </div>
+      <div class="badge">
+        <span class="badge__mark" aria-hidden="true">&#10022;</span>
+        <div class="badge__name">AVVO Top Rated 10.0</div>
+        <div class="badge__year">2020 to 2025</div>
+      </div>
+      <div class="badge">
+        <span class="badge__mark" aria-hidden="true">&#10022;</span>
+        <div class="badge__name">Texas Trial Lawyers Association</div>
+        <div class="badge__year">Member, Board Certified</div>
+      </div>
+      <div class="badge">
+        <span class="badge__mark" aria-hidden="true">&#10022;</span>
+        <div class="badge__name">D Magazine Best Lawyers</div>
+        <div class="badge__year">2022 to 2025</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MULTI-MODAL CONTACT -->
+<section class="section contact-modes" id="contact-modes" aria-labelledby="modes-heading">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Reach the Firm</span>
+      <h2 id="modes-heading">Four Ways to Talk to a Lawyer Today.</h2>
+      <p>Use whichever channel is easiest for you. Each one reaches the same intake desk and the same on-call attorney rotation. We answer twenty-four hours a day.</p>
+    </div>
+    <div class="modes-grid">
+      <a href="tel:2145550184" class="mode">
+        <span class="mode__glyph" aria-hidden="true">&#9742;</span>
+        <span class="mode__title">Call</span>
+        <span class="mode__line">(214) 555-0184</span>
+        <span class="mode__sub">Live answer 24/7. Nights, weekends, holidays.</span>
+      </a>
+      <a href="sms:2145550184" class="mode">
+        <span class="mode__glyph" aria-hidden="true">&#128172;</span>
+        <span class="mode__title">Text</span>
+        <span class="mode__line">(214) 555-0184</span>
+        <span class="mode__sub">Send a photo of the wreck. We will reply.</span>
+      </a>
+      <a href="#intake" class="mode">
+        <span class="mode__glyph" aria-hidden="true">&#9998;</span>
+        <span class="mode__title">Online Form</span>
+        <span class="mode__line">Free Case Review</span>
+        <span class="mode__sub">Two minutes. An attorney calls back the same day.</span>
+      </a>
+      <a href="#" class="mode" onclick="event.preventDefault(); alert('Live chat opens in production. Use the form or call line in this preview.');">
+        <span class="mode__glyph" aria-hidden="true">&#128488;</span>
+        <span class="mode__title">Live Chat</span>
+        <span class="mode__line">Bilingual Staff</span>
+        <span class="mode__sub">Hablamos Espanol. Real attorneys, not bots.</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- OFFICES -->
+<section class="section offices" id="offices" aria-labelledby="offices-heading">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Offices</span>
+      <h2 id="offices-heading">Where to Meet Us in Person.</h2>
+      <p>Home and hospital visits available across the DFW metroplex when injury makes travel difficult. The principal office is in downtown Dallas.</p>
+    </div>
+    <div class="offices-grid">
+      <div class="office">
+        <h3>Dallas (Principal Office)</h3>
+        <p>1700 Pacific Avenue, Suite 2400<br>Dallas, TX 75201</p>
+        <a href="tel:2145550184">(214) 555-0184</a>
+      </div>
+      <div class="office">
+        <h3>Fort Worth</h3>
+        <p>301 Commerce Street, Suite 1200<br>Fort Worth, TX 76102</p>
+        <a href="tel:8175550172">(817) 555-0172</a>
+      </div>
+      <div class="office">
+        <h3>Plano</h3>
+        <p>5800 Granite Parkway, Suite 200<br>Plano, TX 75024</p>
+        <a href="tel:9725550139">(972) 555-0139</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section faq" id="faq" aria-labelledby="faq-heading">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Common Questions</span>
+      <h2 id="faq-heading">What Injury Clients Ask First.</h2>
+      <p>The questions below are the ones we field every week. If yours is not listed, call the firm or use the intake form. We answer plainly.</p>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Do I have a case?</summary>
+        <div class="faq-answer">There is no flat answer until we hear the facts. The case-evaluation call is free. If we believe a recovery is realistic, we say so. If we do not, we tell you that as well, and we will often refer you to a firm better suited to your situation.</div>
+      </details>
+      <details class="faq-item">
+        <summary>What does it cost to hire your firm?</summary>
+        <div class="faq-answer">Nothing up front. We work on a contingency fee, which means we are paid only if we recover money for you. The percentage is disclosed in plain language in the engagement agreement before you sign. If we do not win, you owe no attorney's fee.</div>
+      </details>
+      <details class="faq-item">
+        <summary>How long will my case take?</summary>
+        <div class="faq-answer">Simple auto cases can resolve in three to nine months. Complex trucking, malpractice, or wrongful death cases often run twelve to twenty-four months, sometimes longer if trial is required. We will not settle a case prematurely just because the carrier offers a fast number.</div>
+      </details>
+      <details class="faq-item">
+        <summary>What if I was partially at fault?</summary>
+        <div class="faq-answer">Texas follows a modified comparative negligence rule. As long as you were fifty percent or less at fault, you can still recover. Your recovery is reduced by your percentage of fault. Do not assume you have no case because the other side is blaming you. Adjusters do that on every claim.</div>
+      </details>
+      <details class="faq-item">
+        <summary>What if the other driver had no insurance?</summary>
+        <div class="faq-answer">Your own auto policy may include uninsured or underinsured motorist coverage. Most Texas drivers have it and do not realize it. We pull every available policy, including stacked household coverage, and pursue all of them when fault and damages support it.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I switch lawyers if I already signed with another firm?</summary>
+        <div class="faq-answer">Yes. You have the right to fire and replace your attorney at any time. The original firm may have a lien for work done, which is paid out of the recovery and does not increase your total fee. We have taken cases mid-stream and improved them. Call us before you do anything else.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Is the consultation really free?</summary>
+        <div class="faq-answer">Yes. There is no charge to call, no charge to meet, no charge to review records, and no obligation to hire us. If you decide to retain the firm, the engagement agreement is on a no-recovery-no-fee basis.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Hablan Espanol?</summary>
+        <div class="faq-answer">Si. Bilingual staff and attorneys answer the line twenty-four hours a day, including the intake desk and the lead attorney rotation. Confidentiality applies the same way. La consulta es gratis.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="section cta" id="contact">
   <div class="container-narrow">
     <h2>If You Are Hurt, the Clock Is Already Running.</h2>
-    <p>Texas has a two-year statute of limitations on most personal injury claims. Evidence disappears, witnesses move, and insurance adjusters take statements that hurt cases. Call us today.</p>
-    <a href="#contact" class="btn btn-gold">Schedule Your Free Consultation</a>
-    <span class="cta-call">Or call (214) 555-0184. Available nights and weekends.</span>
+    <p>Texas has a two-year statute of limitations on most personal injury claims. Evidence disappears, witnesses move, and insurance adjusters take statements that hurt cases. Call us today. The consultation is free, and there is no fee unless we recover for you.</p>
+    <a href="#intake" class="btn btn-gold">Schedule Your Free Consultation</a>
+    <span class="cta-call">Or call (214) 555-0184. Twenty-four hours. Hablamos Espanol.</span>
   </div>
 </section>
 
@@ -1260,15 +2201,21 @@
       <p>Monday to Friday, 8am to 6pm</p>
     </div>
     <div class="footer-col">
-      <h4>Disclosure</h4>
-      <p class="disclaimer">Not certified by the Texas Board of Legal Specialization unless otherwise noted. The contents of this website do not constitute legal advice. Contacting Bauder &amp; Associates does not create an attorney-client relationship.</p>
+      <h4>Disclosure and Compliance</h4>
+      <p class="disclaimer">Bauder &amp; Associates, PLLC is licensed by the State Bar of Texas. Robert L. Bauder is responsible for the content of this website. The contents of this website are attorney advertising under the rules of the State Bar of Texas. Contacting Bauder &amp; Associates does not create an attorney-client relationship. Past results, verdicts, and settlements do not guarantee a similar outcome and are not predictive of future results. Each case is evaluated on its own facts. Not certified by the Texas Board of Legal Specialization in every area listed.</p>
       <a href="https://dbjtechnologies.com" class="dbj-credit" rel="noopener">Website by DBJ Technologies</a>
     </div>
   </div>
   <div class="footer-bottom">
-    &copy; 2026 Bauder &amp; Associates, PLLC. All rights reserved.
+    &copy; 2026 Bauder &amp; Associates, PLLC. All rights reserved. Principal office: 1700 Pacific Avenue, Suite 2400, Dallas, TX 75201.
   </div>
 </footer>
+
+<!-- STICKY MOBILE CTA -->
+<div class="sticky-cta" role="region" aria-label="Mobile contact bar">
+  <a href="tel:2145550184" class="sticky-cta__call">Call 24/7</a>
+  <a href="#intake" class="sticky-cta__form">Free Case Review</a>
+</div>
 
 </body>
 </html>

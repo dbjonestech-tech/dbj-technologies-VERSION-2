@@ -829,6 +829,618 @@
       font-feature-settings: 'kern', 'liga', 'tnum';
     }
 
+    /* ---------- Fiduciary pledge (signature card after portrait) ---------- */
+    .pledge-section {
+      background: var(--parchment);
+      padding: 0 clamp(1.25rem, 5vw, 3rem) clamp(5rem, 9vw, 7rem);
+    }
+    .pledge-card {
+      max-width: 920px;
+      margin: 0 auto;
+      background: var(--warm-white);
+      border: 1px solid var(--hairline-forest);
+      border-left: 3px solid var(--forest);
+      box-shadow: var(--shadow-soft);
+      padding: clamp(2.4rem, 5vw, 3.6rem) clamp(1.8rem, 5vw, 3.4rem);
+      position: relative;
+    }
+    .pledge-card .eyebrow { display: block; margin: 0 0 1.4rem; }
+    .pledge-card h2 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-style: italic;
+      font-size: clamp(1.7rem, 2.8vw, 2.3rem);
+      line-height: 1.2;
+      letter-spacing: -0.005em;
+      color: var(--charcoal);
+      margin: 0 0 1.4rem;
+      max-width: 28ch;
+    }
+    .pledge-card p {
+      color: var(--warm-stone);
+      font-size: 1.02rem;
+      line-height: 1.9;
+      margin: 0 0 1rem;
+      max-width: 60ch;
+    }
+    .pledge-card p:last-of-type { margin-bottom: 0; }
+    .pledge-sig {
+      margin-top: 2.2rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--hairline-forest);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 1.05rem;
+      color: var(--forest);
+      letter-spacing: 0.01em;
+    }
+
+    /* ---------- Who I Serve (client minimum band) ---------- */
+    .serve-band {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .serve-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+      margin-top: 1rem;
+    }
+    .serve-card {
+      background: var(--warm-white);
+      box-shadow: var(--shadow-soft);
+      padding: 2rem 1.9rem;
+      border-radius: 2px;
+      border-top: 3px solid var(--forest);
+    }
+    .serve-card .serve-mark {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 1.55rem;
+      color: var(--forest);
+      letter-spacing: 0.005em;
+      margin: 0 0 0.65rem;
+      font-feature-settings: 'kern', 'liga', 'tnum';
+    }
+    .serve-card h3 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.18rem;
+      color: var(--charcoal);
+      margin: 0 0 0.7rem;
+    }
+    .serve-card p {
+      color: var(--warm-stone);
+      font-size: 0.96rem;
+      line-height: 1.78;
+      margin: 0;
+    }
+    .serve-foot {
+      margin-top: 2.4rem;
+      text-align: center;
+      color: var(--warm-stone);
+      font-size: 0.95rem;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.85;
+    }
+    .serve-foot strong {
+      color: var(--charcoal);
+      font-weight: 500;
+    }
+
+    /* ---------- Specialized services list ---------- */
+    .specialty-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem 2rem;
+      margin-top: 1rem;
+    }
+    .specialty-item {
+      border-top: 1px solid var(--hairline-forest);
+      padding: 1.4rem 0 0;
+    }
+    .specialty-item h3 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.1rem;
+      color: var(--charcoal);
+      margin: 0 0 0.5rem;
+      letter-spacing: 0.005em;
+    }
+    .specialty-item p {
+      color: var(--warm-stone);
+      font-size: 0.93rem;
+      line-height: 1.75;
+      margin: 0;
+    }
+    .specialty-meta {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+      display: block;
+      margin: 0 0 0.55rem;
+    }
+
+    /* ---------- Fee schedule table ---------- */
+    .fee-wrap {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .fee-intro {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 2.6rem;
+      color: var(--warm-stone);
+      line-height: 1.85;
+    }
+    .fee-intro strong {
+      color: var(--charcoal);
+      font-weight: 500;
+    }
+    .fee-table {
+      background: var(--warm-white);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--hairline-forest);
+      border-radius: 2px;
+      overflow: hidden;
+      font-feature-settings: 'kern', 'liga', 'tnum';
+    }
+    .fee-row {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr 1.1fr;
+      gap: 1.5rem;
+      padding: 1.4rem clamp(1.4rem, 3vw, 2.1rem);
+      align-items: baseline;
+      border-bottom: 1px solid var(--hairline-light);
+    }
+    .fee-row:last-child { border-bottom: 0; }
+    .fee-row.fee-head {
+      background: var(--linen);
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+    }
+    .fee-tier {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.1rem;
+      color: var(--charcoal);
+      letter-spacing: 0.005em;
+    }
+    .fee-rate {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 1.25rem;
+      color: var(--forest);
+    }
+    .fee-note {
+      color: var(--warm-stone);
+      font-size: 0.93rem;
+      line-height: 1.7;
+    }
+    .fee-foot {
+      margin-top: 2rem;
+      text-align: center;
+      color: var(--warm-stone-light);
+      font-size: 0.84rem;
+      letter-spacing: 0.02em;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+
+    /* ---------- Custodian band ---------- */
+    .custodian-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: clamp(2.4rem, 5vw, 4.4rem);
+      align-items: center;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .custodian-copy h2 {
+      font-size: var(--fs-h2);
+      margin: 0 0 1.2rem;
+    }
+    .custodian-copy p {
+      color: var(--on-dark-dim);
+      line-height: 1.95;
+      margin: 0 0 1rem;
+      max-width: 560px;
+    }
+    .custodian-marks {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .custodian-mark {
+      background: rgba(247,243,239,0.04);
+      border: 1px solid var(--hairline-on-dark);
+      padding: 1.5rem 1.6rem;
+      border-radius: 2px;
+    }
+    .custodian-mark .custodian-name {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.2rem;
+      color: var(--parchment);
+      margin: 0 0 0.4rem;
+      letter-spacing: 0.005em;
+    }
+    .custodian-mark .custodian-role {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+      margin: 0 0 0.7rem;
+    }
+    .custodian-mark p {
+      color: var(--on-dark-dim);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* ---------- Insights / journal ---------- */
+    .journal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.4rem;
+      margin-top: 1rem;
+    }
+    .journal-entry {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid var(--hairline-forest);
+      padding-top: 1.7rem;
+    }
+    .journal-meta {
+      display: flex;
+      gap: 1rem;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .journal-date {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+      font-feature-settings: 'kern', 'liga', 'tnum';
+    }
+    .journal-cat {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--warm-stone);
+    }
+    .journal-title {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.45rem;
+      color: var(--charcoal);
+      letter-spacing: 0.005em;
+      line-height: 1.3;
+      margin: 0 0 1rem;
+    }
+    .journal-excerpt {
+      color: var(--warm-stone);
+      font-size: 0.97rem;
+      line-height: 1.78;
+      margin: 0 0 1.4rem;
+    }
+    .journal-link {
+      margin-top: auto;
+      align-self: flex-start;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+      border-bottom: 1px solid var(--hairline-forest);
+      padding-bottom: 4px;
+      transition: color 200ms ease, border-color 200ms ease;
+    }
+    .journal-link:hover {
+      color: var(--charcoal);
+      border-bottom-color: var(--charcoal);
+    }
+    .journal-link::after {
+      content: ' \2192';
+      padding-left: 0.4em;
+    }
+    .journal-foot {
+      margin-top: 3.2rem;
+      text-align: center;
+    }
+    .journal-foot a {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--forest);
+      border-bottom: 1px solid var(--hairline-forest);
+      padding-bottom: 3px;
+      transition: color 200ms ease, border-color 200ms ease;
+    }
+    .journal-foot a:hover {
+      color: var(--charcoal);
+      border-bottom-color: var(--charcoal);
+    }
+
+    /* ---------- Recognition honors ---------- */
+    .honors-wrap {
+      max-width: 920px;
+      margin: 3.4rem auto 0;
+    }
+    .honors-wrap h3 {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+      text-align: center;
+      margin: 0 0 1.8rem;
+    }
+    .honor-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.4rem 2.6rem;
+    }
+    .honor-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.1rem;
+      align-items: baseline;
+      font-size: 1rem;
+      color: var(--charcoal);
+      line-height: 1.55;
+    }
+    .honor-year {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-style: italic;
+      font-size: 1.35rem;
+      color: var(--forest);
+      font-feature-settings: 'kern', 'liga', 'tnum';
+    }
+    .honor-text {
+      color: var(--warm-stone);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    .honor-text strong {
+      color: var(--charcoal);
+      font-weight: 500;
+    }
+    .honor-text em {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.04em;
+      color: var(--forest);
+    }
+
+    /* ---------- Discovery booking surface ---------- */
+    .booking-wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: clamp(2.4rem, 5vw, 4.6rem);
+      align-items: stretch;
+    }
+    .booking-copy h2 {
+      font-size: var(--fs-h2);
+      margin: 0 0 1.2rem;
+    }
+    .booking-copy p {
+      color: var(--warm-stone);
+      line-height: 1.9;
+      margin: 0 0 1rem;
+      max-width: 540px;
+    }
+    .booking-copy strong {
+      color: var(--charcoal);
+      font-weight: 500;
+    }
+    .booking-bullets {
+      list-style: none;
+      padding: 0;
+      margin: 1.4rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .booking-bullets li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.85rem;
+      align-items: baseline;
+      color: var(--warm-stone);
+      font-size: 0.97rem;
+      line-height: 1.6;
+    }
+    .booking-bullets li::before {
+      content: "\2726";
+      color: var(--forest);
+      font-size: 0.85rem;
+    }
+    .booking-card {
+      background: var(--warm-white);
+      border: 1px solid var(--hairline-forest);
+      box-shadow: var(--shadow-soft);
+      padding: clamp(2rem, 4vw, 2.8rem);
+      border-radius: 2px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .booking-card .booking-eyebrow {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+      display: inline-block;
+      margin: 0 0 1rem;
+    }
+    .booking-card h3 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.55rem;
+      color: var(--charcoal);
+      margin: 0 0 1rem;
+      letter-spacing: 0.005em;
+    }
+    .booking-meta {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.7rem 1.2rem;
+      margin: 1.2rem 0 1.8rem;
+      font-size: 0.93rem;
+      color: var(--warm-stone);
+      font-feature-settings: 'kern', 'liga', 'tnum';
+    }
+    .booking-meta dt {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+      align-self: baseline;
+    }
+    .booking-meta dd {
+      margin: 0;
+      color: var(--charcoal);
+    }
+    .booking-card .btn {
+      align-self: stretch;
+      text-align: center;
+    }
+    .booking-card .booking-or {
+      margin-top: 1.3rem;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.86rem;
+      color: var(--warm-stone-light);
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    .booking-card .booking-or a {
+      color: var(--forest);
+      border-bottom: 1px solid var(--hairline-forest);
+      padding-bottom: 1px;
+    }
+
+    /* ---------- Privacy / cybersecurity strip ---------- */
+    .privacy-strip {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+    }
+    .privacy-card {
+      background: rgba(247,243,239,0.04);
+      border: 1px solid var(--hairline-on-dark);
+      padding: 1.7rem 1.7rem 1.6rem;
+      border-radius: 2px;
+    }
+    .privacy-card h3 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.15rem;
+      color: var(--parchment);
+      margin: 0 0 0.55rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+    .privacy-card h3::before {
+      content: "\2726";
+      color: var(--forest);
+      font-size: 0.9rem;
+    }
+    .privacy-card p {
+      color: var(--on-dark-dim);
+      font-size: 0.93rem;
+      line-height: 1.75;
+      margin: 0;
+    }
+
+    /* ---------- Compliance band (between disclosure and copyright) ---------- */
+    .compliance-band {
+      max-width: 1180px;
+      margin: clamp(2.5rem, 4vw, 3.2rem) auto 0;
+      padding: 1.8rem 0 0;
+      border-top: 1px solid var(--hairline-on-dark);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.4rem 2rem;
+    }
+    .compliance-item {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.78rem;
+      color: var(--on-dark-dim);
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+    }
+    .compliance-item strong {
+      display: block;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+      margin: 0 0 0.35rem;
+    }
+    .compliance-item a {
+      color: var(--on-dark);
+      border-bottom: 1px solid var(--hairline-on-dark);
+      padding-bottom: 1px;
+    }
+    .compliance-item a:hover {
+      color: var(--forest);
+      border-bottom-color: var(--forest);
+    }
+
+    /* Client login surface in the nav */
+    .nav-login {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--forest);
+      font-weight: 500;
+      border-left: 1px solid var(--hairline-forest);
+      padding-left: 1.4rem;
+      margin-left: 0.6rem;
+      transition: color 200ms ease;
+    }
+    .nav-login:hover { color: var(--parchment); }
+
     /* ---------- Footer ---------- */
     .footer {
       background: var(--charcoal);
@@ -924,12 +1536,28 @@
       .nav-spacer { display: none; }
       .nav-cta { justify-self: center; }
       .nav-links { flex-wrap: wrap; gap: 1.2rem; justify-content: center; }
+      .nav-login { border-left: 0; padding-left: 0; margin-left: 0; }
       .senior-advisor { grid-template-columns: 1fr; gap: 2.4rem; }
       .senior-advisor-portrait { min-height: 420px; }
+      .serve-grid { grid-template-columns: 1fr; }
+      .specialty-grid { grid-template-columns: 1fr 1fr; }
+      .custodian-grid { grid-template-columns: 1fr; gap: 2.4rem; }
+      .custodian-marks { grid-template-columns: 1fr 1fr; }
+      .journal-grid { grid-template-columns: 1fr; gap: 2.4rem; }
+      .honor-list { grid-template-columns: 1fr; gap: 1.4rem; }
+      .booking-wrap { grid-template-columns: 1fr; gap: 2.4rem; }
+      .privacy-strip { grid-template-columns: 1fr; }
+      .compliance-band { grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+      .fee-row { grid-template-columns: 1fr; gap: 0.4rem; }
+      .fee-row.fee-head { display: none; }
     }
 
     @media (max-width: 768px) {
       .services-grid { grid-template-columns: 1fr; }
+      .specialty-grid { grid-template-columns: 1fr; }
+      .custodian-marks { grid-template-columns: 1fr; }
+      .pledge-card { padding: 2rem 1.5rem; }
+      .compliance-band { grid-template-columns: 1fr; }
       .nav-cta { padding: 0.7rem 1.15rem; font-size: 0.68rem; }
       .nav-top { padding: 0.85rem 1.25rem 0.5rem; }
       .nav-bottom { padding: 0.7rem 1.25rem; }
@@ -1001,12 +1629,14 @@
       <span class="nav-spacer" aria-hidden="true"></span>
       <nav class="nav-links" aria-label="Primary">
         <a href="#services">Services</a>
+        <a href="#fees">Fees</a>
         <a href="#philosophy">Philosophy</a>
         <a href="#team">Team</a>
         <a href="#insights">Insights</a>
         <a href="#contact">Contact</a>
+        <a href="#client-login" class="nav-login" aria-label="Client portal login">Client Login</a>
       </nav>
-      <a href="#contact" class="nav-cta">Schedule a Conversation</a>
+      <a href="#contact" class="nav-cta">Schedule a Discovery Call</a>
     </div>
   </header>
 
@@ -1050,6 +1680,21 @@
     <p class="advisor-portrait-title">Founding Partner</p>
   </section>
 
+  <!-- ============ FIDUCIARY PLEDGE (signature card) ============ -->
+  <section class="pledge-section" aria-labelledby="pledge-heading">
+    <article class="pledge-card">
+      <span class="eyebrow">My Fiduciary Pledge</span>
+      <h2 id="pledge-heading">I am a fiduciary. I do not take commissions. My only revenue is from clients.</h2>
+      <p>
+        Beckett Wealth Partners is a fee-only registered investment advisor. I am paid by the families I serve, and only by them. I accept no commissions, no soft-dollar arrangements, no revenue-sharing from fund companies, no insurance overrides, and no referral fees from outside professionals.
+      </p>
+      <p>
+        That structure is the simplest way I know to make sure the recommendation you receive is the recommendation I believe is right for you. It is also the structural difference that separates a registered investment advisor from a broker-dealer, and a fiduciary obligation from a suitability standard. The distinction is not marketing. It is in writing on every plan I sign.
+      </p>
+      <p class="pledge-sig">James Beckett, Founding Partner</p>
+    </article>
+  </section>
+
   <!-- ============ SERVICES ============ -->
   <section class="section section-parchment" id="services">
     <div class="section-inner">
@@ -1082,6 +1727,180 @@
           <span class="service-meta">04 &middot; Owners</span>
           <h3>Business Owner Services</h3>
           <p>Concentrated stock planning, sale-of-company tax mitigation, deferred compensation, and post-liquidity portfolio construction. We have walked dozens of owners through the transition from operator to investor.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHO I SERVE ============ -->
+  <section class="section section-warm-white" id="who-i-serve" aria-labelledby="serve-heading">
+    <div class="section-inner serve-band">
+      <div class="section-head">
+        <span class="eyebrow">Who I Serve</span>
+        <h2 id="serve-heading">Specific Clients. Specific Problems.</h2>
+        <p>I work with a small number of families and owners where I can be the primary financial counsel. The work is more useful when the fit is right, so I am direct about who that is.</p>
+      </div>
+
+      <div class="serve-grid">
+        <article class="serve-card">
+          <p class="serve-mark">$2M+</p>
+          <h3>Established Families</h3>
+          <p>Households with $2 million or more in investable assets, often nearing or in retirement, looking for a single fiduciary to coordinate portfolio, planning, tax, and estate work in one relationship.</p>
+        </article>
+
+        <article class="serve-card">
+          <p class="serve-mark">Liquidity</p>
+          <h3>Business Owners Preparing for Sale</h3>
+          <p>Owners eighteen to thirty-six months out from a sale, where pre-transaction tax planning, deferred compensation strategy, and post-liquidity portfolio construction need to be designed before the wire arrives, not after.</p>
+        </article>
+
+        <article class="serve-card">
+          <p class="serve-mark">RSUs</p>
+          <h3>Tech and Healthcare Executives</h3>
+          <p>Senior leaders with concentrated stock, RSU vesting schedules, ISO and NQSO exercise decisions, 10b5-1 plans, and deferred compensation that need to be coordinated against household cash flow and tax brackets.</p>
+        </article>
+      </div>
+
+      <p class="serve-foot">
+        I keep the firm intentionally small. <strong>Roughly ninety client relationships, never more than one hundred.</strong> If we are not the right fit, I will say so on the first call and point you toward a colleague who is.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SPECIALIZED SERVICES ============ -->
+  <section class="section section-parchment" id="specialties" aria-labelledby="specialty-heading">
+    <div class="section-inner">
+      <div class="section-head">
+        <span class="eyebrow">Specialized Practice Areas</span>
+        <h2 id="specialty-heading">Where the Work Gets Technical.</h2>
+        <p>The headline categories above describe the relationship. These are the technical workstreams that show up inside it. Every one is led by a credentialed advisor on the team.</p>
+      </div>
+
+      <div class="specialty-grid">
+        <article class="specialty-item">
+          <span class="specialty-meta">Equity Compensation</span>
+          <h3>RSU, ISO, NQSO, and 10b5-1 Planning</h3>
+          <p>Vesting schedules modeled against tax brackets. Exercise decisions sequenced for AMT impact. Pre-arranged 10b5-1 trading plans for executives under blackout windows.</p>
+        </article>
+
+        <article class="specialty-item">
+          <span class="specialty-meta">Liquidity Events</span>
+          <h3>Business Sale Planning</h3>
+          <p>Pre-transaction structuring, qualified small business stock review, charitable trust strategies for high-basis owners, and a written post-sale investment policy ready before the closing date.</p>
+        </article>
+
+        <article class="specialty-item">
+          <span class="specialty-meta">Generations</span>
+          <h3>Multi-Generational Wealth Transfer</h3>
+          <p>Annual exclusion gifting, intentionally defective grantor trusts, GRATs, dynasty trusts, and generation-skipping transfer tax planning, coordinated with the family's estate counsel.</p>
+        </article>
+
+        <article class="specialty-item">
+          <span class="specialty-meta">Tax</span>
+          <h3>Tax Planning Coordination</h3>
+          <p>Roth conversion ladders, tax-loss harvesting, asset location across taxable and tax-deferred accounts, and direct quarterly coordination with your CPA on projected liabilities.</p>
+        </article>
+
+        <article class="specialty-item">
+          <span class="specialty-meta">Estate</span>
+          <h3>Estate Planning Coordination</h3>
+          <p>Document review, beneficiary alignment, titling audits, trust funding follow-through, and a working relationship with two senior estate attorneys in DFW for clients without one.</p>
+        </article>
+
+        <article class="specialty-item">
+          <span class="specialty-meta">Giving</span>
+          <h3>Charitable and Donor-Advised Funds</h3>
+          <p>Donor-advised fund design, appreciated-securities gifting, charitable remainder trusts, and family giving statements that turn philanthropic intent into a disciplined annual practice.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEE SCHEDULE ============ -->
+  <section class="section section-warm-white" id="fees" aria-labelledby="fees-heading">
+    <div class="section-inner fee-wrap">
+      <div class="section-head">
+        <span class="eyebrow">Published Fee Schedule</span>
+        <h2 id="fees-heading">My Fees, in Plain Numbers.</h2>
+        <p class="fee-intro">Most advisors hide the fee. I publish it. <strong>One annual advisory fee, billed quarterly, declining as assets grow.</strong> No commissions, no transaction kickbacks, no platform fees buried in a fund expense ratio.</p>
+      </div>
+
+      <div class="fee-table" role="table" aria-label="Tiered advisory fee schedule">
+        <div class="fee-row fee-head" role="row">
+          <span role="columnheader">Assets Under Management</span>
+          <span role="columnheader">Annual Fee</span>
+          <span role="columnheader">Notes</span>
+        </div>
+
+        <div class="fee-row" role="row">
+          <span class="fee-tier" role="cell">First $1,000,000</span>
+          <span class="fee-rate" role="cell">1.00%</span>
+          <span class="fee-note" role="cell">Includes the full planning relationship, not a separate planning fee.</span>
+        </div>
+
+        <div class="fee-row" role="row">
+          <span class="fee-tier" role="cell">Next $2,000,000</span>
+          <span class="fee-rate" role="cell">0.85%</span>
+          <span class="fee-note" role="cell">Applied to the portion of assets between $1M and $3M.</span>
+        </div>
+
+        <div class="fee-row" role="row">
+          <span class="fee-tier" role="cell">Next $2,000,000</span>
+          <span class="fee-rate" role="cell">0.65%</span>
+          <span class="fee-note" role="cell">Applied to the portion of assets between $3M and $5M.</span>
+        </div>
+
+        <div class="fee-row" role="row">
+          <span class="fee-tier" role="cell">Above $5,000,000</span>
+          <span class="fee-rate" role="cell">0.45%</span>
+          <span class="fee-note" role="cell">Applied to all assets over $5M. Negotiable on relationships above $20M.</span>
+        </div>
+
+        <div class="fee-row" role="row">
+          <span class="fee-tier" role="cell">Planning-Only Engagements</span>
+          <span class="fee-rate" role="cell">$8,500 / yr</span>
+          <span class="fee-note" role="cell">Flat retainer. Available to existing relationships only and limited each year.</span>
+        </div>
+      </div>
+
+      <p class="fee-foot">Fees are calculated and debited quarterly in arrears, in equal installments, against the prior quarter-end value of advised assets. The full fee schedule, methodology, and conflicts disclosures appear in our <a href="#">Form ADV Part 2A</a>. There are no separate trading commissions on the custodial platforms we use.</p>
+    </div>
+  </section>
+
+  <!-- ============ CUSTODIAN ============ -->
+  <section class="section section-charcoal" id="custodian" aria-labelledby="custodian-heading">
+    <div class="custodian-grid">
+      <div class="custodian-copy">
+        <span class="eyebrow eyebrow-on-dark">Where Your Assets Are Held</span>
+        <h2 id="custodian-heading">Your Money Stays in Your Name, at a Major Custodian.</h2>
+        <p>
+          You do not write a check to Beckett Wealth Partners. You open accounts in your own name at one of the institutional custodians below. We are granted limited trading and reporting authority on those accounts. Nothing else.
+        </p>
+        <p>
+          That structural separation is the single most important fraud-resistance signal a registered investment advisor can offer. You can log in to your custodian directly, twenty-four hours a day, see every position and every fee, and verify our work against an independent record of truth.
+        </p>
+      </div>
+
+      <div class="custodian-marks" role="list" aria-label="Custodian relationships">
+        <article class="custodian-mark" role="listitem">
+          <p class="custodian-name">Charles Schwab</p>
+          <span class="custodian-role">Primary Custodian</span>
+          <p>SIPC member. Default custodial relationship for new and transferred household assets.</p>
+        </article>
+        <article class="custodian-mark" role="listitem">
+          <p class="custodian-name">Fidelity Institutional</p>
+          <span class="custodian-role">Secondary Custodian</span>
+          <p>SIPC member. Used for clients with established Fidelity 401(k), HSA, or brokerage relationships.</p>
+        </article>
+        <article class="custodian-mark" role="listitem">
+          <p class="custodian-name">Pershing</p>
+          <span class="custodian-role">Specialty Custody</span>
+          <p>Available for trust and estate accounts where clients require an independent corporate trustee.</p>
+        </article>
+        <article class="custodian-mark" role="listitem">
+          <p class="custodian-name">eMoney Advisor</p>
+          <span class="custodian-role">Client Portal</span>
+          <p>Aggregated household reporting, planning dashboards, and secure document vault available to every client.</p>
         </article>
       </div>
     </div>
@@ -1223,13 +2042,59 @@
     </div>
   </section>
 
-  <!-- ============ PRESS LOCKUP ============ -->
-  <section class="section section-linen" id="insights">
+  <!-- ============ INSIGHTS / QUARTERLY COMMENTARY ============ -->
+  <section class="section section-linen" id="insights" aria-labelledby="insights-heading">
+    <div class="section-inner">
+      <div class="section-head">
+        <span class="eyebrow">Quarterly Commentary</span>
+        <h2 id="insights-heading">Considered Perspective, Written Quarterly.</h2>
+        <p>I publish four substantive pieces a year. Real perspective on markets, planning practice, and the questions clients are actually asking. No "five reasons to start saving" content. Each is written under my name and dated.</p>
+      </div>
+
+      <div class="journal-grid">
+        <article class="journal-entry">
+          <div class="journal-meta">
+            <span class="journal-date">Q1 2026</span>
+            <span class="journal-cat">Capital Markets</span>
+          </div>
+          <h3 class="journal-title">When Concentrated Stock Becomes a Decision, Not a Plan</h3>
+          <p class="journal-excerpt">Most executives we meet have between thirty and seventy percent of household net worth in a single ticker. There is a structured way to talk about that, and a sentimental way. The structured way usually wins.</p>
+          <a href="#" class="journal-link">Read the Letter</a>
+        </article>
+
+        <article class="journal-entry">
+          <div class="journal-meta">
+            <span class="journal-date">Q4 2025</span>
+            <span class="journal-cat">Tax Strategy</span>
+          </div>
+          <h3 class="journal-title">Roth Conversions in a Sunset Year</h3>
+          <p class="journal-excerpt">With the 2017 tax provisions expiring and brackets potentially reverting in 2026, the next eighteen months are the highest-leverage Roth conversion window most retirees will see in their lifetimes. Here is how we are modeling it.</p>
+          <a href="#" class="journal-link">Read the Letter</a>
+        </article>
+
+        <article class="journal-entry">
+          <div class="journal-meta">
+            <span class="journal-date">Q3 2025</span>
+            <span class="journal-cat">Practice Note</span>
+          </div>
+          <h3 class="journal-title">What a Real Discovery Meeting Sounds Like</h3>
+          <p class="journal-excerpt">A first meeting with an advisor should not feel like a pitch. It should feel like a conversation about what you have built and what you want next. Here is the structure I use, and why I do not bring product to the first call.</p>
+          <a href="#" class="journal-link">Read the Letter</a>
+        </article>
+      </div>
+
+      <p class="journal-foot"><a href="#">Read the full archive of quarterly letters</a></p>
+    </div>
+  </section>
+
+  <!-- ============ RECOGNITION ============ -->
+  <section class="section section-warm-white" id="recognition" aria-labelledby="recognition-heading">
     <div class="section-inner press-band">
       <figure class="press-accent">
         <img src="images/financial-detail.jpg" alt="Fountain pen resting on signed financial documents beside reading glasses" width="1600" height="1067" loading="lazy" decoding="async">
       </figure>
-      <span class="eyebrow">As Seen In</span>
+      <span class="eyebrow">Recognition</span>
+      <h2 id="recognition-heading" style="font-size: var(--fs-h2); margin: 0 0 1rem;">Independent Media and Industry Honors.</h2>
       <div class="press-row" aria-label="Press mentions">
         <span class="press-name">Wall Street Journal</span>
         <span class="press-dot" aria-hidden="true">&middot;</span>
@@ -1243,23 +2108,110 @@
         <span class="press-dot" aria-hidden="true">&middot;</span>
         <span class="press-name">Forbes</span>
       </div>
+
+      <div class="honors-wrap">
+        <h3>Recent Honors</h3>
+        <ul class="honor-list">
+          <li class="honor-item">
+            <span class="honor-year">2025</span>
+            <span class="honor-text"><strong>Barron's Top 1,200 Financial Advisors</strong>, Texas, James Beckett, <em>seventh consecutive year</em></span>
+          </li>
+          <li class="honor-item">
+            <span class="honor-year">2025</span>
+            <span class="honor-text"><strong>Forbes Best-In-State Wealth Advisors</strong>, Dallas-Fort Worth, James Beckett</span>
+          </li>
+          <li class="honor-item">
+            <span class="honor-year">2024</span>
+            <span class="honor-text"><strong>D Magazine</strong>, Best Financial Planners in Dallas, Catherine Okafor</span>
+          </li>
+          <li class="honor-item">
+            <span class="honor-year">2024</span>
+            <span class="honor-text"><strong>Five Star Wealth Manager</strong>, Texas, James Beckett, <em>eleventh consecutive year</em></span>
+          </li>
+          <li class="honor-item">
+            <span class="honor-year">2023</span>
+            <span class="honor-text"><strong>Financial Advisor Magazine</strong>, RIA Survey Top 250 Independent Firms</span>
+          </li>
+          <li class="honor-item">
+            <span class="honor-year">2023</span>
+            <span class="honor-text"><strong>CFP Board</strong>, Service to the Profession, Catherine Okafor</span>
+          </li>
+        </ul>
+      </div>
+
       <hr class="hairline wider">
-      <p class="press-disclaimer">References to media appearances do not constitute endorsement.</p>
+      <p class="press-disclaimer">Inclusion in published rankings does not guarantee future results and is not indicative of any individual client's experience. The criteria, methodologies, and any compensation paid for inclusion are disclosed in our Form ADV Part 2A.</p>
     </div>
   </section>
 
-  <!-- ============ CONSULTATION CTA ============ -->
-  <section class="section section-parchment cta-section" id="contact">
+  <!-- ============ PRIVACY AND CYBERSECURITY ============ -->
+  <section class="section section-charcoal" id="privacy" aria-labelledby="privacy-heading">
     <div class="section-inner">
-      <span class="eyebrow">Begin the Conversation</span>
-      <h2>The First Conversation Is the Most Important One.</h2>
-      <p class="cta-sub">
-        Whether you are evaluating a new advisor, preparing for a transition, or simply want a second opinion on your current plan, we welcome the conversation. No obligation, no sales pressure.
-      </p>
-      <a href="mailto:info@beckettwealth.com" class="btn btn-solid">Request a Private Consultation</a>
-      <div class="cta-meta">Or call directly (214) 555-0318 &middot; Turtle Creek Centre, Suite 1200</div>
+      <div class="section-head">
+        <span class="eyebrow eyebrow-on-dark">Trust by Construction</span>
+        <h2 id="privacy-heading">How I Protect Client Data.</h2>
+        <p>The structural defenses below are not a marketing list. They are the operating practices a regulated advisor is expected to maintain, plus a few I have added because the threat surface keeps changing.</p>
+      </div>
+
+      <div class="privacy-strip" role="list">
+        <article class="privacy-card" role="listitem">
+          <h3>Custodial Separation</h3>
+          <p>Client assets are held at Schwab, Fidelity, or Pershing in your name. The firm has limited trading authority only. We never accept incoming wires from clients.</p>
+        </article>
+        <article class="privacy-card" role="listitem">
+          <h3>Encrypted Document Vault</h3>
+          <p>All document exchange happens inside the eMoney secure vault with multi-factor authentication. Tax returns, statements, and estate documents never travel by unencrypted email.</p>
+        </article>
+        <article class="privacy-card" role="listitem">
+          <h3>Annual Penetration Testing</h3>
+          <p>Independent third-party security review and penetration testing performed annually. Internal phishing simulation and staff cybersecurity training run quarterly. Incident response plan reviewed yearly.</p>
+        </article>
+      </div>
     </div>
   </section>
+
+  <!-- ============ DISCOVERY CALL BOOKING ============ -->
+  <section class="section section-parchment" id="contact" aria-labelledby="booking-heading">
+    <div class="section-inner">
+      <div class="booking-wrap">
+        <div class="booking-copy">
+          <span class="eyebrow">Schedule a Discovery Call</span>
+          <h2 id="booking-heading">Thirty Minutes. No Fee. No Follow-Up If It Is Not a Fit.</h2>
+          <p>
+            Whether you are evaluating a new advisor, preparing for a liquidity event, or simply want a second opinion on the plan you have, the first conversation is the most useful one I have all week.
+          </p>
+          <p>
+            I run discovery calls personally. <strong>No analyst, no associate, no relationship-management script.</strong> If we are a fit, we will schedule a deeper planning meeting. If we are not, I will tell you, and I will not follow up.
+          </p>
+          <ul class="booking-bullets">
+            <li>Honest read on whether your situation needs an advisor at all</li>
+            <li>Direct answer on whether your current plan is sound</li>
+            <li>Specific names of two other DFW advisors if I am not the right one</li>
+          </ul>
+        </div>
+
+        <aside class="booking-card" aria-label="Schedule a discovery call">
+          <span class="booking-eyebrow">Discovery Call</span>
+          <h3>Thirty Minutes With James Beckett</h3>
+          <dl class="booking-meta">
+            <dt>Length</dt>
+            <dd>30 minutes</dd>
+            <dt>Fee</dt>
+            <dd>None</dd>
+            <dt>Format</dt>
+            <dd>Phone or video</dd>
+            <dt>Next step</dt>
+            <dd>Only if there is a clear fit</dd>
+          </dl>
+          <a href="https://calendly.com/beckett-wealth/discovery" class="btn btn-solid">Choose a Time</a>
+          <p class="booking-or">Or call <a href="tel:+12145550318">(214) 555-0318</a> &middot; <a href="mailto:info@beckettwealth.com">info@beckettwealth.com</a></p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLIENT LOGIN ANCHOR (footer-adjacent placeholder) ============ -->
+  <section id="client-login" aria-hidden="true" style="height: 1px; overflow: hidden;"></section>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer" role="contentinfo">
@@ -1267,7 +2219,8 @@
 
       <div class="footer-col footer-firm">
         <span class="wordmark">Beckett Wealth Partners</span>
-        <p>Registered Investment Advisor &middot; CRD #189204</p>
+        <p>Registered Investment Advisor<br>SEC File No. 801-72904 &middot; CRD #189204</p>
+        <p style="margin-top: 0.9rem;">Investment advisory services offered through Beckett Wealth Partners, LLC, a Registered Investment Adviser.</p>
       </div>
 
       <div class="footer-col">
@@ -1275,18 +2228,29 @@
         <p>
           3811 Turtle Creek Blvd, Suite 1200<br>
           Dallas, TX 75219<br>
-          (214) 555-0318<br>
+          <a href="tel:+12145550318">(214) 555-0318</a><br>
           <a href="mailto:info@beckettwealth.com">info@beckettwealth.com</a>
         </p>
       </div>
 
       <div class="footer-col">
+        <h4>Client Access</h4>
+        <nav class="footer-links" aria-label="Client access">
+          <a href="#">Client Portal Login</a>
+          <a href="#">Document Vault</a>
+          <a href="#">Quarterly Letters Archive</a>
+          <a href="#contact">Schedule a Discovery Call</a>
+        </nav>
+      </div>
+
+      <div class="footer-col">
         <h4>Disclosures</h4>
         <nav class="footer-links" aria-label="Regulatory">
-          <a href="#">Form ADV</a>
-          <a href="#">Privacy Policy</a>
+          <a href="#">Form ADV Part 2A</a>
+          <a href="#">Form ADV Part 2B</a>
           <a href="#">Form CRS</a>
-          <a href="#">ADV Brochure</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Fiduciary Statement</a>
         </nav>
         <span class="credit">
           <a href="https://dbjtechnologies.com" rel="noopener">Website by DBJ Technologies</a>
@@ -1295,12 +2259,31 @@
 
     </div>
 
+    <div class="compliance-band" aria-label="Regulatory compliance">
+      <div class="compliance-item">
+        <strong>Registration</strong>
+        Registered with the U.S. Securities and Exchange Commission as an investment adviser. Notice-filed in Texas, Oklahoma, and California.
+      </div>
+      <div class="compliance-item">
+        <strong>Standard of Care</strong>
+        We act as a fiduciary on every engagement, in writing, on every recommendation. Not a suitability standard. A fiduciary one.
+      </div>
+      <div class="compliance-item">
+        <strong>Custody</strong>
+        Client assets are held at Charles Schwab, Fidelity Institutional, or Pershing. The firm does not take physical custody of client funds or securities.
+      </div>
+      <div class="compliance-item">
+        <strong>Reference Documents</strong>
+        <a href="#">Form CRS</a>, <a href="#">ADV Part 2A</a>, and <a href="#">Privacy Notice</a> are available on request and from the SEC IAPD database.
+      </div>
+    </div>
+
     <p class="disclosure">
-      Beckett Wealth Partners is a registered investment advisor. Registration does not imply a certain level of skill or training. Past performance is not indicative of future results. All investing involves risk, including loss of principal. The information presented on this site is for informational purposes only and does not constitute investment advice.
+      Beckett Wealth Partners is a registered investment adviser. Registration does not imply a certain level of skill or training. Past performance is not indicative of future results. All investing involves risk, including loss of principal. The information presented on this site is for informational purposes only and does not constitute personalized investment, tax, or legal advice. Specific advice is provided only inside an executed advisory agreement.
     </p>
 
     <div class="footer-bottom">
-      &copy; 2026 Beckett Wealth Partners. All rights reserved.
+      &copy; 2026 Beckett Wealth Partners, LLC. All rights reserved.
     </div>
   </footer>
 

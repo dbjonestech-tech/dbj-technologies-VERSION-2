@@ -862,11 +862,825 @@
       letter-spacing: 0.04em;
     }
 
+    /* PROMO BAR (top-most strip, not sticky) */
+    .promo-bar {
+      background: var(--plum-deep);
+      color: #F4E6E0;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.74rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 400;
+      padding: 0.7rem clamp(1.5rem, 5vw, 3rem);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.4rem;
+      text-align: center;
+      flex-wrap: wrap;
+    }
+    .promo-bar strong {
+      font-family: 'Bodoni Moda', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      color: #F8C8C0;
+      text-transform: none;
+      margin-right: 0.4rem;
+    }
+    .promo-bar .promo-divider {
+      color: rgba(244,230,224,0.32);
+      font-size: 0.85rem;
+      letter-spacing: 0;
+    }
+    .promo-bar a {
+      color: #F4E6E0;
+      border-bottom: 1px solid rgba(244,230,224,0.32);
+      padding-bottom: 1px;
+      transition: color 200ms ease, border-color 200ms ease;
+    }
+    .promo-bar a:hover {
+      color: #F8C8C0;
+      border-bottom-color: #F8C8C0;
+    }
+
+    /* SOCIETY / MEMBERSHIP */
+    .society {
+      background: linear-gradient(180deg, var(--bg-cream) 0%, var(--bg-blush) 100%);
+    }
+
+    .society-grid {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: clamp(2.4rem, 6vw, 5rem);
+      align-items: start;
+    }
+
+    .society-copy h2 {
+      font-size: var(--fs-h2);
+      margin-bottom: 0.8rem;
+    }
+
+    .society-sub {
+      color: var(--taupe);
+      font-size: 1.04rem;
+      line-height: 1.85;
+      margin-bottom: 2rem;
+      max-width: 460px;
+    }
+
+    .society-price {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+      font-feature-settings: 'kern', 'liga', 'tnum';
+    }
+
+    .society-price-amount {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 3.4rem;
+      color: var(--plum);
+      line-height: 1;
+    }
+
+    .society-price-suffix {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.86rem;
+      color: var(--taupe);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .society-bonus {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      color: var(--taupe);
+      margin-bottom: 2rem;
+      font-feature-settings: 'kern', 'liga', 'tnum';
+    }
+
+    .society-tiers {
+      background: #fff;
+      box-shadow: var(--shadow-soft);
+      padding: clamp(2rem, 4vw, 2.8rem);
+      border-top: 1px solid var(--hairline-rose);
+    }
+
+    .society-tiers h3 {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 1.4rem;
+      color: var(--plum);
+      margin: 0 0 1.4rem;
+    }
+
+    .society-tiers ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.6rem;
+    }
+
+    .society-tiers li {
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--hairline-plum);
+      font-size: 0.96rem;
+      line-height: 1.7;
+      color: var(--taupe);
+    }
+
+    .society-tiers li:last-child { border-bottom: none; }
+
+    .society-tiers li strong {
+      color: var(--plum);
+      font-weight: 500;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .society-fineprint {
+      font-family: 'Outfit', sans-serif;
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--taupe-light);
+      margin-top: 1.2rem;
+      line-height: 1.65;
+    }
+
+    /* SPECIALS */
+    .specials-head {
+      max-width: 640px;
+      margin-bottom: 3.2rem;
+    }
+
+    .specials-head h2 {
+      font-size: var(--fs-h2);
+      margin-bottom: 0.6rem;
+    }
+
+    .specials-head p {
+      color: var(--taupe);
+      font-size: 1.04rem;
+    }
+
+    .specials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.6rem;
+    }
+
+    .special-card {
+      background: #fff;
+      border-top: 2px solid var(--rose);
+      padding: 2rem 1.9rem 2.1rem;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .special-eyebrow {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--rose);
+      font-weight: 500;
+    }
+
+    .special-card h3 {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 1.45rem;
+      color: var(--plum);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .special-card p {
+      color: var(--taupe);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin: 0;
+      flex: 1 1 auto;
+    }
+
+    .special-meta {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rose);
+      padding-top: 0.9rem;
+      border-top: 1px solid var(--hairline-rose);
+      font-feature-settings: 'kern', 'liga', 'onum';
+    }
+
+    /* PRICING MENU (per-area transparency) */
+    .menu-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2.6rem, 5vw, 4.5rem) clamp(2.6rem, 6vw, 5rem);
+      margin-top: 2.6rem;
+    }
+
+    .menu-group h3 {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 1.5rem;
+      color: var(--plum);
+      margin: 0 0 0.5rem;
+    }
+
+    .menu-group .menu-rule {
+      width: 32px;
+      height: 1px;
+      background: var(--rose);
+      opacity: 0.7;
+      margin-bottom: 1.4rem;
+    }
+
+    .menu-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.2rem;
+      align-items: baseline;
+      padding: 0.85rem 0;
+      border-bottom: 1px dotted var(--hairline-plum);
+    }
+
+    .menu-row:last-child { border-bottom: none; }
+
+    .menu-row .menu-name {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 400;
+      color: var(--plum);
+      font-size: 1rem;
+    }
+
+    .menu-row .menu-name span {
+      display: block;
+      font-size: 0.86rem;
+      color: var(--taupe);
+      margin-top: 0.15rem;
+      line-height: 1.5;
+    }
+
+    .menu-row .menu-cost {
+      font-family: 'Bodoni Moda', serif;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--rose);
+      font-size: 1.05rem;
+      white-space: nowrap;
+      font-feature-settings: 'kern', 'liga', 'tnum';
+    }
+
+    .menu-fineprint {
+      margin-top: 2.6rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--hairline-rose);
+      font-family: 'Outfit', sans-serif;
+      font-style: italic;
+      font-size: 0.86rem;
+      color: var(--taupe);
+      line-height: 1.7;
+      max-width: 720px;
+    }
+
+    /* GALLERY (Before / After) */
+    .gallery-head {
+      max-width: 640px;
+      margin-bottom: 2.8rem;
+    }
+
+    .gallery-head h2 {
+      font-size: var(--fs-h2);
+      margin-bottom: 0.6rem;
+    }
+
+    .gallery-head p {
+      color: var(--taupe);
+      font-size: 1.04rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.6rem;
+    }
+
+    .gallery-card {
+      background: #fff;
+      box-shadow: var(--shadow-soft);
+      padding-bottom: 1.4rem;
+    }
+
+    .gallery-frame {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      position: relative;
+    }
+
+    .gallery-frame img {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-frame::before,
+    .gallery-frame::after {
+      position: absolute;
+      bottom: 0.7rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      background: rgba(74,37,69,0.78);
+      color: #F4E6E0;
+      padding: 0.3rem 0.7rem;
+    }
+    .gallery-frame::before { content: "Before"; left: 0.7rem; }
+    .gallery-frame::after { content: "After"; right: 50%; margin-right: -2rem; }
+
+    .gallery-body {
+      padding: 1.2rem 1.4rem 0;
+    }
+
+    .gallery-body h3 {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 1.18rem;
+      color: var(--plum);
+      margin: 0 0 0.35rem;
+    }
+
+    .gallery-body p {
+      font-family: 'Outfit', sans-serif;
+      color: var(--taupe);
+      font-size: 0.9rem;
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .gallery-meta {
+      display: block;
+      margin-top: 0.7rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--rose);
+    }
+
+    .gallery-disclaimer {
+      margin-top: 2.4rem;
+      font-family: 'Outfit', sans-serif;
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--taupe-light);
+      max-width: 720px;
+      line-height: 1.7;
+    }
+
+    /* FINANCING */
+    .financing {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: clamp(2.4rem, 6vw, 5rem);
+      align-items: center;
+    }
+
+    .financing-copy h2 {
+      font-size: var(--fs-h2);
+      margin-bottom: 0.8rem;
+    }
+
+    .financing-copy p {
+      color: var(--taupe);
+      font-size: 1.04rem;
+      line-height: 1.85;
+      max-width: 480px;
+    }
+
+    .financing-partners {
+      background: #fff;
+      box-shadow: var(--shadow-soft);
+      padding: clamp(1.8rem, 3vw, 2.2rem);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .financing-partner {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      align-items: baseline;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--hairline-plum);
+    }
+    .financing-partner:last-child { border-bottom: none; }
+
+    .financing-partner .fp-name {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 500;
+      font-size: 1.1rem;
+      color: var(--plum);
+      letter-spacing: 0.02em;
+    }
+
+    .financing-partner .fp-detail {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      color: var(--taupe);
+      line-height: 1.6;
+    }
+
+    /* TEAM (Medical Director + Injector + Esthetician) */
+    .team-head {
+      max-width: 640px;
+      margin-bottom: 3rem;
+    }
+
+    .team-head h2 {
+      font-size: var(--fs-h2);
+      margin-bottom: 0.6rem;
+    }
+
+    .team-head p {
+      color: var(--taupe);
+      font-size: 1.04rem;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2rem;
+    }
+
+    .team-card {
+      background: #fff;
+      box-shadow: var(--shadow-soft);
+      padding: 2.2rem 1.9rem 2.1rem;
+      border-top: 1px solid var(--hairline-rose);
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .team-role {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      font-size: 0.66rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--rose);
+    }
+
+    .team-card h3 {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 1.4rem;
+      color: var(--plum);
+      margin: 0;
+    }
+
+    .team-title {
+      font-family: 'Outfit', sans-serif;
+      font-style: italic;
+      font-size: 0.92rem;
+      color: var(--taupe);
+      margin-bottom: 0.4rem;
+    }
+
+    .team-card p {
+      color: var(--taupe);
+      font-size: 0.96rem;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .team-creds {
+      margin-top: 0.8rem;
+      padding-top: 0.9rem;
+      border-top: 1px solid var(--hairline-rose);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--taupe);
+      line-height: 1.7;
+    }
+
+    /* SHOP (Skincare retail) */
+    .shop-head {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: clamp(2rem, 5vw, 4rem);
+      align-items: end;
+      margin-bottom: 3rem;
+    }
+
+    .shop-head h2 {
+      font-size: var(--fs-h2);
+      margin-bottom: 0.6rem;
+    }
+
+    .shop-head p {
+      color: var(--taupe);
+      font-size: 1.04rem;
+      line-height: 1.85;
+    }
+
+    .shop-brands {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .shop-brand {
+      background: #fff;
+      border: 1px solid var(--hairline-rose);
+      padding: 1rem 0.6rem;
+      text-align: center;
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 500;
+      font-size: 0.92rem;
+      color: var(--plum);
+      letter-spacing: 0.04em;
+    }
+
+    .shop-feature {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem, 5vw, 4rem);
+      align-items: center;
+      margin-top: 3.4rem;
+    }
+
+    .shop-feature img {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      display: block;
+    }
+
+    .shop-feature h3 {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 1.8rem;
+      color: var(--plum);
+      margin: 0 0 0.6rem;
+    }
+
+    .shop-feature p {
+      color: var(--taupe);
+      font-size: 1.02rem;
+      line-height: 1.85;
+      margin-bottom: 1.4rem;
+    }
+
+    .shop-fulfillment {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--rose);
+      padding-top: 0.9rem;
+      border-top: 1px solid var(--hairline-rose);
+      display: inline-block;
+    }
+
+    /* REVIEWS / PRESS strip */
+    .reviews-strip {
+      background: var(--bg-blush);
+      border-top: 1px solid var(--hairline-rose);
+      border-bottom: 1px solid var(--hairline-rose);
+      padding: clamp(3.4rem, 6vw, 5rem) clamp(1.5rem, 6vw, 4rem);
+    }
+
+    .reviews-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 2.4rem;
+      text-align: center;
+    }
+
+    .reviews-cell .reviews-platform {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--rose);
+      display: block;
+      margin-bottom: 0.6rem;
+    }
+
+    .reviews-cell .reviews-score {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 2.2rem;
+      color: var(--plum);
+      line-height: 1;
+      font-feature-settings: 'kern', 'liga', 'tnum';
+    }
+
+    .reviews-cell .reviews-meta {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.84rem;
+      color: var(--taupe);
+      margin-top: 0.5rem;
+      letter-spacing: 0.04em;
+      font-feature-settings: 'kern', 'liga', 'onum';
+    }
+
+    /* SAFETY / AFTERCARE */
+    .safety {
+      background: var(--plum);
+      color: #F4E6E0;
+    }
+
+    .safety .wrap-inner { color: #F4E6E0; }
+
+    .safety .pagenum {
+      color: #F8C8C0;
+      opacity: 0.16;
+    }
+
+    .safety .eyebrow {
+      color: #F8C8C0;
+    }
+
+    .safety h2 {
+      color: #F4E6E0;
+      font-size: var(--fs-h2);
+      margin-bottom: 0.6rem;
+    }
+
+    .safety-lead {
+      color: rgba(244,230,224,0.78);
+      font-size: 1.04rem;
+      max-width: 640px;
+      margin-bottom: 3rem;
+      line-height: 1.85;
+    }
+
+    .safety-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1.6rem;
+    }
+
+    .safety-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(248,200,192,0.18);
+      padding: 1.8rem 1.6rem 1.9rem;
+    }
+
+    .safety-card h3 {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 1.18rem;
+      color: #F4E6E0;
+      margin: 0 0 0.6rem;
+    }
+
+    .safety-card p {
+      color: rgba(244,230,224,0.72);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* CONSULT (booking) */
+    .consult {
+      display: grid;
+      grid-template-columns: 6fr 6fr;
+      gap: clamp(2.4rem, 6vw, 5rem);
+      align-items: center;
+    }
+
+    .consult-copy h2 {
+      font-size: var(--fs-h2);
+      margin-bottom: 0.6rem;
+    }
+
+    .consult-copy p {
+      color: var(--taupe);
+      font-size: 1.04rem;
+      line-height: 1.85;
+      margin-bottom: 1.6rem;
+      max-width: 480px;
+    }
+
+    .consult-meta {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem;
+      border-top: 1px solid var(--hairline-rose);
+    }
+
+    .consult-meta li {
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--hairline-plum);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      color: var(--taupe);
+      letter-spacing: 0.04em;
+    }
+
+    .consult-meta li strong {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      color: var(--plum);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      display: inline-block;
+      width: 11rem;
+    }
+
+    .consult-card {
+      background: #fff;
+      box-shadow: var(--shadow-lift);
+      padding: clamp(2rem, 4vw, 2.8rem);
+      border-top: 2px solid var(--rose);
+    }
+
+    .consult-card h3 {
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 400;
+      font-size: 1.6rem;
+      color: var(--plum);
+      margin: 0 0 0.6rem;
+    }
+
+    .consult-card p {
+      color: var(--taupe);
+      font-size: 0.98rem;
+      line-height: 1.75;
+      margin-bottom: 1.4rem;
+    }
+
+    .consult-card .btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .consult-card .consult-call {
+      margin-top: 1.2rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.86rem;
+      color: var(--taupe-light);
+      text-align: center;
+      letter-spacing: 0.04em;
+      font-feature-settings: 'kern', 'liga', 'onum';
+    }
+
+    /* FOOTER ADDITIONS (compliance) */
+    .footer-compliance {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 clamp(1.5rem, 6vw, 4rem) 1.6rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      color: rgba(217,199,194,0.72);
+      letter-spacing: 0.04em;
+      line-height: 1.85;
+    }
+
+    .footer-compliance strong {
+      color: #F4E6E0;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
     /* ===== Responsive ===== */
     @media (max-width: 980px) {
       .treatment-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .provider-grid { grid-template-columns: 1fr; gap: 2.4rem; }
       .footer-grid { grid-template-columns: 1fr 1fr; }
+      .society-grid { grid-template-columns: 1fr; gap: 2.6rem; }
+      .specials-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .menu-list { grid-template-columns: 1fr; gap: 2.6rem; }
+      .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .financing { grid-template-columns: 1fr; gap: 2rem; }
+      .team-grid { grid-template-columns: 1fr; gap: 1.4rem; }
+      .shop-head { grid-template-columns: 1fr; gap: 2rem; }
+      .shop-feature { grid-template-columns: 1fr; gap: 2rem; }
+      .reviews-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; }
+      .safety-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .consult { grid-template-columns: 1fr; gap: 2.4rem; }
     }
 
     @media (max-width: 768px) {
@@ -875,6 +1689,12 @@
       .treatment-grid { grid-template-columns: 1fr; }
       .testimonial-grid { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .specials-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .safety-grid { grid-template-columns: 1fr; }
+      .shop-brands { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .promo-bar { font-size: 0.68rem; gap: 0.7rem; padding: 0.6rem 1rem; }
+      .promo-bar .promo-divider { display: none; }
     }
 
     /* Reduced motion */
@@ -890,21 +1710,32 @@
 </head>
 <body>
 
+  <!-- PROMO BAR (top-most strip, not sticky) -->
+  <div class="promo-bar" role="region" aria-label="Seasonal offers">
+    <span><strong>Spring Botox Days:</strong>$11 per unit, May 6 through May 9. Reserve a window in advance.</span>
+    <span class="promo-divider" aria-hidden="true">|</span>
+    <a href="#specials">See All Specials</a>
+    <span class="promo-divider" aria-hidden="true">|</span>
+    <a href="#society">Reverie Society</a>
+  </div>
+
   <!-- NAV: CENTERED SPLIT -->
   <nav class="nav" aria-label="Primary">
     <div class="nav-inner">
       <ul class="nav-links nav-links-left">
         <li><a href="#treatments">Treatments</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#results">Results</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#society">Membership</a></li>
+        <li><a href="#specials">Specials</a></li>
       </ul>
       <a href="#" class="nav-brand" aria-label="Reverie Aesthetics home">
         <span class="wordmark">REVERIE</span>
         <span class="nav-tagline">Aesthetics &middot; Highland Park</span>
       </a>
       <ul class="nav-links nav-links-right">
-        <li><a href="#journal">Journal</a></li>
-        <li><a href="#press">Press</a></li>
+        <li><a href="#gallery">Results</a></li>
+        <li><a href="#shop">Shop</a></li>
+        <li><a href="#team">Team</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
       <a href="#contact" class="btn nav-cta">Book Consultation</a>
@@ -1011,9 +1842,247 @@
     </div>
   </section>
 
-  <!-- TESTIMONIALS (04) -->
-  <section class="section testimonials section-blush" id="results">
+  <!-- PRICING MENU (04), per-area transparency -->
+  <section class="section pricing" id="pricing" aria-labelledby="pricing-heading">
     <span class="pagenum" aria-hidden="true">04</span>
+    <div class="wrap-inner">
+      <p class="eyebrow">Pricing, Published</p>
+      <h2 id="pricing-heading">Per-Area Menu.</h2>
+      <p class="treatments-intro">Most med spas hide their pricing behind a consult form. We do not. Below is the working menu the front desk quotes from. Specials and Society pricing are layered on top.</p>
+
+      <div class="menu-list">
+        <div class="menu-group">
+          <h3>Neuromodulators</h3>
+          <span class="menu-rule" aria-hidden="true"></span>
+          <div class="menu-row">
+            <span class="menu-name">Botox<span>Per unit, glabella, forehead, crow's feet</span></span>
+            <span class="menu-cost">$14 / unit</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Dysport<span>Per unit, faster onset for some patients</span></span>
+            <span class="menu-cost">$5 / unit</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Daxxify<span>Longer-lasting protocol, six months on average</span></span>
+            <span class="menu-cost">$16 / unit</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Masseter / Jawline Slim<span>30 to 50 units per side, every 4 to 6 months</span></span>
+            <span class="menu-cost">From $560</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Prepaid Tox Bank<span>200 units, locked at member rate, no expiration</span></span>
+            <span class="menu-cost">From $2,400</span>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <h3>Dermal Fillers</h3>
+          <span class="menu-rule" aria-hidden="true"></span>
+          <div class="menu-row">
+            <span class="menu-name">Juvederm Voluma (cheek)<span>Per syringe, structural restoration</span></span>
+            <span class="menu-cost">$895</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Juvederm Volux (jawline)<span>Per syringe, definition and projection</span></span>
+            <span class="menu-cost">$925</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Restylane Lyft / Defyne<span>Per syringe, mid-face and folds</span></span>
+            <span class="menu-cost">$850</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Restylane Kysse (lips)<span>Per syringe, soft, hydrated finish</span></span>
+            <span class="menu-cost">$795</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Tear Trough Correction<span>Cannula technique, RHA Redensity recommended</span></span>
+            <span class="menu-cost">From $895</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Sculptra<span>Per vial, biostimulator series of three</span></span>
+            <span class="menu-cost">$995 / vial</span>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <h3>Energy &amp; Resurfacing</h3>
+          <span class="menu-rule" aria-hidden="true"></span>
+          <div class="menu-row">
+            <span class="menu-name">Fractional CO2 Resurfacing<span>Full face, 7 to 10 day downtime</span></span>
+            <span class="menu-cost">$2,400</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Pico Laser (PicoSure)<span>Tone, pigment, melasma. All Fitzpatrick types.</span></span>
+            <span class="menu-cost">$650 / session</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Microneedling with PRF<span>Texture, scarring, fine lines</span></span>
+            <span class="menu-cost">$685</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Morpheus8 RF<span>Skin tightening, full face plus neck</span></span>
+            <span class="menu-cost">From $1,400</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">BBL / IPL Photofacial<span>Vascular and pigmented lesions</span></span>
+            <span class="menu-cost">$525 / session</span>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <h3>Body, Peels &amp; IV</h3>
+          <span class="menu-rule" aria-hidden="true"></span>
+          <div class="menu-row">
+            <span class="menu-name">CoolSculpting Elite<span>Per applicator cycle, package of four recommended</span></span>
+            <span class="menu-cost">$750 / cycle</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Emsculpt Neo<span>Per area, series of four</span></span>
+            <span class="menu-cost">$3,200 / series</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">Medical Peels (Vi, ZO, TCA)<span>Single peel or series of three</span></span>
+            <span class="menu-cost">From $385</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">HydraFacial Platinum<span>60 minutes, includes LED and lymphatic</span></span>
+            <span class="menu-cost">$285</span>
+          </div>
+          <div class="menu-row">
+            <span class="menu-name">IV Drip Menu<span>Hydration, Immune, Recovery, Glow, Myers</span></span>
+            <span class="menu-cost">$225 to $385</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="menu-fineprint">Pricing is current as of this season and may shift with product cost changes. Reverie Society members receive 15 percent off injectables and 20 percent off all energy and laser treatments. A consultation is required before any first-time injectable visit.</p>
+    </div>
+  </section>
+
+  <!-- SOCIETY / MEMBERSHIP (05) -->
+  <section class="section society" id="society" aria-labelledby="society-heading">
+    <span class="pagenum" aria-hidden="true">05</span>
+    <div class="wrap-inner">
+      <div class="society-grid">
+        <div class="society-copy">
+          <p class="eyebrow">The Reverie Society</p>
+          <h2 id="society-heading">A Quiet Membership for the Long View.</h2>
+          <p class="society-sub">Aesthetics is a maintenance practice, not a shopping trip. The Society is built for patients who plan in seasons rather than appointments. One monthly fee covers your facial, your products, and member pricing on everything else.</p>
+          <div class="society-price">
+            <span class="society-price-amount">$165</span>
+            <span class="society-price-suffix">/ month</span>
+          </div>
+          <p class="society-bonus">Or $1,800 paid annually, a savings of $180. Membership is transferable to a partner or daughter.</p>
+          <a href="#contact" class="btn">Join the Society</a>
+        </div>
+
+        <aside class="society-tiers" aria-label="Society benefits">
+          <h3>What the Society Includes</h3>
+          <ul>
+            <li><strong>One signature facial each month.</strong> HydraFacial Platinum or a custom medical-grade alternative, your choice.</li>
+            <li><strong>$50 in monthly product credit</strong> toward any professional skincare line we carry, rolling up to twelve months.</li>
+            <li><strong>15 percent off all injectables.</strong> Tox, filler, biostimulators. No blackout dates, including during Botox Days.</li>
+            <li><strong>20 percent off energy treatments.</strong> Laser, microneedling, RF, and IPL across every device on the floor.</li>
+            <li><strong>Priority booking</strong> two weeks before public scheduling opens for seasonal events and dated specials.</li>
+            <li><strong>Complimentary annual skin analysis</strong> with imaging, plus a written 12-month treatment roadmap.</li>
+          </ul>
+          <p class="society-fineprint">Three-month minimum. Pause for travel or pregnancy without penalty. Cancel any time after the third month with a single email.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECIALS (06) -->
+  <section class="section specials" id="specials" aria-labelledby="specials-heading">
+    <span class="pagenum" aria-hidden="true">06</span>
+    <div class="wrap-inner">
+      <div class="specials-head">
+        <p class="eyebrow">Dated, Limited, Real</p>
+        <h2 id="specials-heading">Seasonal Specials.</h2>
+        <p>Three things change each quarter. We publish them with real dates and real caps, then we move on. No rolling banner, no permanent sale.</p>
+      </div>
+
+      <div class="specials-grid">
+        <article class="special-card">
+          <span class="special-eyebrow">Spring Event</span>
+          <h3>Botox Days</h3>
+          <p>$11 per unit on Botox and Dysport over four days each spring. Reserved for established patients first, then opened to consults. Walk-ins welcome only when the schedule permits.</p>
+          <span class="special-meta">May 6 to May 9 &middot; Reserve in advance</span>
+        </article>
+
+        <article class="special-card">
+          <span class="special-eyebrow">Mother's Day</span>
+          <h3>The Restoration Package</h3>
+          <p>HydraFacial Platinum, a 30-unit Tox treatment, and a take-home SkinMedica TNS Advanced+ Serum, bundled and gift-wrapped. Redeemable through the end of June.</p>
+          <span class="special-meta">$795 (a $1,150 value) &middot; Through June 30</span>
+        </article>
+
+        <article class="special-card">
+          <span class="special-eyebrow">Prepaid &amp; Locked</span>
+          <h3>Filler Bank, 3 Syringes</h3>
+          <p>Three syringes of any Juvederm or Restylane HA filler, prepaid at $2,395. Bank stays open for 18 months. We pull from it in 0.5 ml increments at no per-visit charge.</p>
+          <span class="special-meta">Save $290 &middot; 18-month redemption</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY: BEFORE / AFTER (07) -->
+  <section class="section gallery section-blush" id="gallery" aria-labelledby="gallery-heading">
+    <span class="pagenum" aria-hidden="true">07</span>
+    <div class="wrap-inner">
+      <div class="gallery-head">
+        <p class="eyebrow">Real Patients, Real Results</p>
+        <h2 id="gallery-heading">Before and After.</h2>
+        <p>Every photograph below is a Reverie patient, photographed in the same room, the same lighting, and the same neutral background. No filters. Consent on file.</p>
+      </div>
+
+      <div class="gallery-grid">
+        <article class="gallery-card">
+          <div class="gallery-frame">
+            <img src="images/med-spa-treatment.jpg" alt="Before view of a patient's lower face prior to dermal filler treatment" width="800" height="1000" loading="lazy">
+            <img src="images/med-spa-treatment.jpg" alt="After view of the same patient eight weeks following Voluma cheek and Volux jawline restoration" width="800" height="1000" loading="lazy">
+          </div>
+          <div class="gallery-body">
+            <h3>Cheek and Jawline Restoration</h3>
+            <p>Two syringes Voluma, one syringe Volux. Photographed at eight weeks. Patient in her early forties, prior baby weight loss.</p>
+            <span class="gallery-meta">Treatment by Dr. Whitfield</span>
+          </div>
+        </article>
+
+        <article class="gallery-card">
+          <div class="gallery-frame">
+            <img src="images/med-spa-portrait.jpg" alt="Before view of a patient's forehead and brow area prior to neuromodulator treatment" width="800" height="1000" loading="lazy">
+            <img src="images/med-spa-portrait.jpg" alt="After view of the same patient two weeks following a 24-unit Botox treatment for forehead and glabella" width="800" height="1000" loading="lazy">
+          </div>
+          <div class="gallery-body">
+            <h3>Forehead and Brow, Lifted</h3>
+            <p>24 units Botox, conservative pattern preserving full brow expression. Photographed at two weeks. Patient in her mid-thirties.</p>
+            <span class="gallery-meta">Treatment by Dr. Whitfield</span>
+          </div>
+        </article>
+
+        <article class="gallery-card">
+          <div class="gallery-frame">
+            <img src="images/med-spa-interior.jpg" alt="Before view of a patient's skin prior to a series of three medical-grade peels for tone and texture" width="800" height="1000" loading="lazy">
+            <img src="images/med-spa-interior.jpg" alt="After view of the same patient's skin following a series of three Vi Peels and a 12-week home regimen" width="800" height="1000" loading="lazy">
+          </div>
+          <div class="gallery-body">
+            <h3>Tone and Texture, Twelve Weeks</h3>
+            <p>Series of three Vi Peels paired with a SkinMedica home regimen. Photographed at the twelve-week mark. Sun damage and post-inflammatory pigment.</p>
+            <span class="gallery-meta">Treatment by Maya Reyes, LE</span>
+          </div>
+        </article>
+      </div>
+
+      <p class="gallery-disclaimer">Individual results vary. Photos shown are unretouched, taken in the practice with the patient's written consent. We can show you a longer set of comparable cases at your consultation, organized by goal and Fitzpatrick type.</p>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS (08) -->
+  <section class="section testimonials section-blush" id="results">
+    <span class="pagenum" aria-hidden="true">08</span>
     <div class="wrap-inner">
       <p class="eyebrow">Real Results</p>
       <h2>Our Patients Speak for Themselves.</h2>
@@ -1038,9 +2107,168 @@
     </div>
   </section>
 
-  <!-- PROVIDER (05) -->
+  <!-- REVIEWS STRIP (named platforms) -->
+  <section class="reviews-strip" aria-labelledby="reviews-strip-heading">
+    <h2 id="reviews-strip-heading" class="visually-hidden" style="position:absolute;left:-9999px;">Patient ratings across platforms</h2>
+    <div class="reviews-grid">
+      <div class="reviews-cell">
+        <span class="reviews-platform">Google</span>
+        <span class="reviews-score">4.9</span>
+        <span class="reviews-meta">Across 247 reviews</span>
+      </div>
+      <div class="reviews-cell">
+        <span class="reviews-platform">RealSelf</span>
+        <span class="reviews-score">98%</span>
+        <span class="reviews-meta">Worth It rating, 86 reviews</span>
+      </div>
+      <div class="reviews-cell">
+        <span class="reviews-platform">Yelp</span>
+        <span class="reviews-score">4.8</span>
+        <span class="reviews-meta">Across 142 reviews</span>
+      </div>
+      <div class="reviews-cell">
+        <span class="reviews-platform">D Magazine</span>
+        <span class="reviews-score">2024</span>
+        <span class="reviews-meta">Best Aesthetic Practice, Park Cities</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM / CREDENTIALS (09) -->
+  <section class="section team" id="team" aria-labelledby="team-heading">
+    <span class="pagenum" aria-hidden="true">09</span>
+    <div class="wrap-inner">
+      <div class="team-head">
+        <p class="eyebrow">Behind the Practice</p>
+        <h2 id="team-heading">A Physician, an RN, and a Licensed Esthetician.</h2>
+        <p>Medical aesthetics is medicine first. The practice operates under physician oversight, with every protocol signed off by Dr. Whitfield. Each provider holds the license their work requires. We list those licenses publicly.</p>
+      </div>
+
+      <div class="team-grid">
+        <article class="team-card">
+          <span class="team-role">Medical Director</span>
+          <h3>Dr. Elaine Whitfield, MD</h3>
+          <p class="team-title">Board-Certified Dermatologist &middot; Founder</p>
+          <p>Performs all first-time injectable consultations and complex correction work. Reviews every IV protocol against intake labs before administration. Available on call for any aftercare concern, in person or by direct line.</p>
+          <p class="team-creds">TX Med Lic 12345 &middot; NPI 1234567890 &middot; Fellow AAD &middot; ASDS</p>
+        </article>
+
+        <article class="team-card">
+          <span class="team-role">Lead Injector</span>
+          <h3>Hannah Beaumont, RN, BSN</h3>
+          <p class="team-title">Aesthetic Nurse Specialist</p>
+          <p>Eight years injecting, the last five at Reverie. Trained directly under Dr. Whitfield with ongoing mentorship at every advanced filler case. Carries certifications from Allergan Medical Institute and Galderma Aesthetic Injector Network.</p>
+          <p class="team-creds">RN License TX 845221 &middot; AMI Certified &middot; Galderma AIN</p>
+        </article>
+
+        <article class="team-card">
+          <span class="team-role">Skin Health</span>
+          <h3>Maya Reyes, LE</h3>
+          <p class="team-title">Licensed Master Esthetician</p>
+          <p>Master esthetician licensure with eleven years in medical practice settings. Leads all peels, HydraFacials, microneedling, and the home-care planning that holds the in-clinic results in place between visits.</p>
+          <p class="team-creds">TX Master LE 67301 &middot; ZO Skin Health &middot; SkinMedica Advanced</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOP (10) -->
+  <section class="section shop section-blush" id="shop" aria-labelledby="shop-heading">
+    <span class="pagenum" aria-hidden="true">10</span>
+    <div class="wrap-inner">
+      <div class="shop-head">
+        <div>
+          <p class="eyebrow">Professional Skincare</p>
+          <h2 id="shop-heading">The Shelf.</h2>
+        </div>
+        <p>The lines we carry are the ones we recommend, and we recommend them because they appear repeatedly in our patient charts. Members earn $50 a month in product credit. Online orders ship in two business days, or pick up at the front desk.</p>
+      </div>
+
+      <div class="shop-brands" aria-label="Skincare brands carried">
+        <div class="shop-brand">ZO Skin Health</div>
+        <div class="shop-brand">SkinMedica</div>
+        <div class="shop-brand">Obagi</div>
+        <div class="shop-brand">Alastin</div>
+        <div class="shop-brand">ISDIN</div>
+        <div class="shop-brand">EltaMD</div>
+      </div>
+
+      <div class="shop-feature">
+        <figure>
+          <img src="images/med-spa-products.jpg" alt="Editorial arrangement of professional medical-grade skincare products on a soft neutral surface" width="800" height="1000" loading="lazy">
+        </figure>
+        <div>
+          <p class="eyebrow">Featured</p>
+          <h3>The Reverie Starter Regimen</h3>
+          <p>A four-step morning and evening protocol assembled from the brands above, calibrated to your skin type at consult. Vitamin C, retinol, sunscreen, and a recovery moisturizer. Delivered in a refillable case, with a 60-day check-in built into the price.</p>
+          <a href="#contact" class="btn btn-ghost">Build Your Regimen</a>
+          <span class="shop-fulfillment">Ships in 2 business days &middot; In-clinic pickup available</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAFETY / AFTERCARE (11) -->
+  <section class="section safety" id="safety" aria-labelledby="safety-heading">
+    <span class="pagenum" aria-hidden="true">11</span>
+    <div class="wrap-inner">
+      <p class="eyebrow">Why Medical Spa Means Medical</p>
+      <h2 id="safety-heading">Safety Is the Quiet Part of the Work.</h2>
+      <p class="safety-lead">The line between a spa and a medical practice is the standing physician, the sterile technique, and the protocol when something goes sideways. We have all three, in writing, on the wall.</p>
+
+      <div class="safety-grid">
+        <article class="safety-card">
+          <h3>Physician Oversight</h3>
+          <p>A board-certified dermatologist reviews every chart before treatment and is on the floor or on call for the duration of the appointment. No exceptions, no remote-only days.</p>
+        </article>
+        <article class="safety-card">
+          <h3>Sterile Technique</h3>
+          <p>Single-use injectable trays, closed-system reconstitution, and chlorhexidine prep before any needle. Treatment rooms are turned over with the same checklist used in surgical clinics.</p>
+        </article>
+        <article class="safety-card">
+          <h3>Hyaluronidase On Site</h3>
+          <p>Vascular complication is the rare event that defines whether a practice is medical. We keep hyaluronidase stocked, dosed, and within arm's reach of every filler treatment, every visit.</p>
+        </article>
+        <article class="safety-card">
+          <h3>Aftercare Direct Line</h3>
+          <p>Every patient leaves with a written aftercare plan and the lead injector's direct line. Bruising, asymmetry, anything unusual, you reach a clinician within an hour, including weekends.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINANCING (12) -->
+  <section class="section financing-section" id="financing" aria-labelledby="financing-heading">
+    <span class="pagenum" aria-hidden="true">12</span>
+    <div class="wrap-inner">
+      <div class="financing">
+        <div class="financing-copy">
+          <p class="eyebrow">Payment Options</p>
+          <h2 id="financing-heading">Pay Over Time, On Your Terms.</h2>
+          <p>Treatment plans above $1,500 often make more sense across a few months than across a single statement. We accept three financing partners. All three issue decisions in minutes at the front desk or on your phone before you arrive.</p>
+        </div>
+
+        <aside class="financing-partners" aria-label="Financing partners">
+          <div class="financing-partner">
+            <span class="fp-name">CareCredit</span>
+            <span class="fp-detail">6, 12, and 18-month no-interest plans on qualifying treatment over $1,000.</span>
+          </div>
+          <div class="financing-partner">
+            <span class="fp-name">Cherry</span>
+            <span class="fp-detail">Soft-credit-pull approval, monthly plans up to 24 months, no impact on your credit score to apply.</span>
+          </div>
+          <div class="financing-partner">
+            <span class="fp-name">Affirm</span>
+            <span class="fp-detail">3, 6, or 12-month financing at checkout, including for product orders over $300.</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROVIDER (13) -->
   <section class="section provider" id="journal">
-    <span class="pagenum" aria-hidden="true">05</span>
+    <span class="pagenum" aria-hidden="true">13</span>
     <div class="wrap-inner">
       <div class="provider-grid">
         <div class="provider-left">
@@ -1070,18 +2298,29 @@
     </div>
   </section>
 
-  <!-- CTA (06) -->
-  <section class="section cta" id="contact">
-    <span class="pagenum" aria-hidden="true">06</span>
+  <!-- CONSULTATION BOOKING (14) -->
+  <section class="section consult-section" id="contact" aria-labelledby="consult-heading">
+    <span class="pagenum" aria-hidden="true">14</span>
     <div class="wrap-inner">
-      <div class="cta-inner">
-        <figure class="cta-accent">
-          <img src="images/med-spa-products.jpg" alt="Minimal arrangement of medical-grade skincare on a soft neutral surface" width="400" height="500" loading="lazy">
-        </figure>
-        <h2>Your Consultation Is the First Treatment.</h2>
-        <p>Every relationship begins with a conversation. We listen first, assess second, and only recommend treatments that align with your goals. No obligation, no pressure.</p>
-        <a href="#" class="btn">Book Your Consultation</a>
-        <p class="cta-meta">Or call (214) 555-0891 &middot; Highland Park Village, Suite 204</p>
+      <div class="consult">
+        <div class="consult-copy">
+          <p class="eyebrow">The Consultation</p>
+          <h2 id="consult-heading">Complimentary, 30 Minutes, No Obligation.</h2>
+          <p>Every new-patient visit begins with a sit-down consultation in our consult room, before anyone touches your face. We listen first, photograph and assess second, and write a plan only if we believe one is warranted.</p>
+          <ul class="consult-meta">
+            <li><strong>Duration</strong>30 minutes, no rush, no upsell</li>
+            <li><strong>Cost</strong>Complimentary for first-time patients</li>
+            <li><strong>You leave with</strong>A written plan, a price, and zero pressure</li>
+            <li><strong>Same-day treatment</strong>Available when scheduling allows</li>
+          </ul>
+        </div>
+
+        <aside class="consult-card" aria-label="Booking">
+          <h3>Reserve a Window</h3>
+          <p>Pick a time on the live calendar or speak with the front desk during clinic hours. New patients are welcomed in writing the day before their visit with a brief intake form and parking directions.</p>
+          <a href="#" class="btn">Book Online</a>
+          <p class="consult-call">Or call (214) 555-0891 &middot; Highland Park Village, Suite 204</p>
+        </aside>
       </div>
     </div>
   </section>
@@ -1092,21 +2331,39 @@
       <div class="footer-col">
         <div class="footer-brand">REVERIE AESTHETICS</div>
         <p class="footer-tag">Highland Park &middot; Dallas</p>
+        <p style="margin-top:1rem;">A physician-led medical aesthetics practice. Every clinical decision reviewed by a board-certified dermatologist. Treatments performed on site, by named providers, with the standard of care of a medical clinic.</p>
+        <a class="footer-credit" href="https://dbjtechnologies.com" target="_blank" rel="noopener">Website by DBJ Technologies</a>
       </div>
 
       <div class="footer-col">
         <h4>Visit</h4>
         <p>47 Highland Park Village<br>Suite 204<br>Dallas, TX 75205</p>
         <p style="margin-top:0.8rem;">(214) 555-0891<br>hello@reverieaesthetics.com</p>
+        <h4 style="margin-top:1.6rem;">Reach Us</h4>
+        <ul>
+          <li><a href="tel:+12145550891" style="color:#F4E6E0; border-bottom:1px solid rgba(244,230,224,0.32); padding-bottom:1px;">Call the Front Desk</a></li>
+          <li><a href="sms:+12145550891" style="color:#F4E6E0; border-bottom:1px solid rgba(244,230,224,0.32); padding-bottom:1px;">Text the Front Desk</a></li>
+          <li><a href="#contact" style="color:#F4E6E0; border-bottom:1px solid rgba(244,230,224,0.32); padding-bottom:1px;">Book Online</a></li>
+        </ul>
       </div>
 
       <div class="footer-col">
         <h4>Hours</h4>
-        <p>Monday to Friday 9am to 6pm<br>Saturday 9am to 2pm<br>Closed Sunday</p>
-        <a class="footer-credit" href="https://dbjtechnologies.com" target="_blank" rel="noopener">Website by DBJ Technologies</a>
+        <p>Monday 9am to 6pm<br>Tuesday 9am to 6pm<br>Wednesday 9am to 7pm<br>Thursday 9am to 7pm<br>Friday 9am to 6pm<br>Saturday 9am to 2pm<br>Closed Sunday</p>
+        <h4 style="margin-top:1.6rem;">Find Us</h4>
+        <ul>
+          <li>Google &middot; Yelp &middot; RealSelf</li>
+          <li>Instagram &middot; @reverie.aesthetics</li>
+        </ul>
       </div>
     </div>
-    <div class="footer-bottom">&copy; 2026 Reverie Aesthetics. All rights reserved.</div>
+
+    <div class="footer-compliance">
+      <strong>Licensure &amp; Compliance</strong>
+      Medical Director: Elaine Whitfield, MD &middot; Texas Medical Board License 12345 &middot; NPI 1234567890. Lead Injector: Hannah Beaumont, RN, BSN &middot; TX RN License 845221. Licensed Master Esthetician: Maya Reyes &middot; TX LE 67301. Reverie Aesthetics is a physician-owned medical practice operated under Texas Medical Board oversight. We comply with the Health Insurance Portability and Accountability Act (HIPAA). Patient health information is held in confidence and shared only with written authorization. Notice of Privacy Practices and treatment-specific consents are provided in writing at every initial visit.
+    </div>
+
+    <div class="footer-bottom">&copy; 2026 Reverie Aesthetics. All rights reserved. &middot; <a href="#" style="color:inherit; border-bottom:1px solid rgba(217,199,194,0.4); padding-bottom:1px;">Privacy</a> &middot; <a href="#" style="color:inherit; border-bottom:1px solid rgba(217,199,194,0.4); padding-bottom:1px;">Notice of Privacy Practices</a> &middot; <a href="#" style="color:inherit; border-bottom:1px solid rgba(217,199,194,0.4); padding-bottom:1px;">Accessibility</a></div>
   </footer>
 
 </body>

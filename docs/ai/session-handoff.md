@@ -6,7 +6,47 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
-## Last Session: April 27, 2026 -- In-house real-time monitoring (V1 + safe V2 enhancements)
+## Last Session: April 27, 2026 -- Pass 1 + blueprint for the remaining 5 portfolio templates
+
+### What shipped (templates + docs)
+
+Pass 1 content-infrastructure expansion plus a deep-dive blueprint markdown doc for the five portfolio templates that had not yet been improved. After this session all 8 templates and all 8 blueprints are in place and ready for the per-template critique and edit pass.
+
+**Templates expanded** (all under `public/templates/`):
+- `dental-practice.html`: 1080 -> 2042 lines. New surfaces: dated promo strip + emergency strip, Specials with three dated cards, Ridgeview Smile Plan in-house membership ($29/mo adult, $19 kids), Smile Gallery, Office Tour (technology + comfort), named hygiene team (Maya Rios, Jordan Tate, Elena Lin), Financing (CareCredit / Sunbit / Cherry / in-house), multi-modal contact strip, footer compliance (TX dental license, ADA, TDA, sterilization standards, Hablamos Espanol). Insurance pill grid expanded 8 -> 12 carriers with honest out-of-network aside.
+- `real-estate.html`: 907 -> 1747 lines. New surfaces: Sold portfolio (8 closed transactions with year, neighborhood, side, price), Buyer Process + Seller Process numbered timelines, Concierge (Off-Market Access, Staging, Renovation Strategy, Relocation Network, Discreet Photography, Trusted Advisors), Press / Recognition strip with 6 publication marks + dated honors list, Off-Market Private List quarterly email capture, Direct Private Consultation CTA replacing the thin sellers section. Listings cards now carry status glyphs (Active / Under Contract / Just Sold). Footer rebuilt as 4-column with TREC license, broker license, EHO, MLS NTREIS, IABS, TREC Consumer Protection Notice. Brokerage affiliation pill (Briggs Freeman Sotheby's) added quietly to nav.
+- `med-spa.html`: 1113 -> 2370 lines. New surfaces: per-area transparent Pricing menu (neuromodulators, fillers, energy/resurfacing, body/peels/IV), Reverie Society monthly membership, dated Specials (Botox Days, Mother's Day Restoration, Filler Bank), Before/After gallery with consent disclaimer, three-provider credentials grid (Medical Director MD/NPI, RN injector, Master Esthetician), six-brand Shop (ZO, SkinMedica, Obagi, Alastin, ISDIN, EltaMD), Safety section (physician oversight, sterile technique, hyaluronidase on site, aftercare line), Financing (CareCredit / Cherry / Affirm with terms), 4-platform reviews strip (Google / RealSelf / Yelp / D Magazine), expanded footer compliance (TX Medical Board, NPI, RN/LE license numbers, HIPAA notice).
+- `pi-law.html`: 1274 -> 2221 lines. New surfaces: red 24/7 + bilingual urgent strip above nav, "No Fee Unless We Win" badge cluster on hero, Free Case Review intake form with personal-review pledge from senior partner, Practice Areas expanded 6 -> 10 cards (auto, truck, motorcycle, pedestrian/bike, premises, work, wrongful death, dog bite, catastrophic, med-mal/bad faith), Results with case-amount cards under the verdicts ledger, "What to do after an accident" 7-step lead magnet, Recognition with 8 dated peer-reviewed badges (Super Lawyers, Best Lawyers, Multi-Million / Million Dollar Advocates Forum, Martindale-Hubbell, AVVO, TTLA, D Magazine), 4-channel multi-modal contact (Call / Text / Online / Live Chat), 3 Office Locations (Dallas / Fort Worth / Plano), 8-question FAQ accordion, mobile sticky CTA. Footer disclaimer expanded with State Bar of Texas attorney advertising notice + named responsible attorney + prior-results disclaimer. Note: agent stripped diacritics from "Espanol"; flagged for the critique pass.
+- `financial-advisor.html`: 1308 -> 2291 lines. New surfaces: signed Fiduciary Pledge after the founder portrait, Who I Serve with $2M minimum + capped relationship count, Specialties (RSU/ISO/10b5-1, business sale, multi-gen, tax, estate, charitable/DAF), published tiered Fee schedule (1.00 / 0.85 / 0.65 / 0.45) plus planning-only retainer, Custodian disclosure (Schwab / Fidelity / Pershing / eMoney) on charcoal section, quarterly Insights commentary grid replacing the thin press lockup, expanded Recognition with dated honors and methodology disclaimer, Privacy / cybersecurity 3-card strip, restructured Contact as a Discovery Call booking surface ("no follow-up if it is not a fit"). Footer rebuilt 4-column with Form ADV Part 2A/2B, Form CRS, Privacy Policy, Fiduciary Statement, SEC file number, RIA attribution. Nav adds Fees + Client Login.
+
+**Blueprints created** (all under `docs/blueprints/`):
+- `dental-practice.md` (39 lines)
+- `real-estate.md` (37 lines)
+- `med-spa.md` (37 lines)
+- `pi-law.md` (41 lines)
+- `financial-advisor.md` (37 lines)
+
+All five mirror the format established by `upscale-restaurant.md` / `hvac-contractor.md` / `luxury-home-builder.md`: frontmatter (title, slug, template, headline, summary), 4 sections (How <archetype> actually use the site / What most <vertical> sites get wrong / What your <vertical> site actually needs / See the proof), audit-voice opinionated, ends with the indexing-blocked + screenshots-separately note.
+
+### Discipline preserved across all 5
+
+- Every existing CSS variable, type stack, color token, and visual idiom preserved on each template. Mobile breakpoints extended for the new sections. No redesigns.
+- Every image references a file that exists on disk in `public/templates/images/`. No invented filenames.
+- `<meta name="robots" content="noindex, nofollow">` preserved on all 8 templates.
+- Em-dash check across `public/templates/` + `docs/blueprints/` returns zero matches.
+- All new sections use meaningful IDs and `aria-labelledby` on their headings.
+
+### Known issues to address in the critique pass
+
+1. PI-law agent stripped diacritics from "Hablamos Espanol" for ASCII safety; restore "Español".
+2. Voice mix in `pi-law.html` and `financial-advisor.html`: agents preserved the existing "we" firm-voice in structural sections and only used "I" in personal-letter / pledge surfaces. CLAUDE.md mandates first-person "I" throughout the site, but those two templates already shipped with "we" before this pass. Decide whether to push them all the way to first-person.
+3. User flagged that the three Pass-1 templates from prior sessions (restaurant, hvac, luxury-builders) were also "not impressive" and deserve a critique pass. All 8 templates are now at parity for that work.
+
+### Next recommended task
+
+Critique pass, one template at a time. Joshy will lead; the agent should match each template's design constraints and resist over-restructuring during edits.
+
+## Prior Session: April 27, 2026 -- In-house real-time monitoring (V1 + safe V2 enhancements)
 
 ### What shipped (code)
 

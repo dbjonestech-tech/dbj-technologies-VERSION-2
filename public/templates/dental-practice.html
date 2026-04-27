@@ -741,6 +741,618 @@
     .footer-inner{grid-template-columns:1fr}
   }
 
+  /* Promo strip · top-most, seasonal/new patient */
+  .promo-strip{
+    background:var(--charcoal);
+    color:rgba(255,255,255,0.88);
+    padding:0.6rem clamp(1rem,4vw,2rem);
+    text-align:center;
+    font-family:'DM Sans',sans-serif;
+    font-size:0.85rem;
+    letter-spacing:0.02em;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0.85rem;
+    flex-wrap:wrap;
+  }
+  .promo-strip__lead{
+    color:var(--coral);
+    font-weight:500;
+    text-transform:uppercase;
+    letter-spacing:0.18em;
+    font-size:0.74rem;
+  }
+  .promo-strip__main{color:var(--white);font-weight:500}
+  .promo-strip__main strong{
+    color:var(--coral);
+    font-weight:600;
+    font-feature-settings:'kern','liga','tnum';
+    font-variant-numeric:tabular-nums;
+  }
+  .promo-strip__sep{color:rgba(255,255,255,0.35);margin:0 0.2rem}
+  .promo-strip__link{
+    color:var(--coral);
+    text-transform:uppercase;
+    letter-spacing:0.16em;
+    font-size:0.74rem;
+    font-weight:500;
+    border-bottom:1px solid rgba(231,111,81,0.45);
+    padding-bottom:1px;
+    transition:color 160ms ease, border-color 160ms ease;
+  }
+  .promo-strip__link:hover{color:var(--white);border-bottom-color:var(--white)}
+
+  /* Emergency strip · below nav */
+  .emergency-strip{
+    background:var(--coral);
+    color:var(--white);
+    padding:0.7rem clamp(1rem,4vw,2rem);
+    text-align:center;
+    border-bottom:1px solid var(--coral-deep);
+  }
+  .emergency-strip__line{
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    font-size:0.92rem;
+    letter-spacing:0.04em;
+    line-height:1.5;
+  }
+  .emergency-strip__line strong{font-weight:600;letter-spacing:0.06em;text-transform:uppercase;font-size:0.78rem;margin-right:0.35rem}
+  .emergency-strip__line a{
+    color:var(--white);
+    font-weight:600;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    font-feature-settings:'kern','liga','tnum';
+    font-variant-numeric:tabular-nums;
+  }
+  .emergency-strip__sep{margin:0 0.5rem;color:rgba(255,255,255,0.7)}
+
+  /* Specials · dated new-patient and seasonal offers */
+  .specials{background:var(--white)}
+  .specials-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1.5rem;
+  }
+  .special-card{
+    position:relative;
+    background:var(--white);
+    border:1.5px solid var(--coral);
+    border-radius:12px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:var(--shadow-soft);
+    transition:transform 220ms ease, box-shadow 220ms ease;
+  }
+  .special-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift)}
+  .special-card__banner{
+    background:var(--coral);
+    color:var(--white);
+    padding:0.55rem 1rem;
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.22em;
+    text-align:center;
+  }
+  .special-card__body{
+    padding:1.65rem 1.65rem 1.4rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.4rem;
+    flex:1;
+  }
+  .special-card__price{
+    font-family:'DM Serif Display',serif;
+    font-weight:400;
+    font-size:3rem;
+    color:var(--coral);
+    line-height:1;
+    letter-spacing:-0.01em;
+    margin:0;
+    font-feature-settings:'kern','liga','tnum';
+    font-variant-numeric:tabular-nums;
+  }
+  .special-card__title{
+    font-family:'DM Serif Display',serif;
+    font-weight:400;
+    font-size:1.3rem;
+    color:var(--charcoal);
+    line-height:1.2;
+    margin:0.3rem 0 0;
+  }
+  .special-card__includes{
+    color:var(--warm-gray);
+    font-size:0.97rem;
+    line-height:1.65;
+    margin:0.3rem 0 0;
+  }
+  .special-card__fine{
+    color:var(--warm-gray-light);
+    font-size:0.78rem;
+    line-height:1.55;
+    border-top:1px solid var(--hairline);
+    padding-top:0.85rem;
+    margin-top:auto;
+    font-feature-settings:'kern','liga','tnum';
+    font-variant-numeric:tabular-nums;
+  }
+  .special-card__cta{
+    background:var(--charcoal);
+    color:var(--white);
+    padding:0.95rem 1rem;
+    text-align:center;
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    font-size:0.84rem;
+    text-transform:uppercase;
+    letter-spacing:0.18em;
+    transition:background 180ms ease;
+    display:block;
+  }
+  .special-card__cta:hover{background:var(--teal)}
+  .special-card--featured{
+    border-color:var(--coral-deep);
+    box-shadow:0 12px 30px rgba(231,111,81,0.18);
+  }
+  .specials-foot{
+    margin-top:2rem;
+    text-align:center;
+    color:var(--warm-gray);
+    font-size:0.95rem;
+  }
+  .specials-foot a{color:var(--teal);font-weight:500;border-bottom:1px solid rgba(42,157,143,0.35);padding-bottom:1px}
+  .specials-foot a:hover{color:var(--teal-deep);border-bottom-color:var(--teal-deep)}
+  @media (max-width:900px){.specials-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto}}
+
+  /* Membership · Ridgeview Smile Plan */
+  .membership{background:var(--cream)}
+  .membership-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:3rem;
+    align-items:center;
+  }
+  .membership__copy h2{font-size:var(--fs-h2);margin-top:0.85rem;margin-bottom:1rem}
+  .membership__sub{
+    color:var(--warm-gray);
+    font-size:1.04rem;
+    line-height:1.75;
+    max-width:480px;
+    margin-bottom:1.5rem;
+  }
+  .membership__price{
+    display:flex;
+    align-items:baseline;
+    gap:0.55rem;
+    margin:1.4rem 0 0.5rem;
+  }
+  .membership__price-amount{
+    font-family:'DM Serif Display',serif;
+    font-weight:400;
+    font-size:3.6rem;
+    color:var(--coral);
+    line-height:0.95;
+    letter-spacing:-0.01em;
+    font-feature-settings:'kern','liga','tnum';
+    font-variant-numeric:tabular-nums;
+  }
+  .membership__price-suffix{
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    font-size:0.95rem;
+    color:var(--warm-gray);
+    text-transform:uppercase;
+    letter-spacing:0.18em;
+  }
+  .membership__bonus{
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    color:var(--teal);
+    text-transform:uppercase;
+    letter-spacing:0.16em;
+    font-size:0.78rem;
+    margin:0.5rem 0 1.6rem;
+    font-feature-settings:'kern','liga','tnum';
+    font-variant-numeric:tabular-nums;
+  }
+  .membership__benefits{
+    background:var(--white);
+    border:1px solid var(--hairline);
+    border-radius:12px;
+    padding:2rem 2.25rem;
+    box-shadow:var(--shadow-soft);
+  }
+  .membership__benefits h3{
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.2em;
+    color:var(--teal);
+    margin:0 0 1.4rem;
+  }
+  .membership__benefits ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:0.95rem;
+  }
+  .membership__benefits li{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:0.85rem;
+    align-items:baseline;
+    color:var(--charcoal);
+    font-size:1rem;
+    line-height:1.6;
+  }
+  .membership__benefits li::before{
+    content:'\2713';
+    color:var(--coral);
+    font-weight:700;
+    font-size:1.05rem;
+    line-height:1;
+  }
+  .membership__benefits li strong{color:var(--charcoal);font-weight:600}
+  .membership__fine{
+    margin-top:1.25rem;
+    color:var(--warm-gray-light);
+    font-size:0.85rem;
+    line-height:1.55;
+  }
+  @media (max-width:900px){.membership-grid{grid-template-columns:1fr;gap:2.25rem}}
+
+  /* Smile Gallery */
+  .gallery{background:var(--white)}
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1.5rem;
+  }
+  .case-card{
+    background:var(--white);
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--hairline);
+    box-shadow:var(--shadow-soft);
+    display:flex;
+    flex-direction:column;
+    transition:transform 220ms ease, box-shadow 220ms ease;
+  }
+  .case-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift)}
+  .case-card__photo{
+    position:relative;
+    width:100%;
+    aspect-ratio:4/3;
+    background:var(--mist);
+    overflow:hidden;
+  }
+  .case-card__photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+    display:block;
+  }
+  .case-card__split{
+    position:absolute;
+    top:50%;
+    left:0;
+    right:0;
+    height:1px;
+    background:rgba(255,255,255,0.55);
+    pointer-events:none;
+  }
+  .case-card__label{
+    position:absolute;
+    top:0.85rem;
+    left:0.85rem;
+    background:rgba(38,70,83,0.78);
+    color:var(--white);
+    font-family:'DM Sans',sans-serif;
+    font-size:0.68rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    padding:0.35rem 0.7rem;
+    border-radius:4px;
+    font-weight:500;
+  }
+  .case-card__body{padding:1.5rem 1.5rem 1.65rem;display:flex;flex-direction:column;gap:0.55rem;flex:1}
+  .case-card h3{
+    font-family:'DM Serif Display',serif;
+    font-size:1.15rem;
+    color:var(--charcoal);
+    line-height:1.25;
+  }
+  .case-card__notes{color:var(--warm-gray);font-size:0.97rem;line-height:1.65}
+  .case-card__meta{
+    margin-top:auto;
+    font-family:'DM Sans',sans-serif;
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--teal);
+    font-weight:500;
+  }
+  .gallery-foot{
+    margin-top:2.25rem;
+    text-align:center;
+    color:var(--warm-gray);
+    font-size:0.92rem;
+  }
+  @media (max-width:900px){.gallery-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto}}
+
+  /* Tour · technology and amenities */
+  .tour{background:var(--mist)}
+  .tour-photo{
+    width:100%;
+    height:340px;
+    object-fit:cover;
+    object-position:center;
+    border-radius:12px;
+    box-shadow:var(--shadow-soft);
+    display:block;
+    margin:0 auto 3rem;
+  }
+  @media (max-width:600px){.tour-photo{height:240px;margin-bottom:2rem}}
+  .tour-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:3rem;
+  }
+  .tour-col h3{
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    font-size:0.78rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--teal);
+    margin-bottom:1.25rem;
+  }
+  .tour-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:1.1rem;
+  }
+  .tour-list li{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:0.85rem;
+    align-items:baseline;
+  }
+  .tour-list li::before{
+    content:'\25C6';
+    color:var(--coral);
+    font-size:0.85rem;
+    line-height:1.4;
+  }
+  .tour-list li strong{
+    display:block;
+    font-family:'DM Serif Display',serif;
+    font-weight:400;
+    font-size:1.1rem;
+    color:var(--charcoal);
+    line-height:1.3;
+    margin-bottom:0.25rem;
+  }
+  .tour-list li span{
+    color:var(--warm-gray);
+    font-size:0.97rem;
+    line-height:1.6;
+  }
+  @media (max-width:900px){.tour-grid{grid-template-columns:1fr;gap:2.25rem}}
+
+  /* Hygiene team */
+  .hygiene{background:var(--white)}
+  .hygiene-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1.75rem;
+  }
+  .hygiene-card{
+    background:var(--cream);
+    border:1px solid var(--hairline);
+    border-radius:12px;
+    padding:1.85rem 1.65rem 1.65rem;
+    text-align:center;
+    box-shadow:var(--shadow-soft);
+  }
+  .hygiene-avatar{
+    width:88px;
+    height:88px;
+    border-radius:50%;
+    background:var(--teal-pale-solid);
+    color:var(--teal);
+    margin:0 auto 1rem;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'DM Serif Display',serif;
+    font-size:1.55rem;
+    border:2px solid var(--teal);
+  }
+  .hygiene-card h3{
+    font-family:'DM Serif Display',serif;
+    font-size:1.2rem;
+    color:var(--charcoal);
+    margin-bottom:0.3rem;
+  }
+  .hygiene-card .role{
+    font-family:'DM Sans',sans-serif;
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--teal);
+    font-weight:500;
+    margin-bottom:0.85rem;
+  }
+  .hygiene-card p{color:var(--warm-gray);font-size:0.97rem;line-height:1.65}
+  @media (max-width:900px){.hygiene-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+
+  /* Financing */
+  .financing{background:var(--charcoal);color:rgba(255,255,255,0.85)}
+  .financing-grid{
+    display:grid;
+    grid-template-columns:1.15fr 1fr;
+    gap:3rem;
+    align-items:center;
+  }
+  .financing__copy h2{
+    font-family:'DM Serif Display',serif;
+    font-weight:400;
+    font-size:var(--fs-h2);
+    color:var(--white);
+    margin-top:0.85rem;
+    margin-bottom:1rem;
+  }
+  .financing__copy .eyebrow{color:var(--coral)}
+  .financing__copy p{
+    color:rgba(255,255,255,0.78);
+    line-height:1.75;
+    margin-bottom:1.4rem;
+    max-width:540px;
+  }
+  .financing__chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.55rem 0.95rem;
+    align-items:center;
+    color:var(--coral);
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    text-transform:uppercase;
+    letter-spacing:0.16em;
+    font-size:0.8rem;
+    font-feature-settings:'kern','liga','tnum';
+    font-variant-numeric:tabular-nums;
+  }
+  .financing__chips .sep{color:var(--coral);opacity:0.55}
+  .financing__card{
+    background:var(--coral);
+    color:var(--white);
+    border-radius:12px;
+    padding:2.5rem;
+    box-shadow:0 16px 40px rgba(231,111,81,0.25);
+  }
+  .financing__card h3{
+    font-family:'DM Serif Display',serif;
+    font-weight:400;
+    font-size:1.55rem;
+    color:var(--white);
+    margin-bottom:0.85rem;
+    line-height:1.2;
+  }
+  .financing__card p{
+    color:rgba(255,255,255,0.94);
+    line-height:1.65;
+    margin-bottom:1.5rem;
+    font-size:1rem;
+    font-feature-settings:'kern','liga','tnum';
+    font-variant-numeric:tabular-nums;
+  }
+  .financing__card .btn{background:var(--white);color:var(--coral-deep)}
+  .financing__card .btn:hover{background:var(--cream);color:var(--coral-deep)}
+  @media (max-width:900px){.financing-grid{grid-template-columns:1fr;gap:2.25rem}}
+
+  /* Multi-modal contact strip */
+  .contact-strip{
+    background:var(--white);
+    border-top:1px solid var(--hairline);
+    border-bottom:1px solid var(--hairline);
+  }
+  .contact-strip__grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1.5rem;
+  }
+  .contact-strip__card{
+    background:var(--cream);
+    border-top:3px solid var(--teal);
+    border-radius:12px;
+    padding:1.85rem 1.85rem 1.65rem;
+    box-shadow:var(--shadow-soft);
+    display:flex;
+    flex-direction:column;
+    gap:0.4rem;
+  }
+  .contact-strip__icon{
+    font-size:1.5rem;
+    color:var(--teal);
+    line-height:1;
+    margin-bottom:0.45rem;
+  }
+  .contact-strip__label{
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    font-size:0.74rem;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--teal);
+  }
+  .contact-strip__title{
+    font-family:'DM Serif Display',serif;
+    font-weight:400;
+    font-size:1.45rem;
+    color:var(--charcoal);
+    line-height:1.15;
+    margin:0.1rem 0 0.35rem;
+  }
+  .contact-strip__sub{
+    color:var(--warm-gray);
+    font-size:0.95rem;
+    line-height:1.6;
+    margin:0 0 1rem;
+  }
+  .contact-strip__action{
+    margin-top:auto;
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:0.16em;
+    color:var(--teal);
+    padding:0.7rem 1.1rem;
+    border:1px solid var(--teal);
+    border-radius:6px;
+    transition:background 180ms ease, color 180ms ease;
+    align-self:flex-start;
+  }
+  .contact-strip__action:hover{background:var(--teal);color:var(--white)}
+  @media (max-width:900px){.contact-strip__grid{grid-template-columns:1fr}}
+
+  /* Footer compliance row */
+  .footer-compliance{
+    max-width:1200px;
+    margin:2.25rem auto 0;
+    padding-top:1.5rem;
+    border-top:1px solid rgba(255,255,255,0.10);
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.6rem 1rem;
+    justify-content:center;
+    text-align:center;
+    font-family:'DM Sans',sans-serif;
+    font-size:0.74rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.6);
+    font-weight:500;
+  }
+  .footer-compliance .sep{color:var(--teal);opacity:0.6}
+
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{
@@ -750,11 +1362,19 @@
       scroll-behavior:auto !important;
     }
     .btn:hover{transform:none}
-    .service-card:hover,.testimonial-card:hover{transform:none}
+    .service-card:hover,.testimonial-card:hover,.special-card:hover,.case-card:hover{transform:none}
   }
 </style>
 </head>
 <body>
+
+<!-- Promo strip · top-most, dated new-patient offer -->
+<div class="promo-strip" role="region" aria-label="New patient special">
+  <span class="promo-strip__lead">New Patient Special</span>
+  <span class="promo-strip__main"><strong>$59</strong> cleaning, exam, and digital x-rays through May 31. No insurance required.</span>
+  <span class="promo-strip__sep" aria-hidden="true">|</span>
+  <a class="promo-strip__link" href="#specials">View All Specials</a>
+</div>
 
 <!-- Nav · three-block: logo left, links center, dual CTAs right -->
 <header class="nav" role="banner">
@@ -767,8 +1387,10 @@
     </div>
     <nav class="nav-links" aria-label="Primary">
       <a href="#services">Services</a>
-      <a href="#doctor">About</a>
-      <a href="#testimonials">Smile Gallery</a>
+      <a href="#specials">Specials</a>
+      <a href="#membership">Membership</a>
+      <a href="#gallery">Smile Gallery</a>
+      <a href="#tour">Office Tour</a>
       <a href="#insurance">Insurance</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -778,6 +1400,18 @@
     </div>
   </div>
 </header>
+
+<!-- Emergency strip · same-day care promise, tap-to-call -->
+<div class="emergency-strip" role="region" aria-label="Dental emergency">
+  <p class="emergency-strip__line">
+    <strong>Dental Emergency?</strong>
+    We see emergencies the same day.
+    <span class="emergency-strip__sep" aria-hidden="true">·</span>
+    Call <a href="tel:9725550149">(972) 555-0149</a>
+    <span class="emergency-strip__sep" aria-hidden="true">·</span>
+    Hablamos Español
+  </p>
+</div>
 
 <!-- Hero · 50/50 photo-forward split -->
 <section class="hero" aria-labelledby="hero-heading">
@@ -856,6 +1490,82 @@
         <h3>Sedation Dentistry</h3>
         <p>Nitrous, oral sedation, and IV sedation available. We help nervous patients get back into a chair.</p>
       </article>
+    </div>
+  </div>
+</section>
+
+<!-- Specials · dated new-patient and seasonal offers -->
+<section class="specials" id="specials" aria-labelledby="specials-heading">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Current Specials</p>
+      <h2 id="specials-heading">Honest Pricing, Dated Offers, No Fine Print Surprises.</h2>
+      <p>Three offers we run year-round and refresh seasonally. Each has a real expiration. Each is honored at the front desk without a code.</p>
+    </div>
+    <div class="specials-grid">
+      <article class="special-card special-card--featured">
+        <div class="special-card__banner">For New Patients</div>
+        <div class="special-card__body">
+          <p class="special-card__price">$59</p>
+          <h3 class="special-card__title">Cleaning, Exam &amp; Digital X-Rays</h3>
+          <p class="special-card__includes">A standard hygiene visit, full digital x-ray series, oral cancer screening, and a one-on-one treatment conversation. For adults without insurance.</p>
+          <p class="special-card__fine">New patients only. Adults 18+. Healthy gums (non-periodontal). Expires May 31, 2026. Cannot be combined with insurance benefits.</p>
+        </div>
+        <a class="special-card__cta" href="#contact">Book This Special</a>
+      </article>
+      <article class="special-card">
+        <div class="special-card__banner">Free Consultation</div>
+        <div class="special-card__body">
+          <p class="special-card__price">$0</p>
+          <h3 class="special-card__title">Invisalign &amp; Clear Aligner Consult</h3>
+          <p class="special-card__includes">Complimentary 3D scan, candidacy review, and treatment estimate. Includes 0% financing options for qualifying applicants.</p>
+          <p class="special-card__fine">Adults and teens. 30-minute appointment. Includes complimentary 3D iTero scan. No obligation to start treatment.</p>
+        </div>
+        <a class="special-card__cta" href="#contact">Book Free Consult</a>
+      </article>
+      <article class="special-card">
+        <div class="special-card__banner">With Cleaning</div>
+        <div class="special-card__body">
+          <p class="special-card__price">Free</p>
+          <h3 class="special-card__title">Take-Home Whitening Kit</h3>
+          <p class="special-card__includes">Custom-fitted trays and professional-grade whitening gel, free with any new patient cleaning and exam booked in May.</p>
+          <p class="special-card__fine">New patients only. Must complete cleaning, exam, and x-rays. Expires May 31, 2026. One per household.</p>
+        </div>
+        <a class="special-card__cta" href="#contact">Book and Claim</a>
+      </article>
+    </div>
+    <p class="specials-foot">Already a patient? Ask the front desk about referral credits and the <a href="#membership">Ridgeview Smile Plan</a>.</p>
+  </div>
+</section>
+
+<!-- Membership · in-house plan for uninsured patients -->
+<section class="membership" id="membership" aria-labelledby="membership-heading">
+  <div class="container">
+    <div class="membership-grid">
+      <div class="membership__copy">
+        <p class="eyebrow">Ridgeview Smile Plan</p>
+        <h2 id="membership-heading">Dental Care Without Insurance, Without the Guesswork.</h2>
+        <p class="membership__sub">A simple monthly membership for patients without dental insurance. No deductibles, no annual maximums, no claims to file. Cleanings and exams are included. Everything else is discounted.</p>
+        <div class="membership__price">
+          <span class="membership__price-amount">$29</span>
+          <span class="membership__price-suffix">per month, adult</span>
+        </div>
+        <p class="membership__bonus">$19 per month for kids under 13 · Family plans from $69</p>
+        <a href="#contact" class="btn btn-coral">Join the Plan</a>
+        <p class="membership__fine">Sign up takes about three minutes at your next visit. Benefits start the same day. Cancel anytime after the first 12 months.</p>
+      </div>
+      <aside class="membership__benefits" aria-label="Smile Plan benefits">
+        <h3>What's Included</h3>
+        <ul>
+          <li><strong>Two cleanings &amp; exams</strong> per year, fully included</li>
+          <li><strong>Digital x-rays</strong> at recall, fully included</li>
+          <li><strong>Oral cancer screening</strong> at every recall, fully included</li>
+          <li><strong>20% off</strong> fillings, crowns, bridges, and root canals</li>
+          <li><strong>15% off</strong> Invisalign, veneers, and cosmetic work</li>
+          <li><strong>10% off</strong> sedation and emergency visits</li>
+          <li><strong>No deductible, no maximum, no claims</strong></li>
+        </ul>
+      </aside>
     </div>
   </div>
 </section>
@@ -989,6 +1699,211 @@
   </div>
 </section>
 
+<!-- Smile Gallery · before/after with case notes -->
+<section class="gallery" id="gallery" aria-labelledby="gallery-heading">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Smile Gallery</p>
+      <h2 id="gallery-heading">Real Patients, Real Outcomes.</h2>
+      <p>A small selection of cases planned and finished in our office. Photos are shared with each patient's written consent.</p>
+    </div>
+    <div class="gallery-grid">
+      <article class="case-card">
+        <div class="case-card__photo">
+          <img src="images/dental-operatory.jpg" alt="Single-visit veneer case, before and after" width="800" height="600" loading="lazy" decoding="async">
+          <span class="case-card__split" aria-hidden="true"></span>
+          <span class="case-card__label">Before / After</span>
+        </div>
+        <div class="case-card__body">
+          <h3>Single-Visit Veneers, Front Six</h3>
+          <p class="case-card__notes">Six porcelain veneers planned digitally and seated in two visits. The patient asked for a brighter smile that still looked like her own teeth. We matched the value to her natural canines on purpose.</p>
+          <p class="case-card__meta">Cosmetic <span aria-hidden="true">·</span> 2 Visits</p>
+        </div>
+      </article>
+      <article class="case-card">
+        <div class="case-card__photo">
+          <img src="images/dental-reception.jpg" alt="Same-day CEREC crown case" width="800" height="600" loading="lazy" decoding="async">
+          <span class="case-card__split" aria-hidden="true"></span>
+          <span class="case-card__label">Before / After</span>
+        </div>
+        <div class="case-card__body">
+          <h3>Same-Day CEREC Crown</h3>
+          <p class="case-card__notes">A failed metal crown on a lower molar replaced with a same-day CEREC ceramic crown. Scanned, milled, and bonded in a single 90-minute appointment. No temporary, no second visit.</p>
+          <p class="case-card__meta">Restorative <span aria-hidden="true">·</span> 1 Visit</p>
+        </div>
+      </article>
+      <article class="case-card">
+        <div class="case-card__photo">
+          <img src="images/dental-hero.jpg" alt="Full-mouth restoration case" width="800" height="600" loading="lazy" decoding="async">
+          <span class="case-card__split" aria-hidden="true"></span>
+          <span class="case-card__label">Before / After</span>
+        </div>
+        <div class="case-card__body">
+          <h3>Full-Mouth Rehabilitation</h3>
+          <p class="case-card__notes">A patient returning to the chair after fifteen years away. Two implants placed by our oral surgeon, four crowns, and a Smile Plan kept the long-term hygiene affordable. Treated over six months.</p>
+          <p class="case-card__meta">Restorative + Implants <span aria-hidden="true">·</span> 6 Months</p>
+        </div>
+      </article>
+    </div>
+    <p class="gallery-foot">More cases shared in person at your consult. Ask Dr. Parker for the full library.</p>
+  </div>
+</section>
+
+<!-- Office Tour · technology and comfort amenities -->
+<section class="tour" id="tour" aria-labelledby="tour-heading">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Inside the Office</p>
+      <h2 id="tour-heading">Modern Technology in a Comfortable Setting.</h2>
+      <p>The tools we chose change what is possible in a single visit. The amenities we chose change how the visit feels.</p>
+    </div>
+    <img class="tour-photo" src="images/dental-operatory.jpg" alt="Modern dental operatory at Ridgeview Dental with intraoral scanner and CEREC milling unit visible" width="1600" height="900" loading="lazy" decoding="async">
+    <div class="tour-grid">
+      <div class="tour-col">
+        <h3>Technology</h3>
+        <ul class="tour-list">
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>3D iTero Digital Scans</strong>
+              No goopy impressions. Aligner planning, crown fits, and treatment previews in minutes, not weeks.
+            </span>
+          </li>
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>CEREC Same-Day Crowns</strong>
+              Designed, milled, and bonded in one appointment. No temporaries, no second visit, no second numbing.
+            </span>
+          </li>
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>Intraoral Cameras</strong>
+              You see what we see on the chairside monitor. Treatment recommendations come with the photo of why.
+            </span>
+          </li>
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>Low-Dose Digital X-Ray</strong>
+              About 90% less radiation than film. Images appear on screen the same second they are captured.
+            </span>
+          </li>
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>Sedation Suite</strong>
+              Nitrous on every chair. Oral sedation by prescription. IV sedation by appointment with our anesthesiologist.
+            </span>
+          </li>
+        </ul>
+      </div>
+      <div class="tour-col">
+        <h3>Comfort</h3>
+        <ul class="tour-list">
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>Overhead Netflix &amp; Spotify</strong>
+              Pick your show or your playlist when you sit down. Headphones cancel the drill, your choice cancels the boredom.
+            </span>
+          </li>
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>Heated Massage Chairs</strong>
+              Every operatory chair has a warming layer and a gentle massage setting. Both are optional, both are quiet.
+            </span>
+          </li>
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>Weighted Blankets &amp; Pillows</strong>
+              For anxious patients, the weighted lap blanket is a small thing that helps a lot. Ask the assistant when you arrive.
+            </span>
+          </li>
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>Pediatric Room</strong>
+              Its own waiting area, its own books, its own playlist. Designed so siblings can be seen back to back without losing the calm.
+            </span>
+          </li>
+          <li>
+            <span aria-hidden="true"></span>
+            <span>
+              <strong>Sterilization You Can See</strong>
+              Our instrument sterilization room is glass-walled. We follow CDC and OSHA standards and we are happy to walk you through the room.
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Hygiene Team · name the people who actually do most of the visits -->
+<section class="hygiene" id="hygiene" aria-labelledby="hygiene-heading">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Your Hygiene Team</p>
+      <h2 id="hygiene-heading">The People You Will Actually See Most.</h2>
+      <p>Dr. Parker handles diagnosis and treatment. The hygiene team handles the relationship. They are who your kids will ask for by name.</p>
+    </div>
+    <div class="hygiene-grid">
+      <article class="hygiene-card">
+        <div class="hygiene-avatar" aria-hidden="true">MR</div>
+        <h3>Maya Rios, RDH</h3>
+        <p class="role">Lead Hygienist <span aria-hidden="true">·</span> Bilingual</p>
+        <p>With us since 2015. Maya leads our recall program and trains every new hygienist. She is the calm voice for nervous patients and runs cleanings in English and Spanish.</p>
+      </article>
+      <article class="hygiene-card">
+        <div class="hygiene-avatar" aria-hidden="true">JT</div>
+        <h3>Jordan Tate, RDH</h3>
+        <p class="role">Pediatric &amp; Family Hygienist</p>
+        <p>Jordan handles our pediatric room and family blocks. Three years with us, eleven years in dentistry. The reason "next Ridgeview day" gets asked at the dinner table.</p>
+      </article>
+      <article class="hygiene-card">
+        <div class="hygiene-avatar" aria-hidden="true">EL</div>
+        <h3>Elena Lin, RDH</h3>
+        <p class="role">Periodontal Hygienist</p>
+        <p>Elena focuses on patients managing gum disease and patients returning after a long break. Gentle, thorough, and never makes the gap feel like a lecture.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Financing · CareCredit, Sunbit, Cherry, in-house -->
+<section class="financing" id="financing" aria-labelledby="financing-heading">
+  <div class="container">
+    <div class="financing-grid">
+      <div class="financing__copy">
+        <p class="eyebrow">Financing</p>
+        <h2 id="financing-heading">Big Treatment Plans Should Not Force a Bad Decision.</h2>
+        <p>Implants, ortho, and full-mouth work are real numbers. We work with three outside lenders, plus our own in-house pay-over-time plan, so the right care is not gated by what you can pay this month.</p>
+        <p>Our front desk runs the application with you in about ten minutes. Most decisions come back the same visit.</p>
+        <div class="financing__chips">
+          <span>CareCredit</span>
+          <span class="sep" aria-hidden="true">·</span>
+          <span>Sunbit</span>
+          <span class="sep" aria-hidden="true">·</span>
+          <span>Cherry</span>
+          <span class="sep" aria-hidden="true">·</span>
+          <span>In-House Plans</span>
+          <span class="sep" aria-hidden="true">·</span>
+          <span>0% APR Available</span>
+        </div>
+      </div>
+      <aside class="financing__card" aria-label="Financing example">
+        <h3>Example: $4,200 Implant + Crown</h3>
+        <p>With a 24-month 0% promotional plan through CareCredit, that is roughly $175 per month. Approval check is a soft credit pull and does not impact your score.</p>
+        <a href="#contact" class="btn">Apply at Your Visit</a>
+      </aside>
+    </div>
+  </div>
+</section>
+
 <!-- Insurance -->
 <section class="insurance" id="insurance" aria-labelledby="insurance-heading">
   <div class="container">
@@ -1003,14 +1918,48 @@
       <div>
         <div class="pill-grid" role="list" aria-label="Accepted insurance plans">
           <span class="pill" role="listitem">Delta Dental</span>
+          <span class="pill" role="listitem">BCBS Texas</span>
           <span class="pill" role="listitem">Cigna</span>
-          <span class="pill" role="listitem">MetLife</span>
           <span class="pill" role="listitem">Aetna</span>
-          <span class="pill" role="listitem">United</span>
-          <span class="pill" role="listitem">BCBS</span>
+          <span class="pill" role="listitem">MetLife</span>
+          <span class="pill" role="listitem">United Concordia</span>
+          <span class="pill" role="listitem">UnitedHealthcare</span>
           <span class="pill" role="listitem">Guardian</span>
           <span class="pill" role="listitem">Humana</span>
+          <span class="pill" role="listitem">Principal</span>
+          <span class="pill" role="listitem">Ameritas</span>
+          <span class="pill" role="listitem">Sun Life</span>
         </div>
+        <p class="insurance-aside">Don't see yours? Most PPO plans we are out-of-network with still pay nearly the same. Call and we will quote your out-of-pocket before you book.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Multi-modal contact strip · Call, Text, Book Online -->
+<section class="contact-strip" aria-label="Ways to reach us">
+  <div class="container">
+    <div class="contact-strip__grid">
+      <div class="contact-strip__card">
+        <span class="contact-strip__icon" aria-hidden="true">✦</span>
+        <p class="contact-strip__label">Call</p>
+        <p class="contact-strip__title">(972) 555-0149</p>
+        <p class="contact-strip__sub">Live front desk, Monday through Friday. After-hours line for active patients with emergencies.</p>
+        <a class="contact-strip__action" href="tel:9725550149">Tap to Call</a>
+      </div>
+      <div class="contact-strip__card">
+        <span class="contact-strip__icon" aria-hidden="true">◆</span>
+        <p class="contact-strip__label">Text</p>
+        <p class="contact-strip__title">(972) 555-0149</p>
+        <p class="contact-strip__sub">Send us a photo of the tooth. We will reply during business hours and book the right kind of appointment.</p>
+        <a class="contact-strip__action" href="sms:9725550149">Tap to Text</a>
+      </div>
+      <div class="contact-strip__card">
+        <span class="contact-strip__icon" aria-hidden="true">✦</span>
+        <p class="contact-strip__label">Book Online</p>
+        <p class="contact-strip__title">Same-Week Availability</p>
+        <p class="contact-strip__sub">Self-schedule any cleaning, exam, or new patient visit. Most slots open within 5 to 7 days, with some same-day openings.</p>
+        <a class="contact-strip__action" href="#contact">Book Online</a>
       </div>
     </div>
   </div>
@@ -1062,17 +2011,30 @@
     <div class="footer-col">
       <h4>Resources</h4>
       <div class="footer-list">
+        <a href="#specials">Specials</a>
+        <a href="#membership">Smile Plan</a>
+        <a href="#financing">Financing</a>
+        <a href="#insurance">Insurance</a>
         <a href="#">Patient Forms</a>
-        <a href="#">Financing</a>
-        <a href="#">Insurance</a>
         <a href="#">Privacy</a>
       </div>
       <p class="credit"><a href="https://dbjtechnologies.com" rel="noopener">Website by DBJ Technologies</a></p>
     </div>
   </div>
+  <div class="footer-compliance" aria-label="Practice compliance">
+    <span>Texas Dental License No. DDS-12894</span>
+    <span class="sep" aria-hidden="true">·</span>
+    <span>American Dental Association Member</span>
+    <span class="sep" aria-hidden="true">·</span>
+    <span>Texas Dental Association Member</span>
+    <span class="sep" aria-hidden="true">·</span>
+    <span>CDC and OSHA Sterilization Standards</span>
+    <span class="sep" aria-hidden="true">·</span>
+    <span>Hablamos Español</span>
+  </div>
   <div class="footer-bottom">
     <span>© 2026 Ridgeview Dental. All rights reserved.</span>
-    <span>Plano, TX</span>
+    <span>Plano, TX <span style="opacity:0.55">·</span> Accessible · ADA Compliant</span>
   </div>
 </footer>
 

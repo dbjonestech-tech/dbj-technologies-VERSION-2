@@ -121,7 +121,7 @@
   }
   .nav-links {
     display: flex;
-    gap: 2.8rem;
+    gap: 2.2rem;
     align-items: center;
   }
   .nav-links a {
@@ -134,6 +134,16 @@
     transition: color 0.3s ease;
   }
   .nav-links a:hover { color: var(--copper); }
+  .nav-broker {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-style: italic;
+    color: var(--on-dark-dim);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    border-left: 1px solid var(--hairline-copper);
+    padding-left: 1.4rem;
+    margin-left: 0.6rem;
+  }
 
   .btn {
     display: inline-block;
@@ -154,6 +164,15 @@
     background: var(--copper-deep);
     border-color: var(--copper-deep);
     transform: translateY(-1px);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--copper);
+    border: 1px solid var(--copper);
+  }
+  .btn-ghost:hover {
+    background: var(--copper);
+    color: #fff;
   }
 
   /* ======== HERO: CONTAINED GALLERY FRAME ======== */
@@ -397,6 +416,31 @@
   .prop-card-featured:hover { box-shadow: 0 28px 64px rgba(10,10,10,0.32); }
   .prop-card:hover::before { opacity: 1; }
 
+  /* Status glyph that rides above the price */
+  .prop-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--copper);
+    margin-bottom: 0.9rem;
+  }
+  .prop-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    background: var(--copper);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .prop-status.under::before { background: transparent; border: 1px solid var(--copper); }
+  .prop-status.sold::before { background: var(--copper); border-radius: 0; transform: rotate(45deg); }
+  .prop-card-featured .prop-status { color: var(--copper); }
+
   .prop-price {
     font-family: 'Libre Caslon Display', Georgia, serif;
     font-weight: 400;
@@ -469,6 +513,77 @@
   }
   .prop-viewall a:hover { color: var(--copper-deep); }
 
+  /* ======== SOLD PORTFOLIO ======== */
+  .sold {
+    background: var(--cream);
+    border-top: 1px solid var(--hairline-copper);
+    border-bottom: 1px solid var(--hairline-copper);
+  }
+  .sold-intro {
+    color: var(--warm-gray);
+    max-width: 620px;
+    font-size: 1.02rem;
+    line-height: 1.85;
+    margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
+  }
+  .sold-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--hairline-copper);
+  }
+  .sold-row {
+    display: grid;
+    grid-template-columns: 0.6fr 2fr 1.4fr 1fr 0.8fr;
+    align-items: baseline;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--hairline-copper);
+    font-family: 'Karla', sans-serif;
+  }
+  .sold-year {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-size: 1.6rem;
+    color: var(--copper);
+    font-feature-settings: 'kern', 'liga', 'tnum';
+    letter-spacing: 0.02em;
+  }
+  .sold-address {
+    font-weight: 500;
+    color: var(--black);
+    font-size: 1.02rem;
+    letter-spacing: 0.005em;
+  }
+  .sold-nh {
+    font-style: italic;
+    color: var(--warm-gray);
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-size: 1.02rem;
+  }
+  .sold-side {
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    font-weight: 500;
+  }
+  .sold-price {
+    text-align: right;
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    color: var(--black);
+    font-size: 1.25rem;
+    font-feature-settings: 'kern', 'liga', 'tnum', 'salt';
+    letter-spacing: -0.005em;
+  }
+  .sold-foot {
+    margin-top: 2.5rem;
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-style: italic;
+    color: var(--warm-gray-light);
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
   /* ======== NEIGHBORHOODS ======== */
   .neighborhoods {
     background: var(--cream);
@@ -504,6 +619,231 @@
     color: var(--warm-gray);
     font-size: 0.99rem;
     line-height: 1.85;
+  }
+
+  /* ======== PROCESS (BUYER + SELLER) ======== */
+  .process {
+    background: var(--ivory);
+  }
+  .process-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(3rem, 6vw, 5rem);
+    align-items: start;
+  }
+  .process-col h3.process-col-title {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.85rem;
+    color: var(--black);
+    margin-bottom: 0.5rem;
+    line-height: 1.15;
+  }
+  .process-col-eyebrow {
+    display: block;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 0.85rem;
+  }
+  .process-col-lead {
+    color: var(--warm-gray);
+    font-size: 1rem;
+    line-height: 1.85;
+    margin-bottom: 2.4rem;
+    max-width: 460px;
+  }
+  .process-list {
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 4.5rem;
+    list-style: none;
+  }
+  .process-list::before {
+    content: "";
+    position: absolute;
+    left: 1.4rem;
+    top: 1.2rem;
+    bottom: 1.2rem;
+    width: 1px;
+    background: var(--copper);
+    opacity: 0.5;
+  }
+  .process-step {
+    position: relative;
+    padding: 1.2rem 0 2rem 0;
+  }
+  .process-step:last-child { padding-bottom: 0; }
+  .process-step::before {
+    content: "";
+    position: absolute;
+    left: -3.18rem;
+    top: 1.85rem;
+    width: 9px;
+    height: 9px;
+    background: var(--ivory);
+    border: 1px solid var(--copper);
+    border-radius: 50%;
+  }
+  .process-num {
+    position: absolute;
+    left: -4.5rem;
+    top: 1.1rem;
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.7rem;
+    color: var(--copper);
+    letter-spacing: 0.02em;
+    font-feature-settings: 'kern', 'liga', 'tnum';
+  }
+  .process-step h4 {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.3rem;
+    color: var(--black);
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+  .process-step p {
+    color: var(--warm-gray);
+    font-size: 0.99rem;
+    line-height: 1.8;
+  }
+
+  /* ======== CONCIERGE SERVICES ======== */
+  .concierge {
+    background: var(--cream);
+  }
+  .conc-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 4vw, 3rem) clamp(2.5rem, 5vw, 4rem);
+  }
+  .conc-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--hairline-copper);
+  }
+  .conc-mark {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-style: italic;
+    font-size: 1.65rem;
+    color: var(--copper);
+    line-height: 1;
+    font-feature-settings: 'kern', 'liga', 'tnum';
+    letter-spacing: 0.02em;
+    padding-top: 0.05em;
+  }
+  .conc-body h3 {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.3rem;
+    color: var(--black);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+  .conc-body p {
+    color: var(--warm-gray);
+    font-size: 0.98rem;
+    line-height: 1.8;
+  }
+
+  /* ======== PRESS / RECOGNITION ======== */
+  .press {
+    background: var(--ivory);
+    text-align: center;
+  }
+  .press .section-head {
+    margin: 0 auto clamp(2.5rem, 4vw, 3.5rem);
+    text-align: center;
+  }
+  .press-marks {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2.2rem 3.4rem;
+    padding: 1rem 0 3rem;
+    border-bottom: 1px solid var(--hairline-copper);
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+  .press-mark {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.5rem;
+    color: var(--black);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    opacity: 0.86;
+  }
+  .press-mark.smallcap {
+    font-style: normal;
+    font-family: 'Karla', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    opacity: 0.78;
+  }
+  .press-honors {
+    margin: 3.2rem auto 0;
+    max-width: 880px;
+    text-align: left;
+  }
+  .press-honors h3 {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--copper);
+    font-weight: 500;
+    margin: 0 0 1.85rem;
+    text-align: center;
+  }
+  .honor-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.4rem 3rem;
+  }
+  .honor-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.15rem;
+    align-items: baseline;
+    line-height: 1.55;
+  }
+  .honor-year {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.45rem;
+    color: var(--copper);
+    font-feature-settings: 'kern', 'liga', 'tnum';
+    letter-spacing: 0.02em;
+  }
+  .honor-text {
+    color: var(--warm-gray);
+    font-size: 0.96rem;
+    line-height: 1.7;
+  }
+  .honor-text strong {
+    color: var(--black);
+    font-weight: 500;
+  }
+  .honor-text em {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-style: italic;
+    color: var(--copper-deep);
   }
 
   /* ======== TESTIMONIALS ======== */
@@ -563,36 +903,128 @@
     padding: 0;
   }
 
-  /* ======== SELLERS CTA ======== */
-  .sellers {
+  /* ======== PRIVATE LIST EMAIL CAPTURE ======== */
+  .privatelist {
+    background: var(--black);
+    color: var(--on-dark);
+    text-align: center;
+    border-top: 1px solid var(--copper);
+    border-bottom: 1px solid var(--copper);
+  }
+  .privatelist .container { max-width: 720px; }
+  .privatelist .eyebrow {
+    display: block;
+    color: var(--copper);
+    margin-bottom: 1.25rem;
+  }
+  .privatelist h2 {
+    color: var(--ivory);
+    font-size: var(--fs-h2);
+    margin-bottom: 1.4rem;
+  }
+  .privatelist-sub {
+    color: var(--on-dark-dim);
+    font-size: 1.04rem;
+    line-height: 1.85;
+    max-width: 560px;
+    margin: 0 auto 2.5rem;
+  }
+  .privatelist-form {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .privatelist-input {
+    flex: 1 1 280px;
+    background: transparent;
+    border: 1px solid var(--hairline-copper);
+    color: var(--ivory);
+    font-family: 'Karla', sans-serif;
+    font-size: 0.95rem;
+    padding: 1rem 1.15rem;
+    letter-spacing: 0.04em;
+    transition: border-color 0.3s ease;
+  }
+  .privatelist-input::placeholder {
+    color: var(--on-dark-dim);
+    font-style: italic;
+  }
+  .privatelist-input:focus {
+    outline: none;
+    border-color: var(--copper);
+  }
+  .privatelist-foot {
+    margin-top: 1.6rem;
+    color: var(--on-dark-dim);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+
+  /* ======== CONSULTATION CTA (replaces thin sellers) ======== */
+  .consult {
     background: var(--cream);
     text-align: center;
   }
-  .sellers .container { max-width: 720px; }
-  .sellers .eyebrow {
+  .consult .container { max-width: 760px; }
+  .consult .eyebrow {
     display: block;
     margin-bottom: 1.25rem;
   }
-  .sellers h2 {
+  .consult h2 {
     font-size: var(--fs-h2);
     margin-bottom: 1.5rem;
   }
-  .sellers-sub {
+  .consult-sub {
     color: var(--warm-gray);
-    max-width: 540px;
+    max-width: 580px;
     margin: 0 auto 2.5rem;
     font-size: 1.05rem;
     line-height: 1.85;
   }
-  .sellers-foot {
-    margin-top: 2rem;
-    color: var(--warm-gray-light);
-    font-size: 0.85rem;
-    letter-spacing: 0.04em;
+  .consult-channels {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 720px;
+    margin: 2.8rem auto 0;
+    text-align: center;
   }
-  .sellers-foot .sep {
+  .consult-channel {
+    padding: 1.6rem 1.1rem;
+    border: 1px solid var(--hairline-copper);
+    background: var(--ivory);
+  }
+  .consult-channel-label {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
     color: var(--copper);
-    margin: 0 0.6em;
+    font-weight: 500;
+    margin-bottom: 0.65rem;
+    display: block;
+  }
+  .consult-channel-value {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    color: var(--black);
+    font-size: 1.08rem;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+  }
+  .consult-channel a { transition: color 0.3s ease; }
+  .consult-channel a:hover { color: var(--copper-deep); }
+  .consult-promise {
+    margin-top: 2.4rem;
+    color: var(--warm-gray-light);
+    font-style: italic;
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-size: 1rem;
+    line-height: 1.7;
   }
 
   /* ======== FOOTER ======== */
@@ -606,9 +1038,9 @@
   }
   .footer-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: clamp(2.5rem, 5vw, 4.5rem);
-    margin-bottom: 3.5rem;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    margin-bottom: 3rem;
   }
   .footer-wordmark {
     font-family: 'Libre Caslon Display', Georgia, serif;
@@ -625,11 +1057,31 @@
   .footer-block a { color: var(--on-dark-dim); transition: color 0.3s ease; }
   .footer-block a:hover { color: var(--copper); }
 
+  .footer-subhead {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--copper);
+    font-weight: 500;
+    margin-bottom: 0.95rem;
+    display: block;
+  }
   .footer-broker {
     font-style: italic;
     color: var(--on-dark-dim);
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.7rem;
     line-height: 1.7;
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-size: 0.98rem;
+  }
+  .footer-license {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    color: var(--on-dark-dim);
+    font-feature-settings: 'tnum';
   }
   .footer-credit a {
     color: var(--copper);
@@ -646,13 +1098,37 @@
     margin-bottom: 1.5rem;
   }
   .footer-legal {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
     color: var(--on-dark-dim);
     font-size: 12px;
     letter-spacing: 0.04em;
   }
+  .footer-legal-marks {
+    display: flex;
+    gap: 1.4rem;
+    align-items: center;
+    font-style: italic;
+    flex-wrap: wrap;
+  }
+  .footer-legal-marks span {
+    border-left: 1px solid var(--hairline-copper);
+    padding-left: 1.4rem;
+  }
+  .footer-legal-marks span:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
 
   /* ======== RESPONSIVE ======== */
+  @media (max-width: 1100px) {
+    .nav-broker { display: none; }
+    .nav-links { gap: 1.6rem; }
+  }
+
   @media (max-width: 960px) {
     .agent-grid { grid-template-columns: 1fr; gap: 2.5rem; }
     .agent-right { order: -1; }
@@ -664,7 +1140,24 @@
     }
     .prop-card-featured:hover { transform: translateY(-2px); }
     .nh-grid { grid-template-columns: 1fr; gap: 2.75rem; }
-    .footer-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .process-grid { grid-template-columns: 1fr; gap: 3.5rem; }
+    .conc-list { grid-template-columns: 1fr; gap: 1.6rem; }
+    .consult-channels { grid-template-columns: 1fr; gap: 1rem; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    .honor-list { grid-template-columns: 1fr; gap: 1rem; }
+    .sold-row {
+      grid-template-columns: 0.6fr 2fr 1fr;
+      grid-template-areas:
+        "year address price"
+        "year nh side";
+      column-gap: 1rem;
+      row-gap: 0.4rem;
+    }
+    .sold-year { grid-area: year; }
+    .sold-address { grid-area: address; }
+    .sold-price { grid-area: price; }
+    .sold-nh { grid-area: nh; }
+    .sold-side { grid-area: side; text-align: right; }
   }
 
   @media (max-width: 768px) {
@@ -685,7 +1178,19 @@
     .prop-body { padding: 1.75rem 1.5rem 0 1.5rem; }
     .prop-photo { height: 200px; }
     .nh-strip { height: 240px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 2.25rem; }
+    .footer-legal { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+    .footer-legal-marks span {
+      border-left: 0;
+      padding-left: 0;
+    }
     footer { padding: 3.5rem 1.25rem 2rem; }
+    .press-marks { gap: 1.5rem 2rem; }
+    .press-mark { font-size: 1.2rem; }
+    .press-mark.smallcap { font-size: 0.78rem; letter-spacing: 0.24em; }
+    .process-list { padding-left: 3.6rem; }
+    .process-num { left: -3.6rem; font-size: 1.4rem; }
+    .privatelist-form { flex-direction: column; }
   }
 
   @media (max-width: 480px) {
@@ -700,11 +1205,15 @@
   <div class="nav-inner">
     <a href="#" class="wordmark">LAUREN PRESCOTT</a>
     <div class="nav-links">
-      <a href="#properties">Properties</a>
+      <a href="#properties">Listings</a>
+      <a href="#sold">Sold</a>
       <a href="#neighborhoods">Neighborhoods</a>
       <a href="#about">About</a>
-      <a href="#sellers">Sellers</a>
+      <a href="#process">Process</a>
+      <a href="#concierge">Concierge</a>
+      <a href="#press">Press</a>
       <a href="#contact">Contact</a>
+      <span class="nav-broker" aria-hidden="true">Briggs Freeman Sotheby&rsquo;s</span>
     </div>
   </div>
 </nav>
@@ -729,17 +1238,17 @@
 </header>
 
 <!-- ===== AGENT (MEET LAUREN) ===== -->
-<section class="agent" id="about">
+<section class="agent" id="about" aria-labelledby="about-h">
   <div class="agent-grid">
     <div class="agent-left">
       <span class="eyebrow">MEET LAUREN</span>
-      <h2>Real Estate at the Highest Level Is Not About Houses.</h2>
+      <h2 id="about-h">Real Estate at the Highest Level Is Not About Houses.</h2>
       <div class="agent-paragraphs">
         <p>It is about reading a room before anyone speaks. It is about understanding what a family is actually trying to build, and which of two beautiful properties will quietly hold that life better. After eighteen years and more than two hundred transactions, that is the work I have learned to do well.</p>
         <p>I spent the first decade of my career studying Park Cities one block at a time. I know which streets keep their light through the afternoon, which builders age with grace, and which homes are owned by people who will never list publicly but might, given the right call. I think about real estate the way a good interior designer thinks about a room, in proportion, restraint, and the quiet logic of how a life actually unfolds inside walls.</p>
         <p>My practice is intentionally small. I take a limited number of clients each year so that every introduction, negotiation, and closing receives my direct attention. That is the only way I know how to do this honestly.</p>
       </div>
-      <span class="agent-credentials">LICENSED IN TEXAS &middot; BRIGGS FREEMAN SOTHEBY&rsquo;S INTERNATIONAL REALTY &middot; MEMBER, NRLS</span>
+      <span class="agent-credentials">LICENSED IN TEXAS &middot; TREC #0654182 &middot; BRIGGS FREEMAN SOTHEBY&rsquo;S INTERNATIONAL REALTY &middot; MEMBER, NRLS</span>
     </div>
 
     <div class="agent-right">
@@ -750,12 +1259,12 @@
 </section>
 
 <!-- ===== SELECTED PROPERTIES ===== -->
-<section class="properties" id="properties">
+<section class="properties" id="properties" aria-labelledby="properties-h">
   <div class="container">
     <div class="section-head">
       <span class="eyebrow">SELECTED PROPERTIES</span>
-      <h2>Currently Representing.</h2>
-      <p class="lead">A small sample of active and recently sold listings.</p>
+      <h2 id="properties-h">Currently Representing.</h2>
+      <p class="lead">A small sample of active and recently contracted listings. The full active list is shared privately on request.</p>
     </div>
 
     <div class="prop-grid">
@@ -763,6 +1272,7 @@
         <img class="prop-photo" src="images/real-estate-listing1.jpg" alt="Highland Park living room with floor-to-ceiling windows and natural afternoon light" width="1600" height="1067">
         <div class="prop-photo-rule" aria-hidden="true"></div>
         <div class="prop-body">
+          <span class="prop-status">Active</span>
           <div class="prop-price">$4,250,000</div>
           <div class="prop-rule" aria-hidden="true"></div>
           <div class="prop-address">4907 Lakeside Drive<br>Highland Park</div>
@@ -776,6 +1286,7 @@
         <img class="prop-photo" src="images/real-estate-listing2.jpg" alt="University Park designer kitchen with marble counters and warm fixtures" width="1600" height="1067">
         <div class="prop-photo-rule" aria-hidden="true"></div>
         <div class="prop-body">
+          <span class="prop-status under">Under Contract</span>
           <div class="prop-price">$2,875,000</div>
           <div class="prop-rule" aria-hidden="true"></div>
           <div class="prop-address">3814 Normandy Avenue<br>University Park</div>
@@ -789,6 +1300,7 @@
         <img class="prop-photo" src="images/real-estate-listing3.jpg" alt="Preston Hollow primary bedroom with poised neutral palette and west light" width="1600" height="1067">
         <div class="prop-photo-rule" aria-hidden="true"></div>
         <div class="prop-body">
+          <span class="prop-status">Active</span>
           <div class="prop-price">$6,900,000</div>
           <div class="prop-rule" aria-hidden="true"></div>
           <div class="prop-address">9220 Sunnybrook Lane<br>Preston Hollow</div>
@@ -800,17 +1312,90 @@
     </div>
 
     <div class="prop-viewall">
-      <a href="#">View All Properties &rarr;</a>
+      <a href="#contact">Request the Full Active List &rarr;</a>
     </div>
   </div>
 </section>
 
+<!-- ===== SOLD PORTFOLIO ===== -->
+<section class="sold" id="sold" aria-labelledby="sold-h">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">CLOSED &middot; LAST 24 MONTHS</span>
+      <h2 id="sold-h">A Selection of Recent Closings.</h2>
+    </div>
+    <p class="sold-intro">The pricing strategy and quiet network behind a sale matter more than the listing itself. Below is a representative sample. A full closed-transaction record, with sale-to-list ratio and days on market, is shared in our first conversation.</p>
+
+    <ul class="sold-list" role="list">
+      <li class="sold-row" role="listitem">
+        <span class="sold-year">2025</span>
+        <span class="sold-address">4412 Beverly Drive</span>
+        <span class="sold-nh">Highland Park</span>
+        <span class="sold-side">Represented Seller</span>
+        <span class="sold-price">$5,850,000</span>
+      </li>
+      <li class="sold-row" role="listitem">
+        <span class="sold-year">2025</span>
+        <span class="sold-address">3808 Crescent Avenue</span>
+        <span class="sold-nh">Highland Park</span>
+        <span class="sold-side">Represented Buyer</span>
+        <span class="sold-price">$4,200,000</span>
+      </li>
+      <li class="sold-row" role="listitem">
+        <span class="sold-year">2025</span>
+        <span class="sold-address">5215 Park Lane</span>
+        <span class="sold-nh">Preston Hollow</span>
+        <span class="sold-side">Represented Seller</span>
+        <span class="sold-price">$8,375,000</span>
+      </li>
+      <li class="sold-row" role="listitem">
+        <span class="sold-year">2024</span>
+        <span class="sold-address">3711 Hanover Street</span>
+        <span class="sold-nh">University Park</span>
+        <span class="sold-side">Represented Both</span>
+        <span class="sold-price">$3,950,000</span>
+      </li>
+      <li class="sold-row" role="listitem">
+        <span class="sold-year">2024</span>
+        <span class="sold-address">9420 Rockbrook Drive</span>
+        <span class="sold-nh">Preston Hollow</span>
+        <span class="sold-side">Represented Buyer</span>
+        <span class="sold-price">$6,425,000</span>
+      </li>
+      <li class="sold-row" role="listitem">
+        <span class="sold-year">2024</span>
+        <span class="sold-address">6018 Desco Drive</span>
+        <span class="sold-nh">Volk Estates</span>
+        <span class="sold-side">Represented Seller</span>
+        <span class="sold-price">$4,675,000</span>
+      </li>
+      <li class="sold-row" role="listitem">
+        <span class="sold-year">2024</span>
+        <span class="sold-address">4105 Bryn Mawr Drive</span>
+        <span class="sold-nh">University Park</span>
+        <span class="sold-side">Represented Buyer</span>
+        <span class="sold-price">$2,485,000</span>
+      </li>
+      <li class="sold-row" role="listitem">
+        <span class="sold-year">2023</span>
+        <span class="sold-address">4709 Watauga Road</span>
+        <span class="sold-nh">Bluffview</span>
+        <span class="sold-side">Represented Seller</span>
+        <span class="sold-price">$3,150,000</span>
+      </li>
+    </ul>
+
+    <p class="sold-foot">A number of additional 2024 and 2025 closings are not listed here at the request of the principals involved. Confidential off-market transactions are noted in conversation.</p>
+  </div>
+</section>
+
 <!-- ===== NEIGHBORHOODS ===== -->
-<section class="neighborhoods" id="neighborhoods">
+<section class="neighborhoods" id="neighborhoods" aria-labelledby="neighborhoods-h">
   <div class="container">
     <div class="section-head">
       <span class="eyebrow">NEIGHBORHOOD EXPERTISE</span>
-      <h2>I Know These Streets Because I Live on Them.</h2>
+      <h2 id="neighborhoods-h">I Know These Streets Because I Live on Them.</h2>
+      <p class="lead">Short notes on the neighborhoods I work in most. Each is its own market, with its own rhythm and its own off-market culture.</p>
     </div>
 
     <div class="nh-grid">
@@ -833,6 +1418,18 @@
       </div>
 
       <div class="nh-entry">
+        <h3 class="nh-name">Volk Estates</h3>
+        <div class="nh-stats">MEDIAN $3.8M &middot; 11 TRANSACTIONS YTD</div>
+        <p class="nh-desc">A small, deeply tenured pocket of University Park where homes rarely change hands and never do quickly. The work here is reading the few signals that suggest a listing is coming, and being the call that arrives first.</p>
+      </div>
+
+      <div class="nh-entry">
+        <h3 class="nh-name">Bluffview</h3>
+        <div class="nh-stats">MEDIAN $2.6M &middot; 19 TRANSACTIONS YTD</div>
+        <p class="nh-desc">Rolling lots, mature trees, and an architecturally curious buyer pool. The streets reward an agent who knows which builders worked here in which decade and which renovations were done with restraint.</p>
+      </div>
+
+      <div class="nh-entry">
         <h3 class="nh-name">Prosper &amp; Southlake</h3>
         <div class="nh-stats">MEDIAN $2.8M &middot; 34 TRANSACTIONS YTD</div>
         <p class="nh-desc">Newer estates, larger acreage, and clients arriving from the coasts who want space and stillness without leaving Dallas&rsquo;s orbit. The buyer here is decisive, exacting, and rewards an agent who has actually walked the land.</p>
@@ -841,12 +1438,144 @@
   </div>
 </section>
 
+<!-- ===== PROCESS (BUYER + SELLER) ===== -->
+<section class="process" id="process" aria-labelledby="process-h">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">HOW I WORK</span>
+      <h2 id="process-h">Two Tables. The Same Standard of Care.</h2>
+      <p class="lead">Every engagement begins the same way: an unhurried conversation. From there, the path differs depending on which side of the table you are on.</p>
+    </div>
+
+    <div class="process-grid">
+      <div class="process-col">
+        <span class="process-col-eyebrow">For Buyers</span>
+        <h3 class="process-col-title">From First Conversation to Keys.</h3>
+        <p class="process-col-lead">Most of my buyers are not in a hurry. We use that time well, and we never waste a showing.</p>
+
+        <ol class="process-list" aria-label="Buyer engagement steps">
+          <li class="process-step">
+            <span class="process-num">01</span>
+            <h4>Private Consultation</h4>
+            <p>An unhurried conversation about timing, the life the house needs to hold, and the neighborhoods that fit. No pressure, no obligation, no buyer agreement until we both want one.</p>
+          </li>
+          <li class="process-step">
+            <span class="process-num">02</span>
+            <h4>Curated Search</h4>
+            <p>I send three to five homes, not thirty. The list includes off-market and pre-market inventory you will not see on the public sites. Each home is screened in person before I take you in.</p>
+          </li>
+          <li class="process-step">
+            <span class="process-num">03</span>
+            <h4>Offer and Negotiation</h4>
+            <p>Pricing strategy informed by recent comparable closings, not list prices. I write the offer, manage the back-and-forth, and pay attention to terms a strong listing agent will care about more than the headline number.</p>
+          </li>
+          <li class="process-step">
+            <span class="process-num">04</span>
+            <h4>Inspection to Close</h4>
+            <p>I attend the inspection with you. I have trusted relationships with structural engineers, foundation inspectors, and title attorneys when the situation calls for them. The closing table should be the calmest day of the process.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="process-col">
+        <span class="process-col-eyebrow">For Sellers</span>
+        <h3 class="process-col-title">From Quiet Decision to Closed.</h3>
+        <p class="process-col-lead">A great listing is engineered before the sign goes in the yard. Most of the work happens before the public ever sees the home.</p>
+
+        <ol class="process-list" aria-label="Seller engagement steps">
+          <li class="process-step">
+            <span class="process-num">01</span>
+            <h4>Confidential Valuation</h4>
+            <p>A private market analysis with three pricing scenarios, the supporting comparable sales, and an honest read of how your home will be received. No public footprint, no obligation.</p>
+          </li>
+          <li class="process-step">
+            <span class="process-num">02</span>
+            <h4>Pre-Market Preparation</h4>
+            <p>Staging, paint, light renovation when the math supports it. I coordinate with my preferred stager, contractor, and photographer. The home goes to market once, and only when it is ready.</p>
+          </li>
+          <li class="process-step">
+            <span class="process-num">03</span>
+            <h4>Quiet Launch and Listing</h4>
+            <p>Most of my listings are first shared with a curated network of agents and qualified buyers before they hit MLS. When we do go public, the photography, copy, and price are correct on day one.</p>
+          </li>
+          <li class="process-step">
+            <span class="process-num">04</span>
+            <h4>Offer Strategy and Closing</h4>
+            <p>I screen offers personally, advise on counters, and manage the contract through closing. You hear from me directly through every stage. There is no transaction coordinator standing between us.</p>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONCIERGE SERVICES ===== -->
+<section class="concierge" id="concierge" aria-labelledby="concierge-h">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">CONCIERGE</span>
+      <h2 id="concierge-h">Beyond the Transaction.</h2>
+      <p class="lead">A house at this price point is rarely just bought or sold. The work around the work is what separates a $400K agent from a $4M agent.</p>
+    </div>
+
+    <div class="conc-list">
+      <div class="conc-item">
+        <span class="conc-mark" aria-hidden="true">i</span>
+        <div class="conc-body">
+          <h3>Off-Market Access</h3>
+          <p>A standing relationship with sellers who will entertain the right offer but will not list publicly. Access to the Briggs Freeman private network and the Sotheby&rsquo;s International Realty global pipeline of pre-market inventory.</p>
+        </div>
+      </div>
+
+      <div class="conc-item">
+        <span class="conc-mark" aria-hidden="true">ii</span>
+        <div class="conc-body">
+          <h3>Staging and Preparation</h3>
+          <p>I cover the cost of professional staging on every listing I take above the seven-figure mark. My preferred stagers, painters, and contractors work to a calendar that respects your timeline, not theirs.</p>
+        </div>
+      </div>
+
+      <div class="conc-item">
+        <span class="conc-mark" aria-hidden="true">iii</span>
+        <div class="conc-body">
+          <h3>Renovation Strategy</h3>
+          <p>If a home should be lightly renovated before listing, I project-manage the work end to end with a builder I trust. If a buyer wants to renovate after closing, I introduce the architects and builders I would hire myself.</p>
+        </div>
+      </div>
+
+      <div class="conc-item">
+        <span class="conc-mark" aria-hidden="true">iv</span>
+        <div class="conc-body">
+          <h3>Relocation Network</h3>
+          <p>For clients moving to or from Dallas, I coordinate with vetted agents in New York, Aspen, Palm Beach, and the Bay Area through the Sotheby&rsquo;s referral network. One conversation, one introduction, no cold outreach.</p>
+        </div>
+      </div>
+
+      <div class="conc-item">
+        <span class="conc-mark" aria-hidden="true">v</span>
+        <div class="conc-body">
+          <h3>Discreet Photography and Marketing</h3>
+          <p>An architectural photographer, a videographer, and a print designer who work to a brief, not a template. Your home is presented in the editorial language it deserves, with placements considered on a property-by-property basis.</p>
+        </div>
+      </div>
+
+      <div class="conc-item">
+        <span class="conc-mark" aria-hidden="true">vi</span>
+        <div class="conc-body">
+          <h3>Trusted Advisors</h3>
+          <p>Title attorneys, tax counsel, mortgage advisors at the private banks, foundation engineers, designers. The introductions you need at the moment you need them, with no quiet referral fee on either side.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ===== TESTIMONIALS ===== -->
-<section class="testimonials">
+<section class="testimonials" aria-labelledby="testimonials-h">
   <div class="container">
     <div class="section-head">
       <span class="eyebrow">CLIENT EXPERIENCES</span>
-      <h2>Trust Built on Results.</h2>
+      <h2 id="testimonials-h">Trust Built on Results.</h2>
     </div>
 
     <div class="test-stack">
@@ -859,6 +1588,11 @@
         <p class="test-quote">She walked us through eleven homes, declined two we loved on sight, and brought us to the twelfth. We have lived in it almost six years now and still cannot imagine the life we would have had in either of the first two. That is intuition you cannot teach.</p>
         <div class="test-attribution">David &amp; Christine M. &middot; University Park</div>
       </blockquote>
+
+      <blockquote class="test-block">
+        <p class="test-quote">We needed to move quietly. Lauren found the buyer before we needed to list, handled the introductions herself, and closed in twenty-eight days at a number we did not think was possible. Not one neighbor knew the home was for sale until the moving truck arrived.</p>
+        <div class="test-attribution">Anonymous &middot; Preston Hollow</div>
+      </blockquote>
     </div>
   </div>
 </section>
@@ -866,40 +1600,146 @@
 <!-- ===== NEIGHBORHOOD TRANSITION STRIP ===== -->
 <img class="nh-strip" src="images/real-estate-neighborhood.jpg" alt="Tree-canopied Park Cities residential street with established estate homes" width="1600" height="900">
 
-<!-- ===== SELLERS ===== -->
-<section class="sellers" id="sellers">
+<!-- ===== PRESS / RECOGNITION ===== -->
+<section class="press" id="press" aria-labelledby="press-h">
   <div class="container">
-    <span class="eyebrow">FOR SELLERS</span>
-    <h2>Considering a Sale?</h2>
-    <p class="sellers-sub">I provide every prospective seller with a confidential market analysis and custom pricing strategy. No obligation, no pressure. Just clarity on what your home is worth and how I would position it.</p>
+    <div class="section-head">
+      <span class="eyebrow">RECOGNITION</span>
+      <h2 id="press-h">As Featured In.</h2>
+      <p class="lead">Most of what I do never appears in print. The work below is what clients and editors chose to share.</p>
+    </div>
+
+    <div class="press-marks" role="list" aria-label="Publications">
+      <span class="press-mark" role="listitem">D Magazine</span>
+      <span class="press-mark smallcap" role="listitem">Wall Street Journal</span>
+      <span class="press-mark" role="listitem">Mansion Global</span>
+      <span class="press-mark smallcap" role="listitem">PaperCity</span>
+      <span class="press-mark" role="listitem">Architectural Digest</span>
+      <span class="press-mark smallcap" role="listitem">Robb Report</span>
+    </div>
+
+    <div class="press-honors">
+      <h3>Recent Honors</h3>
+      <ul class="honor-list" role="list">
+        <li class="honor-item" role="listitem">
+          <span class="honor-year">2025</span>
+          <span class="honor-text"><strong>D Magazine Best Realtors</strong>, Park Cities &amp; Preston Hollow</span>
+        </li>
+        <li class="honor-item" role="listitem">
+          <span class="honor-year">2025</span>
+          <span class="honor-text"><strong>Briggs Freeman Top Producer</strong>, Top 1% by Volume</span>
+        </li>
+        <li class="honor-item" role="listitem">
+          <span class="honor-year">2024</span>
+          <span class="honor-text"><strong>Wall Street Journal RealTrends</strong>, Top 100 Texas Agents</span>
+        </li>
+        <li class="honor-item" role="listitem">
+          <span class="honor-year">2024</span>
+          <span class="honor-text"><strong>D Magazine Best Realtors</strong>, <em>five consecutive years</em></span>
+        </li>
+        <li class="honor-item" role="listitem">
+          <span class="honor-year">2023</span>
+          <span class="honor-text"><strong>Mansion Global</strong>, featured profile, <em>The Quiet Park Cities Market</em></span>
+        </li>
+        <li class="honor-item" role="listitem">
+          <span class="honor-year">2023</span>
+          <span class="honor-text"><strong>PaperCity</strong>, Dallas Real Estate Voices to Watch</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRIVATE LIST EMAIL CAPTURE ===== -->
+<section class="privatelist" id="privatelist" aria-labelledby="privatelist-h">
+  <div class="container">
+    <span class="eyebrow">THE PRIVATE LIST</span>
+    <h2 id="privatelist-h">Off-Market Inventory, Sent Quietly.</h2>
+    <p class="privatelist-sub">A short, considered email three or four times a year. Pre-market homes I am about to bring to listing, off-market inventory my clients are willing to entertain, and the occasional note on what is moving and what is not. No newsletter, no listings firehose, no algorithm.</p>
+
+    <form class="privatelist-form" action="#" method="post" aria-label="Subscribe to the private list">
+      <input class="privatelist-input" type="email" name="email" placeholder="Your email" aria-label="Email address" required>
+      <button class="btn" type="submit">Request Access</button>
+    </form>
+
+    <p class="privatelist-foot">Vetted personally. Your address is never shared, sold, or syndicated.</p>
+  </div>
+</section>
+
+<!-- ===== CONSULTATION CTA ===== -->
+<section class="consult" id="sellers" aria-labelledby="consult-h">
+  <div class="container">
+    <span class="eyebrow">DIRECT &middot; PRIVATE</span>
+    <h2 id="consult-h">A Quiet Conversation. No Obligation.</h2>
+    <p class="consult-sub">Whether you are six months from selling, watching one specific home, or simply trying to understand what your own house is worth right now, the first conversation is private and unhurried. No CRM follow-ups, no junior agent calling on my behalf.</p>
+
     <a href="#contact" class="btn">Request a Private Consultation</a>
-    <p class="sellers-foot">Or call directly (214) 555-0672 <span class="sep">&middot;</span> All inquiries kept confidential</p>
+
+    <div class="consult-channels">
+      <div class="consult-channel">
+        <span class="consult-channel-label">Direct Line</span>
+        <span class="consult-channel-value"><a href="tel:+12145550672">(214) 555-0672</a></span>
+      </div>
+      <div class="consult-channel">
+        <span class="consult-channel-label">Personal Email</span>
+        <span class="consult-channel-value"><a href="mailto:lauren@laurenprescott.com">lauren@laurenprescott.com</a></span>
+      </div>
+      <div class="consult-channel">
+        <span class="consult-channel-label">Response Window</span>
+        <span class="consult-channel-value">Within one business day, personally</span>
+      </div>
+    </div>
+
+    <p class="consult-promise">Every inquiry is read and answered by me, not a team. All conversations are confidential by default.</p>
   </div>
 </section>
 
 <!-- ===== FOOTER ===== -->
-<footer id="contact">
+<footer id="contact" role="contentinfo">
   <div class="footer-inner">
     <div class="footer-grid">
       <div>
         <div class="footer-wordmark">LAUREN PRESCOTT</div>
         <div class="footer-block">Luxury Residential &middot; Dallas, TX</div>
+        <p class="footer-broker">Briggs Freeman Sotheby&rsquo;s<br>International Realty</p>
+        <span class="footer-license">TREC Lic. #0654182</span>
       </div>
 
       <div class="footer-block">
-        <div>(214) 555-0672</div>
-        <div><a href="#">lauren@laurenprescott.com</a></div>
-        <div>3300 Knox Street, Suite 110<br>Dallas, TX 75205</div>
+        <span class="footer-subhead">Reach</span>
+        <div><a href="tel:+12145550672">(214) 555-0672</a></div>
+        <div><a href="mailto:lauren@laurenprescott.com">lauren@laurenprescott.com</a></div>
+        <div style="margin-top:0.7rem;">3300 Knox Street, Suite 110<br>Dallas, TX 75205</div>
+      </div>
+
+      <div class="footer-block">
+        <span class="footer-subhead">Hours</span>
+        <div>By appointment, Monday to Friday</div>
+        <div>Saturday showings by arrangement</div>
+        <div style="margin-top:0.7rem;font-style:italic;">All inquiries are read personally, and answered within one business day.</div>
       </div>
 
       <div>
-        <p class="footer-broker">Briggs Freeman Sotheby&rsquo;s International Realty</p>
-        <p class="footer-credit"><a href="https://dbjtechnologies.com">Website by DBJ Technologies</a></p>
+        <span class="footer-subhead">Brokerage</span>
+        <div class="footer-block">
+          <div>Briggs Freeman Sotheby&rsquo;s International Realty</div>
+          <div>5600 W Lovers Lane, Suite 224<br>Dallas, TX 75209</div>
+          <div style="margin-top:0.7rem;">TX Brokerage Lic. #0497850</div>
+        </div>
+        <p class="footer-credit" style="margin-top:1.4rem;"><a href="https://dbjtechnologies.com">Website by DBJ Technologies</a></p>
       </div>
     </div>
 
     <div class="footer-rule" aria-hidden="true"></div>
-    <div class="footer-legal">&copy; 2026 Lauren Prescott. All rights reserved. Equal Housing Opportunity.</div>
+    <div class="footer-legal">
+      <span>&copy; 2026 Lauren Prescott. All rights reserved.</span>
+      <span class="footer-legal-marks">
+        <span>Equal Housing Opportunity</span>
+        <span>MLS Member, North Texas Real Estate Information Systems</span>
+        <span><a href="https://www.trec.texas.gov/" rel="noopener">TREC Consumer Protection Notice</a></span>
+        <span><a href="https://www.trec.texas.gov/" rel="noopener">Information About Brokerage Services</a></span>
+      </span>
+    </div>
   </div>
 </footer>
 
