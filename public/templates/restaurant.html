@@ -150,6 +150,47 @@
     transform: translateY(-1px);
   }
 
+  /* ============ PROMO BAR (top-most strip, not sticky) ============ */
+  .promo-bar {
+    background: var(--espresso-deep);
+    color: var(--amber);
+    border-bottom: 1px solid var(--hairline-amber);
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    padding: 0.7rem clamp(1.5rem, 5vw, 3rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    text-align: center;
+    flex-wrap: wrap;
+  }
+  .promo-bar .promo-text { color: var(--amber); }
+  .promo-bar .promo-text strong {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 0.96rem;
+    letter-spacing: 0.02em;
+    margin-right: 0.45rem;
+  }
+  .promo-bar .promo-divider {
+    color: rgba(201,169,110,0.4);
+    font-size: 0.85rem;
+  }
+  .promo-bar a {
+    color: var(--cream);
+    border-bottom: 1px solid rgba(255,248,240,0.3);
+    padding-bottom: 1px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .promo-bar a:hover {
+    color: var(--amber);
+    border-bottom-color: var(--amber);
+  }
+
   /* ============ NAV (centered split signature) ============ */
   .nav {
     position: sticky;
@@ -209,6 +250,26 @@
     color: var(--cream);
     text-transform: uppercase;
     white-space: nowrap;
+  }
+
+  .nav-right .nav-cta {
+    display: inline-block;
+    background: var(--burgundy);
+    color: var(--cream);
+    border: 1px solid var(--burgundy);
+    padding: 0.6rem 1.3rem;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+  }
+  .nav-right .nav-cta:hover {
+    background: var(--burgundy-deep);
+    border-color: var(--burgundy-deep);
+    color: var(--cream);
   }
 
   /* ============ HERO: CINEMATIC LETTERBOX ============ */
@@ -605,52 +666,165 @@
     color: var(--cream);
   }
 
-  /* ============ BAR STRIP (full-bleed atmosphere band) ============ */
-  .bar-strip {
+  /* ============ THE BAR (separately branded program) ============ */
+  .bar {
+    position: relative;
     width: 100vw;
     margin-left: calc(50% - 50vw);
-    height: 320px;
     background:
-      linear-gradient(rgba(28,18,16,0.42), rgba(28,18,16,0.58)),
-      url('images/people/restaurant-bartender.jpg') center 80%/cover no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 6vw, 4rem);
+      linear-gradient(rgba(28,18,16,0.66), rgba(28,18,16,0.80)),
+      url('images/people/restaurant-bartender.jpg') center 60%/cover no-repeat;
     color: var(--cream);
+    padding: clamp(4.5rem, 8vw, 7rem) clamp(1.5rem, 6vw, 4rem);
   }
 
-  .bar-strip-inner {
-    text-align: center;
-    max-width: 540px;
+  .bar-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: center;
+    max-width: 1080px;
+    margin: 0 auto;
   }
 
-  .bar-strip-inner .glyph {
+  .bar-copy { color: var(--cream); }
+  .bar-copy .ornament {
+    justify-content: flex-start;
+    margin-left: 0;
     color: var(--amber);
-    font-family: 'Fraunces', serif;
-    font-size: 1rem;
-    line-height: 1;
-    margin-bottom: 0.9rem;
-    display: block;
   }
+  .bar-copy .eyebrow.amber { color: var(--amber); }
 
-  .bar-strip-inner h3 {
+  .bar-copy h2 {
     font-family: 'Fraunces', serif;
-    font-style: italic;
     font-weight: 400;
     color: var(--cream);
-    font-size: 1.6rem;
-    line-height: 1.2;
-    margin: 0 0 1rem;
-    letter-spacing: 0;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    margin: 0 0 1.2rem;
+    font-variation-settings: 'SOFT' 50;
+    letter-spacing: -0.005em;
   }
-
-  .bar-strip-inner p {
+  .bar-copy h2 sup {
+    font-size: 0.42em;
+    vertical-align: super;
+    font-weight: 500;
+    color: var(--amber);
+    letter-spacing: 0.04em;
+    margin-left: 0.15em;
+    opacity: 0.75;
+  }
+  .bar-copy .bar-tagline {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--amber);
+    font-size: 1.15rem;
+    margin: 0 0 1.6rem;
+  }
+  .bar-copy p {
     font-family: 'Nunito Sans', sans-serif;
     color: var(--on-dark-dim);
-    font-size: 0.92rem;
-    line-height: 1.65;
-    margin: 0 auto;
+    line-height: 1.85;
+    margin: 0 0 1rem;
+    font-size: 1rem;
+  }
+  .bar-meta-block {
+    margin-top: 1.6rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--hairline-amber);
+  }
+  .bar-meta-block .bar-meta {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0;
+  }
+  .bar-meta-block .bar-meta + .bar-meta {
+    margin-top: 0.6rem;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+    font-size: 0.96rem;
+    color: var(--on-dark-dim);
+  }
+
+  .bar-card {
+    background: var(--paper);
+    color: var(--espresso);
+    padding: 2.4rem 2rem 2rem;
+    box-shadow: var(--shadow-warm);
+  }
+  .bar-card .top-glyph {
+    color: var(--amber);
+    font-family: 'Fraunces', serif;
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 0.9rem;
+  }
+  .bar-card h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--espresso);
+    font-size: 1.05rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin: 0 0 1.6rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--hairline-amber);
+    text-align: center;
+  }
+  .cocktail-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    text-align: left;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--hairline-light);
+  }
+  .cocktail-row:last-of-type { border-bottom: none; }
+  .cocktail-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--espresso);
+    font-size: 1.04rem;
+    line-height: 1.3;
+  }
+  .cocktail-desc {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--umber-light);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+    line-height: 1.55;
+  }
+  .cocktail-price {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--burgundy);
+    font-size: 0.95rem;
+    text-align: right;
+    align-self: center;
+    font-feature-settings: 'kern','liga','tnum';
+    white-space: nowrap;
+  }
+  .bar-card-foot {
+    margin-top: 1.6rem;
+    text-align: center;
+  }
+  .bar-card-foot a {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--burgundy);
+    font-size: 0.96rem;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--burgundy-pale);
+    padding-bottom: 2px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .bar-card-foot a:hover {
+    color: var(--burgundy-deep);
+    border-bottom-color: var(--burgundy);
   }
 
   /* ============ WINE PROGRAM ============ */
@@ -752,31 +926,328 @@
     white-space: nowrap;
   }
 
-  /* ============ PRIVATE DINING ============ */
+  /* ============ PANTRY (online market for take-home goods) ============ */
+  .pantry {
+    background: var(--paper);
+    color: var(--espresso);
+  }
+  .pantry .section-head {
+    text-align: center;
+    margin: 0 auto 3rem;
+    max-width: 640px;
+  }
+  .pantry .section-head .ornament { margin-bottom: 1.4rem; }
+  .pantry .section-head .eyebrow { color: var(--burgundy); }
+  .pantry .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--espresso);
+    font-size: var(--fs-h2);
+    margin: 0 0 1.1rem;
+    font-variation-settings: 'SOFT' 50;
+  }
+  .pantry .section-head p {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--umber);
+    line-height: 1.85;
+    margin: 0 auto;
+    max-width: 540px;
+    font-size: 1.02rem;
+  }
+
+  .pantry-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.6rem;
+    margin-top: 1rem;
+  }
+  .pantry-item {
+    background: var(--cream);
+    border: 1px solid var(--hairline-light);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .pantry-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-soft);
+  }
+  .pantry-image {
+    aspect-ratio: 4 / 3;
+    background-color: var(--linen);
+    background-size: cover;
+    background-position: center;
+    border-bottom: 1px solid var(--hairline-light);
+  }
+  .pantry-body {
+    padding: 1.5rem 1.5rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .pantry-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--espresso);
+    font-size: 1.12rem;
+    letter-spacing: 0.005em;
+    line-height: 1.3;
+    margin: 0 0 0.55rem;
+  }
+  .pantry-desc {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--umber);
+    font-size: 0.88rem;
+    line-height: 1.65;
+    margin: 0 0 1.2rem;
+    flex: 1;
+  }
+  .pantry-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: auto;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--hairline-light);
+  }
+  .pantry-price {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--burgundy);
+    font-size: 1.18rem;
+    font-feature-settings: 'kern','liga','tnum';
+  }
+  .pantry-link {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--burgundy);
+    cursor: pointer;
+    border-bottom: 1px solid var(--burgundy-pale);
+    padding-bottom: 2px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .pantry-link:hover { color: var(--burgundy-deep); border-bottom-color: var(--burgundy); }
+
+  .pantry-foot-line {
+    text-align: center;
+    margin: 3rem auto 0;
+    max-width: 600px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--umber);
+    font-size: 0.98rem;
+  }
+
+  /* ============ GIFT CARDS STRIP (within Pantry) ============ */
+  .gift-cards {
+    background: var(--cream);
+    border: 1px solid var(--burgundy-pale);
+    padding: 1.85rem 2rem;
+    margin: 0 0 2.6rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.8rem;
+    align-items: center;
+    text-align: left;
+  }
+  .gift-cards .gift-glyph {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--amber);
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  .gift-cards .gift-body { display: flex; flex-direction: column; gap: 0.35rem; }
+  .gift-cards h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--espresso);
+    font-size: 1.3rem;
+    margin: 0;
+    letter-spacing: -0.005em;
+  }
+  .gift-cards p {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--umber);
+    font-size: 0.92rem;
+    margin: 0;
+    line-height: 1.6;
+  }
+  .gift-cards .btn {
+    padding: 0.85rem 1.6rem;
+    font-size: 0.72rem;
+  }
+  .pantry-foot-line a {
+    color: var(--burgundy);
+    border-bottom: 1px solid var(--burgundy-pale);
+    padding-bottom: 2px;
+  }
+  .pantry-foot-line a:hover {
+    color: var(--burgundy-deep);
+    border-bottom-color: var(--burgundy);
+  }
+
+  /* ============ PRIVATE DINING (two rooms + named GM + dress code) ============ */
   .private h2 {
     font-family: 'Fraunces', serif;
     font-weight: 400;
     color: var(--cream);
     font-size: var(--fs-h2);
-    margin: 0 0 1.5rem;
+    margin: 0 0 1.2rem;
   }
 
   .private p {
     font-family: 'Nunito Sans', sans-serif;
     color: var(--on-dark-dim);
     line-height: 1.85;
-    max-width: 580px;
+    max-width: 600px;
     margin: 0 auto 1.6rem;
   }
 
-  .private .detail {
+  .rooms-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 3rem 0 0;
+    text-align: left;
+  }
+  .room-card {
+    background: var(--espresso-soft);
+    border: 1px solid var(--hairline-amber);
+    padding: clamp(2rem, 4vw, 2.8rem);
+    display: flex;
+    flex-direction: column;
+  }
+  .room-eyebrow {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--amber);
+    margin: 0 0 0.85rem;
+  }
+  .room-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--cream);
+    font-size: 1.85rem;
+    letter-spacing: -0.005em;
+    line-height: 1.12;
+    margin: 0 0 0.5rem;
+    font-variation-settings: 'SOFT' 50;
+  }
+  .room-cap {
+    font-family: 'Fraunces', serif;
+    color: var(--amber);
+    font-size: 0.96rem;
+    font-style: italic;
+    margin: 0 0 1.2rem;
+  }
+  .room-rule {
+    width: 32px;
+    height: 1px;
+    background: var(--amber);
+    margin: 0 0 1.4rem;
+    opacity: 0.55;
+  }
+  .room-desc {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--on-dark-dim);
+    line-height: 1.85;
+    font-size: 0.96rem;
+    margin: 0 0 1.6rem;
+    flex: 1;
+  }
+  .room-meta {
+    border-top: 1px solid var(--hairline-amber);
+    padding-top: 1.2rem;
+    margin: 0;
+  }
+  .room-meta-label {
+    color: var(--amber);
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.45rem;
+  }
+  .room-price {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--cream);
+    font-size: 1.3rem;
+    font-feature-settings: 'kern','liga','tnum';
+    display: inline-block;
+    margin-right: 0.4rem;
+  }
+  .room-price-suffix {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--on-dark-dim);
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+  }
+
+  .private-host {
+    margin: 3.2rem auto 0;
+    padding-top: 2.4rem;
+    border-top: 1px solid var(--hairline-amber);
+    text-align: center;
+    max-width: 720px;
+  }
+  .private-host-name {
     font-family: 'Fraunces', serif;
     font-style: italic;
-    color: var(--amber);
-    font-size: 0.92rem;
-    letter-spacing: 0.08em;
-    margin: 0 0 2.4rem;
+    color: var(--cream);
+    font-size: 1.45rem;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.005em;
   }
+  .private-host-title {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--amber);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin: 0 0 1.2rem;
+  }
+  .private-host-quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--on-dark-dim);
+    font-size: 1.08rem;
+    line-height: 1.7;
+    margin: 0 auto 2rem;
+    max-width: 560px;
+  }
+
+  .private-meta-row {
+    display: flex;
+    justify-content: center;
+    gap: 1.8rem 2.4rem;
+    flex-wrap: wrap;
+    margin: 0 0 2.2rem;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    color: var(--on-dark-dim);
+  }
+  .private-meta-row a {
+    color: var(--amber);
+    border-bottom: 1px solid rgba(201,169,110,0.3);
+    padding-bottom: 1px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .private-meta-row a:hover { color: var(--cream); border-bottom-color: var(--amber); }
 
   /* ============ PRESS / REVIEWS ============ */
   .press h2 {
@@ -848,6 +1319,82 @@
     max-width: 760px;
   }
 
+  /* ============ AWARDS STRIP (dated recognition) ============ */
+  .awards-strip {
+    margin: 4rem auto 0;
+    max-width: 880px;
+  }
+  .awards-strip h3 {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--burgundy);
+    font-weight: 500;
+    margin: 0 0 2rem;
+    text-align: center;
+  }
+  .awards-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.6rem 3rem;
+  }
+  .award-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.2rem;
+    align-items: baseline;
+    text-align: left;
+  }
+  .award-year {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.45rem;
+    color: var(--amber);
+    font-feature-settings: 'kern','liga','tnum';
+    letter-spacing: 0.02em;
+  }
+  .award-text {
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--umber);
+    font-size: 0.96rem;
+    line-height: 1.7;
+  }
+  .award-text strong {
+    color: var(--espresso);
+    font-weight: 500;
+  }
+  .award-text em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--burgundy);
+    font-size: 1.05em;
+  }
+  .google-strip {
+    margin: 3rem auto 0;
+    text-align: center;
+    padding-top: 2.4rem;
+    border-top: 1px solid var(--hairline-light);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.08rem;
+    color: var(--espresso);
+    max-width: 720px;
+  }
+  .google-strip strong {
+    color: var(--burgundy);
+    font-weight: 500;
+  }
+  .google-strip .stars {
+    color: var(--amber);
+    letter-spacing: 0.12em;
+    font-size: 1rem;
+    margin-right: 0.4rem;
+  }
+
   /* ============ INTERIOR STRIP ============ */
   .interior-strip {
     width: 100%;
@@ -890,6 +1437,132 @@
 
   .reserve .meta:first-of-type {
     margin-top: 2.4rem;
+  }
+
+  /* ============ ACCESSIBILITY UTILITY ============ */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ============ HOURS TABLE (expanded day-by-day) ============ */
+  .hours-table {
+    margin: 2rem auto 0;
+    max-width: 560px;
+    text-align: left;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.94rem;
+    color: var(--umber);
+  }
+  .hours-row {
+    display: grid;
+    grid-template-columns: 0.85fr 1.4fr;
+    gap: 1.4rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--hairline-light);
+    align-items: baseline;
+  }
+  .hours-row:last-child { border-bottom: none; }
+  .hours-row > span:first-child {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--burgundy);
+    font-size: 1rem;
+  }
+  .hours-row > span:last-child {
+    letter-spacing: 0.02em;
+    line-height: 1.55;
+  }
+
+  /* ============ PREFERRED GUEST LIST (email capture) ============ */
+  .preferred {
+    background: var(--espresso-deep);
+    color: var(--on-dark);
+    text-align: center;
+    padding: clamp(3.5rem, 6vw, 5rem) clamp(1.5rem, 6vw, 4rem);
+    border-top: 1px solid var(--hairline-amber);
+    border-bottom: 1px solid var(--hairline-amber);
+  }
+  .preferred-inner {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .preferred .ornament {
+    color: var(--amber);
+    margin-bottom: 1.2rem;
+  }
+  .preferred .eyebrow {
+    color: var(--amber);
+    margin-bottom: 1rem;
+  }
+  .preferred h3 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--cream);
+    font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+    line-height: 1.45;
+    margin: 0 0 1.8rem;
+    font-variation-settings: 'SOFT' 50;
+  }
+  .preferred-form {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 480px;
+    margin: 0 auto 1.2rem;
+  }
+  .preferred-input {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--hairline-amber);
+    color: var(--cream);
+    padding: 0.95rem 1.1rem;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+    border-radius: 0;
+    transition: border-color 0.2s ease;
+  }
+  .preferred-input::placeholder {
+    color: var(--on-dark-dim);
+    opacity: 0.7;
+  }
+  .preferred-input:focus {
+    outline: none;
+    border-color: var(--amber);
+  }
+  .preferred-submit {
+    background: var(--amber);
+    color: var(--espresso);
+    border: 1px solid var(--amber);
+    padding: 0.95rem 1.6rem;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+  }
+  .preferred-submit:hover {
+    background: var(--cream);
+    border-color: var(--cream);
+    color: var(--espresso);
+  }
+  .preferred-privacy {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--on-dark-dim);
+    font-size: 0.88rem;
+    margin: 0;
   }
 
   /* ============ FOOTER (centered editorial) ============ */
@@ -951,6 +1624,28 @@
     color: var(--amber);
   }
 
+  .footer-meta {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--amber);
+    font-size: 0.92rem;
+    margin: 0 0 1.4rem;
+    letter-spacing: 0.005em;
+  }
+  .footer-social {
+    margin-top: 0.5rem;
+  }
+  .footer-social a {
+    color: var(--amber);
+    border-bottom: 1px solid rgba(201,169,110,0.3);
+    padding-bottom: 1px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .footer-social a:hover {
+    color: var(--cream);
+    border-bottom-color: var(--cream);
+  }
+
   /* ============ RESPONSIVE ============ */
   @media (max-width: 900px) {
     .menu-grid,
@@ -985,16 +1680,49 @@
       height: 260px;
     }
 
-    .bar-strip {
-      height: 240px;
+    .bar-grid {
+      grid-template-columns: 1fr;
     }
+    .bar-copy { text-align: center; }
+    .bar-copy .ornament { justify-content: center; margin-left: auto; margin-right: auto; }
+
+    .pantry-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .gift-cards {
+      grid-template-columns: 1fr;
+      gap: 1.2rem;
+      text-align: center;
+      padding: 2rem 1.6rem;
+    }
+    .gift-cards .gift-glyph { font-size: 1.8rem; }
+
+    .rooms-grid { grid-template-columns: 1fr; }
+
+    .awards-list { grid-template-columns: 1fr; gap: 1.2rem; }
+
+    .hours-row { grid-template-columns: 1fr; gap: 0.3rem; }
+
+    .preferred-form { flex-direction: column; gap: 0.7rem; }
 
     .menu-intermission .quote {
       font-size: 1.3rem;
     }
   }
 
+  @media (max-width: 600px) {
+    .pantry-grid { grid-template-columns: 1fr; }
+  }
+
   @media (max-width: 768px) {
+    .promo-bar {
+      font-size: 0.72rem;
+      padding: 0.55rem 1.2rem;
+      gap: 0.6rem;
+      line-height: 1.4;
+    }
+    .promo-bar .promo-text strong { font-size: 0.85rem; }
+    .promo-bar .promo-divider { display: none; }
+
     .nav-inner {
       grid-template-columns: 1fr;
       justify-items: center;
@@ -1062,17 +1790,29 @@
 </head>
 <body>
 
+<!-- ============ PROMO BAR (top-most strip, not sticky) ============ -->
+<div class="promo-bar" role="region" aria-label="Seasonal offerings">
+  <span class="promo-text"><strong>Mother&rsquo;s Day Brunch:</strong>Three-course prix fixe, Sunday May 11, two seatings.</span>
+  <span class="promo-divider" aria-hidden="true">|</span>
+  <a href="#reserve">Reserve a Table</a>
+  <span class="promo-divider" aria-hidden="true">|</span>
+  <a href="#gift-cards">Gift Cards</a>
+</div>
+
 <!-- ============ NAV (centered split signature) ============ -->
 <nav class="nav" aria-label="Primary">
   <div class="nav-inner">
     <div class="nav-left">
       <a href="#menu">Menu</a>
       <a href="#wine">Wine</a>
+      <a href="#bar">Bar</a>
+      <a href="#pantry">Pantry</a>
     </div>
     <a href="#" class="wordmark">Ember &amp; Vine</a>
     <div class="nav-right">
       <a href="#private">Private Events</a>
-      <a href="#reserve">Reservations</a>
+      <a href="#gift-cards">Gift Cards</a>
+      <a href="#reserve" class="nav-cta">Reserve</a>
     </div>
   </div>
 </nav>
@@ -1251,12 +1991,58 @@
   </div>
 </section>
 
-<!-- ============ BAR STRIP (full-bleed atmosphere band) ============ -->
-<section class="bar-strip" aria-label="The bar at Ember and Vine">
-  <div class="bar-strip-inner">
-    <span class="glyph" aria-hidden="true">&#10022;</span>
-    <h3>The Bar</h3>
-    <p>Aperol spritzes from 5pm. House Negronis aged in Texas oak for thirty days. A short list of what the bartender thinks pairs with what you ordered. Ask.</p>
+<!-- ============ THE BAR (separately branded program) ============ -->
+<section class="bar" id="bar" aria-labelledby="bar-heading">
+  <div class="bar-grid">
+    <div class="bar-copy">
+      <div class="ornament" aria-hidden="true">
+        <span>&#10022;</span>
+        <span>&#10022;</span>
+        <span>&#10022;</span>
+      </div>
+      <p class="eyebrow amber">The Bar Program</p>
+      <h2 id="bar-heading">The Garnet<sup>&reg;</sup></h2>
+      <p class="bar-tagline">Aperitivo at five. Negroni at midnight.</p>
+      <p>The bar at Ember &amp; Vine has its own door, its own menu, and its own opinions. Henry Ramos has been running it since the day we opened, aging Negronis in Texas oak for thirty days and pouring whatever spritz the season calls for.</p>
+      <p>Sit at the marble counter, order the cocktail of the week, and let Henry tell you about the producer who grew the orange peel.</p>
+      <div class="bar-meta-block">
+        <p class="bar-meta">Henry Ramos &middot; Bar Director</p>
+        <p class="bar-meta">Open until 11pm Tuesday through Thursday, until midnight Friday and Saturday. Walk-ins welcome at the counter.</p>
+      </div>
+    </div>
+
+    <aside class="bar-card" aria-label="Signature cocktails">
+      <div class="top-glyph" aria-hidden="true">&#10022;</div>
+      <h3>Signature Cocktails</h3>
+
+      <div class="cocktail-row">
+        <div>
+          <div class="cocktail-name">The Garnet Negroni</div>
+          <div class="cocktail-desc">Aged thirty days in Texas oak, served over a single rock.</div>
+        </div>
+        <div class="cocktail-price">$18</div>
+      </div>
+
+      <div class="cocktail-row">
+        <div>
+          <div class="cocktail-name">Smoked Mezcal Paloma</div>
+          <div class="cocktail-desc">Mezcal Vago, ruby grapefruit, salt rim, smoked salt cube.</div>
+        </div>
+        <div class="cocktail-price">$16</div>
+      </div>
+
+      <div class="cocktail-row">
+        <div>
+          <div class="cocktail-name">Aperitivo of the Week</div>
+          <div class="cocktail-desc">Whatever Henry is pouring tonight. Ask.</div>
+        </div>
+        <div class="cocktail-price">$14</div>
+      </div>
+
+      <div class="bar-card-foot">
+        <a href="#bar">View the full bar list &rarr;</a>
+      </div>
+    </aside>
   </div>
 </section>
 
@@ -1308,19 +2094,133 @@
   </div>
 </section>
 
-<!-- ============ PRIVATE DINING ============ -->
+<!-- ============ PRIVATE DINING (two rooms + named GM + dress code) ============ -->
 <section class="private section-espresso center" id="private">
-  <div class="section-narrow">
+  <div class="section-inner">
     <div class="ornament" aria-hidden="true">
       <span>&#10022;</span>
       <span>&#10022;</span>
       <span>&#10022;</span>
     </div>
     <p class="eyebrow amber">Private Dining</p>
-    <h2>Your Table Is Waiting.</h2>
-    <p>Our private dining room seats up to 24 guests for birthdays, rehearsal dinners, corporate events, and celebrations that deserve a real meal. Custom menus, dedicated service, and a space that feels like yours for the evening.</p>
-    <p class="detail">24 guests maximum &middot; Custom menus from $85 per person &middot; Full buyout available</p>
-    <a href="#" class="btn btn-primary">Inquire About Private Dining</a>
+    <h2>Two Rooms for the Nights That Matter.</h2>
+    <p>Birthdays, rehearsal dinners, board offsites, the milestone you have been planning for months. Two distinct rooms, custom menus written with the chef, and a single host who plans every detail.</p>
+
+    <div class="rooms-grid" role="list" aria-label="Private dining rooms">
+      <article class="room-card" role="listitem">
+        <p class="room-eyebrow">The Main Room</p>
+        <h3 class="room-name">The Vine Room</h3>
+        <p class="room-cap">Up to 24 guests, seated.</p>
+        <div class="room-rule" aria-hidden="true"></div>
+        <p class="room-desc">Our principal private space, with its own entrance off the courtyard, a marble bar, and three large windows that look onto the Bishop Arts streetscape. Custom three- or four-course menus, full bar service, and dedicated staff for the evening.</p>
+        <div class="room-meta">
+          <span class="room-meta-label">Pricing</span>
+          <span class="room-price">$95</span><span class="room-price-suffix">per guest, three courses</span>
+        </div>
+      </article>
+
+      <article class="room-card" role="listitem">
+        <p class="room-eyebrow">The Tasting Counter</p>
+        <h3 class="room-name">The Chef&rsquo;s Counter</h3>
+        <p class="room-cap">Up to 8 guests, kitchen-side.</p>
+        <div class="room-rule" aria-hidden="true"></div>
+        <p class="room-desc">Eight seats facing the line. A six-course tasting menu by Chef Cole, plated and served by him personally, with optional wine pairings. The most memorable seat in the house, and the hardest to book.</p>
+        <div class="room-meta">
+          <span class="room-meta-label">Pricing</span>
+          <span class="room-price">$185</span><span class="room-price-suffix">per guest, six-course tasting</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="private-host">
+      <p class="private-host-name">Catherine Dao</p>
+      <p class="private-host-title">General Manager &middot; Private Events Host</p>
+      <p class="private-host-quote">&ldquo;Every event is planned by me personally, from the menu read-through to the floor plan. I answer every inquiry within four business hours, every time.&rdquo;</p>
+      <p class="private-meta-row">
+        <a href="#private">Dress Code Policy</a>
+        <a href="#private">Sample Menus (PDF)</a>
+        <a href="mailto:events@emberandvine.com">events@emberandvine.com</a>
+        <span>(214) 555-0726, ext. 2</span>
+      </p>
+      <a href="mailto:events@emberandvine.com" class="btn btn-primary">Inquire About Private Dining</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PANTRY (online market for take-home goods) ============ -->
+<section class="pantry" id="pantry" aria-labelledby="pantry-heading">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="ornament" aria-hidden="true">
+        <span>&#10022;</span>
+        <span>&#10022;</span>
+        <span>&#10022;</span>
+      </div>
+      <p class="eyebrow">The Pantry</p>
+      <h2 id="pantry-heading">Take a Little Ember Home.</h2>
+      <p>A short, rotating shelf of things we make in the kitchen and would happily eat for breakfast. Shipped flat-rate within Texas, ready for pickup the same day if you live nearby.</p>
+    </div>
+
+    <div class="gift-cards" id="gift-cards">
+      <span class="gift-glyph" aria-hidden="true">&#10022;</span>
+      <div class="gift-body">
+        <h3>Gift Cards</h3>
+        <p>From $50 in any denomination. Sent by email or printed at the host stand. The most welcomed wedding present in Bishop Arts.</p>
+      </div>
+      <a href="#gift-cards" class="btn btn-ghost">Buy a Gift Card</a>
+    </div>
+
+    <div class="pantry-grid" role="list" aria-label="Pantry items">
+      <article class="pantry-item" role="listitem">
+        <div class="pantry-image" style="background-image:url('images/restaurant-dish1.jpg');" aria-hidden="true"></div>
+        <div class="pantry-body">
+          <h3 class="pantry-name">The Garnet Negroni Kit</h3>
+          <p class="pantry-desc">House recipe with the oak chip we use behind the bar. 750ml, hand-numbered. Makes twelve cocktails.</p>
+          <div class="pantry-foot">
+            <span class="pantry-price">$48</span>
+            <a class="pantry-link" href="#pantry">Add to Cart</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="pantry-item" role="listitem">
+        <div class="pantry-image" style="background-image:url('images/restaurant-dish2.jpg');" aria-hidden="true"></div>
+        <div class="pantry-body">
+          <h3 class="pantry-name">House Granola, 12oz</h3>
+          <p class="pantry-desc">Oats, olive oil, dates, sea salt. Small batch, baked the same morning as bread service. Pairs with everything.</p>
+          <div class="pantry-foot">
+            <span class="pantry-price">$14</span>
+            <a class="pantry-link" href="#pantry">Add to Cart</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="pantry-item" role="listitem">
+        <div class="pantry-image" style="background-image:url('images/restaurant-bar.jpg');" aria-hidden="true"></div>
+        <div class="pantry-body">
+          <h3 class="pantry-name">Chef Cole&rsquo;s Harissa, 8oz</h3>
+          <p class="pantry-desc">North African chili paste with smoked paprika, caraway, and roasted garlic. Stir into eggs, marinate lamb, save the rest of the week.</p>
+          <div class="pantry-foot">
+            <span class="pantry-price">$12</span>
+            <a class="pantry-link" href="#pantry">Add to Cart</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="pantry-item" role="listitem">
+        <div class="pantry-image" style="background-image:url('images/restaurant-interior.jpg');" aria-hidden="true"></div>
+        <div class="pantry-body">
+          <h3 class="pantry-name">The Holiday Box</h3>
+          <p class="pantry-desc">Granola, harissa, house spice blend, and a recipe card from the chef. Wrapped in cream linen, tied with twine. Ships the next morning.</p>
+          <div class="pantry-foot">
+            <span class="pantry-price">$85</span>
+            <a class="pantry-link" href="#pantry">Add to Cart</a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <p class="pantry-foot-line">Looking for the cookbook? <a href="#pantry">It is back in stock.</a></p>
   </div>
 </section>
 
@@ -1340,7 +2240,37 @@
       <p class="attribution">Rachel &amp; Thomas W. &middot; Lakewood</p>
     </div>
 
-    <p class="trust-line">4.8&#9733; on Google (380+ Reviews) &middot; OpenTable Diners&rsquo; Choice 2025 &middot; D Magazine Best New Restaurant</p>
+    <div class="awards-strip">
+      <h3>Recognition</h3>
+      <ul class="awards-list" role="list">
+        <li class="award-item" role="listitem">
+          <span class="award-year">2025</span>
+          <span class="award-text"><strong>D Magazine</strong>, Best New Restaurant</span>
+        </li>
+        <li class="award-item" role="listitem">
+          <span class="award-year">2025</span>
+          <span class="award-text"><strong>Eater Dallas</strong>, 38 Essential Restaurants</span>
+        </li>
+        <li class="award-item" role="listitem">
+          <span class="award-year">2025</span>
+          <span class="award-text"><strong>OpenTable</strong>, Diners&rsquo; Choice</span>
+        </li>
+        <li class="award-item" role="listitem">
+          <span class="award-year">2025</span>
+          <span class="award-text"><strong>Texas Monthly</strong>, Where to Eat Now</span>
+        </li>
+        <li class="award-item" role="listitem">
+          <span class="award-year">2024</span>
+          <span class="award-text"><strong>StarChefs</strong>, Rising Star Award &middot; <em>Chef Marcus Cole</em></span>
+        </li>
+        <li class="award-item" role="listitem">
+          <span class="award-year">2024</span>
+          <span class="award-text"><strong>Wine Spectator</strong>, Award of Excellence</span>
+        </li>
+      </ul>
+
+      <p class="google-strip"><span class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><strong>4.8</strong> on Google, based on 380+ guest reviews.</p>
+    </div>
   </div>
 </section>
 
@@ -1359,9 +2289,34 @@
     </div>
     <h2>We Would Love to Have You.</h2>
     <p class="sub">Reservations recommended, especially Thursday through Saturday. Walk-ins welcome at the bar.</p>
-    <a href="#" class="btn btn-primary">Reserve a Table</a>
+    <a href="#reserve" class="btn btn-primary">Reserve a Table</a>
     <p class="meta">(214) 555-0726 &middot; 331 W 7th Street, Bishop Arts, Dallas, TX 75208</p>
-    <p class="meta">Tuesday through Saturday &middot; 5pm to 10pm &middot; Bar open until 11pm</p>
+
+    <div class="hours-table" role="list" aria-label="Hours">
+      <div class="hours-row" role="listitem"><span>Tuesday to Thursday</span><span>Dinner 5pm to 10pm &middot; Bar until 11pm</span></div>
+      <div class="hours-row" role="listitem"><span>Friday to Saturday</span><span>Dinner 5pm to 11pm &middot; Bar until midnight</span></div>
+      <div class="hours-row" role="listitem"><span>Sunday</span><span>Brunch 10am to 2pm &middot; Closed for dinner</span></div>
+      <div class="hours-row" role="listitem"><span>Monday</span><span>Closed for service &middot; Private events only</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PREFERRED GUEST LIST (email capture) ============ -->
+<section class="preferred" id="preferred-guest" aria-labelledby="preferred-heading">
+  <div class="preferred-inner">
+    <div class="ornament" aria-hidden="true">
+      <span>&#10022;</span>
+      <span>&#10022;</span>
+      <span>&#10022;</span>
+    </div>
+    <p class="eyebrow amber">The Preferred Guest List</p>
+    <h3 id="preferred-heading">Early access to seasonal menu changes, holiday tables, and the occasional cancellation worth knowing about.</h3>
+    <form class="preferred-form" action="#preferred-guest" method="get" aria-label="Subscribe to the preferred guest list">
+      <label class="visually-hidden" for="preferred-email">Email address</label>
+      <input class="preferred-input" id="preferred-email" type="email" name="email" placeholder="Your email address" required>
+      <button class="preferred-submit" type="submit">Join</button>
+    </form>
+    <p class="preferred-privacy">One thoughtful note a month, never shared. Unsubscribe in one click.</p>
   </div>
 </section>
 
@@ -1376,9 +2331,13 @@
     <p class="footer-wordmark">Ember &amp; Vine</p>
     <p class="footer-line">331 West 7th Street &middot; Bishop Arts &middot; Dallas, TX 75208</p>
     <p class="footer-line">(214) 555-0726 &middot; <a href="mailto:hello@emberandvine.com">hello@emberandvine.com</a></p>
-    <p class="footer-line">Tuesday through Saturday &middot; 5pm to 10pm &middot; Bar until 11pm</p>
+    <p class="footer-line">Dinner Tuesday to Saturday &middot; Sunday Brunch 10am to 2pm &middot; Closed Monday</p>
+    <p class="footer-line footer-social"><a href="https://instagram.com/emberandvinedallas">@emberandvinedallas on Instagram</a></p>
+
     <div class="footer-rule" aria-hidden="true"></div>
-    <p class="footer-bottom">&copy; 2026 Ember &amp; Vine. All rights reserved. &middot; Website by <a href="https://dbjtechnologies.com">DBJ Technologies</a></p>
+
+    <p class="footer-meta">Catherine Dao, General Manager &middot; Texas Restaurant Association Member</p>
+    <p class="footer-bottom">&copy; 2026 Ember &amp; Vine. All rights reserved. &middot; <a href="#preferred-guest">Accessibility</a> &middot; <a href="#preferred-guest">Privacy</a> &middot; Website by <a href="https://dbjtechnologies.com">DBJ Technologies</a></p>
   </div>
 </footer>
 
