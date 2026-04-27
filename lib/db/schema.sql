@@ -75,3 +75,25 @@ CREATE INDEX IF NOT EXISTS idx_email_events_type ON email_events(email_type);
 CREATE UNIQUE INDEX IF NOT EXISTS uniq_email_event_resend_id_status
   ON email_events (resend_id, status)
   WHERE resend_id IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS api_usage_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  scan_id UUID REFERENCES scans(id) ON DELETE SET NULL,
+  provider TEXT NOT NULL CHECK (provider IN ('anthropic', 'browserless', 'pagespeed', 'resend')),
+  operation TEXT NOT NULL,
+  model TEXT,
+  input_tokens INTEGER NOT NULL DEFAULT 0,
+  output_tokens INTEGER NOT NULL DEFAULT 0,
+  cache_read_tokens INTEGER NOT NULL DEFAULT 0,
+  cache_write_tokens INTEGER NOT NULL DEFAULT 0,
+  duration_ms INTEGER,
+  status TEXT NOT NULL CHECK (status IN ('ok', 'retry', 'fail')),
+  attempt INTEGER NOT NULL DEFAULT 1,
+  cost_usd NUMERIC(12, 6) NOT NULL DEFAULT 0,
+  occurred_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_api_usage_scan ON api_usage_events(scan_id);
+CREATE INDEX IF NOT EXISTS idx_api_usage_provider ON api_usage_events(provider);
+CREATE INDEX IF NOT EXISTS idx_api_usage_occurred_at ON api_usage_events(occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_api_usage_provider_occurred_at ON api_usage_events(provider, occurred_at DESC);

@@ -1,4 +1,5 @@
 import type { PerformanceScores } from "@/lib/types/scan";
+import { recordPagespeedUsage } from "./api-usage";
 
 export type AuditResult = {
   scores: PerformanceScores;
@@ -42,7 +43,10 @@ function readAuditScore(
   return typeof v === "number" && Number.isFinite(v) ? v : 0;
 }
 
-export async function runPerformanceAudit(url: string): Promise<AuditResult> {
+export async function runPerformanceAudit(
+  url: string,
+  scanId: string | null = null
+): Promise<AuditResult> {
   const qs = new URLSearchParams({
     url,
     strategy: "desktop",
@@ -59,6 +63,7 @@ export async function runPerformanceAudit(url: string): Promise<AuditResult> {
   let lastErr: unknown;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const start = Date.now();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), AUDIT_TIMEOUT_MS);
 
@@ -70,7 +75,15 @@ export async function runPerformanceAudit(url: string): Promise<AuditResult> {
 
       if (!res.ok) {
         const detail = await res.text().catch(() => "");
-        if (TRANSIENT_STATUSES.has(res.status) && attempt < maxAttempts) {
+        const isTransient = TRANSIENT_STATUSES.has(res.status);
+        if (isTransient && attempt < maxAttempts) {
+          await recordPagespeedUsage({
+            scanId,
+            operation: "lighthouse",
+            durationMs: Date.now() - start,
+            status: "retry",
+            attempt,
+          });
           const delay = RETRY_DELAYS_MS[attempt - 1]!;
           console.warn(
             `[run-audit] PSI returned ${res.status}, retrying (attempt ${attempt}/${maxAttempts}) after ${delay / 1000}s...`
@@ -78,6 +91,13 @@ export async function runPerformanceAudit(url: string): Promise<AuditResult> {
           await new Promise((resolve) => setTimeout(resolve, delay));
           continue;
         }
+        await recordPagespeedUsage({
+          scanId,
+          operation: "lighthouse",
+          durationMs: Date.now() - start,
+          status: "fail",
+          attempt,
+        });
         throw new Error(
           `PageSpeed Insights failed (${res.status}): ${detail.slice(0, 200)}`
         );
@@ -85,6 +105,13 @@ export async function runPerformanceAudit(url: string): Promise<AuditResult> {
 
       const data = (await res.json()) as PsiResponse;
       if (data.error) {
+        await recordPagespeedUsage({
+          scanId,
+          operation: "lighthouse",
+          durationMs: Date.now() - start,
+          status: "fail",
+          attempt,
+        });
         throw new Error(
           `PageSpeed Insights error: ${data.error.message ?? "unknown"}`
         );
@@ -103,12 +130,26 @@ export async function runPerformanceAudit(url: string): Promise<AuditResult> {
         si: readAuditNumeric(audits, "speed-index"),
       };
 
+      await recordPagespeedUsage({
+        scanId,
+        operation: "lighthouse",
+        durationMs: Date.now() - start,
+        status: "ok",
+        attempt,
+      });
       return { scores, raw: lh ?? null };
     } catch (err) {
       lastErr = err;
       const isTimeout = (err as Error)?.name === "AbortError";
       const isNetwork = err instanceof TypeError;
       if ((isTimeout || isNetwork) && attempt < maxAttempts) {
+        await recordPagespeedUsage({
+          scanId,
+          operation: "lighthouse",
+          durationMs: Date.now() - start,
+          status: "retry",
+          attempt,
+        });
         const delay = RETRY_DELAYS_MS[attempt - 1]!;
         const reason = isTimeout ? "timeout after 60s" : "network error";
         console.warn(
@@ -117,6 +158,17 @@ export async function runPerformanceAudit(url: string): Promise<AuditResult> {
         await new Promise((resolve) => setTimeout(resolve, delay));
         continue;
       }
+      // Final-attempt failure: only record fail if we haven't already
+      // logged this attempt's outcome above. The two non-OK branches
+      // above already log; this catch fires for the final iteration's
+      // network/timeout errors that DIDN'T short-circuit into retry.
+      await recordPagespeedUsage({
+        scanId,
+        operation: "lighthouse",
+        durationMs: Date.now() - start,
+        status: "fail",
+        attempt,
+      });
       if (isTimeout) {
         throw new Error("PageSpeed Insights timed out after 60s.");
       }

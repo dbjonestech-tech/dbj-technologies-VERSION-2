@@ -3,7 +3,116 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 27, 2026 (late evening) -- hvac-contractor Pass 1 + Comfort Club
+## Last Session: April 27, 2026 (overnight) -- Cost monitoring + alerting (Feature #12)
+
+### What shipped
+
+The second-biggest-win item from the feasibility doc landed: full
+outbound-API instrumentation, an alerting cron, and a server-rendered
+admin dashboard. Closes the cost-channel blind spot the same way #11
+closed the deliverability blind spot.
+
+- **Migration `lib/db/migrations/007_api_usage_events.sql`.** New table
+  `api_usage_events` with
+  `(scan_id, provider, operation, model, input_tokens, output_tokens,
+  cache_read_tokens, cache_write_tokens, duration_ms, status, attempt,
+  cost_usd, occurred_at)`. `provider` is a 4-value CHECK enum
+  (`anthropic`/`browserless`/`pagespeed`/`resend`). `cost_usd` is
+  `NUMERIC(12,6)` so a SUM over millions of rows still aggregates
+  exactly. Indexes on `scan_id`, `provider`, `occurred_at DESC`, and a
+  composite `(provider, occurred_at DESC)` for the dashboard's grouped
+  windowed queries. `scan_id` is `ON DELETE SET NULL` so purging a scan
+  never destroys spend history.
+- **`lib/services/api-usage.ts`.** Pricing table for Sonnet 4.6 and
+  Haiku 4.5 (input / output / cache-read / cache-write per MTok at
+  ephemeral 5min TTL rates). `calculateAnthropicCostUsd` does the
+  arithmetic. Three recorders: `recordAnthropicUsage` (computes cost
+  from token counts), `recordBrowserlessUsage` (call count + duration
+  only because Browserless v2 bills per unit-bucket, not per call),
+  and `recordPagespeedUsage` (call count + duration only because PSI
+  is free up to 25k/day with key). All recorders swallow their own
+  errors so a logging failure can never break a real API call.
+- **Claude wrappers (`lib/services/claude-analysis.ts`).** `callClaude`,
+  `callClaudeWithJsonSchema`, `runVisionAudit`, `runRemediationPlan`,
+  `runRevenueImpact`, and `researchIndustryBenchmark` all accept an
+  optional `scanId: string | null = null` parameter. The four exported
+  functions thread `AnthropicCallMeta` ({operation, scanId}) into
+  `callClaude`, which records once per attempt with status `ok`,
+  `retry`, or `fail`. Retries appear as separate rows. The benchmark
+  research function uses `callWithRetry` directly with its own
+  `client.messages.create`, instrumented inline with the same pattern.
+- **Chat (`app/(grade)/api/chat/route.ts`).** Streaming Haiku chat
+  records token usage via `stream.finalMessage()` after the stream
+  settles. One row per chat turn, success or failure.
+- **Browserless (`lib/services/browserless.ts`).** `captureScreenshot`
+  accepts `scanId` as a third parameter. Mobile vs desktop differentiated
+  by viewport width (`<=768` is mobile) in the `operation` column.
+  Records both success and failure.
+- **PageSpeed (`lib/services/pagespeed.ts`).** `runPerformanceAudit`
+  accepts `scanId` as a second parameter. The inline retry loop
+  records every attempt with the right status — a 4xx that triggers
+  retry logs `retry`, then a final `fail` (or `ok` if a later attempt
+  succeeds), with `attempt` incrementing.
+- **Cron (`lib/inngest/functions.ts` + `api/inngest/route.ts`).**
+  New `costAlertDaily` function with trigger
+  `cron: "TZ=America/Chicago 0 9 * * *"`. Sums prior 24h spend by
+  provider, fires `Sentry.captureMessage` at level `warning` if total
+  >= `COST_DAILY_ALERT_USD` (default `$10/day`), `error` at >= 2x.
+  Registered alongside `scanRequested` in the Inngest serve route.
+- **Dashboard (`app/(marketing)/internal/cost/page.tsx`).** Server
+  component, force-dynamic, no client JS. Three stacked windowed
+  sections (24h / 7d / 30d) each with totals plus three tables:
+  by-provider (with OK/retry/fail breakdown and avg duration),
+  by-operation (top 20), top-spending scans (top 10). Auth via
+  `?pin=<INTERNAL_ADMIN_PIN>` query param; mismatch or unset env
+  returns 404 (not 401) so scanners can't even confirm the page
+  exists. `metadata.robots: { index: false, follow: false, nocache:
+  true }`.
+- **`/internal/` added to `app/robots.ts` disallow.**
+
+### Manual deploy gates (NOT automated)
+
+In order, after the deploy fans out:
+
+1. Apply migrations 005, 006, and 007 to prod Neon via
+   `npx tsx lib/db/setup.ts`. The script is idempotent and picks up
+   every numbered migration in order.
+2. Set `INTERNAL_ADMIN_PIN` in Vercel (Production + Preview). Pick
+   something opaque -- this is the only thing standing between the
+   internet and the dashboard.
+3. Optionally set `COST_DAILY_ALERT_USD` if the default
+   `$10/day warning / $20/day error` threshold is wrong for the
+   current scan volume.
+4. Visit `https://dbjtechnologies.com/internal/cost?pin=<your-pin>`.
+   The first scan after deploy populates rows; existing scans before
+   the deploy will not be retroactively logged.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 NEW em-dashes across all 11 changed/new files.
+- `svix@1.90.0`, `resend@^6.12.2`, `@sentry/nextjs@^10.47.0`, `zod@^3.24.1`
+  all already installed (no `npm install` required).
+
+### Files changed (8 modified, 3 created)
+
+- `lib/db/migrations/007_api_usage_events.sql` (NEW)
+- `lib/db/schema.sql` (mirror of 007)
+- `lib/services/api-usage.ts` (NEW -- pricing table + recorders)
+- `lib/services/claude-analysis.ts` (call wrappers thread scanId; record per attempt)
+- `lib/services/browserless.ts` (record screenshot calls)
+- `lib/services/pagespeed.ts` (record PSI calls per attempt)
+- `lib/inngest/functions.ts` (call sites pass scanId; new `costAlertDaily` cron)
+- `app/(grade)/api/inngest/route.ts` (register `costAlertDaily`)
+- `app/(grade)/api/chat/route.ts` (record chat usage via finalMessage)
+- `app/(marketing)/internal/cost/page.tsx` (NEW -- admin dashboard)
+- `app/robots.ts` (add `/internal/` to disallow)
+
+Plus this update to `docs/ai/session-handoff.md` and the
+`docs/ai/backlog.md` entry marked complete.
+
+## Previous Session: April 27, 2026 (late evening) -- hvac-contractor Pass 1 + Comfort Club
 
 ### What shipped (this commit)
 

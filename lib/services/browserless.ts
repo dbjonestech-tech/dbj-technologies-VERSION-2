@@ -1,3 +1,5 @@
+import { recordBrowserlessUsage } from "./api-usage";
+
 export type Viewport = { width: number; height: number };
 
 const DEFAULT_BROWSERLESS_BASE = "https://production-sfo.browserless.io";
@@ -75,7 +77,8 @@ type BrowserlessFunctionBody = {
 
 export async function captureScreenshot(
   url: string,
-  viewport: Viewport
+  viewport: Viewport,
+  scanId: string | null = null
 ): Promise<Buffer> {
   const token = process.env.BROWSERLESS_API_KEY;
   if (!token) {
@@ -88,6 +91,9 @@ export async function captureScreenshot(
     context: { url, width: viewport.width, height: viewport.height },
   };
 
+  const operation =
+    viewport.width <= 768 ? "screenshot-mobile" : "screenshot-desktop";
+  const start = Date.now();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), SCREENSHOT_TIMEOUT_MS);
 
@@ -114,8 +120,20 @@ export async function captureScreenshot(
     if (buf.byteLength === 0) {
       throw new Error("Browserless returned an empty screenshot.");
     }
+    await recordBrowserlessUsage({
+      scanId,
+      operation,
+      durationMs: Date.now() - start,
+      status: "ok",
+    });
     return buf;
   } catch (err) {
+    await recordBrowserlessUsage({
+      scanId,
+      operation,
+      durationMs: Date.now() - start,
+      status: "fail",
+    });
     if ((err as Error).name === "AbortError") {
       throw new Error("Browserless screenshot timed out after 45s.");
     }

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { getDb } from "../db";
 import {
   getScanPipelineContext,
@@ -109,8 +110,8 @@ export const scanRequested = inngest.createFunction(
           };
 
           const results = await Promise.allSettled([
-            captureScreenshot(resolvedUrl, { width: 1440, height: 900 }),
-            captureScreenshot(resolvedUrl, { width: 375, height: 812 }),
+            captureScreenshot(resolvedUrl, { width: 1440, height: 900 }, scanId),
+            captureScreenshot(resolvedUrl, { width: 375, height: 812 }, scanId),
           ]);
 
           if (results[0].status === "fulfilled") {
@@ -143,7 +144,7 @@ export const scanRequested = inngest.createFunction(
 
       const audit: AuditOutcome = await step.run("s4", async () => {
         try {
-          const { scores, raw } = await runPerformanceAudit(resolvedUrl);
+          const { scores, raw } = await runPerformanceAudit(resolvedUrl, scanId);
           const durationMs = Date.now() - startedAt;
           await updateScanResults(scanId, raw, durationMs, resolvedUrl);
           return { ok: true, error: null, scores };
@@ -181,7 +182,8 @@ export const scanRequested = inngest.createFunction(
               pageText,
               siteUrl,
               businessName,
-              ctx.lighthouseData
+              ctx.lighthouseData,
+              scanId
             );
             await updateScanAiAnalysis(scanId, result);
             return { ok: true };
@@ -213,7 +215,8 @@ export const scanRequested = inngest.createFunction(
               ctx.industry,
               ctx.city,
               siteUrl,
-              businessName
+              businessName,
+              scanId
             );
             await updateScanRemediation(scanId, result);
             return { ok: true };
@@ -306,7 +309,8 @@ export const scanRequested = inngest.createFunction(
             businessName,
             ctx.visionAudit?.businessModel ?? "B2C",
             ctx.visionAudit?.inferredVertical ?? "general",
-            ctx.visionAudit?.inferredVerticalParent ?? "Other"
+            ctx.visionAudit?.inferredVerticalParent ?? "Other",
+            scanId
           );
           if (benchmark) {
             try {
@@ -365,7 +369,8 @@ export const scanRequested = inngest.createFunction(
               businessName,
               audit.scores,
               ctx.lighthouseData,
-              benchmarkStep.benchmark ?? null
+              benchmarkStep.benchmark ?? null,
+              scanId
             );
             await updateScanRevenueImpact(scanId, result);
             return { ok: true };
@@ -652,3 +657,74 @@ async function shouldSuppressFollowup(scanId: string): Promise<{
 
   return { suppress: false };
 }
+
+/**
+ * Daily cost-alert cron. Fires once a day in America/Chicago (the
+ * studio's home timezone) and warns if the prior 24-hour API spend
+ * crossed the threshold.
+ *
+ * Threshold defaults to $10/day. Override via COST_DAILY_ALERT_USD
+ * in Vercel. Warning at threshold, error at 2x threshold.
+ *
+ * Pairs with the api_usage_events table seeded by migration 007 and
+ * the recordAnthropicUsage / recordBrowserlessUsage / recordPagespeedUsage
+ * helpers.
+ */
+export const costAlertDaily = inngest.createFunction(
+  {
+    id: "pathlight-cost-alert-daily",
+    triggers: [{ cron: "TZ=America/Chicago 0 9 * * *" }],
+    retries: 0,
+  },
+  async ({ step }) => {
+    await step.run("check-daily-spend", async () => {
+      const sql = getDb();
+      const rows = (await sql`
+        SELECT
+          provider,
+          COUNT(*)::int AS calls,
+          SUM(cost_usd) AS total_usd
+        FROM api_usage_events
+        WHERE occurred_at > now() - interval '1 day'
+        GROUP BY provider
+      `) as { provider: string; calls: number; total_usd: string | number }[];
+
+      const breakdown = rows.map((r) => ({
+        provider: r.provider,
+        calls: Number(r.calls),
+        totalUsd: Number(r.total_usd),
+      }));
+      const totalUsd = breakdown.reduce((sum, r) => sum + r.totalUsd, 0);
+      const totalCalls = breakdown.reduce((sum, r) => sum + r.calls, 0);
+
+      const thresholdRaw = process.env.COST_DAILY_ALERT_USD;
+      const threshold = (() => {
+        const parsed = thresholdRaw ? Number(thresholdRaw) : NaN;
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : 10;
+      })();
+
+      console.log(
+        `[cost-alert] 24h spend $${totalUsd.toFixed(2)} across ${totalCalls} calls (threshold $${threshold.toFixed(2)})`,
+        breakdown
+      );
+
+      if (totalUsd < threshold) {
+        return {
+          totalUsd,
+          totalCalls,
+          breakdown,
+          alerted: false,
+        };
+      }
+
+      const level = totalUsd >= threshold * 2 ? "error" : "warning";
+      const message = `Pathlight 24h API spend $${totalUsd.toFixed(2)} exceeded threshold $${threshold.toFixed(2)}`;
+      Sentry.captureMessage(message, {
+        level,
+        tags: { source: "cost-monitor" },
+        extra: { totalUsd, totalCalls, breakdown, threshold },
+      });
+      return { totalUsd, totalCalls, breakdown, alerted: true, level };
+    });
+  }
+);

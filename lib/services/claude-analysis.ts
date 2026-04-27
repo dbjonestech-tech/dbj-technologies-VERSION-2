@@ -16,8 +16,17 @@ import type {
   RevenueImpactResult,
   VisionAuditResult,
 } from "@/lib/types/scan";
+import {
+  recordAnthropicUsage,
+  type ApiCallStatus,
+} from "./api-usage";
 
 const MODEL = "claude-sonnet-4-6";
+
+export type AnthropicCallMeta = {
+  operation: string;
+  scanId: string | null;
+};
 const CALL_TIMEOUT_MS = 90_000;
 const MAX_HEADINGS = 40;
 const MAX_LINK_TEXTS = 40;
@@ -243,16 +252,22 @@ async function callClaude(
   system: string,
   messages: ChatMessage[],
   maxTokens: number = 2048,
-  temperature?: number
+  temperature?: number,
+  meta?: AnthropicCallMeta
 ): Promise<string> {
   const client = getAnthropic();
+  const operation = meta?.operation ?? "claude-call";
+  const scanId = meta?.scanId ?? null;
+  let attempt = 0;
 
   try {
     const response = await callWithRetry("callClaude", async () => {
+      attempt += 1;
+      const start = Date.now();
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), CALL_TIMEOUT_MS);
       try {
-        return (await client.messages.create(
+        const apiResp = (await client.messages.create(
           {
             model: MODEL,
             max_tokens: maxTokens,
@@ -265,7 +280,38 @@ async function callClaude(
             ...(temperature !== undefined && { temperature }),
           },
           { signal: controller.signal }
-        )) as unknown as AnthropicMessageResponse;
+        )) as unknown as AnthropicMessageResponse & {
+          usage?: {
+            input_tokens?: number;
+            output_tokens?: number;
+            cache_creation_input_tokens?: number;
+            cache_read_input_tokens?: number;
+          };
+        };
+        await recordAnthropicUsage({
+          scanId,
+          operation,
+          model: MODEL,
+          durationMs: Date.now() - start,
+          status: "ok",
+          attempt,
+          usage: apiResp.usage ?? null,
+        });
+        return apiResp;
+      } catch (err) {
+        const status: ApiCallStatus = isTransientAnthropicError(err)
+          ? "retry"
+          : "fail";
+        await recordAnthropicUsage({
+          scanId,
+          operation,
+          model: MODEL,
+          durationMs: Date.now() - start,
+          status,
+          attempt,
+          usage: null,
+        });
+        throw err;
       } finally {
         clearTimeout(timer);
       }
@@ -297,13 +343,15 @@ async function callClaudeWithJsonSchema<T>(
   initialUserContent: string | MessageBlock[],
   schema: z.ZodType<T>,
   maxTokens: number = 2048,
-  temperature?: number
+  temperature?: number,
+  meta?: AnthropicCallMeta
 ): Promise<T> {
   const firstResponseText = await callClaude(
     system,
     [{ role: "user", content: initialUserContent }],
     maxTokens,
-    temperature
+    temperature,
+    meta
   );
 
   const firstAttempt = tryParse<T>(firstResponseText, schema);
@@ -321,7 +369,8 @@ async function callClaudeWithJsonSchema<T>(
       },
     ],
     maxTokens,
-    temperature
+    temperature,
+    meta
   );
 
   const secondAttempt = tryParse<T>(secondResponseText, schema);
@@ -846,7 +895,8 @@ export async function runVisionAudit(
   pageTextContent: PageTextContent,
   url: string,
   businessName: string | null,
-  lighthouseData: unknown
+  lighthouseData: unknown,
+  scanId: string | null = null
 ): Promise<VisionAuditResult> {
   const desktop = stripDataUriPrefix(desktopScreenshot);
   const mobile = stripDataUriPrefix(mobileScreenshot);
@@ -910,7 +960,8 @@ export async function runVisionAudit(
     userBlocks,
     visionAuditSchema,
     3000,
-    0
+    0,
+    { operation: "vision-audit", scanId }
   ) as Promise<VisionAuditResult>;
 }
 
@@ -938,7 +989,8 @@ export async function runRemediationPlan(
   industry: string | null,
   city: string | null,
   url: string,
-  businessName: string | null
+  businessName: string | null,
+  scanId: string | null = null
 ): Promise<RemediationResult> {
   const user = [
     renderSiteInformation(url, businessName),
@@ -962,7 +1014,8 @@ export async function runRemediationPlan(
     user,
     remediationSchema,
     2048,
-    0
+    0,
+    { operation: "remediation-plan", scanId }
   ) as Promise<RemediationResult>;
 }
 
@@ -973,7 +1026,8 @@ export async function researchIndustryBenchmark(
   businessName: string | null,
   businessModel: "B2B" | "B2C" | "mixed" = "B2C",
   inferredVertical: string = "general",
-  inferredVerticalParent: string = "Other"
+  inferredVerticalParent: string = "Other",
+  scanId: string | null = null
 ): Promise<IndustryBenchmark | null> {
   if (!industry && !businessName && !url) return null;
 
@@ -1033,14 +1087,17 @@ CRITICAL RESEARCH RULES:
 
 Search for "${industryLabel} average job ticket value" or "${industryLabel} average transaction value" and "${industryLabel} website traffic benchmarks". Find real numbers.`;
 
+  let benchmarkAttempt = 0;
   try {
     const response = await callWithRetry(
       "researchIndustryBenchmark",
       async () => {
+        benchmarkAttempt += 1;
+        const start = Date.now();
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 90_000);
         try {
-          return await client.messages.create(
+          const apiResp = (await client.messages.create(
             {
               model: MODEL,
               max_tokens: 1024,
@@ -1056,7 +1113,39 @@ Search for "${industryLabel} average job ticket value" or "${industryLabel} aver
               messages: [{ role: "user", content: userPrompt }],
             },
             { signal: controller.signal }
-          );
+          )) as unknown as {
+            content: Array<{ type: string; text?: string; [k: string]: unknown }>;
+            usage?: {
+              input_tokens?: number;
+              output_tokens?: number;
+              cache_creation_input_tokens?: number;
+              cache_read_input_tokens?: number;
+            };
+          };
+          await recordAnthropicUsage({
+            scanId,
+            operation: "benchmark-research",
+            model: MODEL,
+            durationMs: Date.now() - start,
+            status: "ok",
+            attempt: benchmarkAttempt,
+            usage: apiResp.usage ?? null,
+          });
+          return apiResp;
+        } catch (err) {
+          const status: ApiCallStatus = isTransientAnthropicError(err)
+            ? "retry"
+            : "fail";
+          await recordAnthropicUsage({
+            scanId,
+            operation: "benchmark-research",
+            model: MODEL,
+            durationMs: Date.now() - start,
+            status,
+            attempt: benchmarkAttempt,
+            usage: null,
+          });
+          throw err;
         } finally {
           clearTimeout(timeout);
         }
@@ -1149,7 +1238,8 @@ export async function runRevenueImpact(
   businessName: string | null,
   performanceScores: PerformanceScores,
   lighthouseData: unknown,
-  benchmark?: IndustryBenchmark | null
+  benchmark?: IndustryBenchmark | null,
+  scanId: string | null = null
 ): Promise<RevenueImpactResult> {
   const lighthouseDetails = extractLighthouseAuditDetails(lighthouseData);
 
@@ -1208,7 +1298,8 @@ export async function runRevenueImpact(
     user,
     revenueImpactSchema,
     1500,
-    0
+    0,
+    { operation: "revenue-impact", scanId }
   );
 
   const estimatedMonthlyLoss = Math.round(

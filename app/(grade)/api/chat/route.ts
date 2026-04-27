@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getFullScanReport } from "@/lib/db/queries";
 import { buildChatSystemPrompt } from "@/lib/prompts/pathlight-chat";
+import { recordAnthropicUsage } from "@/lib/services/api-usage";
 
 /* runtime/dynamic exports removed; redundant with the default Node.js
    runtime for route handlers in Next 16 and incompatible with the
@@ -82,6 +83,7 @@ export async function POST(request: Request): Promise<Response> {
     },
   ];
 
+  const callStart = Date.now();
   let stream: ReturnType<typeof client.messages.stream>;
   try {
     stream = client.messages.stream({
@@ -92,8 +94,54 @@ export async function POST(request: Request): Promise<Response> {
     });
   } catch (err) {
     console.error("[chat] failed to start stream", err);
+    await recordAnthropicUsage({
+      scanId,
+      operation: "chat",
+      model: CHAT_MODEL,
+      durationMs: Date.now() - callStart,
+      status: "fail",
+      attempt: 1,
+      usage: null,
+    });
     return jsonError("Something went wrong. Please try again.", 500);
   }
+
+  // Schedule a single usage-record write to fire after the stream
+  // settles. finalMessage() resolves with the assembled Message
+  // (including usage tokens) once the stream finishes successfully;
+  // it rejects if the stream errors. Either branch logs once.
+  void stream
+    .finalMessage()
+    .then((msg: unknown) => {
+      const usage = (msg as { usage?: unknown }).usage as
+        | {
+            input_tokens?: number;
+            output_tokens?: number;
+            cache_creation_input_tokens?: number;
+            cache_read_input_tokens?: number;
+          }
+        | undefined;
+      void recordAnthropicUsage({
+        scanId,
+        operation: "chat",
+        model: CHAT_MODEL,
+        durationMs: Date.now() - callStart,
+        status: "ok",
+        attempt: 1,
+        usage: usage ?? null,
+      });
+    })
+    .catch(() => {
+      void recordAnthropicUsage({
+        scanId,
+        operation: "chat",
+        model: CHAT_MODEL,
+        durationMs: Date.now() - callStart,
+        status: "fail",
+        attempt: 1,
+        usage: null,
+      });
+    });
 
   const encoder = new TextEncoder();
   const sse = new ReadableStream<Uint8Array>({
