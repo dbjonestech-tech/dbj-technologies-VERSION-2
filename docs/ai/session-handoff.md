@@ -82,7 +82,10 @@ regression is diagnosable from function logs.
 
 ### Final state
 
-- Pending commit + push at session end.
+- Committed and pushed to `origin main` as `a68ce3e`
+  (`fix(pathlight): permissive Resend webhook schema + audio Blob
+  notes`).
+- Working tree clean after this snapshot commit.
 - Vercel auto-deploys 1-3 min after push.
 
 ## Prior Session: April 27, 2026 -- Pathlight partial-banner mitigation (schema-repair prompt)
