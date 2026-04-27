@@ -4,8 +4,8 @@ import { getDb } from "../db";
  * In-house monitoring event capture and read APIs.
  *
  * track() is the single write path for the monitoring_events table.
- * Pairs with the dashboard at /internal/monitor, the SSE live tail at
- * /internal/monitor/api/stream, the Inngest threshold crons in
+ * Pairs with the dashboard at /admin/monitor, the SSE live tail at
+ * /admin/monitor/api/stream, the Inngest threshold crons in
  * lib/inngest/functions.ts, and the public /api/status JSON endpoint.
  *
  * Design intent: writes are best-effort and never throw to the caller.
@@ -101,7 +101,7 @@ export async function getMaxEventId(): Promise<string> {
 
 /**
  * Pull all events tied to a single scan, oldest first. Powers the
- * /internal/monitor/scan/[scanId] drill-down view.
+ * /admin/monitor/scan/[scanId] drill-down view.
  */
 export async function getEventsForScan(
   scanId: string

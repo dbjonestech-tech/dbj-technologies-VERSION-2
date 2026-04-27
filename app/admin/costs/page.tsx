@@ -1,4 +1,3 @@
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getDb } from "@/lib/db";
 
@@ -6,7 +5,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Internal cost dashboard",
+  title: "Costs",
   robots: { index: false, follow: false, nocache: true },
 };
 
@@ -142,58 +141,29 @@ function formatMs(n: number | null): string {
   return `${Math.round(n)}ms`;
 }
 
-export default async function InternalCostDashboard({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const expectedPin = process.env.INTERNAL_ADMIN_PIN;
-  if (!expectedPin) {
-    notFound();
-  }
-
-  const params = await searchParams;
-  const supplied = typeof params.pin === "string" ? params.pin : null;
-  if (!supplied || supplied !== expectedPin) {
-    notFound();
-  }
-
+export default async function AdminCosts() {
   const windows = await Promise.all(
     WINDOWS.map((w) => loadWindow(w.label, w.interval))
   );
 
   return (
-    <div
-      className="min-h-screen w-full px-6 py-12"
-      style={{ backgroundColor: "#06060a", color: "#e7ebf2" }}
-    >
+    <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-10">
-          <p
-            className="text-xs font-semibold uppercase tracking-[0.3em]"
-            style={{ color: "#9aa3b2" }}
-          >
-            Internal
+        <header className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
+            Operations
           </p>
-          <h1
-            className="mt-2 font-display text-3xl font-bold sm:text-4xl"
-            style={{ color: "#e7ebf2" }}
-          >
-            Cost Dashboard
+          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
+            Costs
           </h1>
-          <p
-            className="mt-3 max-w-2xl text-sm leading-relaxed"
-            style={{ color: "#9aa3b2" }}
-          >
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
             Outbound API spend across Anthropic, Browserless, PageSpeed
-            Insights, and Resend. Anthropic dollars are computed from
-            input/output/cache token counts at log time. Browserless and
-            PageSpeed Insights row counts are tracked but their per-call
-            dollar cost is not, so totalUsd is Anthropic-only.
+            Insights, ElevenLabs, and Resend. Anthropic dollars are
+            computed from input/output/cache token counts at log time.
           </p>
         </header>
 
-        <div className="grid gap-8">
+        <div className="grid gap-6">
           {windows.map((w) => (
             <WindowSection key={w.label} window={w} />
           ))}
@@ -205,18 +175,9 @@ export default async function InternalCostDashboard({
 
 function WindowSection({ window: w }: { window: WindowSummary }) {
   return (
-    <section
-      className="rounded-2xl border p-6"
-      style={{
-        borderColor: "rgba(255,255,255,0.08)",
-        backgroundColor: "rgba(10,12,18,0.7)",
-      }}
-    >
+    <section className="rounded-xl border border-zinc-200 bg-white p-6">
       <header className="mb-6 flex flex-wrap items-baseline justify-between gap-4">
-        <h2
-          className="font-display text-xl font-semibold"
-          style={{ color: "#e7ebf2" }}
-        >
+        <h2 className="font-display text-base font-semibold text-zinc-900">
           {w.label}
         </h2>
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
@@ -227,47 +188,62 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
         </div>
       </header>
 
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider" style={{ color: "#6b7280" }}>
+      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
         By provider
       </h3>
       <div className="overflow-x-auto">
         <table className="mb-6 w-full min-w-[600px] text-sm">
           <thead>
-            <tr className="text-left text-xs uppercase tracking-wider" style={{ color: "#6b7280" }}>
-              <th className="px-3 py-2">Provider</th>
-              <th className="px-3 py-2 text-right">Calls</th>
-              <th className="px-3 py-2 text-right">OK / Retry / Fail</th>
-              <th className="px-3 py-2 text-right">Avg duration</th>
-              <th className="px-3 py-2 text-right">Total spend</th>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-2 font-semibold">Provider</th>
+              <th className="px-3 py-2 text-right font-semibold">Calls</th>
+              <th className="px-3 py-2 text-right font-semibold">
+                OK / Retry / Fail
+              </th>
+              <th className="px-3 py-2 text-right font-semibold">
+                Avg duration
+              </th>
+              <th className="px-3 py-2 text-right font-semibold">
+                Total spend
+              </th>
             </tr>
           </thead>
           <tbody>
             {w.byProvider.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-3 py-3 text-center" style={{ color: "#9aa3b2" }}>
+                <td
+                  colSpan={5}
+                  className="px-3 py-3 text-center text-zinc-500"
+                >
                   No calls in this window.
                 </td>
               </tr>
             ) : (
               w.byProvider.map((row) => (
-                <tr
-                  key={row.provider}
-                  className="border-t"
-                  style={{ borderColor: "rgba(255,255,255,0.05)" }}
-                >
-                  <td className="px-3 py-2 font-mono">{row.provider}</td>
-                  <td className="px-3 py-2 text-right">{formatNumber(Number(row.calls))}</td>
-                  <td className="px-3 py-2 text-right text-xs" style={{ color: "#9aa3b2" }}>
-                    <span style={{ color: "#86efac" }}>{Number(row.ok_calls)}</span>
-                    {" / "}
-                    <span style={{ color: "#fcd34d" }}>{Number(row.retry_calls)}</span>
-                    {" / "}
-                    <span style={{ color: "#fca5a5" }}>{Number(row.fail_calls)}</span>
+                <tr key={row.provider} className="border-t border-zinc-100">
+                  <td className="px-3 py-2 font-mono text-zinc-900">
+                    {row.provider}
                   </td>
-                  <td className="px-3 py-2 text-right" style={{ color: "#9aa3b2" }}>
+                  <td className="px-3 py-2 text-right text-zinc-900">
+                    {formatNumber(Number(row.calls))}
+                  </td>
+                  <td className="px-3 py-2 text-right text-xs">
+                    <span className="text-emerald-600">
+                      {Number(row.ok_calls)}
+                    </span>
+                    {" / "}
+                    <span className="text-amber-600">
+                      {Number(row.retry_calls)}
+                    </span>
+                    {" / "}
+                    <span className="text-red-600">
+                      {Number(row.fail_calls)}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 text-right text-zinc-500">
                     {formatMs(Number(row.avg_duration_ms))}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono">
+                  <td className="px-3 py-2 text-right font-mono text-zinc-900">
                     {formatUsd(Number(row.total_usd))}
                   </td>
                 </tr>
@@ -277,23 +253,28 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
         </table>
       </div>
 
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider" style={{ color: "#6b7280" }}>
+      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
         By operation (top 20)
       </h3>
       <div className="overflow-x-auto">
         <table className="mb-6 w-full min-w-[500px] text-sm">
           <thead>
-            <tr className="text-left text-xs uppercase tracking-wider" style={{ color: "#6b7280" }}>
-              <th className="px-3 py-2">Provider</th>
-              <th className="px-3 py-2">Operation</th>
-              <th className="px-3 py-2 text-right">Calls</th>
-              <th className="px-3 py-2 text-right">Total spend</th>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-2 font-semibold">Provider</th>
+              <th className="px-3 py-2 font-semibold">Operation</th>
+              <th className="px-3 py-2 text-right font-semibold">Calls</th>
+              <th className="px-3 py-2 text-right font-semibold">
+                Total spend
+              </th>
             </tr>
           </thead>
           <tbody>
             {w.byOperation.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-3 py-3 text-center" style={{ color: "#9aa3b2" }}>
+                <td
+                  colSpan={4}
+                  className="px-3 py-3 text-center text-zinc-500"
+                >
                   No operations recorded in this window.
                 </td>
               </tr>
@@ -301,15 +282,18 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
               w.byOperation.map((row) => (
                 <tr
                   key={`${row.provider}:${row.operation}`}
-                  className="border-t"
-                  style={{ borderColor: "rgba(255,255,255,0.05)" }}
+                  className="border-t border-zinc-100"
                 >
-                  <td className="px-3 py-2 font-mono text-xs" style={{ color: "#9aa3b2" }}>
+                  <td className="px-3 py-2 font-mono text-xs text-zinc-500">
                     {row.provider}
                   </td>
-                  <td className="px-3 py-2 font-mono">{row.operation}</td>
-                  <td className="px-3 py-2 text-right">{formatNumber(Number(row.calls))}</td>
-                  <td className="px-3 py-2 text-right font-mono">
+                  <td className="px-3 py-2 font-mono text-zinc-900">
+                    {row.operation}
+                  </td>
+                  <td className="px-3 py-2 text-right text-zinc-900">
+                    {formatNumber(Number(row.calls))}
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono text-zinc-900">
                     {formatUsd(Number(row.total_usd))}
                   </td>
                 </tr>
@@ -319,22 +303,27 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
         </table>
       </div>
 
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider" style={{ color: "#6b7280" }}>
+      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
         Top scans by spend (top 10)
       </h3>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[400px] text-sm">
           <thead>
-            <tr className="text-left text-xs uppercase tracking-wider" style={{ color: "#6b7280" }}>
-              <th className="px-3 py-2">Scan ID</th>
-              <th className="px-3 py-2 text-right">Calls</th>
-              <th className="px-3 py-2 text-right">Total spend</th>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-2 font-semibold">Scan ID</th>
+              <th className="px-3 py-2 text-right font-semibold">Calls</th>
+              <th className="px-3 py-2 text-right font-semibold">
+                Total spend
+              </th>
             </tr>
           </thead>
           <tbody>
             {w.topScans.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-3 py-3 text-center" style={{ color: "#9aa3b2" }}>
+                <td
+                  colSpan={3}
+                  className="px-3 py-3 text-center text-zinc-500"
+                >
                   No scan-attributed spend in this window.
                 </td>
               </tr>
@@ -342,14 +331,15 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
               w.topScans.map((row) => (
                 <tr
                   key={row.scan_id ?? "null"}
-                  className="border-t"
-                  style={{ borderColor: "rgba(255,255,255,0.05)" }}
+                  className="border-t border-zinc-100"
                 >
-                  <td className="px-3 py-2 font-mono text-xs">
+                  <td className="px-3 py-2 font-mono text-xs text-zinc-900">
                     {row.scan_id ?? "(unattributed)"}
                   </td>
-                  <td className="px-3 py-2 text-right">{formatNumber(Number(row.calls))}</td>
-                  <td className="px-3 py-2 text-right font-mono">
+                  <td className="px-3 py-2 text-right text-zinc-900">
+                    {formatNumber(Number(row.calls))}
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono text-zinc-900">
                     {formatUsd(Number(row.total_usd))}
                   </td>
                 </tr>
@@ -365,16 +355,10 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col items-end">
-      <span
-        className="text-[10px] uppercase tracking-wider"
-        style={{ color: "#6b7280" }}
-      >
+      <span className="text-[10px] uppercase tracking-wider text-zinc-500">
         {label}
       </span>
-      <span
-        className="font-mono text-base font-semibold"
-        style={{ color: "#e7ebf2" }}
-      >
+      <span className="font-mono text-base font-semibold text-zinc-900">
         {value}
       </span>
     </div>

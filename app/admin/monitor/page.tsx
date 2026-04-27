@@ -1,5 +1,3 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
 import type { Metadata } from "next";
 import {
   getCanaryStatus,
@@ -18,15 +16,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Internal monitor",
+  title: "Monitor",
   robots: { index: false, follow: false, nocache: true },
 };
-
-const WINDOWS: { label: string; interval: string }[] = [
-  { label: "Last 24 hours", interval: "1 day" },
-  { label: "Last 7 days", interval: "7 days" },
-  { label: "Last 30 days", interval: "30 days" },
-];
 
 function formatNumber(n: number): string {
   return new Intl.NumberFormat("en-US").format(n);
@@ -45,80 +37,45 @@ function formatRelative(iso: string): string {
   return `${Math.floor(ms / 86_400_000)}d ago`;
 }
 
-function scoreColor(n: number | null): string {
-  if (n === null) return "#6b7280";
-  if (n >= 95) return "#86efac";
-  if (n >= 90) return "#fcd34d";
-  if (n >= 75) return "#fb923c";
-  return "#fca5a5";
+function scoreClass(n: number | null): string {
+  if (n === null) return "text-zinc-400";
+  if (n >= 95) return "text-emerald-600";
+  if (n >= 90) return "text-amber-600";
+  if (n >= 75) return "text-orange-600";
+  return "text-red-600";
 }
 
-export default async function InternalMonitor({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const expectedPin = process.env.INTERNAL_ADMIN_PIN;
-  if (!expectedPin) notFound();
-  const params = await searchParams;
-  const supplied = typeof params.pin === "string" ? params.pin : null;
-  if (!supplied || supplied !== expectedPin) notFound();
+export default async function AdminMonitor() {
+  /* Auth is enforced by middleware.ts + the admin layout (defense in
+   * depth, both require a valid admin session). */
 
-  const [
-    funnel24,
-    funnel7,
-    funnel30,
-    levels24,
-    canary,
-    lighthouse,
-    recent,
-  ] = await Promise.all([
-    getFunnelCounts("1 day"),
-    getFunnelCounts("7 days"),
-    getFunnelCounts("30 days"),
-    getLevelSummary("1 day"),
-    getCanaryStatus(),
-    getLatestLighthousePerPage(),
-    getRecentEvents(50),
-  ]);
+  const [funnel24, funnel7, funnel30, levels24, canary, lighthouse, recent] =
+    await Promise.all([
+      getFunnelCounts("1 day"),
+      getFunnelCounts("7 days"),
+      getFunnelCounts("30 days"),
+      getLevelSummary("1 day"),
+      getCanaryStatus(),
+      getLatestLighthousePerPage(),
+      getRecentEvents(50),
+    ]);
 
   return (
-    <div
-      className="min-h-screen w-full px-6 py-12"
-      style={{ backgroundColor: "#06060a", color: "#e7ebf2" }}
-    >
+    <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-10">
-          <p
-            className="text-xs font-semibold uppercase tracking-[0.3em]"
-            style={{ color: "#9aa3b2" }}
-          >
-            Internal
+        <header className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
+            Operations
           </p>
-          <h1
-            className="mt-2 font-display text-3xl font-bold sm:text-4xl"
-            style={{ color: "#e7ebf2" }}
-          >
+          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
             Monitor
           </h1>
-          <p
-            className="mt-3 max-w-2xl text-sm leading-relaxed"
-            style={{ color: "#9aa3b2" }}
-          >
-            Real-time view of Pathlight + the marketing site. Funnel
-            counts and Lighthouse trends are read from monitoring_events
-            and lighthouse_history. The live tail at the bottom streams
-            new events as they land.
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
+            Real-time view of Pathlight and the marketing site. Funnel
+            counts and Lighthouse trends read from monitoring_events and
+            lighthouse_history. The live tail at the bottom streams new
+            events as they land.
           </p>
-          <div className="mt-4 flex flex-wrap gap-3 text-xs">
-            <Link
-              href={`/internal/cost?pin=${encodeURIComponent(supplied)}`}
-              className="rounded-full border px-3 py-1 transition-colors hover:border-white/30"
-              style={{ borderColor: "rgba(255,255,255,0.1)", color: "#9aa3b2" }}
-            >
-              Cost dashboard →
-            </Link>
-          </div>
         </header>
 
         <CanarySection canary={canary} />
@@ -135,7 +92,7 @@ export default async function InternalMonitor({
 
         <LighthouseSection rows={lighthouse} />
 
-        <RecentEventsSection seed={recent} pin={supplied} />
+        <RecentEventsSection seed={recent} />
       </div>
     </div>
   );
@@ -148,29 +105,29 @@ function CanarySection({
 }) {
   const indicator = (() => {
     if (!canary.lastEventAt)
-      return { color: "#6b7280", label: "no canary runs yet" };
+      return { className: "text-zinc-500", label: "no canary runs yet" };
     if (canary.consecutiveFailures >= 2)
-      return { color: "#fca5a5", label: "FAILING" };
+      return { className: "text-red-600", label: "FAILING" };
     if (canary.lastLevel === "error")
-      return { color: "#fcd34d", label: "single fail (within tolerance)" };
-    return { color: "#86efac", label: "healthy" };
+      return {
+        className: "text-amber-600",
+        label: "single fail (within tolerance)",
+      };
+    return { className: "text-emerald-600", label: "healthy" };
   })();
   return (
     <Section title="Synthetic canary">
       <div className="flex items-baseline justify-between">
-        <span
-          className="font-mono text-base"
-          style={{ color: indicator.color }}
-        >
+        <span className={`font-mono text-base ${indicator.className}`}>
           ● {indicator.label}
         </span>
-        <span className="text-xs" style={{ color: "#9aa3b2" }}>
+        <span className="text-xs text-zinc-500">
           {canary.lastEventAt
             ? `last ${formatRelative(canary.lastEventAt)}`
             : "-"}
         </span>
       </div>
-      <p className="mt-2 text-xs" style={{ color: "#6b7280" }}>
+      <p className="mt-2 text-xs text-zinc-500">
         Runs every 4 hours. Verifies PSI + Browserless against a stable
         URL. Two consecutive fails on the same check escalate to Sentry.
       </p>
@@ -188,17 +145,17 @@ function FunnelSection({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[700px] text-sm">
           <thead>
-            <tr
-              className="text-left text-xs uppercase tracking-wider"
-              style={{ color: "#6b7280" }}
-            >
-              <th className="px-3 py-2">Stage</th>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-2 font-semibold">Stage</th>
               {windows.map((w) => (
-                <th key={w.label} className="px-3 py-2 text-right">
+                <th
+                  key={w.label}
+                  className="px-3 py-2 text-right font-semibold"
+                >
                   {w.label}
                 </th>
               ))}
-              <th className="px-3 py-2 text-right">7d → 30d</th>
+              <th className="px-3 py-2 text-right font-semibold">7d → 30d</th>
             </tr>
           </thead>
           <tbody>
@@ -283,8 +240,8 @@ function FunnelRow({
   warnIfRatioAbove?: number;
 }) {
   return (
-    <tr className="border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-      <td className="px-3 py-2">{label}</td>
+    <tr className="border-t border-zinc-100">
+      <td className="px-3 py-2 text-zinc-700">{label}</td>
       {values.map((v, i) => {
         const denom = denominators?.[i] ?? 0;
         const ratio = denom > 0 ? v / denom : null;
@@ -295,12 +252,11 @@ function FunnelRow({
         return (
           <td
             key={i}
-            className="px-3 py-2 text-right font-mono"
-            style={{ color: flag ? "#fca5a5" : undefined }}
+            className={`px-3 py-2 text-right font-mono ${flag ? "text-red-600" : "text-zinc-900"}`}
           >
             {formatNumber(v)}
             {denominators ? (
-              <span className="ml-2 text-[11px]" style={{ color: "#6b7280" }}>
+              <span className="ml-2 text-[11px] text-zinc-500">
                 {formatPct(v, denom)}
               </span>
             ) : null}
@@ -320,28 +276,30 @@ function LevelsSection({
   return (
     <Section title="Severity (last 24h)">
       <div className="flex flex-wrap gap-6 text-sm">
-        <Pill color="#86efac" label="info" value={formatNumber(levels.info)} />
-        <Pill color="#fcd34d" label="warn" value={formatNumber(levels.warn)} />
-        <Pill color="#fca5a5" label="error" value={formatNumber(levels.error)} />
+        <Pill className="text-emerald-600" label="info" value={formatNumber(levels.info)} />
+        <Pill className="text-amber-600" label="warn" value={formatNumber(levels.warn)} />
+        <Pill className="text-red-600" label="error" value={formatNumber(levels.error)} />
       </div>
     </Section>
   );
 }
 
 function Pill({
-  color,
+  className,
   label,
   value,
 }: {
-  color: string;
+  className: string;
   label: string;
   value: string;
 }) {
   return (
     <div className="flex items-baseline gap-2">
-      <span style={{ color }}>●</span>
-      <span className="font-mono text-base font-semibold">{value}</span>
-      <span className="text-[11px] uppercase tracking-wider" style={{ color: "#6b7280" }}>
+      <span className={className}>●</span>
+      <span className="font-mono text-base font-semibold text-zinc-900">
+        {value}
+      </span>
+      <span className="text-[11px] uppercase tracking-wider text-zinc-500">
         {label}
       </span>
     </div>
@@ -359,17 +317,14 @@ function LighthouseSection({ rows }: { rows: LighthouseRow[] }) {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[700px] text-sm">
           <thead>
-            <tr
-              className="text-left text-xs uppercase tracking-wider"
-              style={{ color: "#6b7280" }}
-            >
-              <th className="px-3 py-2">Page</th>
-              <th className="px-3 py-2">Strategy</th>
-              <th className="px-3 py-2 text-right">Perf</th>
-              <th className="px-3 py-2 text-right">A11y</th>
-              <th className="px-3 py-2 text-right">Best Pr.</th>
-              <th className="px-3 py-2 text-right">SEO</th>
-              <th className="px-3 py-2 text-right">When</th>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-2 font-semibold">Page</th>
+              <th className="px-3 py-2 font-semibold">Strategy</th>
+              <th className="px-3 py-2 text-right font-semibold">Perf</th>
+              <th className="px-3 py-2 text-right font-semibold">A11y</th>
+              <th className="px-3 py-2 text-right font-semibold">Best Pr.</th>
+              <th className="px-3 py-2 text-right font-semibold">SEO</th>
+              <th className="px-3 py-2 text-right font-semibold">When</th>
             </tr>
           </thead>
           <tbody>
@@ -379,49 +334,38 @@ function LighthouseSection({ rows }: { rows: LighthouseRow[] }) {
                 return (
                   <tr
                     key={`${page.path}-${strategy}`}
-                    className="border-t"
-                    style={{ borderColor: "rgba(255,255,255,0.05)" }}
+                    className="border-t border-zinc-100"
                   >
-                    <td className="px-3 py-2 font-mono text-xs">
+                    <td className="px-3 py-2 font-mono text-xs text-zinc-900">
                       {page.path}
-                      <span
-                        className="ml-2 text-[11px]"
-                        style={{ color: "#6b7280" }}
-                      >
+                      <span className="ml-2 text-[11px] text-zinc-500">
                         {page.label}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-xs" style={{ color: "#9aa3b2" }}>
+                    <td className="px-3 py-2 text-xs text-zinc-500">
                       {strategy}
                     </td>
                     <td
-                      className="px-3 py-2 text-right font-mono"
-                      style={{ color: scoreColor(r?.performance ?? null) }}
+                      className={`px-3 py-2 text-right font-mono ${scoreClass(r?.performance ?? null)}`}
                     >
                       {r?.performance ?? "-"}
                     </td>
                     <td
-                      className="px-3 py-2 text-right font-mono"
-                      style={{ color: scoreColor(r?.accessibility ?? null) }}
+                      className={`px-3 py-2 text-right font-mono ${scoreClass(r?.accessibility ?? null)}`}
                     >
                       {r?.accessibility ?? "-"}
                     </td>
                     <td
-                      className="px-3 py-2 text-right font-mono"
-                      style={{ color: scoreColor(r?.best_practices ?? null) }}
+                      className={`px-3 py-2 text-right font-mono ${scoreClass(r?.best_practices ?? null)}`}
                     >
                       {r?.best_practices ?? "-"}
                     </td>
                     <td
-                      className="px-3 py-2 text-right font-mono"
-                      style={{ color: scoreColor(r?.seo ?? null) }}
+                      className={`px-3 py-2 text-right font-mono ${scoreClass(r?.seo ?? null)}`}
                     >
                       {r?.seo ?? "-"}
                     </td>
-                    <td
-                      className="px-3 py-2 text-right text-xs"
-                      style={{ color: "#6b7280" }}
-                    >
+                    <td className="px-3 py-2 text-right text-xs text-zinc-500">
                       {r ? formatRelative(r.created_at) : "no data"}
                     </td>
                   </tr>
@@ -431,7 +375,7 @@ function LighthouseSection({ rows }: { rows: LighthouseRow[] }) {
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-xs" style={{ color: "#6b7280" }}>
+      <p className="mt-3 text-xs text-zinc-500">
         Daily Lighthouse cron at 09:00 UTC. Cells turn yellow under 95,
         orange under 90, red under 75.
       </p>
@@ -441,18 +385,16 @@ function LighthouseSection({ rows }: { rows: LighthouseRow[] }) {
 
 function RecentEventsSection({
   seed,
-  pin,
 }: {
   seed: MonitoringEventRow[];
-  pin: string;
 }) {
   return (
     <Section title="Live event tail">
-      <p className="mb-3 text-xs" style={{ color: "#6b7280" }}>
+      <p className="mb-3 text-xs text-zinc-500">
         Most recent first. New events stream in via SSE; the connection
         auto-reconnects every 5 minutes.
       </p>
-      <MonitorLive seed={seed} pin={pin} />
+      <MonitorLive seed={seed} />
     </Section>
   );
 }
@@ -465,17 +407,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section
-      className="mb-8 rounded-2xl border p-6"
-      style={{
-        borderColor: "rgba(255,255,255,0.08)",
-        backgroundColor: "rgba(10,12,18,0.7)",
-      }}
-    >
-      <h2
-        className="mb-4 font-display text-xl font-semibold"
-        style={{ color: "#e7ebf2" }}
-      >
+    <section className="mb-6 rounded-xl border border-zinc-200 bg-white p-6">
+      <h2 className="mb-4 font-display text-base font-semibold text-zinc-900">
         {title}
       </h2>
       {children}

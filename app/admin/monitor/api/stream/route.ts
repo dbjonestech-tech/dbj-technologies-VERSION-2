@@ -3,16 +3,15 @@ import {
   getMaxEventId,
 } from "@/lib/services/monitoring";
 
-/* SSE live tail for /internal/monitor.
+/* SSE live tail for /admin/monitor.
  *
  * Polls monitoring_events every 2s for rows with id > lastSeen and
  * pushes each new row as a `data:` SSE frame. Connection is capped at
  * MAX_CONNECTION_MS so the function does not run indefinitely; the
  * client reconnects automatically.
  *
- * Auth: requires the same INTERNAL_ADMIN_PIN env that gates the
- * dashboard server component. Unauthorized requests get a 404 (not
- * 401) so the endpoint's existence is not advertised to a probe.
+ * Auth: gated by middleware.ts (admin session required). The route
+ * itself adds no further check.
  */
 
 const POLL_INTERVAL_MS = 2_000;
@@ -22,15 +21,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET(request: Request): Promise<Response> {
-  const expectedPin = process.env.INTERNAL_ADMIN_PIN;
-  if (!expectedPin) {
-    return new Response("Not Found", { status: 404 });
-  }
   const url = new URL(request.url);
-  const supplied = url.searchParams.get("pin");
-  if (!supplied || supplied !== expectedPin) {
-    return new Response("Not Found", { status: 404 });
-  }
 
   // Optional ?after= cursor lets the client resume after a reconnect.
   // Without it we start from the current MAX(id) so the client only

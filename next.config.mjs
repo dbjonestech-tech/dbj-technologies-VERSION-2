@@ -21,6 +21,29 @@ const nextConfig = {
         destination: "/pricing/maintenance",
         permanent: true,
       },
+      /* /internal/* was the legacy admin namespace before the
+       * authenticated admin shell moved to /admin/*. Keep these
+       * 301s so any bookmarked or already-published links resolve. */
+      {
+        source: "/internal/monitor/:path*",
+        destination: "/admin/monitor/:path*",
+        permanent: true,
+      },
+      {
+        source: "/internal/monitor",
+        destination: "/admin/monitor",
+        permanent: true,
+      },
+      {
+        source: "/internal/cost",
+        destination: "/admin/costs",
+        permanent: true,
+      },
+      {
+        source: "/internal",
+        destination: "/admin",
+        permanent: true,
+      },
     ];
   },
 };

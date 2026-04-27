@@ -55,6 +55,17 @@ const chatScanRatelimit = new Ratelimit({
   analytics: false,
 });
 
+/* Sign-in throttle. Auth.js retries are user-driven (click button -> OAuth
+   round-trip), so 10/min/IP is generous for legitimate use while throttling
+   credential-stuffing or replay attempts. Keyed on IP because OAuth doesn't
+   surface an attempted-email until after the Google round-trip. */
+const signinRatelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, "1 m"),
+  prefix: "auth:rl:signin-ip",
+  analytics: false,
+});
+
 export async function emailLimiter(email: string): Promise<LimitResult> {
   const { success, remaining } = await emailRatelimit.limit(email.toLowerCase());
   return { success, remaining };
@@ -78,6 +89,26 @@ export async function chatLimiter(ip: string): Promise<LimitResult> {
 export async function chatScanLimiter(scanId: string): Promise<LimitResult> {
   const { success, remaining } = await chatScanRatelimit.limit(scanId);
   return { success, remaining };
+}
+
+export async function signinLimiter(ip: string): Promise<LimitResult> {
+  /* Fail-open: if Upstash env is missing (local dev) or Redis is
+     transiently down, allow the sign-in through. A rate-limiter
+     outage must never block legitimate auth. Google's own throttling
+     remains the floor, and the audit log captures every attempt. */
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    return { success: true, remaining: -1 };
+  }
+  try {
+    const { success, remaining } = await signinRatelimit.limit(ip);
+    return { success, remaining };
+  } catch (err) {
+    console.error("[signinLimiter] upstash error, allowing through:", err);
+    return { success: true, remaining: -1 };
+  }
 }
 
 /* Shared IP extraction. Vercel/Cloudflare set x-forwarded-for; falling

@@ -8,10 +8,8 @@ const MAX_EVENTS_RETAINED = 200;
 
 export default function MonitorLive({
   seed,
-  pin,
 }: {
   seed: MonitoringEventRow[];
-  pin: string;
 }) {
   const [events, setEvents] = useState<MonitoringEventRow[]>(seed);
   const [connected, setConnected] = useState<boolean>(false);
@@ -23,7 +21,7 @@ export default function MonitorLive({
 
     function open() {
       if (cancelled) return;
-      const url = `/internal/monitor/api/stream?pin=${encodeURIComponent(pin)}&after=${encodeURIComponent(lastIdRef.current)}`;
+      const url = `/admin/monitor/api/stream?after=${encodeURIComponent(lastIdRef.current)}`;
       source = new EventSource(url);
       source.onopen = () => setConnected(true);
       source.onmessage = (e) => {
@@ -32,6 +30,12 @@ export default function MonitorLive({
           const row = JSON.parse(e.data) as MonitoringEventRow;
           lastIdRef.current = row.id;
           setEvents((prev) => {
+            /* Dedup by id. Reconnect logic uses ?after=lastId so the
+             * stream should never replay rows we already have, but a
+             * race between the seeded snapshot and the first SSE batch
+             * can deliver an overlap. Without this guard React warns on
+             * duplicate keys. */
+            if (prev.some((p) => p.id === row.id)) return prev;
             const next = [row, ...prev];
             return next.slice(0, MAX_EVENTS_RETAINED);
           });
@@ -55,44 +59,44 @@ export default function MonitorLive({
       cancelled = true;
       source?.close();
     };
-  }, [pin]);
+  }, []);
 
   return (
     <div>
-      <div className="mb-3 flex items-center gap-2 text-xs">
+      <div className="mb-3 flex items-center gap-3 text-xs">
         <span
-          style={{ color: connected ? "#86efac" : "#fcd34d" }}
+          className={
+            connected
+              ? "text-emerald-600"
+              : "text-amber-600"
+          }
         >
           ● {connected ? "live" : "reconnecting…"}
         </span>
-        <span style={{ color: "#6b7280" }}>
+        <span className="text-zinc-500">
           {events.length} event{events.length === 1 ? "" : "s"} retained
         </span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[700px] text-sm">
           <thead>
-            <tr
-              className="text-left text-xs uppercase tracking-wider"
-              style={{ color: "#6b7280" }}
-            >
-              <th className="px-3 py-2">Time</th>
-              <th className="px-3 py-2">Lvl</th>
-              <th className="px-3 py-2">Event</th>
-              <th className="px-3 py-2">Scan</th>
-              <th className="px-3 py-2">Payload</th>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-2 font-semibold">Time</th>
+              <th className="px-3 py-2 font-semibold">Lvl</th>
+              <th className="px-3 py-2 font-semibold">Event</th>
+              <th className="px-3 py-2 font-semibold">Scan</th>
+              <th className="px-3 py-2 font-semibold">Payload</th>
             </tr>
           </thead>
           <tbody>
             {events.map((e) => (
-              <EventRow key={e.id} row={e} pin={pin} />
+              <EventRow key={e.id} row={e} />
             ))}
             {events.length === 0 ? (
               <tr>
                 <td
                   colSpan={5}
-                  className="px-3 py-4 text-center"
-                  style={{ color: "#9aa3b2" }}
+                  className="px-3 py-4 text-center text-zinc-500"
                 >
                   No events yet.
                 </td>
@@ -105,46 +109,38 @@ export default function MonitorLive({
   );
 }
 
-function EventRow({ row, pin }: { row: MonitoringEventRow; pin: string }) {
+function EventRow({ row }: { row: MonitoringEventRow }) {
   const time = new Date(row.created_at).toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
   });
-  const levelColor =
+  const levelClass =
     row.level === "error"
-      ? "#fca5a5"
+      ? "text-red-600"
       : row.level === "warn"
-        ? "#fcd34d"
-        : "#86efac";
+        ? "text-amber-600"
+        : "text-emerald-600";
   return (
-    <tr className="border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-      <td
-        className="px-3 py-2 font-mono text-xs"
-        style={{ color: "#9aa3b2" }}
-      >
-        {time}
-      </td>
-      <td className="px-3 py-2" style={{ color: levelColor }}>
-        {row.level}
-      </td>
-      <td className="px-3 py-2 font-mono text-xs">{row.event}</td>
+    <tr className="border-t border-zinc-100">
+      <td className="px-3 py-2 font-mono text-xs text-zinc-500">{time}</td>
+      <td className={`px-3 py-2 ${levelClass}`}>{row.level}</td>
+      <td className="px-3 py-2 font-mono text-xs text-zinc-900">{row.event}</td>
       <td className="px-3 py-2 font-mono text-[11px]">
         {row.scan_id ? (
           <Link
-            href={`/internal/monitor/scan/${row.scan_id}?pin=${encodeURIComponent(pin)}`}
-            style={{ color: "#60a5fa" }}
+            href={`/admin/monitor/scan/${row.scan_id}`}
+            className="text-blue-600 hover:underline"
           >
             {row.scan_id.slice(0, 8)}…
           </Link>
         ) : (
-          <span style={{ color: "#6b7280" }}>-</span>
+          <span className="text-zinc-400">-</span>
         )}
       </td>
       <td
-        className="max-w-[300px] truncate px-3 py-2 font-mono text-[11px]"
-        style={{ color: "#9aa3b2" }}
+        className="max-w-[300px] truncate px-3 py-2 font-mono text-[11px] text-zinc-500"
         title={JSON.stringify(row.payload)}
       >
         {Object.keys(row.payload).length === 0

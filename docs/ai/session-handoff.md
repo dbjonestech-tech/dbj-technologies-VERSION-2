@@ -6,7 +6,93 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
-## Last Session: April 27, 2026 -- Pass 1 + blueprint for the remaining 5 portfolio templates
+## Last Session: April 27, 2026 -- Admin login portal (Stages 1 + 2 = Tiers 0-2)
+
+### What shipped
+
+Auth foundation plus the operations surface lifted into a unified `/admin/*` shell. End-to-end Google OAuth sign-in works against the email allowlist, every protected route is gated by a JWT-cookie session, and the previously-orphaned monitor/cost dashboards now live inside the admin sidebar layout instead of rendering under the public marketing navbar.
+
+**Stage 1 (Tier 0/1) -- auth foundation + security hygiene:**
+- Auth.js v5 with Google provider, JWT 8h sessions, `prompt=select_account` on the OAuth call.
+- Split-config pattern: `auth.config.ts` (edge-safe) imported by both middleware and the full instance; `auth.ts` adds Node-only events (audit log + new-device email).
+- Email allowlist: `lib/auth/allowlist.ts` reads `ADMIN_EMAILS` env at module load, `isAdminEmail()` is O(1). signIn callback denies non-allowlist accounts and writes a `signin.denied` row to `admin_audit_log`.
+- Audit log: migration `010_admin_audit.sql` (table + 4 indexes). `lib/auth/audit.ts` holds `writeAdminAudit()` (best-effort, swallows errors) + `isNewDevice()` (30d lookback) + `getRecentAuditEvents()`. `lib/auth/device.ts` builds a stable hash of `${ip}::${userAgent}` via Web Crypto so the module is safe to import from any runtime.
+- New-device email: `lib/email-templates/admin-new-device.ts` (Chicago-time formatted, browser/OS detection from UA). `lib/auth/notify.ts` wires it through Resend.
+- Rate limiter: `signinLimiter` (10/min/IP) added to `lib/rate-limit.ts`. Fail-open when Upstash env is missing or Redis errors so a limiter outage never blocks legitimate auth.
+- Sign-in page: `/signin` server component, white theme, single Google OAuth button via server action, error message handling for `AccessDenied` / `Verification` / `Configuration`.
+- Custom NextAuth route handler at `/api/auth/[...nextauth]/route.ts` wraps `signIn`/`callback` GET+POST in the IP rate limiter, leaves session reads unthrottled.
+- Sign-in link added to the public navbar (desktop + mobile).
+- Server action `signOutAction` wired into the admin layout sign-out button.
+- Type augmentation in `types/next-auth.d.ts` adds `isAdmin` to `Session` and `JWT`.
+- Edge-runtime fixes during build-out: rewrote `lib/auth/device.ts` from `node:crypto` to Web Crypto so the middleware bundle stays Node-free.
+
+**Stage 2 (Tier 2) -- admin dashboard surface + layout consistency fix:**
+- Admin shell at `app/admin/layout.tsx`: white sidebar with grouped nav (Overview / Operations / Account), DBJ logo, "Signed in as" footer, sign-out form. Mobile shows a top-bar variant. Auth check at the layout level is defense-in-depth (middleware is the primary gate).
+- Admin landing at `app/admin/page.tsx`: personalized greeting, six quick-link cards (two live, four marked Soon).
+- **Fixed the marketing-navbar leak**: lifted `/internal/monitor`, `/internal/monitor/scan/[scanId]`, `/internal/monitor/api/stream`, and `/internal/cost` out of `app/(marketing)/` and into `app/admin/*`. Re-themed all four pages from the dark canvas (`#06060a`) to the admin shell's light palette (white sections, zinc borders, Tailwind utility classes for state colors). Old paths now 301 to new paths via `next.config.mjs` redirects.
+  - `/internal/monitor` -> `/admin/monitor`
+  - `/internal/monitor/scan/[scanId]` -> `/admin/monitor/scan/[scanId]`
+  - `/internal/monitor/api/stream` -> `/admin/monitor/api/stream`
+  - `/internal/cost` -> `/admin/costs`
+- Fixed pre-existing duplicate React key warning in MonitorLive.tsx: SSE merge now dedupes by id when prepending so a seed/stream race can't produce duplicate-key console warnings.
+- Middleware cleanup: dropped `/internal` from `PROTECTED_PREFIXES` and `CACHE_EXCLUDED_PREFIXES` (next.config redirects fire before middleware ever sees the path).
+- robots.ts: added `/admin/` and `/signin` disallows alongside the existing `/internal/` (kept for the redirect window).
+
+### Files added
+
+- `auth.config.ts`, `auth.ts`, `middleware.ts` (revised)
+- `app/api/auth/[...nextauth]/route.ts`
+- `app/signin/page.tsx`
+- `app/admin/layout.tsx`, `app/admin/page.tsx`
+- `app/admin/monitor/page.tsx`, `app/admin/monitor/MonitorLive.tsx`
+- `app/admin/monitor/api/stream/route.ts`, `app/admin/monitor/scan/[scanId]/page.tsx`
+- `app/admin/costs/page.tsx`
+- `lib/auth/allowlist.ts`, `lib/auth/audit.ts`, `lib/auth/device.ts`, `lib/auth/notify.ts`, `lib/auth/actions.ts`
+- `lib/email-templates/admin-new-device.ts`
+- `lib/db/migrations/010_admin_audit.sql`
+- `scripts/run-migration.mjs`
+- `types/next-auth.d.ts`
+
+### Files modified
+
+- `lib/rate-limit.ts` (added `signinLimiter`)
+- `components/layout/Navbar.tsx` (Sign in link, desktop + mobile)
+- `next.config.mjs` (legacy `/internal/*` redirects)
+- `app/robots.ts` (disallow admin + signin)
+- `lib/services/monitoring.ts`, `lib/services/lighthouse-monitor.ts` (path comments updated)
+
+### Files deleted
+
+- `app/(marketing)/internal/monitor/page.tsx`
+- `app/(marketing)/internal/monitor/MonitorLive.tsx`
+- `app/(marketing)/internal/monitor/api/stream/route.ts`
+- `app/(marketing)/internal/monitor/scan/[scanId]/page.tsx`
+- `app/(marketing)/internal/cost/page.tsx`
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- Sign-in -> Google OAuth -> `/admin` flow verified manually with both allowlist accounts.
+- Migration `010_admin_audit.sql` applied via `node --env-file=.env.local scripts/run-migration.mjs`.
+
+### Known minor items
+
+- Migration 010 was applied to the dev Postgres (which is the same Neon branch as production via POSTGRES_URL). Confirm before next prod deploy that the `admin_audit_log` table exists in the production Neon branch.
+- Sign-in page logo Image emits a width/height aspect-ratio console warning. Cosmetic.
+- Next.js 16 deprecation: `middleware.ts` should eventually move to `proxy.ts`. Non-blocking.
+
+### Git status at session pause
+
+Working tree dirty. Stages 1 + 2 are not yet committed -- per session intent, no commit until the user explicitly approves. When approved, commit message draft: `feat(admin): Google OAuth login portal + unified /admin/* operations surface`.
+
+### Next recommended task
+
+Stage 3 (operational tools): build out `/admin/scans` (filterable scans table with status + revenue range), `/admin/leads` (unified inbox combining scan emails + contact form submissions), `/admin/database` (row counts + recent activity per table), and `/admin/audit` (read view over `admin_audit_log`). Each becomes one of the cards currently labeled "Soon" on the dashboard.
+
+---
+
+## Earlier Session: April 27, 2026 -- Pass 1 + blueprint for the remaining 5 portfolio templates
 
 ### What shipped (templates + docs)
 

@@ -10,7 +10,7 @@ import { recordPagespeedUsage } from "./api-usage";
  * Performance metrics that the Pathlight scan pipeline consumes.
  *
  * Each call writes one row to lighthouse_history. The dashboard at
- * /internal/monitor reads from there for the latest scores grid + 30d
+ * /admin/monitor reads from there for the latest scores grid + 30d
  * sparklines, and the cron itself compares against the rolling 7-day
  * median to decide when to Sentry-alert on regression.
  */
