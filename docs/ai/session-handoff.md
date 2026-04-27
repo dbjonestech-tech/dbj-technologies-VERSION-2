@@ -6,70 +6,100 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
-## Last Session: April 27, 2026 -- Pathlight partial-banner mitigation (schema-repair prompt)
+## Last Session: April 27, 2026 -- Resend webhook schema permissive + audio Blob store fix
 
-### What shipped
+### What shipped (code)
 
-`lib/services/claude-analysis.ts` `callClaudeWithJsonSchema` repair prompt
-now threads the specific `firstAttempt.error` (parse failure or Zod
-validation message) back to Claude, instead of the generic "your
-previous response was not valid JSON." Targets the dominant remaining
-trigger of the report-page "Some analysis steps could not be completed"
-banner: schema-validation failures where the JSON parsed but a field
-type/shape was wrong, and the second attempt repeated the same failure
-because Claude had no signal about what to fix.
+`lib/services/email.ts` `resendWebhookEventSchema` loosened to be
+permissive at the boundary. Real Resend test events were arriving,
+passing Svix signature verification, then being rejected by zod and
+returning `"ignored"` so no row landed in `email_events`. Specific
+changes: `data` itself optional + passthrough; `data.email_id`/`to`/
+`tags` use `.nullish()` instead of `.optional()`; tag entries accept
+optional `name` and `z.unknown()` for `value` (Resend system tags
+sometimes deliver null values which broke `z.string()`). The handler
+now uses `typeof === "string"` guards before extracting `scan_id`/
+`email_type` from tags. The "failed schema validation" warning now
+includes the failing field paths and zod messages so the next
+regression is diagnosable from function logs.
 
-No new attempts, no extra branches, no cost increase. Total Claude
-calls per JSON step still capped at 2 (initial plus 1 repair). 5xx/429
-network retries via `callWithRetry` (3 attempts, 15s/30s backoff)
-unchanged.
+### What shipped (infra; user-driven, no code)
 
-### Verified visually before this fix
+1. **Vercel Blob store recreated as Public.** Original `pathlight-audio`
+   store was created Private, which conflicts with `lib/services/voice.ts`
+   uploadToBlob (REST PUT defaults to public access). Symptom: ElevenLabs
+   was being called and counted in api_usage_events but
+   `audio_summary_url` was always NULL because the Blob upload
+   400'd with `Cannot use public access on a private store`. The `a5`
+   step's try/catch swallowed the error so the report still shipped
+   without audio (graceful degradation worked as designed). Fix: deleted
+   the private store, recreated `pathlight-audio` as public. Fresh
+   `BLOB_READ_WRITE_TOKEN` rotated automatically.
+2. **`RESEND_WEBHOOK_SECRET` set in Vercel** + webhook URL registered
+   in Resend dashboard.
 
-Joshy confirmed in incognito browser that the three April 25 active-fix
-items are working:
+### What was already correct (verified, not changed)
 
-- About-page ScrollWordBatch word spacing renders correctly (no more
-  "smartdecisions" word collisions).
-- About headline does not wrap mid-word at any breakpoint.
-- Homepage shows no white flash on first or repeat visits.
+- Migrations 005, 006, 007, 008 all already applied to prod Neon (DB
+  query confirmed `email_events_status_check` covers all 7 statuses,
+  `uniq_email_event_resend_id_status` index exists,
+  `idx_scans_email_url_created` exists, `scan_results.audio_summary_url`
+  column exists, `api_usage_events.provider_check` includes
+  `elevenlabs`). The "still-pending" language in earlier docs was
+  drift; everything was actually shipped.
 
-Code for all three was already shipped; this was browser-side
-verification only.
+### Manual post-deploy verification
 
-### Manual post-deploy verification (per .claude/rules/pathlight.md)
+1. **Webhook test event:** Resend dashboard → Webhooks → Send test
+   event. Confirm Vercel function logs for `/api/webhooks/resend`
+   return 200 with NO `[email] webhook payload failed schema
+   validation` warning. A new row should land in `email_events` with
+   the test event's status (or, for a fully synthetic test that lacks
+   `scan_id`/`email_type` tags and pre-existing send row, outcome will
+   be "uncorrelated" -- still a clean parse, just no insert).
+2. **Audio fix:** run a fresh Pathlight scan of any URL. The `a5` step
+   should run silently (no `[a5] audio summary failed` warning). The
+   report page should show the `<audio controls>` block above the
+   Pillar Breakdown, and the report email should include the "Listen
+   to your 60-second summary" link.
 
-1. Re-scan `dbjtechnologies.com` once the new Vercel deploy lands.
-   Score, revenue estimate, source attribution, and chatbot responses
-   should match the prior baseline (Pathlight Score 78/100, low
-   confidence revenue, honest methodology disclaimer).
-2. Watch Sentry for any new `ClaudeAnalysisError: ${label}: could not
-   parse a valid JSON response after one retry` traces over the next
-   week. Expectation: drop in frequency, since the repair attempt now
-   has actionable signal.
+### Files changed (1 modified, N docs)
 
-### Files changed (1 modified, 2 docs)
-
-- `lib/services/claude-analysis.ts` -- repair prompt threads
-  `firstAttempt.error` instead of generic copy. Added a 4-line WHY
-  comment per project rules.
-- `docs/ai/decision-log.md` -- new dated entry recording the decision
-  and reasoning.
+- `lib/services/email.ts` -- permissive webhook schema + diagnostic
+  zod-error logging + type-guarded tag reads.
 - `docs/ai/session-handoff.md` -- this entry.
+- `docs/ai/current-state.md` -- removed "manual deploy gates" /
+  "still-pending 005 + 006" drift; added Blob-store-private fix note.
+- `docs/ai/backlog.md` -- dropped "Two manual steps remaining" from
+  the Resend webhook entry; added Blob-store-private fix note to the
+  voice entry.
 
 ### Verification
 
 - `npx tsc --noEmit` clean.
 - `npm run lint` clean.
-- 0 em-dashes in changed range of `claude-analysis.ts`.
+- 0 em-dashes in changed file.
 
 ### Final state
 
-- Committed and pushed to `origin main` as `217c262`
-  (`fix(pathlight): JSON-schema repair prompt threads the actual parse
-  error`). Snapshot follow-up `e26e914`.
-- Working tree was clean; this archive pass is the next commit.
+- Pending commit + push at session end.
 - Vercel auto-deploys 1-3 min after push.
+
+## Prior Session: April 27, 2026 -- Pathlight partial-banner mitigation (schema-repair prompt)
+
+`lib/services/claude-analysis.ts` `callClaudeWithJsonSchema` repair
+prompt now threads the specific `firstAttempt.error` (parse failure
+or Zod validation message) back to Claude, instead of the generic
+"your previous response was not valid JSON." Targets the dominant
+remaining trigger of the report-page "Some analysis steps could not
+be completed" banner: schema-validation failures where the JSON
+parsed but a field type/shape was wrong, and the second attempt
+repeated the same failure because Claude had no signal about what to
+fix. Total Claude calls per JSON step still capped at 2.
+
+Committed and pushed to `origin main` as `217c262`
+(`fix(pathlight): JSON-schema repair prompt threads the actual parse
+error`). Snapshot follow-up `e26e914`.
 
 ### Note on parallel work
 
@@ -116,7 +146,7 @@ Never `.remove()` a node that was rendered by a server component (here: the dark
 - Sample report screenshot still missing from Pathlight landing. Visual proof is the next gap, doubly urgent now that the homepage leads with PathlightCTA.
 - Pathlight product error messages in `app/(grade)/pathlight/**` still use "we"/"our" (6 instances at `page.tsx:45`, `ScanStatus.tsx:330/337/347/350`, `unsubscribe/route.ts:85`). Deliberately left as system voice; pending Joshy's call.
 - JSX comments containing "we" in `WhyDBJContent.tsx:137`, `ProcessContent.tsx:216`, `global-error.tsx:21`. Internal only, not customer-facing.
-- **Migrations `005_dedupe_index.sql`, `006_resend_webhook_events.sql`, `007_api_usage_events.sql`, `008_audio_summary.sql`** all queued; check via `lib/db/setup.ts` whether prod Neon is current. Idempotent runner picks up every numbered `.sql` in order.
+- ~~Migrations `005`-`008` queued~~ -- verified applied to prod Neon on April 27. No action needed.
 - **Manual Vercel dashboard step:** `www.dbjtechnologies.com` now attached per Joshy (April 27). After the deploy lands, verify `curl -I https://www.dbjtechnologies.com/` returns 301 -> apex, and `curl https://dbjtechnologies.com/robots.txt` shows the disallow list from `app/robots.ts` (not the prior permissive one-liner).
 
 ## Future Surface (not pending, just enumerated)
@@ -125,8 +155,8 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Next Recommended Tasks
 
-1. Re-scan `dbjtechnologies.com` to verify the schema-repair fix did not regress the pipeline. Score, revenue estimate, source attribution, and chatbot responses should match the prior baseline.
-2. Apply any pending DB migrations to production Neon (`005`-`008`). Idempotent script: `npx tsx lib/db/setup.ts`.
+1. Re-scan any URL to verify the audio Blob fix produced an `audio_summary_url` row, the `<audio controls>` block renders above the Pillar Breakdown, and the report email contains the "Listen to your 60-second summary" link.
+2. Send a Resend test event from the dashboard and confirm `email_events` receives a row with no `[email] webhook payload failed schema validation` warning in the function logs.
 3. Add sample report screenshot(s) to Pathlight landing.
 4. Screenshot all eight portfolio templates at desktop (1440px) and mobile (768px) widths (`pi-law.html`, `luxury-builders.html`, `dental-practice.html`, `med-spa.html`, `hvac-contractor.html`, `real-estate.html`, `financial-advisor.html`, `restaurant.html`) and wire them into `lib/work-data.ts`.
 5. Decide on Pathlight product error message voice (system "we" vs studio "I"; leaning toward system voice per SaaS convention).

@@ -284,23 +284,30 @@ const WEBHOOK_STATUS_BY_EVENT: Record<string, EmailStatus> = {
   "email.complained": "complained",
 };
 
+// Permissive at the boundary on purpose. Resend's webhook payload
+// shape varies by event type and has shifted over time (test events
+// drop fields, system tags arrive with null values, `to` can be null
+// on some delivery_delayed variants). We validate just enough to
+// route on `type`; downstream reads use type guards.
 const resendWebhookEventSchema = z.object({
   type: z.string(),
-  created_at: z.string().optional(),
   data: z
     .object({
-      email_id: z.string().optional(),
-      to: z.array(z.string()).optional(),
+      email_id: z.string().nullish(),
+      to: z.array(z.string()).nullish(),
       tags: z
         .array(
-          z.object({
-            name: z.string(),
-            value: z.string(),
-          })
+          z
+            .object({
+              name: z.string().optional(),
+              value: z.unknown().optional(),
+            })
+            .passthrough()
         )
-        .optional(),
+        .nullish(),
     })
-    .passthrough(),
+    .passthrough()
+    .optional(),
 });
 
 export type ResendWebhookOutcome = "ingested" | "ignored" | "uncorrelated";
@@ -319,7 +326,15 @@ export async function handleResendWebhookEvent(
 ): Promise<ResendWebhookOutcome> {
   const parsed = resendWebhookEventSchema.safeParse(raw);
   if (!parsed.success) {
-    console.warn("[email] webhook payload failed schema validation");
+    // Include the failing field path so future regressions are
+    // diagnosable from the function logs without repro.
+    const fields = parsed.error.issues
+      .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`)
+      .join("; ");
+    console.warn(
+      "[email] webhook payload failed schema validation:",
+      fields
+    );
     return "ignored";
   }
   const { type, data } = parsed.data;
@@ -327,15 +342,17 @@ export async function handleResendWebhookEvent(
   const status = WEBHOOK_STATUS_BY_EVENT[type];
   if (!status) return "ignored";
 
-  const resendId = data.email_id ?? null;
-  const recipient = data.to?.[0]?.toLowerCase() ?? null;
+  const resendId = data?.email_id ?? null;
+  const recipient = data?.to?.[0]?.toLowerCase() ?? null;
 
-  const tags = data.tags ?? [];
-  const tagScanId = tags.find((t) => t.name === "scan_id")?.value ?? null;
-  const tagEmailTypeRaw = tags.find((t) => t.name === "email_type")?.value;
+  const tags = data?.tags ?? [];
+  const scanIdValue = tags.find((t) => t.name === "scan_id")?.value;
+  const tagScanId = typeof scanIdValue === "string" ? scanIdValue : null;
+  const emailTypeValue = tags.find((t) => t.name === "email_type")?.value;
   const tagEmailType =
-    tagEmailTypeRaw && VALID_EMAIL_TYPES.has(tagEmailTypeRaw as EmailType)
-      ? (tagEmailTypeRaw as EmailType)
+    typeof emailTypeValue === "string" &&
+    VALID_EMAIL_TYPES.has(emailTypeValue as EmailType)
+      ? (emailTypeValue as EmailType)
       : null;
 
   let scanId = tagScanId;
