@@ -11,7 +11,7 @@ import {
  *  1. Haiku 4.5 generates a 100-130 word spoken script grounded in the
  *     scan data (single biggest issue, conservative revenue framing,
  *     spelled-out numbers, end with one next action).
- *  2. ElevenLabs eleven_turbo_v2_5 with the Adam voice turns the
+ *  2. ElevenLabs eleven_turbo_v2_5 with the Charlie voice turns the
  *     script into an MP3 buffer.
  *  3. The MP3 buffer is uploaded to Vercel Blob at a stable per-scan
  *     path. The public Blob URL is returned to the caller, which
@@ -27,17 +27,18 @@ import {
  *   BLOB_READ_WRITE_TOKEN  (NEW, required by Vercel Blob)
  *
  * Optional:
- *   ELEVENLABS_VOICE_ID    (override the default Adam voice)
+ *   ELEVENLABS_VOICE_ID    (override the default Charlie voice)
  *   ELEVENLABS_MODEL       (override eleven_turbo_v2_5)
  */
 
 const HAIKU_MODEL = "claude-haiku-4-5-20251001";
 const HAIKU_MAX_TOKENS = 600;
-// ElevenLabs stock voice "Adam" -- warm male, conversational tone,
-// well-suited to a senior-consultant-on-the-phone narration. Voice
-// ID is the canonical public ID published in ElevenLabs's voice
+// ElevenLabs stock voice "Charlie" -- young British male, calm
+// conversational delivery. Reads like a thoughtful colleague
+// walking you through findings rather than a polished announcer.
+// Voice ID is the canonical public ID from the ElevenLabs voice
 // library and is safe to ship in source.
-const DEFAULT_VOICE_ID = "pNInz6obpgDQGcFmaJgB";
+const DEFAULT_VOICE_ID = "IKne3meq5aSn9XLyUdCD";
 const DEFAULT_TTS_MODEL = "eleven_turbo_v2_5";
 const TTS_TIMEOUT_MS = 45_000;
 const BLOB_UPLOAD_TIMEOUT_MS = 30_000;
@@ -167,8 +168,9 @@ async function generateScript(
  * 2026 (~5-8s for 100 words at typical load). Output format is
  * mp3_44100_128 for ~1MB per 60s clip and consumer-safe bitrate.
  *
- * voice_settings tuning: stability 0.45 (less monotone, more natural
- * variation), similarity_boost 0.8 (faithful to the Adam timbre),
+ * voice_settings tuning for Charlie: stability 0.65 (calmer, more even
+ * delivery so the narration feels measured rather than animated),
+ * similarity_boost 0.85 (faithful to Charlie's natural British timbre),
  * style 0.0 (no stylization, pure narration).
  */
 async function synthesizeAudio(
@@ -202,8 +204,8 @@ async function synthesizeAudio(
           text: script,
           model_id: modelId,
           voice_settings: {
-            stability: 0.45,
-            similarity_boost: 0.8,
+            stability: 0.65,
+            similarity_boost: 0.85,
             style: 0,
             use_speaker_boost: true,
           },
