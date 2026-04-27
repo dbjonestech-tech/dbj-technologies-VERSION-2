@@ -6,7 +6,65 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
-## Last Session: April 27, 2026 -- Admin login portal (Stages 1 + 2 = Tiers 0-2)
+## Last Session: April 27, 2026 -- Admin Stage 3: operational tools (scans, leads, audit, database)
+
+### What shipped
+
+Stage 3 lands the four operational tools that completed the admin shell. Every "Soon" placeholder on the landing dashboard except Users is now live, and the contact form gained durable persistence so leads are no longer lost when Resend is the only record.
+
+**New surfaces (4 server-component pages):**
+- `/admin/scans` -- Filterable scans table joined against scan_results. Filters: status (pending / scanning / analyzing / complete / partial / failed), date window (24h / 7d / 30d / 90d), revenue bucket ($0-$1k, $1k-$5k, $5k-$10k, $10k+, "no revenue computed"), free-text search across URL/email/business name. Each row shows status badge + Pathlight score + computed monthly loss + duration; per-row links to the public report and to the existing /admin/monitor/scan/{id} drill-down. 50 per page with prev/next pagination.
+- `/admin/leads` -- Two-tab unified inbox. "Pathlight signups" (leads table) shows email, business, scan_count, last_scan_at, unsubscribed badge. "Contact form" reads the new contact_submissions table (full name + email + phone + company + budget + project_type + message + Resend ID + IP + UA), with a collapsible <details> per row for the message body. Top of page: 4 stat cards (total leads, unsubscribed, total contacts, contacts 7d).
+- `/admin/audit` -- Read view over admin_audit_log. Filters: event type (8 known events), result (success/denied/error), date window (24h/7d/30d), email (partial match). Rows show timestamp, event, badged result, email, IP, short UA, expandable JSON metadata. 4 stat cards across the top (events 24h, denied 24h, errors 24h, unique emails 24h) with warn/error tone when non-zero.
+- `/admin/database` -- Catalog view of all 10 tracked tables (scans, scan_results, leads, contact_submissions, email_events, email_unsubscribes, monitoring_events, lighthouse_history, api_usage_events, admin_audit_log) grouped by domain (Pathlight / Email / Telemetry / Admin). Each row: total count, 24h/7d/30d insert volume, newest row relative time, oldest row absolute date, and a one-line description. Read-only. Per-table errors fail safe with `total = -1` rendered as red `error`.
+
+**Contact form persistence (migration 011 + route change):**
+- New table `contact_submissions` (UUID id, name, email lowercased, phone, company, budget, project_type, message, resend_id, ip, user_agent, created_at). Two indexes (created_at DESC, email).
+- Migration `011_contact_submissions.sql` applied to Neon via `node --env-file=.env.local scripts/run-migration.mjs lib/db/migrations/011_contact_submissions.sql`.
+- `app/(marketing)/api/contact/route.ts` now calls a best-effort `persistContactSubmission()` helper alongside the Resend send. Failures swallow to console.warn (same pattern as `track()` and `writeAdminAudit()`). Persistence runs on all three paths: dev (no API key), Resend success (with `data.id` captured), Resend failure (resend_id null). A delivery error is exactly when the durable record matters most so the lead is captured regardless.
+
+**Nav + dashboard wiring:**
+- `app/admin/layout.tsx`: dropped `disabled: true` from Scans, Leads, Database, Audit log. Users remains the only "Soon" entry.
+- `app/admin/page.tsx`: same four cards flipped from "Soon" to "live"; added a dedicated Audit log card (ShieldCheck icon).
+
+### Files added
+
+- `lib/db/migrations/011_contact_submissions.sql`
+- `app/admin/scans/page.tsx`
+- `app/admin/leads/page.tsx`
+- `app/admin/audit/page.tsx`
+- `app/admin/database/page.tsx`
+
+### Files modified
+
+- `app/(marketing)/api/contact/route.ts` (persistence helper + 3 call sites + user-agent capture; also stripped a pre-existing em-dash from line 91)
+- `app/admin/layout.tsx` (4 entries flipped to live)
+- `app/admin/page.tsx` (5 cards: 3 flipped to live + new Audit log card)
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` exit 0.
+- 0 em-dashes across all changed files.
+- Migration 011 applied successfully to the Neon branch (POSTGRES_URL); 3 statements ok.
+
+### Known minor items
+
+- Migration 011 was applied to the dev Postgres which is the same Neon branch as production via POSTGRES_URL. Confirm before next prod deploy that `contact_submissions` table exists in the production Neon branch.
+- /admin/users still placeholder; reserved for Stage 5 (roles + invitation foundation).
+- The neon serverless driver does not strongly type `await Promise.all([sql\`...\`, ...])`; loadCounts in /admin/leads casts to `{ n: number }[][]` after the await. Same pattern can be reused for any future page that runs multiple count queries in parallel.
+
+### Git status at session pause
+
+Working tree dirty: 3 modified + 5 new files (the 4 admin pages + migration 011). Not committed yet pending Joshy's review per protocol. Stage 1 + 2 still at commit `b1f59e4` on origin/main.
+
+### Next recommended task
+
+Stage 4 (polish, Tier 4): cmdk command palette, sonner toast notifications, theme toggle (light/dark), keyboard shortcuts. After Stage 4, Stage 5 covers roles + invitation foundation and unlocks the /admin/users surface.
+
+---
+
+## Earlier Session: April 27, 2026 -- Admin login portal (Stages 1 + 2 = Tiers 0-2)
 
 ### What shipped
 

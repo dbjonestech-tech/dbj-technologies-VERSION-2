@@ -33,7 +33,7 @@
 ## Priority 3: Pathlight Hardening
 
 - [ ] Investigate intermittent "Some analysis steps could not be completed" banner (root cause traced April 27 to `s6` finalize: triggered when ANY of vision/remediation/revenue/score steps fail while audit + screenshots succeed; retry logic handles most cases, root cause for remaining occurrences still unknown)
-- [ ] Pathlight admin dashboard for viewing captured lead data (scan data already persists to Postgres, just no UI to view it)
+- [x] Pathlight admin dashboard for viewing captured lead data -- DONE April 27. Stage 3 shipped /admin/scans (filterable scans table), /admin/leads (Pathlight signups + contact form submissions in a two-tab inbox), /admin/audit (admin_audit_log read view), /admin/database (row counts + recent activity per table). Migration 011 added contact_submissions table; the contact form now persists every submission alongside the Resend send (best-effort).
 - [ ] Revenue confidence bands on reports (show range instead of single precise number)
 - [ ] Input validation gate v2: extend lib/services/url.ts to also reject social media URLs (facebook/instagram/twitter/linkedin/youtube/tiktok), Google Docs/Sheets/Drive links, file:// and data:// schemes, and known parked-domain patterns (godaddysites.com, wixsite.com holding pages). Today the gate only blocks private IPs, embedded credentials, and sensitive query params.
 - [x] Rate limiting per email/IP -- DONE (emailLimiter 3/24h + ipLimiter 5/24h enforced in app/(grade)/api/scan/route.ts:71-85; verified April 27)

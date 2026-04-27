@@ -2,6 +2,45 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
 import { track } from "@/lib/services/monitoring";
+import { getDb } from "@/lib/db";
+
+/* Best-effort: a DB outage must not block lead capture once the
+ * Resend send has already happened. Failures swallow to console.warn. */
+async function persistContactSubmission(input: {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  budget: string;
+  projectType: string;
+  message: string;
+  resendId: string | null;
+  ip: string | null;
+  userAgent: string | null;
+}): Promise<void> {
+  try {
+    const sql = getDb();
+    await sql`
+      INSERT INTO contact_submissions
+        (name, email, phone, company, budget, project_type, message, resend_id, ip, user_agent)
+      VALUES (
+        ${input.name},
+        ${input.email.toLowerCase().trim()},
+        ${input.phone || null},
+        ${input.company || null},
+        ${input.budget},
+        ${input.projectType},
+        ${input.message},
+        ${input.resendId},
+        ${input.ip},
+        ${input.userAgent}
+      )
+    `;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`[contact] persist failed: ${message}`);
+  }
+}
 
 /* ─── HTML SANITIZATION ─────────────────────────── */
 function escapeHtml(unsafe: string): string {
@@ -49,7 +88,7 @@ const contactSchema = z.object({
   budget: z.string().min(1).max(100),
   projectType: z.string().min(1).max(100),
   message: z.string().min(10).max(5000),
-  // Honeypot field — should always be empty
+  // Honeypot field, should always be empty.
   website: z.string().max(0, "Bot detected").optional().default(""),
 });
 
@@ -78,6 +117,7 @@ export async function POST(request: Request) {
     /* ─── RATE LIMITING ───────────────────────── */
     const forwarded = request.headers.get("x-forwarded-for");
     const ip = forwarded?.split(",")[0]?.trim() || "unknown";
+    const userAgent = request.headers.get("user-agent");
     if (isRateLimited(ip)) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
@@ -135,6 +175,18 @@ export async function POST(request: Request) {
       <p style="white-space:pre-wrap;background:#f9f9f9;padding:16px;border-radius:8px;">${safe.message}</p>
     `;
 
+    const persistArgs = {
+      name,
+      email,
+      phone,
+      company,
+      budget,
+      projectType,
+      message,
+      ip: ip === "unknown" ? null : ip,
+      userAgent,
+    };
+
     if (!process.env.RESEND_API_KEY) {
       if (process.env.NODE_ENV === "development") {
         // Local development convenience: surface that a submission arrived
@@ -143,12 +195,15 @@ export async function POST(request: Request) {
         console.log(
           "[contact] RESEND_API_KEY not set; submission accepted but no email sent (dev only)"
         );
+        await persistContactSubmission({ ...persistArgs, resendId: null });
         return NextResponse.json({ success: true });
       }
       // Production: missing email config is a server error, not a silent
       // success. Surface it so the user retries instead of believing
-      // their inquiry was delivered.
+      // their inquiry was delivered. Persist anyway so the lead is not
+      // lost while config is being fixed.
       console.error("[contact] RESEND_API_KEY missing in production");
+      await persistContactSubmission({ ...persistArgs, resendId: null });
       return NextResponse.json(
         { error: "Server configuration error. Please email joshua@dbjtechnologies.com directly." },
         { status: 500 }
@@ -156,7 +211,7 @@ export async function POST(request: Request) {
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const { error: sendError } = await resend.emails.send({
+    const { data: sendData, error: sendError } = await resend.emails.send({
       from: process.env.CONTACT_FROM_EMAIL || "DBJ Technologies Website <joshua@dbjtechnologies.com>",
       to: process.env.CONTACT_EMAIL || "joshua@dbjtechnologies.com",
       replyTo: email,
@@ -170,12 +225,19 @@ export async function POST(request: Request) {
         { stage: "resend-send", error: String(sendError).slice(0, 500) },
         { level: "error" }
       );
+      // Persist on failure too: a delivery error is exactly when the
+      // durable record matters most so the lead is not lost in transit.
+      await persistContactSubmission({ ...persistArgs, resendId: null });
       return NextResponse.json(
         { error: "Failed to send message" },
         { status: 500 }
       );
     }
 
+    await persistContactSubmission({
+      ...persistArgs,
+      resendId: sendData?.id ?? null,
+    });
     await track("contact.submitted", {
       projectType: safe.projectType,
       hasBudget: Boolean(safe.budget),

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import { Activity, DollarSign, FileText, Mail, Users, Database } from "lucide-react";
+import { Activity, DollarSign, FileText, Mail, Users, Database, ShieldCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -30,21 +30,28 @@ const QUICK_LINKS: {
     description: "Filterable table of every scan with status and revenue range.",
     href: "/admin/scans",
     icon: FileText,
-    status: "soon",
+    status: "live",
   },
   {
     label: "Leads",
-    description: "Unified inbox of scan emails + contact form submissions.",
+    description: "Pathlight scan signups and contact-form submissions side by side.",
     href: "/admin/leads",
     icon: Mail,
-    status: "soon",
+    status: "live",
   },
   {
     label: "Database",
     description: "Row counts and recent activity by table.",
     href: "/admin/database",
     icon: Database,
-    status: "soon",
+    status: "live",
+  },
+  {
+    label: "Audit log",
+    description: "Sign-in attempts, allowlist denials, and protected-route access.",
+    href: "/admin/audit",
+    icon: ShieldCheck,
+    status: "live",
   },
   {
     label: "Users",

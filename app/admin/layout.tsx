@@ -26,15 +26,15 @@ const NAV_GROUPS: {
     items: [
       { label: "Monitor", href: "/admin/monitor", icon: Activity },
       { label: "Costs", href: "/admin/costs", icon: DollarSign },
-      { label: "Scans", href: "/admin/scans", icon: FileText, disabled: true },
-      { label: "Leads", href: "/admin/leads", icon: Mail, disabled: true },
-      { label: "Database", href: "/admin/database", icon: Database, disabled: true },
+      { label: "Scans", href: "/admin/scans", icon: FileText },
+      { label: "Leads", href: "/admin/leads", icon: Mail },
+      { label: "Database", href: "/admin/database", icon: Database },
     ],
   },
   {
     label: "Account",
     items: [
-      { label: "Audit log", href: "/admin/audit", icon: FileText, disabled: true },
+      { label: "Audit log", href: "/admin/audit", icon: FileText },
       { label: "Users", href: "/admin/users", icon: Users, disabled: true },
     ],
   },
