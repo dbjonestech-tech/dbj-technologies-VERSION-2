@@ -3,7 +3,95 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 27, 2026 (afternoon) -- Pathlight lockdown + audit + feasibility
+## Last Session: April 27, 2026 (evening) -- Resend bounce/complaint webhook (Feature #11)
+
+### What shipped
+
+The biggest-win item from `docs/ai/pathlight-feature-feasibility.md`
+landed: a verified Resend webhook receiver that closes the email
+deliverability blind spot (bounced and spam-complaint events were
+silently invisible until now, with no auto-suppression and no alert
+when bounce rate climbed toward Resend's 5% suspension threshold).
+
+- **Migration `lib/db/migrations/006_email_webhook_events.sql`.** Extends
+  the `email_events.status` CHECK constraint to include `delivered`,
+  `delivery_delayed`, `bounced`, `complained` alongside the existing
+  `sent`/`skipped`/`failed`. Adds a partial unique index
+  `uniq_email_event_resend_id_status ON email_events (resend_id, status)
+  WHERE resend_id IS NOT NULL` for idempotent ingestion (Svix may
+  redeliver the same event under network jitter or our own 5xx, and the
+  same email progresses through several statuses naturally so the
+  uniqueness must be on the pair, not the id alone). `lib/db/schema.sql`
+  mirrored to match for fresh-DB setup.
+- **`lib/services/email.ts`.** Outgoing sends now carry `tags: [{ name:
+  "scan_id", value: scanId }, { name: "email_type", value: emailType }]`
+  so every webhook event correlates back to a scan even when the
+  resend_id lookup misses. New exported `handleResendWebhookEvent`
+  validates the payload with Zod, maps event type to a status, looks
+  up the scan/email_type from tags first and falls back to a
+  `resend_id` lookup against the original `sent` row, inserts the new
+  row with `ON CONFLICT (resend_id, status) DO NOTHING`, and on
+  bounced/complained calls `markUnsubscribed(recipient)` (which writes
+  to both `leads.unsubscribed_at` and `email_unsubscribes`). Returns
+  `"ingested" | "ignored" | "uncorrelated"` so the route handler can
+  surface the outcome. New private `checkBounceRateAlert` runs after
+  every bounce: if 7-day window has at least 20 sends and bounce rate
+  >=2%, fires `Sentry.captureMessage` at level `warning` (or `error`
+  at >=5%, the actual Resend suspension threshold).
+- **`app/(grade)/api/webhooks/resend/route.ts`.** New POST handler
+  exposes `/api/webhooks/resend`. Checks `RESEND_WEBHOOK_SECRET` (returns
+  503 if unset), reads `svix-id` / `svix-timestamp` / `svix-signature`
+  headers (400 if missing), reads the raw body via `request.text()`
+  (verification must run on the exact bytes that arrived, not on a
+  reparsed JSON), and verifies via `svix`'s `Webhook.verify`. Bad
+  signature returns 401. Handler errors return 200 so Resend does NOT
+  retry-storm us (errors already captured to Sentry). GET returns 405
+  with an `allow: POST` header.
+- **`/api/` is already disallowed in `robots.ts`** so the webhook URL
+  is not crawlable.
+
+### Manual deploy steps (NOT automated)
+
+These need to happen in this order after the next deploy fans out:
+
+1. Apply migration 006 to prod Neon: `npx tsx lib/db/setup.ts`. The
+   script picks up every numbered migration in
+   `lib/db/migrations/` in order, idempotent. (Migration 005 from a
+   prior session is also still pending per the prior handoff; the
+   script handles both at once.)
+2. In the Resend dashboard, add a webhook endpoint pointing at
+   `https://dbjtechnologies.com/api/webhooks/resend`. Subscribe at
+   minimum to `email.delivered`, `email.delivery_delayed`,
+   `email.bounced`, and `email.complained`.
+3. Copy the signing secret Resend gives you and set it in Vercel as
+   `RESEND_WEBHOOK_SECRET` (Production + Preview). NOT added to
+   `.env.example` per the project rule that forbids modifying that
+   file in implementation prompts -- noted here for the user to add
+   manually if desired.
+4. Trigger a known-bad email (a `bounce@simulator.amazonses.com` or
+   similar Resend test address works well) to confirm the row lands
+   in `email_events` with `status = 'bounced'` and the address shows
+   up in `email_unsubscribes`.
+
+### Verification
+
+- `npx tsc --noEmit` -- clean (exit 0)
+- `npm run lint` -- clean
+- Em-dash check on all four new/touched files (`route.ts`, `email.ts`,
+  `schema.sql`, `006_*.sql`) -- 0 em-dashes total.
+- `svix@1.90.0` and `resend@^6.12.2` already installed (no `npm install`
+  required).
+
+### Files changed (3 modified, 2 created)
+
+- `lib/db/migrations/006_email_webhook_events.sql` (NEW)
+- `lib/db/schema.sql` (mirror of 006: enum + partial unique index)
+- `lib/services/email.ts` (Tag in dispatch + webhook handler suite)
+- `app/(grade)/api/webhooks/resend/route.ts` (NEW route handler)
+- `docs/ai/backlog.md`, `docs/ai/session-handoff.md`, `docs/ai/current-state.md`
+  (status updates)
+
+## Previous Session: April 27, 2026 (afternoon) -- Pathlight lockdown + audit + feasibility
 
 ### What shipped (Phase 1: Lockdown)
 

@@ -1,4 +1,6 @@
+import * as Sentry from "@sentry/nextjs";
 import { Resend } from "resend";
+import { z } from "zod";
 import { getDb } from "../db";
 import { getFullScanReport } from "../db/queries";
 import {
@@ -10,7 +12,7 @@ import {
   type EmailMergeData,
 } from "../email-templates/pathlight";
 import type { RemediationItem } from "@/lib/types/scan";
-import { generateUnsubscribeUrl } from "./unsubscribe";
+import { generateUnsubscribeUrl, markUnsubscribed } from "./unsubscribe";
 
 export type EmailType =
   | "report_delivery"
@@ -18,7 +20,21 @@ export type EmailType =
   | "followup_5d"
   | "breakup_8d";
 
-export type EmailStatus = "sent" | "skipped" | "failed";
+export type EmailStatus =
+  | "sent"
+  | "skipped"
+  | "failed"
+  | "delivered"
+  | "delivery_delayed"
+  | "bounced"
+  | "complained";
+
+const VALID_EMAIL_TYPES: ReadonlySet<EmailType> = new Set([
+  "report_delivery",
+  "followup_48h",
+  "followup_5d",
+  "breakup_8d",
+]);
 
 export type EmailSendResult = {
   status: EmailStatus;
@@ -152,6 +168,14 @@ async function dispatch(
         "List-Unsubscribe": `<${generateUnsubscribeUrlForMail(toEmail)}>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
+      // Tags travel back on every Resend webhook event so we can
+      // correlate a bounce/complaint to the originating scan even if
+      // the resend_id lookup misses (e.g., the original email_events
+      // row failed to insert before the webhook fired).
+      tags: [
+        { name: "scan_id", value: scanId },
+        { name: "email_type", value: emailType },
+      ],
     });
 
     if (error) {
@@ -242,4 +266,177 @@ export async function sendFollowUp(
         ? buildFollowUp5d(merge)
         : buildBreakup8d(merge);
   return dispatch(scanId, emailType, built, merge.email);
+}
+
+/* ─── Resend webhook ingestion ───────────────────── */
+
+// Resend uses Svix under the hood. The four webhook event types we
+// care about map cleanly onto email_events.status terminal values.
+// 'sent' is also delivered as a webhook but our send code already
+// inserts a 'sent' row at the moment of dispatch, so we ignore the
+// webhook variant. opened/clicked/failed are deliberately skipped
+// (privacy, noise, and 'failed' is handled at send time).
+const WEBHOOK_STATUS_BY_EVENT: Record<string, EmailStatus> = {
+  "email.delivered": "delivered",
+  "email.delivery_delayed": "delivery_delayed",
+  "email.bounced": "bounced",
+  "email.complained": "complained",
+};
+
+const resendWebhookEventSchema = z.object({
+  type: z.string(),
+  created_at: z.string().optional(),
+  data: z
+    .object({
+      email_id: z.string().optional(),
+      to: z.array(z.string()).optional(),
+      tags: z
+        .array(
+          z.object({
+            name: z.string(),
+            value: z.string(),
+          })
+        )
+        .optional(),
+    })
+    .passthrough(),
+});
+
+export type ResendWebhookOutcome = "ingested" | "ignored" | "uncorrelated";
+
+/**
+ * Process a verified Resend webhook event. Idempotent: re-processing
+ * the same (resend_id, status) pair is a no-op thanks to the partial
+ * unique index added in migration 006.
+ *
+ * Returns "ignored" when the event type is not one we track,
+ * "uncorrelated" when we cannot tie the event back to a scan record,
+ * and "ingested" on a successful insert (or no-op if already present).
+ */
+export async function handleResendWebhookEvent(
+  raw: unknown
+): Promise<ResendWebhookOutcome> {
+  const parsed = resendWebhookEventSchema.safeParse(raw);
+  if (!parsed.success) {
+    console.warn("[email] webhook payload failed schema validation");
+    return "ignored";
+  }
+  const { type, data } = parsed.data;
+
+  const status = WEBHOOK_STATUS_BY_EVENT[type];
+  if (!status) return "ignored";
+
+  const resendId = data.email_id ?? null;
+  const recipient = data.to?.[0]?.toLowerCase() ?? null;
+
+  const tags = data.tags ?? [];
+  const tagScanId = tags.find((t) => t.name === "scan_id")?.value ?? null;
+  const tagEmailTypeRaw = tags.find((t) => t.name === "email_type")?.value;
+  const tagEmailType =
+    tagEmailTypeRaw && VALID_EMAIL_TYPES.has(tagEmailTypeRaw as EmailType)
+      ? (tagEmailTypeRaw as EmailType)
+      : null;
+
+  let scanId = tagScanId;
+  let emailType: EmailType | null = tagEmailType;
+
+  // Fall back to looking up the original email_events row by resend_id
+  // when the tags are missing (e.g., a Resend send that pre-dates the
+  // tags rollout, or a webhook for an email sent through a different
+  // code path).
+  if ((!scanId || !emailType) && resendId) {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT scan_id, email_type
+      FROM email_events
+      WHERE resend_id = ${resendId} AND status = 'sent'
+      ORDER BY sent_at ASC
+      LIMIT 1
+    `) as { scan_id: string | null; email_type: string }[];
+    const row = rows[0];
+    if (row) {
+      scanId = scanId ?? row.scan_id ?? null;
+      if (
+        !emailType &&
+        VALID_EMAIL_TYPES.has(row.email_type as EmailType)
+      ) {
+        emailType = row.email_type as EmailType;
+      }
+    }
+  }
+
+  if (!scanId || !emailType) {
+    console.warn(
+      "[email] webhook event could not be correlated to a scan",
+      { type, resendId }
+    );
+    return "uncorrelated";
+  }
+
+  const sql = getDb();
+  await sql`
+    INSERT INTO email_events (scan_id, email_type, status, resend_id)
+    VALUES (${scanId}, ${emailType}, ${status}, ${resendId})
+    ON CONFLICT (resend_id, status) DO NOTHING
+  `;
+
+  if ((status === "bounced" || status === "complained") && recipient) {
+    try {
+      await markUnsubscribed(recipient);
+    } catch (err) {
+      console.error(
+        "[email] failed to auto-unsubscribe after bounce/complaint",
+        err
+      );
+    }
+  }
+
+  if (status === "bounced") {
+    await checkBounceRateAlert();
+  }
+
+  return "ingested";
+}
+
+/**
+ * Tracks bounce rate over a trailing 7-day window. Resend will start
+ * throttling and may suspend a sender domain when hard bounces exceed
+ * roughly 5%. We warn at 2% so there is room to react before deliverability
+ * actually degrades. Skips alerting for low-volume windows where a single
+ * bad address would push the percentage past the threshold.
+ */
+async function checkBounceRateAlert(): Promise<void> {
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        COUNT(*) FILTER (WHERE status = 'bounced')::int AS bounces,
+        COUNT(*) FILTER (WHERE status IN ('sent', 'delivered'))::int AS sends
+      FROM email_events
+      WHERE sent_at > now() - interval '7 days'
+    `) as { bounces: number; sends: number }[];
+    const bounces = rows[0]?.bounces ?? 0;
+    const sends = rows[0]?.sends ?? 0;
+    if (sends < 20) return;
+
+    const rate = bounces / sends;
+    if (rate < 0.02) return;
+
+    const level = rate >= 0.05 ? "error" : "warning";
+    const message = `Pathlight email bounce rate ${(rate * 100).toFixed(1)}% over 7d (${bounces}/${sends})`;
+    console.warn(`[email] bounce rate alert: ${message}`);
+    Sentry.captureMessage(message, {
+      level,
+      tags: { source: "email-bounce-monitor" },
+      extra: {
+        bounces,
+        sends,
+        rate,
+        threshold_warning: 0.02,
+        threshold_critical: 0.05,
+      },
+    });
+  } catch (err) {
+    console.error("[email] bounce rate alert query failed", err);
+  }
 }

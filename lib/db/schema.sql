@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS email_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   scan_id UUID REFERENCES scans(id) ON DELETE CASCADE,
   email_type TEXT NOT NULL CHECK (email_type IN ('report_delivery', 'followup_48h', 'followup_5d', 'breakup_8d')),
-  status TEXT NOT NULL CHECK (status IN ('sent', 'skipped', 'failed')),
+  status TEXT NOT NULL CHECK (status IN ('sent', 'skipped', 'failed', 'bounced', 'complained', 'delivered', 'delivery_delayed')),
   resend_id TEXT,
   error_message TEXT,
   sent_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -72,3 +72,6 @@ CREATE TABLE IF NOT EXISTS email_events (
 
 CREATE INDEX IF NOT EXISTS idx_email_events_scan ON email_events(scan_id);
 CREATE INDEX IF NOT EXISTS idx_email_events_type ON email_events(email_type);
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_email_event_resend_id_status
+  ON email_events (resend_id, status)
+  WHERE resend_id IS NOT NULL;
