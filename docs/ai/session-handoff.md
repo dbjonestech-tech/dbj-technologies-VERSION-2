@@ -68,6 +68,13 @@ Optionally set `ELEVENLABS_DAILY_CAP_USD` in Vercel to override.
 - `npm run lint` clean.
 - 0 NEW em-dashes in either changed file.
 
+### Commit + push status
+
+Committed at `c75574d` and pushed to `origin main`. 3 files
+modified. Working tree carries unrelated parallel changes
+(`docs/ai/decision-log.md`, `lib/services/claude-analysis.ts`)
+left for the partial-banner-mitigation session to commit.
+
 ## Earlier Session: April 27, 2026 -- Pathlight partial-banner mitigation (schema-repair prompt)
 
 ### What shipped
