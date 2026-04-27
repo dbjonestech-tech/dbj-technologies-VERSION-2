@@ -115,16 +115,24 @@ against actual code; most were stale or wrong. Three real issues fixed:
 - `npx tsc --noEmit` clean.
 - `npm run lint` clean.
 - 0 em-dashes in changed files (`vercel.json`, `loading.tsx`).
-- Not yet committed.
+
+### Final state
+
+- Committed and pushed to `origin main` as `9434ff7`
+  (`fix(seo): unblock app/robots.ts, add www->apex redirect, hide loader
+  chrome from a11y`).
+- Working tree clean (only this session-handoff.md amend pending).
+- Vercel auto-deploys 1-3 min after push.
 
 ### Next recommended task
 
-Commit + push these three fixes, then complete the manual Vercel dashboard
-step to attach `www.dbjtechnologies.com`. After deploy:
+Manual Vercel dashboard step: register `www.dbjtechnologies.com` as an
+alias domain on the project so the routing-layer redirect actually fires.
+After the deploy lands, verify:
 
-1. `curl -I https://www.dbjtechnologies.com/` should return 301 ->
+1. `curl -I https://www.dbjtechnologies.com/` returns 301 ->
    `https://dbjtechnologies.com/`.
-2. `curl https://dbjtechnologies.com/robots.txt` should now show the
+2. `curl https://dbjtechnologies.com/robots.txt` shows the
    disallow list from `app/robots.ts`, not the previous permissive
    one-liner.
 
