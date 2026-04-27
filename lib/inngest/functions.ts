@@ -17,6 +17,7 @@ import {
   updateScanStatus,
 } from "../db/queries";
 import { generateVoiceSummary } from "../services/voice";
+import { getProviderSpendUsd } from "../services/api-usage";
 import type { IndustryBenchmark, PerformanceScores } from "@/lib/types/scan";
 import { captureScreenshot } from "../services/browserless";
 import {
@@ -499,6 +500,34 @@ export const scanRequested = inngest.createFunction(
           ) {
             return { ok: true, skipped: "no-remediation" };
           }
+          // Hard daily spend cap circuit breaker. Sums the trailing
+          // 24h of ElevenLabs cost_usd; if it crosses
+          // ELEVENLABS_DAILY_CAP_USD (default $10), short-circuit
+          // and fire a Sentry error. This is the missing kill switch
+          // beyond the per-email and per-IP rate limits at the scan
+          // submission gate, and it is the only line of defense if
+          // the API key itself is ever leaked.
+          const dailyCapRaw = process.env.ELEVENLABS_DAILY_CAP_USD;
+          const dailyCap = (() => {
+            const parsed = dailyCapRaw ? Number(dailyCapRaw) : NaN;
+            return Number.isFinite(parsed) && parsed > 0 ? parsed : 10;
+          })();
+          const spent24h = await getProviderSpendUsd("elevenlabs", 24);
+          if (spent24h >= dailyCap) {
+            const message = `Pathlight ElevenLabs 24h cap reached: $${spent24h.toFixed(2)} >= $${dailyCap.toFixed(2)}. Skipping audio for scan ${scanId}.`;
+            console.warn(`[a5] ${message}`);
+            Sentry.captureMessage(message, {
+              level: "error",
+              tags: { source: "elevenlabs-circuit-breaker" },
+              extra: { scanId, spent24h, dailyCap },
+            });
+            return {
+              ok: false,
+              skipped: "daily-cap-reached",
+              spent24h,
+              dailyCap,
+            };
+          }
           const result = await generateVoiceSummary(report);
           await updateScanAudioSummary(scanId, result.audioUrl, result.script);
           return {
@@ -716,25 +745,31 @@ async function shouldSuppressFollowup(scanId: string): Promise<{
 }
 
 /**
- * Daily cost-alert cron. Fires once a day in America/Chicago (the
- * studio's home timezone) and warns if the prior 24-hour API spend
- * crossed the threshold.
+ * Hourly cost-alert cron. Fires every hour at minute 0 (UTC) and
+ * checks the trailing 24-hour API spend against the threshold.
+ *
+ * Why hourly, not daily: the original once-a-day schedule left a
+ * blind window where an attacker could burn meaningful spend
+ * overnight before any notification fired. Running hourly with the
+ * same 24-hour rolling window means anomalies are surfaced within
+ * an hour without the noise of a per-hour budget.
  *
  * Threshold defaults to $10/day. Override via COST_DAILY_ALERT_USD
  * in Vercel. Warning at threshold, error at 2x threshold.
  *
- * Pairs with the api_usage_events table seeded by migration 007 and
- * the recordAnthropicUsage / recordBrowserlessUsage / recordPagespeedUsage
- * helpers.
+ * Pairs with the api_usage_events table seeded by migration 007,
+ * the recordAnthropicUsage / recordBrowserlessUsage /
+ * recordPagespeedUsage / recordElevenLabsUsage helpers, and the
+ * hard ElevenLabs circuit breaker in step a5.
  */
 export const costAlertDaily = inngest.createFunction(
   {
     id: "pathlight-cost-alert-daily",
-    triggers: [{ cron: "TZ=America/Chicago 0 9 * * *" }],
+    triggers: [{ cron: "0 * * * *" }],
     retries: 0,
   },
   async ({ step }) => {
-    await step.run("check-daily-spend", async () => {
+    await step.run("check-rolling-spend", async () => {
       const sql = getDb();
       const rows = (await sql`
         SELECT

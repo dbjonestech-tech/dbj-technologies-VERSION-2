@@ -233,6 +233,42 @@ export async function recordPagespeedUsage(
   });
 }
 
+/**
+ * Sum cost_usd for a given provider over a rolling time window.
+ * Used by the a5 circuit breaker (hard daily cap on ElevenLabs)
+ * and available to any future per-provider rate-limit logic.
+ *
+ * Returns 0 on query failure so a transient DB blip does not block
+ * the pipeline. The trade-off: a real DB outage could let an attacker
+ * burn spend until the DB returns. Acceptable because the cron also
+ * polls hourly and would catch the drift on the next successful query.
+ */
+export async function getProviderSpendUsd(
+  provider: ApiProvider,
+  intervalHours: number = 24
+): Promise<number> {
+  try {
+    const sql = getDb();
+    const hours = Math.max(1, Math.min(intervalHours, 24 * 30));
+    const interval = `${hours} hours`;
+    const rows = (await sql`
+      SELECT COALESCE(SUM(cost_usd), 0)::float8 AS spent
+      FROM api_usage_events
+      WHERE provider = ${provider}
+        AND occurred_at > now() - (${interval})::interval
+    `) as { spent: number | string | null }[];
+    const raw = rows[0]?.spent ?? 0;
+    const n = typeof raw === "number" ? raw : Number(raw);
+    return Number.isFinite(n) ? n : 0;
+  } catch (err) {
+    console.warn(
+      `[api-usage] getProviderSpendUsd(${provider}) failed`,
+      err instanceof Error ? err.message : err
+    );
+    return 0;
+  }
+}
+
 export type ElevenLabsUsageRecord = {
   scanId: string | null;
   operation: string;

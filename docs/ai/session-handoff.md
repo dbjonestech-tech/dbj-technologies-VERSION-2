@@ -3,7 +3,72 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 27, 2026 -- Pathlight partial-banner mitigation (schema-repair prompt)
+## Last Session: April 27, 2026 (post-voice) -- ElevenLabs cost gap closure (hard cap + hourly cron)
+
+### What shipped
+
+Closes the two gaps Joshy flagged after the voice feature shipped:
+
+1. **Hard daily ElevenLabs spend cap, real-time circuit breaker.**
+   New helper `getProviderSpendUsd(provider, intervalHours)` in
+   `lib/services/api-usage.ts` returns the rolling-window dollar
+   sum for any provider. The `a5` Inngest step now calls it before
+   firing TTS: if 24h ElevenLabs spend already meets or exceeds
+   `ELEVENLABS_DAILY_CAP_USD` (default `$10/day`), the step
+   short-circuits to `{ ok: false, skipped: "daily-cap-reached" }`
+   and fires a Sentry message at level `error` with the spend +
+   cap + scanId attached. The report still ships -- just no audio
+   for the rest of the cap window. As old spend rolls off the
+   24-hour window, capacity returns automatically (no calendar-day
+   reset attack possible). This is the missing kill switch beyond
+   per-email and per-IP rate limits, and it's the only line of
+   defense if `ELEVENLABS_API_KEY` ever leaks (git accident, log
+   capture, third-party breach).
+2. **Cost-alert cron promoted from once-daily to once-hourly.**
+   Trigger changed from `"TZ=America/Chicago 0 9 * * *"` to
+   `"0 * * * *"` (every hour at minute 0, UTC). The query window
+   stays a 24-hour rolling sum, so the threshold logic is unchanged
+   (warning at `$10`, error at `$20`), but anomalies now surface
+   within an hour instead of within a day. Function id stays
+   `pathlight-cost-alert-daily` so existing Inngest history keeps
+   working; only the schedule and step name moved.
+
+### Effective protection model now
+
+For an attacker to burn meaningful ElevenLabs spend, they would
+need to clear, in order:
+
+1. Cloudflare Turnstile bot verification on the scan submission.
+2. Per-email rate limit (3 scans / 24h sliding).
+3. Per-IP rate limit (5 scans / 24h sliding).
+4. 24-hour dedupe on (email, url) pairs.
+5. The new `a5` hard cap of $10/day total ElevenLabs spend.
+
+Worst-case ceiling is now **$10/day = $300/month absolute**, with
+same-hour Sentry notification once the daily cap or the 24h
+threshold crosses. Override the cap with `ELEVENLABS_DAILY_CAP_USD`
+in Vercel if the studio wants headroom; set higher only if scan
+volume legitimately demands it.
+
+### Files changed (2 modified)
+
+- `lib/services/api-usage.ts` (new `getProviderSpendUsd` helper)
+- `lib/inngest/functions.ts` (a5 cap check; cron promoted to hourly)
+
+Plus this update to `docs/ai/session-handoff.md`.
+
+### Manual deploy gates
+
+None new. The cap defaults to `$10/day` with no env var required.
+Optionally set `ELEVENLABS_DAILY_CAP_USD` in Vercel to override.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 NEW em-dashes in either changed file.
+
+## Earlier Session: April 27, 2026 -- Pathlight partial-banner mitigation (schema-repair prompt)
 
 ### What shipped
 
