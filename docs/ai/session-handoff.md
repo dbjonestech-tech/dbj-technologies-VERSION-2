@@ -219,11 +219,21 @@ sources the photography across all 8 templates together.
 
 Plus this update to `docs/ai/session-handoff.md`.
 
-### Deep dive blueprint pending
+### Deep dive blueprint shipped (separate commit)
 
-`docs/blueprints/hvac-contractor.md` (third of 8 vertical-expertise blueprints)
-not yet written. User typically invokes the deep-dive prompt as a follow-up
-after the template commit; will be a separate commit.
+`docs/blueprints/hvac-contractor.md` written and committed as the third of 8
+vertical-expertise blueprints, companion to the template Pass 1 above. 793
+words across four sections: how HVAC customers find service in a panic
+(searching from a phone in front of a broken unit, three questions: zip code
+coverage, today availability, bankruptcy risk; what converts vs what loses the
+call); what most HVAC sites get wrong (small gray phone, contact form
+masquerading as 24/7, stock photos, missing Special Offers / Membership /
+Financing / multi-modal contact / named GM); what the site actually needs (the
+Pass 1 architecture stated as a confident architect's brief); see-the-proof
+linking to `/templates/hvac-contractor.html`. Voice: first-person "I", zero em
+dashes, zero we/our, zero fictional business name in body. Headline "What HVAC
+Contractors Need Online", summary "How HVAC customers find service in a panic,
+what most sites miss, and the architecture that fills the dispatch board."
 
 ## Previous Session: April 27, 2026 (evening) -- Resend bounce/complaint webhook (Feature #11)
 
@@ -672,4 +682,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `c3d3b78` (feat(templates): hvac-contractor Pass 1 content infrastructure), confirmed pushed to `origin main`. Working tree carries unrelated in-progress work on `lib/db/schema.sql`, `lib/inngest/functions.ts`, `lib/services/claude-analysis.ts`, plus untracked `lib/db/migrations/007_api_usage_events.sql` and `lib/services/api-usage.ts` (looks like a Pathlight API-usage-events feature in progress; not staged or modified by this session). Recent chain (most recent first): `c3d3b78` (hvac-contractor Pass 1: promo strip, four-card visual badge stack, Special Offers section with 3 dated coupons, Comfort Club membership at $189/year, zone-card service area replacing 20 city pills, multi-modal contact strip, footer programs column + social row, expanded license line) -> `3dfec0b` (snapshot for aac418a) -> `aac418a` (Resend bounce/complaint webhook with auto-unsubscribe; migration 006 + Svix-verified handler + 2%/5% bounce-rate Sentry alerts) -> `320efad` (snapshot for e7f222d) -> `e7f222d` (Pathlight lockdown of public surfaces + Phase 2 audit + Phase 3 feasibility doc) -> `8a491a6` (snapshot) -> `569f147` (restaurant Pass 1 + upscale-restaurant blueprint) -> `a36cf2a` (snapshot) -> `4ee9171` (luxury-home-builder blueprint) -> `1d3f23c` (snapshot) -> `bc40c1a` (luxury-builders Pass 1) -> `5334ad2` (snapshot) -> `c8f8b62` (unique hero skeletons) -> earlier history elided.
+`main` is at `(this commit)` -- hvac-contractor blueprint deep dive, third of 8. Working tree clean (will be after the snapshot commit). Recent chain (most recent first): `(this commit)` (hvac-contractor blueprint deep dive, 793 words, four sections, companion to Pass 1 template work in `c3d3b78`) -> `c6c9de2` (snapshot for 4490325) -> `4490325` (Pathlight cost monitoring + alerting: per-attempt API usage table, daily cron, /internal/cost dashboard, feature #12) -> `dd246b4` (snapshot for c3d3b78) -> `c3d3b78` (hvac-contractor Pass 1 content infrastructure: promo strip, four-card trust badge stack, Special Offers, Comfort Club membership, zone cards replacing city pills, multi-modal contact strip) -> `3dfec0b` (snapshot for aac418a) -> `aac418a` (Resend bounce/complaint webhook + auto-unsubscribe, feature #11) -> `320efad` (snapshot for e7f222d) -> `e7f222d` (Pathlight lockdown of public surfaces + Phase 2 audit + Phase 3 feasibility doc) -> `8a491a6` (snapshot) -> `569f147` (restaurant Pass 1 + upscale-restaurant blueprint) -> `a36cf2a` (snapshot) -> `4ee9171` (luxury-home-builder blueprint) -> `1d3f23c` (snapshot) -> `bc40c1a` (luxury-builders Pass 1) -> earlier history elided.
