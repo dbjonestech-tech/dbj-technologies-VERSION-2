@@ -18,11 +18,11 @@ export default function Loading() {
             animate={{ rotate: 360 }}
             transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
           />
-          <span className="font-display text-xl font-bold text-gradient">D</span>
+          <span aria-hidden="true" className="font-display text-xl font-bold text-gradient">D</span>
         </motion.div>
 
         {/* Loading bar */}
-        <div className="h-0.5 w-48 overflow-hidden rounded-full bg-gray-200">
+        <div aria-hidden="true" className="h-0.5 w-48 overflow-hidden rounded-full bg-gray-200">
           <motion.div
             className="h-full rounded-full bg-gradient-to-r from-accent-blue to-accent-cyan"
             initial={{ x: "-100%" }}
@@ -31,7 +31,7 @@ export default function Loading() {
           />
         </div>
 
-        <span className="font-mono text-xs uppercase tracking-[0.25em] text-text-muted">
+        <span aria-hidden="true" className="font-mono text-xs uppercase tracking-[0.25em] text-text-muted">
           Loading
         </span>
       </div>

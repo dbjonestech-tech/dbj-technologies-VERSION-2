@@ -2,6 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.dbjtechnologies.com" }],
+      "destination": "https://dbjtechnologies.com/:path*",
+      "permanent": true
+    },
     { "source": "/websites", "destination": "/work", "permanent": true },
     { "source": "/pricing/foundation", "destination": "/pricing/starter", "permanent": true },
     { "source": "/pricing/scale", "destination": "/pricing/professional", "permanent": true }

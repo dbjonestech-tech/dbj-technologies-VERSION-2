@@ -3,7 +3,132 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 27, 2026 (overnight, late) -- PDF Report Download (Feature #10)
+## Last Session: April 27, 2026 -- ChatGPT external-audit triage (SEO/a11y/canonical)
+
+### What shipped (3 fixes, not yet committed)
+
+ChatGPT's external audit flagged ~25 SEO/canonical/a11y items. Verified each
+against actual code; most were stale or wrong. Three real issues fixed:
+
+- **Deleted `public/robots.txt`.** The static file shadowed `app/robots.ts`
+  entirely (Next.js serves the static one when both exist). Result: the
+  carefully-crafted `Disallow: /api/, /pathlight/, /internal/, /monitoring,
+  /templates/` from `app/robots.ts` was never live -- the actual robots.txt
+  served was a permissive `Allow: /` with sitemap only. Scan-report URLs
+  (`/pathlight/[scanId]`), the cost dashboard, API routes, and templates
+  were all crawlable. Removing the static file lets `app/robots.ts` take
+  effect on next deploy. Pathlight landing page (`/pathlight`, no trailing
+  slash) remains crawlable -- only the `/pathlight/` subtree is blocked.
+- **Added www->non-www 301 redirect to `vercel.json`.** Audit claim that
+  both hostnames serve content was correct in the sense that no edge-level
+  redirect existed. Added a `host=www.dbjtechnologies.com` redirect rule
+  with `permanent: true`. **Manual gate:** `www.dbjtechnologies.com` must
+  be registered as an alias domain in the Vercel dashboard for the rule to
+  fire -- routing-layer redirects only run when the host actually resolves
+  to the project. Logged to backlog.
+- **Hid decorative loader text from screen readers / crawlers** in
+  `app/(marketing)/loading.tsx`. The "D" mark and "Loading" label both got
+  `aria-hidden="true"`. The container still has `role="status"` +
+  `aria-label="Loading page"` so screen readers announce the state once,
+  cleanly. Fixes the audit's "D / Loading" parsed-content complaint
+  defensively.
+
+### Verified WRONG or already handled
+
+- **Canonical tags.** Every page.tsx checked (homepage, about, contact,
+  pricing, services, work, faq, why-dbj, privacy, terms, process, pathlight,
+  /pricing/build) exports `alternates: { canonical }`. Dynamic [slug] pages
+  set canonical in `generateMetadata`. `metadataBase` is
+  `https://dbjtechnologies.com` (no www, no trailing slash).
+- **Stale URLs / 200-with-not-found.** `app/(marketing)/work/[slug]/page.tsx`,
+  services/[slug], pricing/[slug] all call Next's `notFound()` for unknown
+  slugs -- proper 404 status. `/work/frontend-architecture` returns 404.
+- **Sitemap.** `app/sitemap.ts` exists, generates static + dynamic URLs from
+  the same data sources the [slug] pages use. Uses canonical host.
+- **JSON-LD.** Comprehensive: Organization + ProfessionalService + WebSite
+  on every page (root layout). FAQPage on /faq + /services/[slug]. Service
+  ItemList on /services. Per-Service on /services/[slug]. CreativeWork +
+  Breadcrumb on /work/[slug]. Offer + Breadcrumb on /pricing/[slug].
+- **OG image.** `app/opengraph-image.tsx` (1200x630, dynamic
+  ImageResponse) is auto-applied site-wide via App Router conventions.
+- **Twitter card.** Default `summary_large_image` set on root layout.
+- **HTML lang.** `<html lang="en">` confirmed at app/layout.tsx:115.
+- **Image alt text.** All five `<Image>` / `<img>` usages have alt
+  attributes.
+- **Font loading.** `next/font/google` for Plus Jakarta Sans + Outfit with
+  `display: swap`. No blocking <link> tags.
+- **404 page.** `app/not-found.tsx` is helpful (links to home + contact).
+- **Analytics vs privacy policy.** Only `@vercel/speed-insights/next` is
+  loaded. Speed Insights is cookieless. Privacy policy explicitly mentions
+  Vercel + analytics. Consistent.
+- **Favicons.** Full set: `/brand/favicon.ico`, `favicon-16/32.png`,
+  `apple_touch_icon.png` referenced in root metadata; `app/icon.tsx`,
+  `app/apple-icon.tsx`, `app/opengraph-image.tsx` provide dynamic versions
+  too. `manifest.webmanifest` complete with 192/512 + maskable icons.
+- **trailingSlash.** Not set in `next.config.mjs`; defaults to `false`.
+- **Robots Pathlight-blocking concern.** `Disallow: /pathlight/` (with
+  trailing slash) only blocks subpaths -- the landing page at `/pathlight`
+  is fine. The real issue was that `app/robots.ts` wasn't being served at
+  all because of the shadowing static file. Both now resolved.
+
+### Backlogged (real but not fixed this session)
+
+- Manual Vercel dashboard step to register `www.dbjtechnologies.com` so the
+  new redirect rule actually fires.
+- AboutContent.tsx `ScrollWordBatch` doesn't honor `prefers-reduced-motion`
+  (final state at opacity 1 / #d1d5db is readable; transition itself
+  doesn't respect the OS preference). Low priority; AboutContent is
+  fragile per do-not-break.md.
+- Optional: drop `https://www.dbjtechnologies.com` from contact-form
+  `allowedOrigins` once the www domain is verified to 301 cleanly.
+
+### Trust/conversion diagnostic (Section 6, no code changes)
+
+- TESTIMONIALS array in `lib/constants.ts:93` is empty -- the
+  TestimonialsSection on the homepage renders null. Backlog already lists
+  Tyler testimonial follow-up.
+- CALENDLY_URL is wired only into Pathlight scan-report final CTA + chat
+  fallback. NOT on /contact, NOT on homepage, NOT in footer.
+- Footer shows only "Dallas, TX" -- no phone, no visible email. Phone
+  blocked on Google Voice setup (already in backlog Priority 1). Email is
+  hidden behind contact form by design.
+- Trust links present: LinkedIn + GitHub in `SOCIAL_LINKS`. Google Business
+  Profile not yet set up (backlog Priority 1).
+- Service slugs (`frontend-architecture`, `backend-systems`,
+  `cloud-infrastructure`, `interface-engineering`, `ecommerce-platforms`,
+  `web-performance`) are clear but technical. Not renaming -- strategy
+  decision for Joshy.
+
+### Files changed (3 modified, 1 deleted)
+
+- `vercel.json` -- added www->apex host redirect (kept existing
+  /websites, /pricing/foundation, /pricing/scale redirects).
+- `app/(marketing)/loading.tsx` -- aria-hidden on decorative D + Loading
+  spans.
+- `public/robots.txt` -- DELETED so `app/robots.ts` takes effect.
+- `docs/ai/backlog.md` -- logged manual Vercel step + ScrollWordBatch
+  reduced-motion gap + optional contact-origin cleanup.
+- `docs/ai/session-handoff.md` -- this entry.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 em-dashes in changed files (`vercel.json`, `loading.tsx`).
+- Not yet committed.
+
+### Next recommended task
+
+Commit + push these three fixes, then complete the manual Vercel dashboard
+step to attach `www.dbjtechnologies.com`. After deploy:
+
+1. `curl -I https://www.dbjtechnologies.com/` should return 301 ->
+   `https://dbjtechnologies.com/`.
+2. `curl https://dbjtechnologies.com/robots.txt` should now show the
+   disallow list from `app/robots.ts`, not the previous permissive
+   one-liner.
+
+## Earlier Session: April 27, 2026 (overnight, late) -- PDF Report Download (Feature #10)
 
 ### What shipped
 
