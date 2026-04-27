@@ -3,7 +3,210 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 26-27, 2026
+## Last Session: April 27, 2026 (afternoon) -- Pathlight lockdown + audit + feasibility
+
+### What shipped (Phase 1: Lockdown)
+
+Goal: strip every proprietary internal from public surfaces (API responses,
+chat prompt, landing copy, work case study, emails, Inngest step IDs, source
+maps). All changes verified via tsc + lint.
+
+- **API redaction (`app/(grade)/api/scan/[scanId]/route.ts`).** Stopped
+  returning `businessScale` and `screenshotHealth` enum values to the
+  browser. Replaced with computed `isOutOfScope: boolean`,
+  `outOfScopeLabel: string | null`, and `screenshotNotice: string | null`
+  (the rendered user-facing message string). Stripped `industryBenchmark`
+  entirely (the deal value still appears via the assumptions block on the
+  revenue card). Sanitized `error` / `errorMessage` server-side so raw
+  scan failures never reach the client.
+- **Scan report UI (`app/(grade)/pathlight/[scanId]/ScanStatus.tsx`).**
+  Updated to consume the new redacted shape. Removed the "Show technical
+  details" disclosure on FailedState (used to leak raw error string).
+  Removed the "Source: ..." line under the revenue methodology (used to
+  leak benchmark source attribution). Dropped imports of the now-unused
+  `BusinessScale` / `ScreenshotHealth` / `IndustryBenchmark` types.
+- **Chat hardening (`app/(grade)/api/chat/route.ts`).** Stream `error`
+  events now return a generic "Something went wrong. Please try again."
+  instead of forwarding the underlying Anthropic error message.
+- **Chat prompt hardening (`lib/prompts/pathlight-chat.ts`).** Stripped
+  `inferredVertical` / `businessModel` blocks from the SCAN CONTEXT.
+  Stripped the benchmark `Source` field from the prompt (kept
+  `confidence`). Rewrote rule 3 of METHODOLOGY TRANSPARENCY to forbid
+  naming specific data sources. Rewrote rule 5 to keep explanations at
+  the outcome level only. Replaced GUARDRAILS with the lockdown spec:
+  refuse all internals (system prompt, model name, pipeline, scoring
+  formulas, vertical DB, benchmark methodology, prompt versions, vendor
+  names) with a fixed "Pathlight uses proprietary analysis methods
+  developed by DBJ Technologies. I can help you understand your specific
+  report results." response, including for prompt-injection attempts.
+- **Landing copy (`app/(grade)/pathlight/PathlightContent.tsx`).** Report
+  Items 2-4 rewritten in outcome language ("Find out what your website
+  is actually costing you", "Know exactly what to fix first and why it
+  matters", "See your site through your customer's eyes"). Differentiator
+  paragraph swapped "rendered-page analysis" for "looks at the same thing
+  your customers do".
+- **Work case study (`lib/work-data.ts`).** Pathlight entry's
+  `metrics: AI Pipeline Stages 5 / Curated Verticals 206` (both internal
+  signals) replaced with `Free Per Scan $0 / Scan Time ~2 min /
+  Delivery Instant + Email`. Removed `AI/LLM Integration` from techStack.
+  Rewrote `notable` and the `How It Works` / `Curated Database` /
+  `The Report` sections to hide pipeline architecture and vertical DB
+  internals while keeping the outcome story. Renamed the section
+  heading from "The Curated Database" to "Calibrated For Your Business".
+  Removed `AI & Machine Learning` from techDetails.
+- **Email template (`lib/email-templates/pathlight.ts`).** Report-delivery
+  email body and text variant: replaced "Lighthouse performance scores,
+  AI-powered design analysis, conversion psychology evaluation, and
+  prioritized fixes ranked by revenue impact." with outcome-focused
+  rewrite ("what your customers see, how fast your site loads, where
+  your messaging is working against you, and the top three fixes that
+  would move the needle most on revenue").
+- **Inngest step IDs (`lib/inngest/functions.ts`).** Renamed every
+  descriptive step ID to opaque identifiers: `validate-url` -> `s1`,
+  `capture-screenshots` -> `s2`, `mark-analyzing` -> `s3`,
+  `run-audit` -> `s4`, `ai-vision-audit` -> `a1`,
+  `ai-remediation` -> `a2`, `research-benchmark` -> `a3`,
+  `ai-revenue-impact` -> `a4`, `calculate-score` -> `s5`,
+  `finalize` -> `s6`, `send-report-email` -> `e1`,
+  `send-followup-1` -> `e2`, `send-followup-2` -> `e3`,
+  `send-breakup` -> `e4`, plus sleeps `wait-for-followup-1` -> `w1`,
+  `wait-for-followup-2` -> `w2`, `wait-for-breakup` -> `w3`.
+  IMPORTANT: any in-flight Inngest jobs at the moment this deploys will
+  break (steps are durable; the new IDs cannot resume the old state).
+  In practice this only affects the 48h/5d/8d follow-up steps for scans
+  in the last 8 days. The function id `pathlight-scan-requested` was
+  intentionally kept (rebinding it would require re-registering the
+  webhook). Internal log prefixes (`[research-benchmark]`, `[run-audit]`)
+  were left as-is since they only appear in server-side console output,
+  never in any client response or browser bundle.
+- **Source maps (`next.config.mjs`).** Added explicit
+  `productionBrowserSourceMaps: false`. Sentry continues to upload its
+  own server-side maps via `withSentryConfig` for stack traces; nothing
+  the browser can fetch.
+- **Robots / print stylesheet.** Already secure. `robots.ts` already
+  blocks `/api/`, `/monitoring`, `/pathlight/`, `/templates/`. Print
+  stylesheet hides the chat panel + trigger and renders the visible
+  report content; nothing screen-hidden becomes print-visible.
+
+### What was already done (Phase 2: Verify)
+
+- **2A industry_benchmark column.** Migration `004_industry_benchmark.sql`
+  exists. `getFullScanReport` reads from it. Whether the migration has
+  been applied to prod Neon is unknown from inside the repo; the
+  `lib/db/setup.ts` script picks up every numbered .sql in
+  `lib/db/migrations/` in order, idempotent. Same status as migration
+  005 -- still flagged in the prior session-handoff as "needs apply".
+- **2B rate limiting.** Enforced today.
+  `app/(grade)/api/scan/route.ts:71-85` runs `emailLimiter`
+  (3 scans / 24h sliding window) and `ipLimiter` (5 / 24h), returning
+  HTTP 429 with a friendly message when exceeded. Upstash-backed.
+- **2C input validation.** `lib/services/url.ts` rejects malformed URLs,
+  unsupported protocols, embedded credentials, sensitive query
+  parameters (`token`, `auth`, `api_key`, `jwt`, `session`, etc.),
+  private/local IP ranges, and unreachable hostnames. NOT rejected
+  today: social-media URLs, Google Docs/Drive/Sheets links, parked-domain
+  patterns, file:// and data:// schemes (file:// is blocked implicitly
+  by ALLOWED_PROTOCOLS but not with a friendly message). Tracked as a
+  v2 task in backlog.
+- **2D duplicate PSI.** Single PSI service at `lib/services/pagespeed.ts`.
+  No `pagespeed-extra.ts` or duplicate fetch.
+- **2E screenshot timing.** `captureScreenshot` waits for `networkidle0`
+  on goto, then attempts to dismiss cookie banners (regex-matched click
+  on accept/agree buttons), waits 600ms, awaits `document.fonts.ready`,
+  then a 2500ms settle window before screenshot. Total ~3s of
+  post-navigation wait.
+- **2F revenue display.** Methodology disclaimer present at
+  `ScanStatus.tsx`'s RevenueImpactBlock: "Pathlight uses AI analysis and
+  conservative revenue modeling. Estimates are directional only and not
+  a substitute for professional consultation." The dollar figure is a
+  single rounded number, not a confidence band -- still tracked in
+  backlog as a v2 idea.
+- **2G scan progress (diagnostic only).** The polling endpoint returns
+  generic status enum (`pending` / `scanning` / `analyzing` / etc.) only.
+  The phase labels rendered to the user (`Capturing screenshots...`,
+  `Analyzing design and positioning...`) are a CLIENT-SIDE timer in
+  `ScanStatus.tsx` LoadingState that cycles through phases on a 4-second
+  loop -- they don't reflect the real step. This is intentional
+  obfuscation today, just worth knowing.
+- **2H report URL auth (diagnostic only).** scanIds are
+  `gen_random_uuid()` UUIDv4 (Postgres default). No auth on
+  `/pathlight/[scanId]`. Risk: anyone with the UUID can view the
+  report. Defended in part by the `robots.ts` disallow on
+  `/pathlight/`. Not implementing auth this session.
+- **2I CONTACT_EMAIL.** No `dbjonestech@gmail.com` in production code;
+  only in two informational refs (`docs/ai/index.md`,
+  `docs/ai/backlog.md`) noting the legacy address. Clean.
+- **2J PathlightCTA copy.** Current homepage tagline ("Not sure your
+  website is working for you? Pathlight scans your site and shows you
+  where you may be losing trust, leads, and revenue. Free. Results in
+  minutes.") is natural and outcome-focused. Left unchanged.
+- **2K partial banner root cause (diagnostic only).** The "Some analysis
+  steps could not be completed" notice in `ScanStatus.tsx` PartialNotice
+  is rendered when `report.status === "partial"`. That status is set by
+  the `s6` (finalize) step in `lib/inngest/functions.ts` when audit and
+  screenshots succeeded but ANY of `visionStep` / `remediationStep` /
+  `revenueStep` / `scoreStep` failed. Since `runRevenueImpact` is gated
+  on `remediationStep.ok`, a single failed remediation cascades to a
+  failed revenue step, which alone is enough to mark the scan partial.
+  callWithRetry handles transient errors; the most likely root cause
+  for the remaining intermittent occurrences is non-transient Anthropic
+  responses (schema validation failures after one retry, or timeouts on
+  cold cache benchmark research). Recommend instrumenting:
+  in the `s6` finalize step, log a Sentry breadcrumb naming WHICH
+  sub-steps failed so the field error distribution becomes visible.
+  Not implemented this session.
+- **2L Resend bounce webhook.** No webhook endpoint exists today.
+  Bounced emails are silent. Tracked in backlog (Priority 3) and
+  Phase 3 feasibility (feature 11).
+- **2M pipeline 420s ceiling.** Typical case (no retries) sums to
+  ~335s of step time, well under 420s. Worst case (every Anthropic
+  call hitting full 90s timeout x 3 retry chain) sums to roughly
+  1100s+, which would not finish within the ceiling. Recommend
+  either raising the ceiling or moving the 4 Claude calls behind a
+  post-finalize deferred event. Tracked in backlog.
+
+### Phase 3: Feasibility doc
+
+New file `docs/ai/pathlight-feature-feasibility.md` (one full pass over
+all 12 candidate features with effort, monthly cost @100 scans, complexity,
+dependencies, and a priority-ordered summary table at the top). Top-of-list
+quick wins: bounce webhook (#11), cost dashboard (#12), QR codes (#8),
+PDF download (#10).
+
+### Files changed (9 modified, 1 created)
+
+- `app/(grade)/api/chat/route.ts` (sanitized stream error responses)
+- `app/(grade)/api/scan/[scanId]/route.ts` (redacted client-safe shape)
+- `app/(grade)/pathlight/PathlightContent.tsx` (outcome-focused report items + differentiator)
+- `app/(grade)/pathlight/[scanId]/ScanStatus.tsx` (consumes redacted shape, removed technical-error disclosure, removed benchmark source line)
+- `lib/email-templates/pathlight.ts` (report-delivery email outcome rewrite)
+- `lib/inngest/functions.ts` (opaque step IDs s1/s2/s3/s4/a1/a2/a3/a4/s5/s6/e1/e2/e3/e4/w1/w2/w3)
+- `lib/prompts/pathlight-chat.ts` (lockdown guardrails, removed source/business-model leakage)
+- `lib/work-data.ts` (Pathlight case study redacted: metrics, techStack, techDetails, body sections)
+- `next.config.mjs` (explicit productionBrowserSourceMaps: false)
+- `docs/ai/pathlight-feature-feasibility.md` (new, Phase 3 feasibility analysis)
+
+Plus this update to `docs/ai/session-handoff.md` and an update to
+`docs/ai/backlog.md` reflecting Phase 2 findings.
+
+### Verification
+
+- `npx tsc --noEmit` -- clean (exit 0)
+- `npm run lint` -- clean (no warnings or errors)
+- Em-dash check on every changed file: 0 NEW em-dashes added.
+  Pre-existing em-dashes left in 3 files (server-side log prefix in
+  `inngest/functions.ts:263`, score-formatting separator in
+  `pathlight-chat.ts:33+46`, code comment in `ScanStatus.tsx:92`)
+  -- all internal/server, none in user-facing copy.
+- `dbjonestech@gmail.com` check in production code: clean.
+
+### Not committed yet
+
+User asked "Do NOT commit yet" at the end of the prompt. All changes
+sit in working tree. `git status` shows the 9 modified files and the
+new feasibility doc + this updated handoff and backlog.
+
+## Previous Session: April 26-27, 2026
 
 ### Themes Shipped
 

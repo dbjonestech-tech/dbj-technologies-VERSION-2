@@ -7,15 +7,15 @@ const REPORT_ITEMS = [
   },
   {
     title: "Revenue Impact Estimate",
-    body: "A dollar estimate of what your website may be costing you monthly, built from industry-specific traffic, conversion, and deal-value benchmarks. Full methodology shown.",
+    body: "Find out what your website is actually costing you each month. Every assumption behind the number is shown, so you can see exactly how it was built.",
   },
   {
     title: "Top 3 Priority Fixes",
-    body: "AI-identified improvements ranked by business impact and implementation difficulty. Each explains what it fixes and why it matters.",
+    body: "Know exactly what to fix first and why it matters. Each fix explains what is wrong, what it would gain you, and how hard it is to ship.",
   },
   {
     title: "Full Desktop & Mobile Screenshots",
-    body: "See your site exactly as Pathlight's AI sees it. Visual analysis of layout, hierarchy, trust signals, and conversion flow.",
+    body: "See your site through your customer's eyes, on the device they actually use. The same view your visitors get when they decide whether to call you.",
   },
 ];
 
@@ -92,11 +92,10 @@ export function PathlightContent() {
             That is useful but incomplete.
           </p>
           <p>
-            Pathlight analyzes what your customers actually see. It evaluates
-            visual design quality, messaging clarity, trust signals, conversion
-            architecture, and mobile experience using rendered-page analysis.
-            Then it translates those findings into estimated revenue impact
-            using validated industry benchmarks.
+            Pathlight looks at the same thing your customers do. It evaluates
+            visual design, messaging clarity, trust signals, conversion flow,
+            and mobile experience, then translates the findings into a revenue
+            impact estimate calibrated for your specific business type.
           </p>
           <p>
             The result is a business-readable report that tells you what to fix

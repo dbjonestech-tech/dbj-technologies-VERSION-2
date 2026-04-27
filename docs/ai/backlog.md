@@ -24,12 +24,15 @@
 
 ## Priority 3: Pathlight Hardening
 
-- [ ] Investigate intermittent "Some analysis steps could not be completed" banner (not systematic, retry logic handles most cases, root cause of remaining occurrences unknown)
+- [ ] Investigate intermittent "Some analysis steps could not be completed" banner (root cause traced April 27 to `s6` finalize: triggered when ANY of vision/remediation/revenue/score steps fail while audit + screenshots succeed; retry logic handles most cases, root cause for remaining occurrences still unknown)
 - [ ] Pathlight admin dashboard for viewing captured lead data (scan data already persists to Postgres, just no UI to view it)
 - [ ] Revenue confidence bands on reports (show range instead of single precise number)
-- [ ] Input validation gate (detect bot-blocking pages, parked domains, login walls, non-business URLs before burning 4 Claude API calls)
-- [ ] Rate limiting per IP/session (Upstash Redis is configured but rate limiting logic may need strengthening before any public marketing push)
+- [ ] Input validation gate v2: extend lib/services/url.ts to also reject social media URLs (facebook/instagram/twitter/linkedin/youtube/tiktok), Google Docs/Sheets/Drive links, file:// and data:// schemes, and known parked-domain patterns (godaddysites.com, wixsite.com holding pages). Today the gate only blocks private IPs, embedded credentials, and sensitive query params.
+- [x] Rate limiting per email/IP -- DONE (emailLimiter 3/24h + ipLimiter 5/24h enforced in app/(grade)/api/scan/route.ts:71-85; verified April 27)
 - [ ] Pathlight landing page: add sample report screenshots (textual rewrite shipped April 25; remaining gap is visual proof of the report itself)
+- [ ] Resend bounce/complaint webhook (gap identified April 27 -- bounced emails currently invisible; full feasibility in docs/ai/pathlight-feature-feasibility.md feature 11)
+- [ ] Cost monitoring instrumentation: track Anthropic tokens, Browserless minutes, PSI calls per scan in a new api_usage_events table (feasibility doc feature 12)
+- [ ] Pipeline 420s ceiling worst-case analysis: typical scan ~335s under ceiling, but worst-case (every Anthropic call hitting full retry chain) sums to ~1100s+. Steps would not run if cumulative time exceeds 420s. Consider raising ceiling to 600-720s OR moving the 4 Claude calls behind a deferred post-finalize event so report delivery is never blocked.
 
 ## Priority 4: Content and SEO
 

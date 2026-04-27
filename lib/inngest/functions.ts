@@ -71,7 +71,7 @@ export const scanRequested = inngest.createFunction(
     const startedAt = Date.now();
 
     try {
-      const { resolvedUrl } = await step.run("validate-url", async () => {
+      const { resolvedUrl } = await step.run("s1", async () => {
         const sql = getDb();
         const rows = (await sql`
           SELECT url FROM scans WHERE id = ${scanId} LIMIT 1
@@ -100,7 +100,7 @@ export const scanRequested = inngest.createFunction(
       });
 
       const screenshots: ScreenshotOutcome = await step.run(
-        "capture-screenshots",
+        "s2",
         async (): Promise<ScreenshotOutcome> => {
           const outcome: ScreenshotOutcome = {
             desktop: null,
@@ -137,11 +137,11 @@ export const scanRequested = inngest.createFunction(
         }
       );
 
-      await step.run("mark-analyzing", async () => {
+      await step.run("s3", async () => {
         await updateScanStatus(scanId, "analyzing");
       });
 
-      const audit: AuditOutcome = await step.run("run-audit", async () => {
+      const audit: AuditOutcome = await step.run("s4", async () => {
         try {
           const { scores, raw } = await runPerformanceAudit(resolvedUrl);
           const durationMs = Date.now() - startedAt;
@@ -155,7 +155,7 @@ export const scanRequested = inngest.createFunction(
       });
 
       const visionStep: StepOutcome = await step.run(
-        "ai-vision-audit",
+        "a1",
         async () => {
           if (!audit.ok || !audit.scores) {
             return { ok: false, error: "skipped: performance audit failed" };
@@ -192,7 +192,7 @@ export const scanRequested = inngest.createFunction(
       );
 
       const remediationStep: StepOutcome = await step.run(
-        "ai-remediation",
+        "a2",
         async () => {
           if (!visionStep.ok) {
             return { ok: false, error: "skipped: vision audit did not succeed" };
@@ -228,7 +228,7 @@ export const scanRequested = inngest.createFunction(
         benchmark: IndustryBenchmark | null;
         outOfScope?: boolean;
         error?: string;
-      } = await step.run("research-benchmark", async () => {
+      } = await step.run("a3", async () => {
         try {
           const ctx = await getScanPipelineContext(scanId);
           if (!ctx)
@@ -335,7 +335,7 @@ export const scanRequested = inngest.createFunction(
       });
 
       const revenueStep: StepOutcome = await step.run(
-        "ai-revenue-impact",
+        "a4",
         async () => {
           if (!visionStep.ok) {
             return { ok: false, error: "skipped: vision audit did not succeed" };
@@ -376,7 +376,7 @@ export const scanRequested = inngest.createFunction(
       );
 
       const scoreStep: StepOutcome = await step.run(
-        "calculate-score",
+        "s5",
         async () => {
           if (!visionStep.ok) {
             return { ok: false, error: "skipped: vision audit did not succeed" };
@@ -417,7 +417,7 @@ export const scanRequested = inngest.createFunction(
         }
       );
 
-      await step.run("finalize", async () => {
+      await step.run("s6", async () => {
         const haveScreenshots =
           screenshots.desktop !== null || screenshots.mobile !== null;
         const errors: string[] = [];
@@ -457,7 +457,7 @@ export const scanRequested = inngest.createFunction(
         );
       });
 
-      await step.run("send-report-email", async () => {
+      await step.run("e1", async () => {
         try {
           await sendPathlightReport(scanId);
         } catch (err) {
@@ -470,9 +470,9 @@ export const scanRequested = inngest.createFunction(
         }
       });
 
-      await step.sleep("wait-for-followup-1", "48h");
+      await step.sleep("w1", "48h");
 
-      await step.run("send-followup-1", async () => {
+      await step.run("e2", async () => {
         try {
           const email = await lookupScanEmail(scanId);
           if (email && (await isUnsubscribed(email))) {
@@ -504,9 +504,9 @@ export const scanRequested = inngest.createFunction(
         }
       });
 
-      await step.sleep("wait-for-followup-2", "72h");
+      await step.sleep("w2", "72h");
 
-      await step.run("send-followup-2", async () => {
+      await step.run("e3", async () => {
         try {
           const email = await lookupScanEmail(scanId);
           if (email && (await isUnsubscribed(email))) {
@@ -538,9 +538,9 @@ export const scanRequested = inngest.createFunction(
         }
       });
 
-      await step.sleep("wait-for-breakup", "72h");
+      await step.sleep("w3", "72h");
 
-      await step.run("send-breakup", async () => {
+      await step.run("e4", async () => {
         try {
           const email = await lookupScanEmail(scanId);
           if (email && (await isUnsubscribed(email))) {

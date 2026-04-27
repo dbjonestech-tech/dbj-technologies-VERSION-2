@@ -1,5 +1,53 @@
 import { NextResponse } from "next/server";
 import { getFullScanReport } from "@/lib/db/queries";
+import type { ScreenshotHealth } from "@/lib/types/scan";
+
+const SCREENSHOT_NOTICES: Record<Exclude<ScreenshotHealth, "clean">, string> = {
+  "cookie-banner-overlay":
+    "The screenshot shows a cookie or privacy consent dialog covering most of the page. Design and positioning scores are based on what was visible behind the overlay and should be read with extra caution.",
+  "loading-or-skeleton":
+    "The screenshot captured the page in a pre-render or loading state. Scores are based on the available content and should be treated as low-confidence. Re-run the scan in a few minutes for a cleaner capture.",
+  "auth-wall":
+    "The URL points to a login, signup, or paywall page rather than a public homepage. Pathlight scored what was visible, but the meaningful audit lives behind the auth gate. Paste the public homepage URL for a calibrated report.",
+  "minimal-content":
+    "The page rendered fully but contained very little content (likely a placeholder, under-construction, or coming-soon page). Scores reflect the sparse capture rather than a finished site.",
+};
+
+const FRIENDLY_ERROR_FALLBACK =
+  "Something went wrong with the scan. Please try again, and if the problem persists, contact us.";
+
+function sanitizeScanError(raw: string | null): string | null {
+  if (!raw) return null;
+  const lower = raw.toLowerCase();
+  if (
+    lower.includes("401") ||
+    lower.includes("invalid api key") ||
+    lower.includes("api key")
+  ) {
+    return "Our scanning service is temporarily unavailable. Please try again in a few minutes.";
+  }
+  if (
+    lower.includes("429") ||
+    lower.includes("quota") ||
+    lower.includes("rate limit")
+  ) {
+    return "We're experiencing high demand. Please try again in a few minutes.";
+  }
+  if (lower.includes("timeout") || lower.includes("etimedout")) {
+    return "The scan took too long to complete. The target website may be slow to respond. Please try again.";
+  }
+  if (
+    lower.includes("enotfound") ||
+    lower.includes("dns") ||
+    lower.includes("getaddrinfo")
+  ) {
+    return "We couldn't reach that website. Please check the URL and try again.";
+  }
+  if (lower.includes("ssl") || lower.includes("certificate")) {
+    return "We couldn't establish a secure connection to that website. The site may have SSL issues.";
+  }
+  return FRIENDLY_ERROR_FALLBACK;
+}
 
 export async function GET(
   _request: Request,
@@ -15,9 +63,20 @@ export async function GET(
     );
   }
 
+  const isOutOfScope =
+    report.businessScale === "national" || report.businessScale === "global";
+
+  const screenshotNotice =
+    report.screenshotHealth && report.screenshotHealth !== "clean"
+      ? (SCREENSHOT_NOTICES[
+          report.screenshotHealth as Exclude<ScreenshotHealth, "clean">
+        ] ?? null)
+      : null;
+
+  const friendlyError = sanitizeScanError(report.error);
+
   return NextResponse.json(
     {
-      // Backward-compatible fields for the existing poller
       scanId: report.id,
       id: report.id,
       status: report.status,
@@ -26,13 +85,12 @@ export async function GET(
       scores: report.scores,
       screenshotDesktop: report.screenshotDesktop,
       screenshotMobile: report.screenshotMobile,
-      error: report.error,
-      errorMessage: report.error,
+      error: friendlyError,
+      errorMessage: friendlyError,
       duration: report.duration,
       createdAt: report.createdAt,
       updatedAt: report.updatedAt,
       completedAt: report.completedAt,
-      // Full Pathlight report
       businessName: report.businessName ?? null,
       industry: report.industry,
       design: report.design,
@@ -42,9 +100,13 @@ export async function GET(
       pathlightScore: report.pathlightScore,
       pillarScores: report.pillarScores,
       lighthouseScores: report.lighthouseScores ?? null,
-      industryBenchmark: report.industryBenchmark ?? null,
-      businessScale: report.businessScale,
-      screenshotHealth: report.screenshotHealth,
+      isOutOfScope,
+      outOfScopeLabel: isOutOfScope
+        ? report.businessScale === "global"
+          ? "global brand"
+          : "national brand"
+        : null,
+      screenshotNotice,
     },
     { headers: { "Cache-Control": "no-cache" } }
   );

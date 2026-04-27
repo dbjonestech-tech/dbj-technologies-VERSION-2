@@ -44,19 +44,18 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     gradient: "from-violet-600 to-pink-500",
     liveUrl: "https://dbjtechnologies.com/pathlight",
     metrics: [
-      { label: "AI Pipeline Stages", value: "5" },
-      { label: "Curated Verticals", value: "206" },
+      { label: "Free Per Scan", value: "$0" },
       { label: "Scan Time", value: "~2 min" },
+      { label: "Delivery", value: "Instant + Email" },
     ],
     techStack: [
       "Next.js 16",
       "TypeScript",
-      "AI/LLM Integration",
       "PostgreSQL",
       "Serverless",
     ],
     notable:
-      "The only free tool that translates website problems into dollar signs. 206 industry benchmarks. Zero scan-to-scan variance for covered verticals.",
+      "The only free tool that translates website problems into dollar signs, calibrated to your specific business type, with consistent results scan after scan.",
     image: "/images/pathlight-landing.webp",
     heroDescription:
       "A full-stack AI platform built from the ground up to scan any business website and produce a complete intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list. All in minutes, for free. Proof that AI-powered analysis, when properly engineered, delivers genuine business insight instead of generic summaries.",
@@ -71,23 +70,18 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
       {
         heading: "How It Works",
-        body: "Every scan runs through a multi-stage AI analysis pipeline. The system captures full-page screenshots on desktop and mobile, runs a comprehensive performance audit, evaluates design and competitive positioning using computer vision, matches the business to its industry for accurate revenue modeling, and generates prioritized recommendations. The entire process is automated with built-in quality checks at every stage.",
+        body: "Submit your URL, get a complete report in roughly two minutes. The report covers performance, visual design, positioning, and search visibility, plus a revenue impact estimate calibrated for your specific business type. Everything runs automatically. No credit card. No back-and-forth.",
       },
       {
-        heading: "The Curated Database",
-        body: "Pathlight maintains a curated database of industry-specific benchmarks covering hundreds of business verticals. Each benchmark has been validated across multiple independent research sources and reviewed for accuracy. When a scan identifies a business's industry, Pathlight pulls validated data rather than relying on a single web search. This eliminates the variance and inconsistency that plague other automated analysis tools.",
+        heading: "Calibrated For Your Business",
+        body: "Every business type converts differently. A law firm and an auto repair shop have nothing in common when it comes to deal value, traffic patterns, or what visitors are looking for on a homepage. Pathlight calibrates its revenue model to the kind of business you actually run, so the dollar number you see is grounded in what your customers actually pay, not a one-size-fits-all guess.",
       },
       {
         heading: "The Report",
-        body: "Every scan produces a Pathlight Score (0-100) broken into four weighted pillars: Design (35%), Performance (25%), Positioning (25%), and Search Visibility (15%). Below the score, the top 3 fixes ranked by impact and difficulty, full desktop and mobile screenshots, and a revenue impact estimate with full methodology transparency. The built-in chatbot lets business owners ask follow-up questions about their results, and it's transparent about confidence levels rather than pretending precision.",
+        body: "Every scan produces a Pathlight Score (0-100) broken into four weighted pillars: Design (35%), Performance (25%), Positioning (25%), and Search Visibility (15%). Below the score, the top 3 fixes ranked by impact and difficulty, full desktop and mobile screenshots, and a revenue impact estimate with full methodology transparency. A built-in assistant lets business owners ask follow-up questions about their results.",
       },
     ],
     techDetails: [
-      {
-        name: "AI & Machine Learning",
-        reason:
-          "Multiple large language models handle different stages of analysis, from visual design evaluation to revenue impact modeling. Each model is prompted with specialized instructions tuned to its task.",
-      },
       {
         name: "Full-Stack TypeScript",
         reason:
@@ -101,7 +95,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       {
         name: "Data Architecture",
         reason:
-          "PostgreSQL for scan persistence and analysis storage. A curated industry benchmark database for accurate revenue modeling. Email event tracking for deliverability monitoring.",
+          "PostgreSQL for scan persistence and analysis storage. Email event tracking for deliverability monitoring. Designed for fast historical lookups across scans.",
       },
     ],
     timeline:

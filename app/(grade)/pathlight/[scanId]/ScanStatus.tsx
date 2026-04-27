@@ -6,9 +6,7 @@ import { ScanningCore } from "./ScanningCore";
 import AskPathlightLoader from "./AskPathlightLoader";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
-  BusinessScale,
   DesignScores,
-  IndustryBenchmark,
   LighthouseCategoryScores,
   PerformanceScores,
   PillarScores,
@@ -17,7 +15,6 @@ import type {
   RemediationResult,
   RevenueImpactResult,
   ScanStatus as ScanStatusValue,
-  ScreenshotHealth,
 } from "@/lib/types/scan";
 
 type InitialScanState = {
@@ -48,9 +45,9 @@ type ApiReport = {
   pathlightScore: number | null;
   pillarScores: PillarScores | null;
   lighthouseScores: LighthouseCategoryScores | null;
-  industryBenchmark: IndustryBenchmark | null;
-  businessScale?: BusinessScale;
-  screenshotHealth?: ScreenshotHealth;
+  isOutOfScope: boolean;
+  outOfScopeLabel: string | null;
+  screenshotNotice: string | null;
 };
 
 const ACTIVE_STATUSES = new Set<string>(["pending", "scanning", "analyzing"]);
@@ -316,45 +313,8 @@ function LoadingState({ status, url }: { status: string; url: string }) {
 
 /* ─────────────────────── Failed ─────────────────────── */
 
-function sanitizeScanError(raw: string | null): {
-  friendly: string;
-  technical: string | null;
-} {
-  const fallback =
-    "Something went wrong with the scan. Please try again, and if the problem persists, contact us.";
-  if (!raw) return { friendly: fallback, technical: null };
-  const lower = raw.toLowerCase();
-  let friendly = fallback;
-  if (
-    lower.includes("401") ||
-    lower.includes("invalid api key") ||
-    lower.includes("api key")
-  ) {
-    friendly =
-      "Our scanning service is temporarily unavailable. Please try again in a few minutes.";
-  } else if (
-    lower.includes("429") ||
-    lower.includes("quota") ||
-    lower.includes("rate limit")
-  ) {
-    friendly =
-      "We're experiencing high demand. Please try again in a few minutes.";
-  } else if (lower.includes("timeout") || lower.includes("etimedout")) {
-    friendly =
-      "The scan took too long to complete. The target website may be slow to respond. Please try again.";
-  } else if (
-    lower.includes("enotfound") ||
-    lower.includes("dns") ||
-    lower.includes("getaddrinfo")
-  ) {
-    friendly =
-      "We couldn't reach that website. Please check the URL and try again.";
-  } else if (lower.includes("ssl") || lower.includes("certificate")) {
-    friendly =
-      "We couldn't establish a secure connection to that website. The site may have SSL issues.";
-  }
-  return { friendly, technical: raw };
-}
+const FAILED_FALLBACK =
+  "Something went wrong with the scan. Please try again, and if the problem persists, contact us.";
 
 function FailedState({
   url,
@@ -363,7 +323,7 @@ function FailedState({
   url: string;
   message: string | null;
 }) {
-  const { friendly, technical } = sanitizeScanError(message);
+  const friendly = message ?? FAILED_FALLBACK;
   return (
     <section className="mx-auto max-w-xl py-20 text-center">
       <p
@@ -394,28 +354,6 @@ function FailedState({
         <p className="mt-3 text-sm" style={{ color: "#f5c6c6" }}>
           {friendly}
         </p>
-        {technical ? (
-          <details className="mt-4 text-left">
-            <summary
-              className="cursor-pointer select-none text-xs font-medium uppercase tracking-wider"
-              style={{ color: "#6b7280" }}
-            >
-              Show technical details
-            </summary>
-            <pre
-              className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-md border p-3 text-[11px] leading-relaxed"
-              style={{
-                borderColor: "rgba(255,255,255,0.08)",
-                backgroundColor: "rgba(0,0,0,0.3)",
-                color: "#9aa3b2",
-                fontFamily:
-                  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-              }}
-            >
-              {technical}
-            </pre>
-          </details>
-        ) : null}
         <div>
           <Link
             href="/pathlight"
@@ -453,8 +391,7 @@ function Report({
     !!report.screenshotDesktop || !!report.screenshotMobile;
   const hasFixes =
     !!report.remediation && report.remediation.items.length > 0;
-  const isOutOfScope =
-    report.businessScale === "national" || report.businessScale === "global";
+  const isOutOfScope = report.isOutOfScope;
   // Revenue and benchmark only make sense when the design audit also ran.
   // Defensive guard: if a stale state ever leaves revenue without design,
   // do not render the dollar headline.
@@ -476,8 +413,8 @@ function Report({
   return (
     <section className="pathlight-report flex flex-col gap-16 py-12">
       {isPartial ? <PartialNotice /> : null}
-      {report.screenshotHealth && report.screenshotHealth !== "clean" ? (
-        <ScreenshotHealthNotice health={report.screenshotHealth} />
+      {report.screenshotNotice ? (
+        <ScreenshotHealthNotice message={report.screenshotNotice} />
       ) : null}
 
       {hasScore ? (
@@ -519,12 +456,9 @@ function Report({
       ) : null}
 
       {isOutOfScope ? (
-        <OutOfScopeNotice scale={report.businessScale as "national" | "global"} />
+        <OutOfScopeNotice label={report.outOfScopeLabel ?? "national brand"} />
       ) : hasRevenue ? (
-        <RevenueImpactBlock
-          impact={report.revenueImpact!}
-          benchmark={report.industryBenchmark}
-        />
+        <RevenueImpactBlock impact={report.revenueImpact!} />
       ) : null}
 
       <FinalCta calendlyUrl={calendlyUrl} />
@@ -556,17 +490,7 @@ function PartialNotice() {
   );
 }
 
-function ScreenshotHealthNotice({ health }: { health: ScreenshotHealth }) {
-  const message: Record<Exclude<ScreenshotHealth, "clean">, string> = {
-    "cookie-banner-overlay":
-      "The screenshot shows a cookie or privacy consent dialog covering most of the page. Design and positioning scores are based on what was visible behind the overlay and should be read with extra caution.",
-    "loading-or-skeleton":
-      "The screenshot captured the page in a pre-render or loading state. Scores are based on the available content and should be treated as low-confidence. Re-run the scan in a few minutes for a cleaner capture.",
-    "auth-wall":
-      "The URL points to a login, signup, or paywall page rather than a public homepage. Pathlight scored what was visible, but the meaningful audit lives behind the auth gate. Paste the public homepage URL for a calibrated report.",
-    "minimal-content":
-      "The page rendered fully but contained very little content (likely a placeholder, under-construction, or coming-soon page). Scores reflect the sparse capture rather than a finished site.",
-  };
+function ScreenshotHealthNotice({ message }: { message: string }) {
   return (
     <div
       className="rounded-2xl border p-5 text-sm"
@@ -576,7 +500,7 @@ function ScreenshotHealthNotice({ health }: { health: ScreenshotHealth }) {
         color: "#fcd34d",
       }}
     >
-      {message[health as Exclude<ScreenshotHealth, "clean">]}
+      {message}
     </div>
   );
 }
@@ -1023,8 +947,7 @@ function DifficultyBadge({
 
 /* ─────────── Out-of-Scope Notice ─────────── */
 
-function OutOfScopeNotice({ scale }: { scale: "national" | "global" }) {
-  const label = scale === "global" ? "global brand" : "national brand";
+function OutOfScopeNotice({ label }: { label: string }) {
   return (
     <section>
       <h2
@@ -1067,10 +990,8 @@ function OutOfScopeNotice({ scale }: { scale: "national" | "global" }) {
 
 function RevenueImpactBlock({
   impact,
-  benchmark,
 }: {
   impact: RevenueImpactResult;
-  benchmark?: IndustryBenchmark | null;
 }) {
   const formatted = useMemo(() => {
     return new Intl.NumberFormat("en-US", {
@@ -1112,15 +1033,6 @@ function RevenueImpactBlock({
         <p className="mt-5 text-sm" style={{ color: "#c5ccd8" }}>
           {impact.methodology}
         </p>
-
-        {benchmark?.source ? (
-          <p
-            className="mt-2 text-xs uppercase tracking-[0.15em]"
-            style={{ color: "rgba(255,255,255,0.35)" }}
-          >
-            Deal value based on industry research · Source: {benchmark.source}
-          </p>
-        ) : null}
 
         <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <AssumptionRow

@@ -115,8 +115,10 @@ export async function POST(request: Request): Promise<Response> {
 
       stream.on("error", (err: unknown) => {
         if (closed) return;
-        const message = err instanceof Error ? err.message : "stream error";
-        safeEnqueue(`data: ${JSON.stringify({ error: message })}\n\n`);
+        console.error("[chat] stream error", err);
+        safeEnqueue(
+          `data: ${JSON.stringify({ error: "Something went wrong. Please try again." })}\n\n`
+        );
         safeEnqueue("data: [DONE]\n\n");
         closed = true;
         try {

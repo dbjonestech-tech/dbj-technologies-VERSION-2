@@ -116,7 +116,7 @@ function buildReportEmail(data: EmailMergeData): BuiltEmail {
             </td>
           </tr>
         </table>
-        <p style="margin: 16px 0;">Your report includes Lighthouse performance scores, AI-powered design analysis, conversion psychology evaluation, and prioritized fixes ranked by revenue impact.</p>
+        <p style="margin: 16px 0;">Your report covers what your customers see, how fast your site loads, where your messaging is working against you, and the top three fixes that would move the needle most on revenue.</p>
         ${button("View Your Full Report", data.reportUrl)}
         <p style="margin: 16px 0;">Questions about your report? Just reply to this email. I read every one.</p>
         <p style="margin: 24px 0 8px;">Joshua Jones<br/>
@@ -134,7 +134,7 @@ function buildReportEmail(data: EmailMergeData): BuiltEmail {
     `Pathlight Score: ${scoreDisplay}/100`,
     `Est. Monthly Revenue Loss: ${revenueDisplay}`,
     "",
-    "Your report includes Lighthouse performance scores, AI-powered design analysis, conversion psychology evaluation, and prioritized fixes ranked by revenue impact.",
+    "Your report covers what your customers see, how fast your site loads, where your messaging is working against you, and the top three fixes that would move the needle most on revenue.",
     "",
     `View your full report: ${data.reportUrl}`,
     "",

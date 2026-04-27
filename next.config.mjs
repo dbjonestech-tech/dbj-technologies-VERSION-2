@@ -7,6 +7,7 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  productionBrowserSourceMaps: false,
   turbopack: {
     root: resolve(__dirname),
   },
