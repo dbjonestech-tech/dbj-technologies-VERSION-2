@@ -112,6 +112,13 @@ In order, after the deploy fans out:
 Plus this update to `docs/ai/session-handoff.md` and the
 `docs/ai/backlog.md` entry marked complete.
 
+### Commit + push status
+
+Committed at `4490325` and pushed to `origin main`. 13 files (10 modified
++ 3 new). Working tree carries one untracked file
+`docs/blueprints/hvac-contractor.md` from the parallel hvac-contractor
+session, left alone for that session to commit separately.
+
 ## Previous Session: April 27, 2026 (late evening) -- hvac-contractor Pass 1 + Comfort Club
 
 ### What shipped (this commit)
