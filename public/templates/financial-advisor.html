@@ -261,28 +261,24 @@
     }
     .nav-cta:hover { background: var(--forest-deep); transform: translateY(-1px); }
 
-    /* ---------- HERO: PORTRAIT-IN-HERO ---------- */
+    /* ---------- HERO: STACKED PORTRAIT REVEAL ---------- */
+    /* Wireframe: text-only hero, framed advisor portrait drops below into the section, overlapping. */
     .hero {
       position: relative;
-      min-height: 88vh;
       background: var(--charcoal);
       background-image: var(--pinstripe);
-      overflow: hidden;
-    }
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 55% 45%;
-      min-height: 88vh;
-      width: 100%;
+      overflow: visible;
+      padding: clamp(5rem, 12vh, 10rem) clamp(1.5rem, 5vw, 4rem) clamp(7rem, 14vh, 11rem);
+      text-align: center;
     }
     .hero-content {
       position: relative;
-      z-index: 2;
+      z-index: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: clamp(4rem, 8vh, 7rem) clamp(2rem, 5vw, 4.5rem);
-      max-width: 720px;
+      align-items: center;
+      max-width: 760px;
+      margin: 0 auto;
     }
     .hero-eyebrow {
       font-family: 'Work Sans', sans-serif;
@@ -302,6 +298,7 @@
       line-height: 1.06;
       letter-spacing: -0.01em;
       margin: 0 0 1.6rem;
+      max-width: 18ch;
     }
     .hero-sub {
       color: var(--on-dark-dim);
@@ -314,13 +311,15 @@
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
-      margin-bottom: 3rem;
+      justify-content: center;
+      margin-bottom: 2.8rem;
     }
 
-    /* AUM tabular row below CTAs */
+    /* AUM tabular row, centered */
     .hero-stats {
       display: flex;
       align-items: stretch;
+      justify-content: center;
       gap: 0;
       flex-wrap: wrap;
       max-width: 620px;
@@ -329,12 +328,13 @@
     .hero-stat {
       display: flex;
       flex-direction: column;
-      padding: 0.4rem 1.8rem 0.4rem 0;
+      align-items: center;
+      text-align: center;
+      padding: 0.4rem 1.8rem;
       border-right: 1px solid var(--hairline-forest);
       min-width: 0;
     }
-    .hero-stat + .hero-stat { padding-left: 1.8rem; }
-    .hero-stat:last-child { border-right: 0; padding-right: 0; }
+    .hero-stat:last-child { border-right: 0; }
     .hero-stat-value {
       font-family: 'EB Garamond', Georgia, serif;
       font-style: italic;
@@ -355,29 +355,45 @@
       font-weight: 500;
     }
 
-    /* Hero portrait panel */
-    .hero-portrait {
+    /* Advisor portrait zone: framed portrait that overlaps upward into the hero band above. */
+    .advisor-portrait-zone {
+      background: var(--parchment);
+      text-align: center;
+      padding: 0 clamp(1.25rem, 5vw, 3rem) clamp(4rem, 8vh, 6rem);
+    }
+    .advisor-portrait-frame {
       position: relative;
-      width: 100%;
-      height: 100%;
-      min-height: 88vh;
+      z-index: 2;
+      max-width: 480px;
+      margin: -120px auto 1.4rem;
+      aspect-ratio: 3 / 4;
+      border: 1px solid var(--forest);
+      background: var(--charcoal-deep);
+      box-shadow: 0 24px 48px rgba(34,31,28,0.28);
       overflow: hidden;
     }
-    .hero-portrait img {
+    .advisor-portrait-frame img {
       width: 100%;
       height: 100%;
-      min-height: 88vh;
       object-fit: cover;
       object-position: center top;
       display: block;
     }
-    .hero-portrait::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, rgba(45,41,38,0.85) 0%, transparent 35%);
-      z-index: 1;
-      pointer-events: none;
+    .advisor-portrait-name {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.2rem;
+      color: var(--charcoal);
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+    .advisor-portrait-title {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--forest);
+      margin: 0.6rem 0 0;
     }
 
     /* ---------- Generic section frame ---------- */
@@ -920,28 +936,15 @@
       .nav-links { gap: 0.95rem; }
       .nav-links a { font-size: 0.7rem; letter-spacing: 0.14em; }
 
-      .hero { min-height: auto; }
-      .hero-grid {
-        grid-template-columns: 1fr;
-        min-height: auto;
-      }
-      .hero-content {
-        padding: 4.5rem 1.5rem 3rem;
-      }
-      .hero-portrait,
-      .hero-portrait img {
-        min-height: 70vh;
-        height: 70vh;
-      }
-      .hero-portrait::before {
-        background: linear-gradient(180deg, rgba(45,41,38,0.55) 0%, transparent 30%);
-      }
-      .hero-ctas { flex-direction: column; align-items: stretch; }
+      .hero { padding: 4rem 1.25rem 5.5rem; }
+      .hero-content { max-width: 100%; }
+      .hero-ctas { flex-direction: column; align-items: stretch; width: 100%; }
       .hero-ctas .btn { text-align: center; }
       .hero-stats {
         flex-direction: column;
         gap: 1.2rem;
         max-width: 100%;
+        width: 100%;
       }
       .hero-stat {
         border-right: 0;
@@ -949,6 +952,7 @@
         padding: 0.4rem 0 1.1rem !important;
       }
       .hero-stat:last-child { border-bottom: 0; padding-bottom: 0.4rem !important; }
+      .advisor-portrait-frame { max-width: 320px; margin-top: -80px; }
 
       .testimonial { padding: 2rem 1.4rem 1.6rem 2.6rem; }
       .testimonial::before { left: 0.4rem; font-size: 4rem; }
@@ -1006,41 +1010,44 @@
     </div>
   </header>
 
-  <!-- ============ HERO: PORTRAIT-IN-HERO ============ -->
+  <!-- ============ HERO: STACKED PORTRAIT REVEAL ============ -->
   <section class="hero" aria-label="Introduction">
-    <div class="hero-grid">
-      <div class="hero-content">
-        <span class="hero-eyebrow">Wealth Management &middot; Dallas, Texas</span>
-        <h1 class="hero-headline">Wealth Is Personal.<br>Your Strategy Should Be Too.</h1>
-        <p class="hero-sub">
-          Beckett Wealth Partners is a fee-only fiduciary firm serving families, business owners, and executives across Dallas-Fort Worth. We manage portfolios, plan for transitions, and protect what you have built.
-        </p>
+    <div class="hero-content">
+      <span class="hero-eyebrow">Wealth Management &middot; Dallas, Texas</span>
+      <h1 class="hero-headline">Wealth Is Personal.<br>Your Strategy Should Be Too.</h1>
+      <p class="hero-sub">
+        Beckett Wealth Partners is a fee-only fiduciary firm serving families, business owners, and executives across Dallas-Fort Worth. We manage portfolios, plan for transitions, and protect what you have built.
+      </p>
 
-        <div class="hero-ctas">
-          <a href="#contact" class="btn btn-solid">Schedule a Consultation</a>
-          <a href="#philosophy" class="btn btn-ghost-forest">Our Approach</a>
-        </div>
-
-        <div class="hero-stats" role="group" aria-label="Firm credentials">
-          <div class="hero-stat">
-            <span class="hero-stat-value">2003</span>
-            <span class="hero-stat-label">Founded</span>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat-value">$540M</span>
-            <span class="hero-stat-label">Assets Under Advisement</span>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat-value">Fee-Only</span>
-            <span class="hero-stat-label">Fiduciary</span>
-          </div>
-        </div>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn btn-solid">Schedule a Consultation</a>
+        <a href="#philosophy" class="btn btn-ghost-forest">Our Approach</a>
       </div>
 
-      <div class="hero-portrait" aria-hidden="false">
-        <img src="images/people/financial-advisor-1.jpg" alt="Founding partner James Beckett at a mahogany desk with a brass banker's lamp" width="1800" height="989" loading="eager" decoding="async" fetchpriority="high">
+      <div class="hero-stats" role="group" aria-label="Firm credentials">
+        <div class="hero-stat">
+          <span class="hero-stat-value">2003</span>
+          <span class="hero-stat-label">Founded</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">$540M</span>
+          <span class="hero-stat-label">Assets Under Advisement</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">Fee-Only</span>
+          <span class="hero-stat-label">Fiduciary</span>
+        </div>
       </div>
     </div>
+  </section>
+
+  <!-- ============ ADVISOR PORTRAIT REVEAL ============ -->
+  <section class="advisor-portrait-zone" aria-label="Founding partner">
+    <figure class="advisor-portrait-frame">
+      <img src="images/people/financial-advisor-1.jpg" alt="Founding partner James Beckett at a mahogany desk with a brass banker's lamp" width="1800" height="989" loading="eager" decoding="async" fetchpriority="high">
+    </figure>
+    <p class="advisor-portrait-name">James Beckett, CFP, CFA</p>
+    <p class="advisor-portrait-title">Founding Partner</p>
   </section>
 
   <!-- ============ SERVICES ============ -->

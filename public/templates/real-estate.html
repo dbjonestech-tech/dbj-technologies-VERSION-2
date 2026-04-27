@@ -156,44 +156,34 @@
     transform: translateY(-1px);
   }
 
-  /* ======== HERO ======== */
+  /* ======== HERO: CONTAINED GALLERY FRAME ======== */
+  /* Wireframe: text block centered above, then a contained framed photo with copper border. Dark space all around. */
   .hero {
     position: relative;
     background:
-      url('images/real-estate-hero.jpg') center / cover no-repeat,
-      linear-gradient(135deg, #0A0A0A 0%, #1A1310 60%, #2A1F18 100%);
-    min-height: 92vh;
+      radial-gradient(circle at 50% 110%, rgba(184,115,51,0.10), transparent 50%),
+      #0A0A0A;
+    min-height: 90vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     overflow: hidden;
-    padding: clamp(2rem, 8vw, 8rem);
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(
-        135deg,
-        rgba(10,10,10,0.88) 0%,
-        rgba(10,10,10,0.78) 42%,
-        rgba(10,10,10,0.58) 70%,
-        rgba(10,10,10,0.48) 100%
-      ),
-      radial-gradient(circle at 78% 62%, rgba(184,115,51,0.22), transparent 58%);
-    pointer-events: none;
+    padding: clamp(3.5rem, 8vh, 6rem) clamp(1.5rem, 5vw, 4rem);
+    text-align: center;
   }
   .hero-inner {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 640px;
+    max-width: 600px;
+    margin: 0 auto 3rem;
   }
-  .hero .eyebrow { display: block; margin-bottom: 2rem; }
+  .hero .eyebrow { display: block; margin-bottom: 1.6rem; }
   .hero h1 {
     color: var(--ivory);
     font-size: clamp(2.6rem, 5vw, 4.4rem);
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.5rem;
     font-weight: 400;
   }
   .hero-sub {
@@ -201,10 +191,10 @@
     font-size: 1.05rem;
     line-height: 1.85;
     max-width: 520px;
-    margin-bottom: 2.5rem;
+    margin: 0 auto 2.2rem;
   }
   .hero-cta-row {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
   .hero-rule {
     width: 240px;
@@ -212,7 +202,7 @@
     height: 1px;
     background: var(--copper);
     opacity: 0.6;
-    margin-bottom: 1.6rem;
+    margin: 0 auto 1.4rem;
   }
   .hero-stats {
     font-family: 'Karla', sans-serif;
@@ -226,6 +216,27 @@
   .hero-stats .sep {
     color: var(--copper);
     margin: 0 0.7em;
+  }
+  /* Gallery frame holding the property photo, presented like a print on a gallery wall */
+  .hero-gallery-frame {
+    position: relative;
+    z-index: 1;
+    width: 70%;
+    max-width: 900px;
+    height: 45vh;
+    min-height: 320px;
+    border: 1px solid var(--copper);
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    background: #141414;
+  }
+  .hero-gallery-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
   }
 
   /* ======== AGENT SECTION ======== */
@@ -661,9 +672,10 @@
     .nav-links { display: none; }
     .wordmark { font-size: 0.78rem; letter-spacing: 0.28em; }
     .btn { padding: 0.85rem 1.6rem; font-size: 0.7rem; letter-spacing: 0.18em; }
-    .hero { padding: clamp(3rem, 10vw, 5rem) 1.5rem; min-height: 88vh; }
+    .hero { padding: clamp(3rem, 10vw, 5rem) 1.25rem; min-height: 88vh; }
     .hero-rule { width: 180px; }
     .hero-stats .sep { display: inline; margin: 0 0.4em; }
+    .hero-gallery-frame { width: 92%; height: 35vh; min-height: 240px; }
     section { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
     .agent { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
     .agent-photo { min-height: 360px; }
@@ -697,7 +709,7 @@
   </div>
 </nav>
 
-<!-- ===== HERO ===== -->
+<!-- ===== HERO: CONTAINED GALLERY FRAME ===== -->
 <header class="hero" role="banner">
   <div class="hero-inner">
     <span class="eyebrow">LUXURY RESIDENTIAL &middot; DALLAS</span>
@@ -711,6 +723,9 @@
       $340M Career Volume <span class="sep">&middot;</span> 200+ Transactions <span class="sep">&middot;</span> Park Cities Resident Since 2008
     </div>
   </div>
+  <figure class="hero-gallery-frame" aria-hidden="true">
+    <img src="images/real-estate-hero.jpg" alt="A Park Cities estate at dusk with warm interior light spilling through the front windows" width="1600" height="900" loading="eager" decoding="async" fetchpriority="high">
+  </figure>
 </header>
 
 <!-- ===== AGENT (MEET LAUREN) ===== -->
