@@ -93,6 +93,14 @@ None this round. The endpoint relies only on `BROWSERLESS_API_KEY`
 which is already set in Vercel for the existing screenshot pipeline.
 The first scan after deploy will be able to produce a PDF.
 
+### Commit + push status
+
+Committed at `d716ae7` and pushed to `origin main`. 5 files (4
+modified + 1 new). Working tree carries unrelated parallel changes
+from a separate session (`app/(marketing)/loading.tsx`,
+`vercel.json`, deletion of `public/robots.txt`) -- left alone for
+that session to commit.
+
 ## Previous Session: April 27, 2026 (overnight) -- Cost monitoring + alerting (Feature #12)
 
 ### What shipped
