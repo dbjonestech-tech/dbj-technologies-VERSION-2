@@ -357,6 +357,12 @@ async function callClaudeWithJsonSchema<T>(
   const firstAttempt = tryParse<T>(firstResponseText, schema);
   if (firstAttempt.ok) return firstAttempt.value;
 
+  /* Repair prompt threads the SPECIFIC parse/validation error back to
+     Claude so the second attempt can target the actual problem (e.g.
+     "expected string at .industry, received null"). The previous
+     generic "respond with only JSON" message lost the error detail
+     and produced the same shape of failure on retry, which was the
+     dominant remaining trigger of the report-page partial banner. */
   const secondResponseText = await callClaude(
     system,
     [
@@ -365,7 +371,9 @@ async function callClaudeWithJsonSchema<T>(
       {
         role: "user",
         content:
-          "Your previous response was not valid JSON. Respond with ONLY a valid JSON object. No backticks, no explanation, no text before or after the JSON.",
+          `Your previous response failed parsing or schema validation: ${firstAttempt.error}\n\n` +
+          "Respond with ONLY a valid JSON object that matches the schema described in the system prompt. " +
+          "Fix the specific issue identified above. No backticks, no explanation, no text before or after the JSON.",
       },
     ],
     maxTokens,
