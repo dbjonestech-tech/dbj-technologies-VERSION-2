@@ -6,7 +6,66 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
-## Last Session: April 27, 2026 -- Resend webhook schema permissive + audio Blob store fix
+## Last Session: April 27, 2026 -- Audio player CSP unblock + post-complete polling extension
+
+### What shipped (code)
+
+`vercel.json` CSP gained an explicit `media-src 'self'
+https://*.public.blob.vercel-storage.com;` directive. Without it the
+CSP fell back to `default-src 'self'`, which blocked the browser from
+loading the audio summary MP3 from the public Blob CDN. Symptom: the
+audio file was reachable via curl with valid `audio/mpeg` content-type
+and 857KB body, but the `<audio controls>` element on the report page
+rendered greyed out and refused to play. CSP was the only blocker
+once the private-store fix landed earlier today.
+
+`app/(grade)/pathlight/[scanId]/ScanStatus.tsx` polling loop now keeps
+polling for up to twelve additional ticks (~36s) after status flips
+out of the active set, gated on `audioSummaryUrl` still being null.
+Reason: the Inngest pipeline runs `a5` (audio) and `e1` (email) AFTER
+`s6` finalize marks status complete, so the audio URL lands a few
+seconds after the live polling page would otherwise stop. Previously
+users only saw the audio player after a manual refresh. Now the live
+page picks it up automatically. Logic moved inside the existing
+`fetchOnce` callback so it reads `data.audioSummaryUrl` directly
+instead of stale React state; the separate `statusState` useEffect
+that cleared the interval is gone.
+
+### What was already correct (verified, not changed)
+
+- The Blob is uploaded correctly with `audio/mpeg` content-type and
+  the public Blob URL persists to `scan_results.audio_summary_url`.
+  Verified by curl on the most recent scan
+  (`45d2e033-ba25-47c4-9c0c-9f4293bf0931`): 200 OK, 857696 bytes,
+  valid MPEG ADTS layer III 128kbps mono. The earlier hypothesis that
+  `Content-Disposition: attachment` was blocking inline playback was
+  wrong; HTML5 `<audio>` plays attachment-flagged media fine. CSP was
+  the actual culprit.
+
+### Files changed (2 modified, 1 docs)
+
+- `vercel.json` -- added `media-src` directive to the Content-Security-Policy header.
+- `app/(grade)/pathlight/[scanId]/ScanStatus.tsx` -- post-complete
+  polling extension (12 extra ticks while audioSummaryUrl is null).
+- `docs/ai/session-handoff.md` -- this entry.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 em-dashes in added lines.
+
+### Note on parallel work
+
+A separate session has uncommitted in-flight work on this branch
+(rate-limit additions to chat + PDF endpoints, ScanningCore UI
+refactor, globals.css updates). I detected it, stashed it under
+`parallel-session-wip-other-tab`, shipped this fix on top of HEAD,
+then restored the stash. Their work is back in the working tree
+exactly as the user left it; this commit only contains the audio
+fixes.
+
+## Prior Session: April 27, 2026 -- Resend webhook schema permissive + audio Blob store fix
 
 ### What shipped (code)
 

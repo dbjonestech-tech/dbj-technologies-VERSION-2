@@ -53,6 +53,11 @@ type ApiReport = {
 
 const ACTIVE_STATUSES = new Set<string>(["pending", "scanning", "analyzing"]);
 const POLL_INTERVAL_MS = 3000;
+// Audio summary (`a5`) and report email (`e1`) run AFTER `s6` flips
+// status to complete, so the URL lands a few seconds late. Keep
+// polling for up to ~36s past complete while audioSummaryUrl is still
+// null so the player on the live page picks it up without a refresh.
+const POST_COMPLETE_AUDIO_POLLS = 12;
 
 const PHASE_LABELS = [
   "Capturing screenshots…",
@@ -75,6 +80,7 @@ export function ScanStatus({
   const [report, setReport] = useState<ApiReport | null>(null);
   const [statusState, setStatusState] = useState<string>(initial.status);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const postCompletePollsRef = useRef<number>(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,6 +95,19 @@ export function ScanStatus({
         if (cancelled) return;
         setReport(data);
         setStatusState(data.status);
+
+        if (!ACTIVE_STATUSES.has(data.status) && intervalRef.current) {
+          if (data.audioSummaryUrl) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+            return;
+          }
+          postCompletePollsRef.current += 1;
+          if (postCompletePollsRef.current >= POST_COMPLETE_AUDIO_POLLS) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+        }
       } catch {
         /* transient — next tick will retry */
       }
@@ -103,13 +122,6 @@ export function ScanStatus({
       intervalRef.current = null;
     };
   }, [initial.scanId]);
-
-  useEffect(() => {
-    if (!ACTIVE_STATUSES.has(statusState) && intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, [statusState]);
 
   const displayUrl = report?.resolvedUrl ?? report?.url ?? initial.url;
   const isActive = ACTIVE_STATUSES.has(statusState);
