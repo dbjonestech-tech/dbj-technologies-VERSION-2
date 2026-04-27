@@ -2,7 +2,7 @@
 
 Last updated: April 27, 2026
 
-## Admin portal (Stages 1 + 2 + 3 shipped)
+## Admin portal (Stages 1 + 2 + 3 + 5 shipped)
 
 Auth: Auth.js v5 + Google OAuth, JWT sessions, `ADMIN_EMAILS` allowlist, `admin_audit_log` table with new-device email notifications. Sign-in at `/signin` (server component, white theme), middleware gates every `/admin/*` route, layout-level auth check is defense in depth. Sign-out via server action. IP-keyed rate limiter on the auth route handler (10/min, fail-open).
 
@@ -14,7 +14,7 @@ Operations surface (all live at `/admin/*`):
 - **Leads**: two-tab inbox. "Pathlight signups" reads `leads`; "Contact form" reads `contact_submissions` (new). Stat cards across the top.
 - **Database**: row counts + 24h/7d/30d insert volume + newest/oldest timestamps for all 10 tracked tables, grouped by domain (Pathlight / Email / Telemetry / Admin).
 - **Audit log**: filterable view of `admin_audit_log` (event, result, time window, email partial match) with badged success/denied/error and expandable JSON metadata.
-- Users: still placeholder (Stage 5).
+- **Users**: invite-by-email surface backed by `admin_users` and `admin_invitations` (migration 012). Bootstrap allowlist remains in `ADMIN_EMAILS` env. Invitations are 7-day single-use tokens delivered via Resend; the public accept page lives at `/invite/[token]` and finalizes via Google OAuth + the `events.signIn` consume-and-upsert CTE in `lib/auth/users.ts`. Disable / reactivate / revoke supported.
 
 Contact form persistence: `app/(marketing)/api/contact/route.ts` now writes to `contact_submissions` (migration 011) on every path -- dev / Resend success / Resend failure -- via a best-effort helper that swallows DB errors so the form never breaks. Resend remains the canonical delivery; this is the durable record.
 

@@ -31,8 +31,8 @@ import authConfig from "./auth.config";
  *     header on marketing routes. Vercel's edge cache will serve
  *     cached HTML to subsequent visitors for an hour, giving sub-50ms
  *     TTFB on cache hits. Pathlight, API, admin, and signin routes
- *     are excluded — those are user-specific or auth-gated and must
- *     not be cached at the CDN.
+ *     are excluded because those are user-specific or auth-gated and
+ *     must not be cached at the CDN.
  */
 
 const { auth: middlewareAuth } = NextAuth(authConfig);
@@ -43,6 +43,7 @@ const CACHE_EXCLUDED_PREFIXES = [
   "/monitoring",
   "/admin",
   "/signin",
+  "/invite",
 ];
 
 const PROTECTED_PREFIXES = ["/admin"];
@@ -90,7 +91,7 @@ export default middlewareAuth((request: NextRequest & { auth: import("next-auth"
 export const config = {
   /* Skip Next-internal asset routes and the Auth.js handler itself.
      The Auth.js callback POST/GET handlers must not pass through the
-     wrapper — `auth()` would recurse. /api/auth is unguarded by design. */
+     wrapper, since `auth()` would recurse. /api/auth is unguarded by design. */
   matcher: [
     "/((?!_next/static|_next/image|api/auth|favicon.ico|brand|images|robots.txt|sitemap.xml|manifest.webmanifest|monitoring).*)",
   ],

@@ -20,6 +20,7 @@ const EVENT_OPTIONS = [
   { value: "signout", label: "Sign-out" },
   { value: "protected.access", label: "Protected access" },
   { value: "protected.denied", label: "Protected denied" },
+  { value: "admin.action", label: "Admin action (invite, revoke, disable)" },
 ] as const;
 
 const RESULT_OPTIONS = [

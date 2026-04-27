@@ -3,12 +3,13 @@ import Google from "next-auth/providers/google";
 import { headers } from "next/headers";
 import { isAdminEmail } from "@/lib/auth/allowlist";
 import { writeAdminAudit } from "@/lib/auth/audit";
+import { hasValidInvitationFor, isAdminUser } from "@/lib/auth/users";
 
 /* Edge-safe Auth.js config. Imported by both `auth.ts` (full app
  * runtime, used by route handlers + server components) and
  * `middleware.ts` (Edge runtime). Splitting the config keeps Node-only
- * code paths — Web Crypto is fine, but Resend SDK + node:crypto are
- * not — out of the middleware bundle.
+ * code paths (Web Crypto is fine, but Resend SDK + node:crypto are
+ * not) out of the middleware bundle.
  *
  * What lives here vs. in auth.ts:
  *   here   -> providers, session strategy, pages, signIn/jwt/session
@@ -54,27 +55,38 @@ export default {
   callbacks: {
     async signIn({ user, profile }) {
       const email = (profile?.email ?? user?.email ?? "").toLowerCase().trim();
-      if (!email || !isAdminEmail(email)) {
-        /* Audit write is best-effort; never let a logging failure
-         * mask the actual denial reason or 500 the callback. */
-        try {
-          const { ip, userAgent } = await readRequestContext();
-          await writeAdminAudit({
-            email: email || null,
-            event: "signin.denied",
-            result: "denied",
-            ip,
-            userAgent,
-            metadata: { reason: "not_in_allowlist" },
-          });
-        } catch (err) {
-          console.error("[auth signIn callback] audit write failed:", err);
-        }
+      if (!email) {
         return false;
       }
-      return true;
+      /* Three-source allow check, in cost order:
+       *   1. ADMIN_EMAILS env (sync set lookup, the bootstrap path)
+       *   2. admin_users (rows accepted via prior invitations)
+       *   3. admin_invitations (open token for this email = first signin)
+       * The invitation path lets the OAuth complete; the events.signIn
+       * hook in auth.ts then consumes the invitation and writes the
+       * admin_users row. */
+      if (isAdminEmail(email)) return true;
+      if (await isAdminUser(email)) return true;
+      if (await hasValidInvitationFor(email)) return true;
+
+      /* Audit write is best-effort; never let a logging failure
+       * mask the actual denial reason or 500 the callback. */
+      try {
+        const { ip, userAgent } = await readRequestContext();
+        await writeAdminAudit({
+          email: email || null,
+          event: "signin.denied",
+          result: "denied",
+          ip,
+          userAgent,
+          metadata: { reason: "not_in_allowlist" },
+        });
+      } catch (err) {
+        console.error("[auth signIn callback] audit write failed:", err);
+      }
+      return false;
     },
-    async jwt({ token, user, profile }) {
+    async jwt({ token, user, profile, trigger }) {
       const email = (
         token.email ??
         profile?.email ??
@@ -83,9 +95,14 @@ export default {
       )
         .toLowerCase()
         .trim();
-      if (email) {
-        token.email = email;
-        token.isAdmin = isAdminEmail(email);
+      if (!email) return token;
+      token.email = email;
+      /* Set isAdmin only at sign-in time. The signIn callback already
+       * gated entry through env, admin_users, or a valid invitation,
+       * so any token reaching this point belongs to an admin. Avoid a
+       * DB query on every session refresh by trusting the gate. */
+      if (trigger === "signIn" || user || token.isAdmin === undefined) {
+        token.isAdmin = true;
       }
       return token;
     },

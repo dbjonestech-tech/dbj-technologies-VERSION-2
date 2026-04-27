@@ -8,7 +8,8 @@ export type AdminAuditEvent =
   | "signin.error"
   | "signout"
   | "protected.access"
-  | "protected.denied";
+  | "protected.denied"
+  | "admin.action";
 
 export type AdminAuditResult = "success" | "denied" | "error";
 

@@ -35,7 +35,7 @@ const NAV_GROUPS: {
     label: "Account",
     items: [
       { label: "Audit log", href: "/admin/audit", icon: FileText },
-      { label: "Users", href: "/admin/users", icon: Users, disabled: true },
+      { label: "Users", href: "/admin/users", icon: Users },
     ],
   },
 ];

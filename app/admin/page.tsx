@@ -55,10 +55,10 @@ const QUICK_LINKS: {
   },
   {
     label: "Users",
-    description: "Admins and (eventually) client portal accounts.",
+    description: "Invite admins. Bootstrap allowlist plus DB-backed members.",
     href: "/admin/users",
     icon: Users,
-    status: "soon",
+    status: "live",
   },
 ];
 
