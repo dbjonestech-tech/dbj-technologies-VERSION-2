@@ -4,6 +4,7 @@ export type Viewport = { width: number; height: number };
 
 const DEFAULT_BROWSERLESS_BASE = "https://production-sfo.browserless.io";
 const SCREENSHOT_TIMEOUT_MS = 45_000;
+const PDF_TIMEOUT_MS = 60_000;
 
 // Runs inside Browserless v2 /function (Puppeteer in a managed Chromium).
 // Emulating prefers-reduced-motion BEFORE navigation lets sites that respect
@@ -136,6 +137,121 @@ export async function captureScreenshot(
     });
     if ((err as Error).name === "AbortError") {
       throw new Error("Browserless screenshot timed out after 45s.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Browserless v2 /pdf endpoint wrapper. Renders the given URL with the
+ * print media type emulated (which activates @media print rules in
+ * globals.css). The report's print stylesheet hides the chat panel,
+ * expands collapsed accordions via .print-expand, and forces white
+ * backgrounds + dark text. Streams the PDF bytes back as a Buffer.
+ *
+ * waitForTimeout is a 2.5s settle window after networkidle0 so any
+ * tail-end animation or font swap completes before capture, matching
+ * the screenshot pipeline's pattern. printBackground: true allows the
+ * SVG score ring and inline-colored badges to render their fill colors.
+ * The print stylesheet zeros out card backgrounds independently, so
+ * this only affects the elements that actually want their colors.
+ */
+type BrowserlessPdfBody = {
+  url: string;
+  options: {
+    format: "Letter";
+    printBackground: boolean;
+    margin: {
+      top: string;
+      right: string;
+      bottom: string;
+      left: string;
+    };
+  };
+  gotoOptions: {
+    waitUntil: "networkidle0";
+    timeout: number;
+  };
+  emulateMediaType: "print";
+  waitForTimeout: number;
+};
+
+export async function generatePdf(
+  url: string,
+  scanId: string | null = null
+): Promise<Buffer> {
+  const token = process.env.BROWSERLESS_API_KEY;
+  if (!token) {
+    throw new Error("BROWSERLESS_API_KEY is not configured.");
+  }
+  const base = process.env.BROWSERLESS_BASE_URL ?? DEFAULT_BROWSERLESS_BASE;
+
+  const body: BrowserlessPdfBody = {
+    url,
+    options: {
+      format: "Letter",
+      printBackground: true,
+      margin: {
+        top: "0.5in",
+        right: "0.5in",
+        bottom: "0.5in",
+        left: "0.5in",
+      },
+    },
+    gotoOptions: {
+      waitUntil: "networkidle0",
+      timeout: 25_000,
+    },
+    emulateMediaType: "print",
+    waitForTimeout: 2_500,
+  };
+
+  const start = Date.now();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), PDF_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(
+      `${base}/pdf?token=${encodeURIComponent(token)}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      }
+    );
+
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      throw new Error(
+        `Browserless PDF failed (${res.status}): ${detail.slice(0, 200)}`
+      );
+    }
+
+    const arrayBuffer = await res.arrayBuffer();
+    const buf = Buffer.from(arrayBuffer);
+    if (buf.byteLength === 0) {
+      throw new Error("Browserless returned an empty PDF.");
+    }
+
+    await recordBrowserlessUsage({
+      scanId,
+      operation: "pdf-report",
+      durationMs: Date.now() - start,
+      status: "ok",
+    });
+    return buf;
+  } catch (err) {
+    await recordBrowserlessUsage({
+      scanId,
+      operation: "pdf-report",
+      durationMs: Date.now() - start,
+      status: "fail",
+    });
+    if ((err as Error).name === "AbortError") {
+      throw new Error("Browserless PDF generation timed out after 60s.");
     }
     throw err;
   } finally {

@@ -425,14 +425,17 @@ function Report({
         />
       ) : null}
 
-      <button
-        type="button"
-        onClick={handlePrint}
-        className="print-hidden text-sm text-white/60 hover:text-white/90 transition-colors flex items-center gap-1.5 mx-auto -mt-8"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Print Full Report
-      </button>
+      <div className="print-hidden flex items-center justify-center gap-6 -mt-8">
+        <button
+          type="button"
+          onClick={handlePrint}
+          className="text-sm text-white/60 hover:text-white/90 transition-colors flex items-center gap-1.5"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print Full Report
+        </button>
+        <DownloadPdfButton scanId={report.scanId} />
+      </div>
 
       {report.pillarScores ? <PillarBreakdown scores={report.pillarScores} /> : null}
 
@@ -471,6 +474,80 @@ function Report({
         calendlyUrl={calendlyUrl}
       />
     </section>
+  );
+}
+
+function DownloadPdfButton({ scanId }: { scanId: string }) {
+  const [state, setState] = useState<"idle" | "loading" | "error">("idle");
+
+  async function handleClick() {
+    if (state === "loading") return;
+    setState("loading");
+    try {
+      const res = await fetch(`/api/scan/${scanId}/pdf`, {
+        cache: "no-store",
+      });
+      if (!res.ok) {
+        throw new Error(`PDF endpoint returned ${res.status}`);
+      }
+      const blob = await res.blob();
+      let filename = "Pathlight-Report.pdf";
+      const cd = res.headers.get("content-disposition");
+      if (cd) {
+        const match = cd.match(/filename="([^"]+)"/);
+        if (match && match[1]) filename = match[1];
+      }
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objectUrl);
+      setState("idle");
+    } catch (err) {
+      console.error("[pdf-download] failed", err);
+      setState("error");
+      // Auto-reset to idle after a few seconds so the user can retry
+      // without having to refresh.
+      setTimeout(() => setState("idle"), 5000);
+    }
+  }
+
+  const label =
+    state === "loading"
+      ? "Generating…"
+      : state === "error"
+        ? "Try again"
+        : "Download PDF";
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={state === "loading"}
+      aria-busy={state === "loading"}
+      className="text-sm text-white/60 hover:text-white/90 transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-wait"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      {label}
+    </button>
   );
 }
 

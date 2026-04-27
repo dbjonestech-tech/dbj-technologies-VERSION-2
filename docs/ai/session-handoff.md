@@ -3,7 +3,97 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 27, 2026 (overnight) -- Cost monitoring + alerting (Feature #12)
+## Last Session: April 27, 2026 (overnight, late) -- PDF Report Download (Feature #10)
+
+### What shipped
+
+The next-biggest-win item from the feasibility doc, ranked priority 4
+in the table at the top of `docs/ai/pathlight-feature-feasibility.md`.
+PDF download turns every Pathlight report into a forwardable artifact
+so a prospect's partner, accountant, or marketing director can read
+the same findings without an inbox copy or a UUID URL.
+
+- **`lib/services/browserless.ts`.** New `generatePdf(url, scanId)`
+  that POSTs to Browserless v2's `/pdf` endpoint with
+  `emulateMediaType: "print"` (which activates the existing print
+  stylesheet in `globals.css` -- chat panel hidden via `.askpath-*`
+  display:none, accordions force-open via `.print-expand`,
+  Lighthouse breakdown via `.print-grid-expand`, white background
+  via `body { background: white }`). `gotoOptions.waitUntil` is
+  `networkidle0` and `waitForTimeout` is 2500ms, matching the
+  screenshot pipeline's settle pattern. `printBackground: true` so
+  the SVG score ring + inline-colored badges render their fills.
+  60s abort timeout (Browserless PDF typically takes 5-10s of actual
+  work). Returns a `Buffer` of PDF bytes. Records to
+  `api_usage_events` with `operation: "pdf-report"` so the cost
+  dashboard reflects on-demand PDF generation alongside screenshots.
+- **`app/(grade)/api/scan/[scanId]/pdf/route.ts`.** New GET endpoint.
+  Loads the scan via `getFullScanReport`, returns 404 if missing,
+  409 if the scan status is not `complete` or `partial` (no PDF for
+  scans still running). Builds a friendly filename of the form
+  `Pathlight-Report-{hostname-slug}-{YYYY-MM-DD}.pdf` from the
+  scanned URL and the scan's createdAt date. Streams the PDF back
+  with `Content-Type: application/pdf`, the computed
+  `Content-Disposition: attachment; filename="..."`, and
+  `Cache-Control: no-store` so no intermediate proxy caches a copy.
+  Browserless errors are captured to Sentry and surfaced to the
+  client as a generic 502 -- internal details never reach the
+  browser.
+- **`app/(grade)/pathlight/[scanId]/ScanStatus.tsx`.** New
+  `DownloadPdfButton` component sits next to the existing
+  "Print Full Report" button (both in a flex row with `print-hidden`
+  so neither survives the actual print). Three states: `idle`,
+  `loading`, `error`. Click triggers a `fetch()` to the new
+  endpoint, reads the response as a blob, parses the filename from
+  the `Content-Disposition` header, and triggers a programmatic
+  anchor download via `URL.createObjectURL`. Disabled while
+  loading; auto-resets to idle 5s after an error so the user can
+  retry without refreshing.
+
+### Cost expectation
+
+At ~$0.05 per PDF (rough Browserless v2 unit cost) and ~20% of
+prospects clicking Download, expect ~$1/mo at 100 scans/mo.
+Visible in `/internal/cost` as a row with
+`provider: browserless` / `operation: pdf-report`.
+
+### Auth posture (intentionally inherited from the report page)
+
+The PDF endpoint has no auth beyond the UUID scanId, identical to
+`/pathlight/[scanId]`. Adding auth here without also adding it to
+the report page would be inconsistent (a viewer could just Cmd+P
+the report and the print stylesheet already produces the same
+output Browserless does). The "no auth on report URL" gap is
+already tracked in backlog as a deferred item; when it lands, the
+PDF endpoint inherits the fix automatically since it loads the same
+report data.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 NEW em-dashes across all 3 changed/new files (two em-dashes that
+  initially landed in `browserless.ts` doc comments were caught and
+  replaced with hyphens before commit).
+
+### Files changed (2 modified, 1 created)
+
+- `lib/services/browserless.ts` (added `generatePdf` + `PDF_TIMEOUT_MS`)
+- `app/(grade)/api/scan/[scanId]/pdf/route.ts` (NEW route handler)
+- `app/(grade)/pathlight/[scanId]/ScanStatus.tsx` (added
+  `DownloadPdfButton` component, wrapped Print + Download in a flex
+  row)
+
+Plus this update to `docs/ai/session-handoff.md` and a `docs/ai/backlog.md`
+entry marked complete.
+
+### Manual deploy gates
+
+None this round. The endpoint relies only on `BROWSERLESS_API_KEY`
+which is already set in Vercel for the existing screenshot pipeline.
+The first scan after deploy will be able to produce a PDF.
+
+## Previous Session: April 27, 2026 (overnight) -- Cost monitoring + alerting (Feature #12)
 
 ### What shipped
 
