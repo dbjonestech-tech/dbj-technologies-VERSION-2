@@ -112,7 +112,9 @@ a { color: inherit; text-decoration: none; }
   padding: 1.4rem clamp(1.25rem, 5vw, 3rem) 0.55rem;
 }
 .wordmark {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-weight: 500;
   font-size: 1.6rem;
@@ -120,6 +122,24 @@ a { color: inherit; text-decoration: none; }
   color: var(--charcoal);
   text-transform: uppercase;
   line-height: 1.1;
+}
+.monogram-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--sage);
+  border-radius: 50%;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--sage);
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1;
+  flex-shrink: 0;
 }
 .nav-tagline {
   display: block;
@@ -132,14 +152,12 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.04em;
 }
 .nav-row {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
+  justify-content: center;
   padding: 0.75rem clamp(1.25rem, 5vw, 3rem) 1.1rem;
-  gap: 1.5rem;
 }
 .nav-links {
-  grid-column: 2;
   display: flex;
   gap: 2.4rem;
   justify-content: center;
@@ -152,11 +170,6 @@ a { color: inherit; text-decoration: none; }
 }
 .nav-links a { transition: color 200ms ease; }
 .nav-links a:hover { color: var(--charcoal); }
-.nav-cta-wrap {
-  grid-column: 3;
-  justify-self: end;
-}
-.nav-cta { font-size: 0.7rem; padding: 0.78rem 1.5rem; letter-spacing: 0.2em; }
 
 /* Hero · luxury home exterior on right, warm-white card on left */
 .hero {
@@ -680,6 +693,27 @@ footer {
   color: var(--charcoal);
   margin-bottom: 0.4rem;
 }
+.footer-col h4.footer-subhead {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  color: var(--sage);
+  margin-bottom: 0.95rem;
+}
+.footer-col .footer-affil {
+  margin-top: 1.35rem;
+  font-size: 0.85rem;
+  color: var(--warm-gray-light);
+  line-height: 1.85;
+}
+.footer-col .footer-hours {
+  margin-top: 1.1rem;
+  font-size: 0.88rem;
+  font-style: italic;
+  line-height: 1.75;
+  color: var(--warm-gray-light);
+}
 .footer-col .est {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-style: italic;
@@ -727,12 +761,45 @@ footer {
 }
 .project-cap {
   margin-top: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.project-cap-name {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-style: italic;
   font-size: 0.98rem;
   color: var(--warm-gray);
   letter-spacing: 0.01em;
 }
+
+/* Project image row link enhancement */
+.project-fig-link {
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 320ms ease;
+}
+.project-fig-link img {
+  transition: filter 320ms ease;
+}
+.project-fig-link:hover { transform: translateY(-4px); }
+.project-fig-link:hover img { filter: brightness(0.97); }
+.project-fig-link:hover .project-cap-link { color: var(--charcoal); }
+.project-cap-link {
+  font-family: 'DM Sans', sans-serif;
+  font-style: normal;
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--sage);
+  font-weight: 500;
+  transition: color 240ms ease;
+}
+.project-cap-link::after { content: ' \2192'; padding-left: 0.4em; }
 
 /* Capabilities craft image */
 .cap-craft {
@@ -747,6 +814,369 @@ footer {
   border-radius: 0;
 }
 
+/* Journal · article previews */
+.journal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.6rem;
+  margin-top: 1rem;
+}
+.journal-entry {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--sage);
+  padding-top: 1.85rem;
+}
+.journal-meta {
+  display: flex;
+  gap: 1.2rem;
+  align-items: baseline;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+.journal-date {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--sage);
+  font-weight: 500;
+}
+.journal-cat {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--warm-gray-light);
+}
+.journal-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  font-size: 1.55rem;
+  color: var(--charcoal);
+  letter-spacing: 0.005em;
+  line-height: 1.25;
+  margin: 0 0 1.1rem;
+}
+.journal-excerpt {
+  color: var(--warm-gray);
+  font-size: 0.99rem;
+  line-height: 1.8;
+  margin: 0 0 1.5rem;
+}
+.journal-link {
+  margin-top: auto;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--sage);
+  font-weight: 500;
+  border-bottom: 1px solid var(--sage-pale);
+  padding-bottom: 4px;
+  align-self: flex-start;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+.journal-link:hover { color: var(--charcoal); border-bottom-color: var(--charcoal); }
+.journal-link::after { content: ' \2192'; padding-left: 0.4em; }
+.journal-foot {
+  margin-top: 3.6rem;
+  text-align: center;
+}
+.journal-foot a {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--sage-deep);
+  border-bottom: 1px solid var(--sage-pale);
+  padding-bottom: 3px;
+}
+.journal-foot a:hover { color: var(--charcoal); border-bottom-color: var(--charcoal); }
+
+/* Recognition · publications and recent honors */
+.recognition .section-head {
+  margin: 0 auto 3rem;
+  max-width: 560px;
+  text-align: center;
+}
+.recognition .section-head .eyebrow {
+  display: block;
+  margin: 0 0 1.25rem;
+}
+.recognition .section-head h2 {
+  margin: 0 auto 1.25rem;
+}
+.recognition .section-head p {
+  max-width: 480px;
+  margin: 0 auto;
+}
+.recognition-marks {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2.4rem 3.4rem;
+  padding: 1rem 0 3.2rem;
+  border-bottom: 1px solid var(--hairline);
+  max-width: 1040px;
+  margin: 0 auto;
+}
+.recognition-mark {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.45rem;
+  color: var(--charcoal);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0.82;
+}
+.recognition-mark.smallcap {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 0.92rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--charcoal);
+  font-family: 'DM Sans', sans-serif;
+  opacity: 0.72;
+}
+.recognition-honors {
+  margin: 3.8rem auto 0;
+  max-width: 880px;
+}
+.recognition-honors h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--sage);
+  font-weight: 500;
+  margin: 0 0 1.85rem;
+  text-align: center;
+}
+.honor-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.6rem 3rem;
+}
+.honor-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.15rem;
+  align-items: baseline;
+  font-size: 1rem;
+  color: var(--charcoal);
+  line-height: 1.55;
+}
+.honor-year {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  font-size: 1.4rem;
+  color: var(--sage);
+  font-feature-settings: 'kern', 'liga', 'tnum';
+  letter-spacing: 0.02em;
+}
+.honor-text {
+  color: var(--warm-gray);
+  font-size: 0.96rem;
+  line-height: 1.7;
+}
+.honor-text strong {
+  color: var(--charcoal);
+  font-weight: 500;
+}
+.honor-text em {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1.05em;
+  color: var(--sage-deep);
+}
+
+/* Available Homes & Lots · inventory cards */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.85rem;
+  margin-top: 1rem;
+}
+.inventory-card {
+  background: var(--warm-white);
+  border: 1px solid var(--sage-pale);
+  display: flex;
+  flex-direction: column;
+}
+.inventory-image {
+  aspect-ratio: 4 / 3;
+  background-color: var(--linen-deep);
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid var(--sage-pale);
+}
+.inventory-body {
+  padding: 1.85rem 1.85rem 2rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.inventory-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+  font-weight: 500;
+  margin-bottom: 1.1rem;
+}
+.inventory-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background: var(--sage);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.inventory-status.coming::before { background: transparent; border: 1px solid var(--sage); }
+.inventory-status.lot::before { background: var(--linen-deep); border: 1px solid var(--sage); transform: rotate(45deg); border-radius: 0; }
+.inventory-address {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  font-size: 1.55rem;
+  color: var(--charcoal);
+  letter-spacing: 0.005em;
+  line-height: 1.18;
+  margin-bottom: 0.45rem;
+}
+.inventory-area {
+  font-family: 'DM Sans', sans-serif;
+  font-feature-settings: 'kern', 'liga', 'tnum';
+  font-size: 0.92rem;
+  color: var(--warm-gray);
+  letter-spacing: 0.04em;
+  margin-bottom: 1.35rem;
+}
+.inventory-area span + span::before {
+  content: '\00B7';
+  margin: 0 0.65rem;
+  color: var(--sage);
+}
+.inventory-meta {
+  font-size: 0.95rem;
+  color: var(--warm-gray);
+  line-height: 1.75;
+  margin-bottom: 1.4rem;
+}
+.inventory-arch {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--sage-deep);
+  margin-bottom: 1.5rem;
+}
+.inventory-link {
+  margin-top: auto;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--sage);
+  font-weight: 500;
+  border-bottom: 1px solid var(--sage-pale);
+  padding-bottom: 4px;
+  align-self: flex-start;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+.inventory-link:hover { color: var(--charcoal); border-bottom-color: var(--charcoal); }
+.inventory-link::after { content: ' \2192'; padding-left: 0.4em; }
+.inventory-foot {
+  margin-top: 2.8rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--warm-gray);
+  max-width: 720px;
+}
+
+/* Communities · overlay-panel pattern on photographs */
+.communities-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+.community-card {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background-color: var(--linen-deep);
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+.community-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(26,26,26,0) 55%, rgba(26,26,26,0.18) 100%);
+  pointer-events: none;
+}
+.community-overlay {
+  position: absolute;
+  bottom: 1.6rem;
+  left: 1.6rem;
+  right: 1.6rem;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid var(--sage-pale);
+  padding: 1.6rem 1.85rem 1.7rem;
+}
+.community-eyebrow {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--sage);
+  font-weight: 500;
+  margin-bottom: 0.55rem;
+}
+.community-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: 1.85rem;
+  color: var(--charcoal);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.05;
+  margin: 0;
+}
+.community-rule {
+  width: 32px;
+  height: 1px;
+  background: var(--sage);
+  margin: 0.95rem 0;
+}
+.community-meta {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.93rem;
+  color: var(--warm-gray);
+  line-height: 1.7;
+  margin: 0;
+}
+.community-card-foot {
+  margin-top: 2.6rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--sage-deep);
+}
+.community-card-foot a { border-bottom: 1px solid var(--sage-pale); padding-bottom: 2px; }
+.community-card-foot a:hover { color: var(--charcoal); border-bottom-color: var(--charcoal); }
+
 /* Responsive */
 @media (max-width: 960px) {
   .ledger { grid-template-columns: 70px 1.6fr 1fr 0.8fr 1.4fr; }
@@ -758,13 +1188,14 @@ footer {
   .principal-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .principal-photo { margin-top: 0; }
   .hero-card { width: 70%; }
+  .inventory-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .nav-row { grid-template-columns: 1fr; gap: 0.8rem; padding-bottom: 1rem; }
-  .nav-links { grid-column: 1; flex-wrap: wrap; gap: 1rem 1.4rem; font-size: 0.7rem; }
-  .nav-cta-wrap { grid-column: 1; justify-self: center; }
-  .wordmark { font-size: 1.3rem; }
+  .nav-row { padding-bottom: 1rem; }
+  .nav-links { flex-wrap: wrap; gap: 0.85rem 1.3rem; font-size: 0.68rem; }
+  .wordmark { font-size: 1.3rem; gap: 0.65rem; }
+  .monogram-mark { width: 32px; height: 32px; font-size: 1rem; }
   .nav-tagline { font-size: 0.88rem; }
 
   .hero { padding: 4rem 1.25rem; min-height: 80vh; }
@@ -806,6 +1237,24 @@ footer {
   .project-fig img { height: 240px; }
   .cap-craft { margin-top: 2.5rem; }
   .cap-craft img { height: 240px; }
+
+  .communities-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .community-card { aspect-ratio: 16 / 10; }
+  .community-overlay { bottom: 1rem; left: 1rem; right: 1rem; padding: 1.1rem 1.25rem 1.2rem; }
+  .community-name { font-size: 1.45rem; }
+
+  .inventory-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .inventory-body { padding: 1.5rem 1.5rem 1.75rem; }
+  .inventory-address { font-size: 1.4rem; }
+
+  .recognition-marks { gap: 1.4rem 2rem; padding-bottom: 2.4rem; }
+  .recognition-mark { font-size: 1.2rem; }
+  .recognition-mark.smallcap { font-size: 0.78rem; letter-spacing: 0.24em; }
+  .honor-list { grid-template-columns: 1fr; gap: 1.4rem; }
+  .recognition-honors { margin-top: 2.6rem; }
+
+  .journal-grid { grid-template-columns: 1fr; gap: 2.4rem; }
+  .journal-title { font-size: 1.35rem; }
 }
 </style>
 </head>
@@ -813,20 +1262,20 @@ footer {
 
 <header class="nav" role="banner">
   <div class="nav-top">
-    <a href="#" class="wordmark" aria-label="Ashworth and Foster, Builders">Ashworth &amp; Foster</a>
-    <span class="nav-tagline">Custom Residential &middot; Park Cities</span>
+    <a href="#" class="wordmark" aria-label="Ashworth and Foster, Builders">
+      <span class="monogram-mark" aria-hidden="true">A</span>Ashworth &amp; Foster
+    </a>
+    <span class="nav-tagline">Custom Residential &middot; Park Cities, Dallas</span>
   </div>
   <div class="nav-row">
     <nav class="nav-links" aria-label="Primary">
-      <a href="#portfolio">Portfolio</a>
-      <a href="#process">Process</a>
+      <a href="#galleries">Galleries</a>
+      <a href="#communities">Communities</a>
+      <a href="#available">Available Homes</a>
       <a href="#studio">Studio</a>
       <a href="#journal">Journal</a>
       <a href="#contact">Contact</a>
     </nav>
-    <div class="nav-cta-wrap">
-      <a href="#contact" class="btn nav-cta">Begin a Project</a>
-    </div>
   </div>
 </header>
 
@@ -839,7 +1288,7 @@ footer {
       <h1>Houses Are Built.<br>Homes Are <em>considered</em>.</h1>
       <p class="hero-sub">We design and build a small number of custom residences each year for clients who care as much about how a home is made as how it looks. Every detail is decided by the principal who runs the project, not delegated to a project manager.</p>
       <div class="hero-actions">
-        <a href="#portfolio" class="btn">View Recent Work</a>
+        <a href="#galleries" class="btn">View Recent Galleries</a>
       </div>
     </div>
   </section>
@@ -868,12 +1317,59 @@ footer {
     </div>
   </section>
 
-  <section id="portfolio" class="section-off">
+  <section id="communities" class="section-warm" aria-label="Communities we build in">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Recent Work</span>
-        <h2>A Selection of Recent Projects.</h2>
-        <p>Each home is documented after completion. We do not photograph during staging or before landscape maturity.</p>
+        <span class="eyebrow">Where We Build</span>
+        <h2 class="italic">Park Cities, Preston Hollow, and the neighborhoods we have spent twenty years learning.</h2>
+        <p>We accept commissions only within neighborhoods we know well enough to anticipate. Below are the four where most of our recent work has happened.</p>
+      </div>
+
+      <div class="communities-grid" role="list">
+        <article class="community-card" role="listitem" style="background-image:url('images/luxury-builders-hero.jpg');" aria-label="Highland Park">
+          <div class="community-overlay">
+            <span class="community-eyebrow">Park Cities</span>
+            <h3 class="community-name">Highland Park</h3>
+            <div class="community-rule" aria-hidden="true"></div>
+            <p class="community-meta">The historic core of the Park Cities. Eighteen homes since 2010, working with most of the architects who shape the neighborhood.</p>
+          </div>
+        </article>
+        <article class="community-card" role="listitem" style="background-image:url('images/luxury-builders-detail.jpg');" aria-label="Preston Hollow">
+          <div class="community-overlay">
+            <span class="community-eyebrow">North Dallas</span>
+            <h3 class="community-name">Preston Hollow</h3>
+            <div class="community-rule" aria-hidden="true"></div>
+            <p class="community-meta">Estate-scale lots between Walnut Hill and Royal Lane. Compound additions through ground-up residences past fourteen thousand square feet.</p>
+          </div>
+        </article>
+        <article class="community-card" role="listitem" style="background-image:url('images/luxury-builders-bath.jpg');" aria-label="Volk Estates">
+          <div class="community-overlay">
+            <span class="community-eyebrow">University Park</span>
+            <h3 class="community-name">Volk Estates</h3>
+            <div class="community-rule" aria-hidden="true"></div>
+            <p class="community-meta">An enclave of mature, gracious lots. Renovation and addition predominate, often on homes built before 1955.</p>
+          </div>
+        </article>
+        <article class="community-card" role="listitem" style="background-image:url('images/luxury-builders-craft.jpg');" aria-label="Bluffview">
+          <div class="community-overlay">
+            <span class="community-eyebrow">Northwest Dallas</span>
+            <h3 class="community-name">Bluffview</h3>
+            <div class="community-rule" aria-hidden="true"></div>
+            <p class="community-meta">Tucked above Bachman Branch. Original 1930s and 1940s homes worth preserving. Five down-to-studs renovations completed.</p>
+          </div>
+        </article>
+      </div>
+
+      <p class="community-card-foot"><a href="#contact">If you have a lot in mind, we are happy to walk it with you &rarr;</a></p>
+    </div>
+  </section>
+
+  <section id="galleries" class="section-off" aria-label="Galleries">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Galleries</span>
+        <h2>Documented Projects, Organized by Residence.</h2>
+        <p>Each home is photographed after completion, never during staging and never before the landscape has matured. Galleries are organized by residence; each contains exterior, interior, and detail studies.</p>
       </div>
 
       <div class="ledger" role="list" aria-label="Recent projects">
@@ -921,22 +1417,87 @@ footer {
         </div>
       </div>
 
-      <p class="ledger-foot"><a href="#portfolio">View the complete portfolio &rarr;</a></p>
+      <p class="ledger-foot"><a href="#galleries">Open the full catalogue &rarr;</a></p>
 
-      <div class="project-row" role="list" aria-label="Recent project documentation">
+      <div class="project-row" role="list" aria-label="Featured galleries">
         <figure class="project-fig" role="listitem">
-          <img src="images/luxury-builders-kitchen.jpg" alt="Custom kitchen with marble island and hand-finished millwork at the Lakeside Residence" width="1600" height="1067" loading="lazy" style="max-width:100%;height:auto;display:block;">
-          <figcaption class="project-cap">Lakeside Residence &middot; Highland Park</figcaption>
+          <a href="#galleries" class="project-fig-link" aria-label="Open the Lakeside Residence gallery">
+            <img src="images/luxury-builders-kitchen.jpg" alt="Custom kitchen with marble island and hand-finished millwork at the Lakeside Residence" width="1600" height="1067" loading="lazy" style="max-width:100%;height:auto;display:block;">
+            <figcaption class="project-cap">
+              <span class="project-cap-name">Lakeside Residence &middot; Highland Park</span>
+              <span class="project-cap-link">View gallery</span>
+            </figcaption>
+          </a>
         </figure>
         <figure class="project-fig" role="listitem">
-          <img src="images/luxury-builders-bath.jpg" alt="Master suite interior with natural light and stone detailing at Strait Lane Estate" width="1600" height="1067" loading="lazy" style="max-width:100%;height:auto;display:block;">
-          <figcaption class="project-cap">Strait Lane Estate &middot; Preston Hollow</figcaption>
+          <a href="#galleries" class="project-fig-link" aria-label="Open the Strait Lane Estate gallery">
+            <img src="images/luxury-builders-bath.jpg" alt="Master suite interior with natural light and stone detailing at Strait Lane Estate" width="1600" height="1067" loading="lazy" style="max-width:100%;height:auto;display:block;">
+            <figcaption class="project-cap">
+              <span class="project-cap-name">Strait Lane Estate &middot; Preston Hollow</span>
+              <span class="project-cap-link">View gallery</span>
+            </figcaption>
+          </a>
         </figure>
         <figure class="project-fig" role="listitem">
-          <img src="images/luxury-builders-detail.jpg" alt="Architectural staircase and custom millwork detail at the Beverly Drive Renovation" width="1600" height="1067" loading="lazy" style="max-width:100%;height:auto;display:block;">
-          <figcaption class="project-cap">Beverly Drive Renovation &middot; Highland Park</figcaption>
+          <a href="#galleries" class="project-fig-link" aria-label="Open the Beverly Drive Renovation gallery">
+            <img src="images/luxury-builders-detail.jpg" alt="Architectural staircase and custom millwork detail at the Beverly Drive Renovation" width="1600" height="1067" loading="lazy" style="max-width:100%;height:auto;display:block;">
+            <figcaption class="project-cap">
+              <span class="project-cap-name">Beverly Drive Renovation &middot; Highland Park</span>
+              <span class="project-cap-link">View gallery</span>
+            </figcaption>
+          </a>
         </figure>
       </div>
+    </div>
+  </section>
+
+  <section id="available" class="section-linen" aria-label="Available homes and lots">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Available Now</span>
+        <h2>A Few Homes Currently in Build, and One Lot Worth Knowing About.</h2>
+        <p>Most of our work is commissioned. Occasionally we build speculatively on a lot we cannot resist, or we hold a lot until the right architect-and-owner pairing finds us. The current list is below.</p>
+      </div>
+
+      <div class="inventory-grid" role="list">
+        <article class="inventory-card" role="listitem">
+          <div class="inventory-image" style="background-image:url('images/luxury-builders-detail.jpg');" aria-hidden="true"></div>
+          <div class="inventory-body">
+            <span class="inventory-status">Under Construction &middot; Spring 2026</span>
+            <h3 class="inventory-address">4321 Beverly Drive</h3>
+            <div class="inventory-area"><span>Highland Park</span><span>7,200 sf</span><span>0.34 acres</span></div>
+            <p class="inventory-meta">A four-bedroom Georgian on a corner lot, with a separate guest pavilion and a north-facing studio above the carriage house.</p>
+            <p class="inventory-arch">Wilson Fuqua, architect.</p>
+            <a href="#contact" class="inventory-link">Inquire</a>
+          </div>
+        </article>
+
+        <article class="inventory-card" role="listitem">
+          <div class="inventory-image" style="background-image:url('images/luxury-builders-bath.jpg');" aria-hidden="true"></div>
+          <div class="inventory-body">
+            <span class="inventory-status coming">Coming Q3 2026</span>
+            <h3 class="inventory-address">5215 Park Lane</h3>
+            <div class="inventory-area"><span>Preston Hollow</span><span>9,800 sf</span><span>1.1 acres</span></div>
+            <p class="inventory-meta">Walnut-stained millwork throughout, a kitchen designed by deVOL, and a primary suite that opens to a private garden screened with hornbeam.</p>
+            <p class="inventory-arch">Stocker Hoesterey Montenegro, architect.</p>
+            <a href="#contact" class="inventory-link">Inquire</a>
+          </div>
+        </article>
+
+        <article class="inventory-card" role="listitem">
+          <div class="inventory-image" style="background-image:url('images/luxury-builders-craft.jpg');" aria-hidden="true"></div>
+          <div class="inventory-body">
+            <span class="inventory-status lot">Lot Available</span>
+            <h3 class="inventory-address">3200 Drexel Drive</h3>
+            <div class="inventory-area"><span>Highland Park</span><span>0.42 acres</span></div>
+            <p class="inventory-meta">An exceptional Highland Park lot with mature pecans, ready for the right architect-and-owner pairing. We are happy to make introductions to architects we trust.</p>
+            <p class="inventory-arch">Architect to be determined with the buyer.</p>
+            <a href="#contact" class="inventory-link">Inquire</a>
+          </div>
+        </article>
+      </div>
+
+      <p class="inventory-foot">All inquiries are answered personally by William or Daniel within two business days. Pricing is shared in conversation, after we understand which finishes and which architect you are envisioning.</p>
     </div>
   </section>
 
@@ -1025,6 +1586,47 @@ footer {
     </div>
   </section>
 
+  <section class="section-off recognition" aria-label="Recognition and recent honors">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Recognition</span>
+        <h2 class="italic">As featured in.</h2>
+        <p>Most of what we build never appears in print. The work below is what our clients and our architects chose to share.</p>
+      </div>
+
+      <div class="recognition-marks" role="list" aria-label="Publications">
+        <span class="recognition-mark" role="listitem">Architectural Digest</span>
+        <span class="recognition-mark" role="listitem">Veranda</span>
+        <span class="recognition-mark smallcap" role="listitem">Luxe Interiors</span>
+        <span class="recognition-mark smallcap" role="listitem">D Home</span>
+        <span class="recognition-mark" role="listitem">Texas Architect</span>
+        <span class="recognition-mark smallcap" role="listitem">PaperCity</span>
+      </div>
+
+      <div class="recognition-honors">
+        <h3>Recent Honors</h3>
+        <ul class="honor-list" role="list">
+          <li class="honor-item" role="listitem">
+            <span class="honor-year">2025</span>
+            <span class="honor-text"><strong>D Home Best Builders</strong>, Custom Residential</span>
+          </li>
+          <li class="honor-item" role="listitem">
+            <span class="honor-year">2024</span>
+            <span class="honor-text"><strong>AIA Dallas Honor Award</strong>, <em>The Lakeside Residence</em>, with Robbie Fusch</span>
+          </li>
+          <li class="honor-item" role="listitem">
+            <span class="honor-year">2024</span>
+            <span class="honor-text"><strong>NARI Contractor of the Year</strong>, Whole-Home Renovation</span>
+          </li>
+          <li class="honor-item" role="listitem">
+            <span class="honor-year">2023</span>
+            <span class="honor-text"><strong>D Home Best Builders</strong>, Renovations</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <section class="section-linen" aria-label="Testimonials">
     <div class="container">
       <div class="section-head">
@@ -1042,6 +1644,50 @@ footer {
           <figcaption class="quote-attr">John &amp; Anne Pemberton &#10022; Preston Hollow</figcaption>
         </figure>
       </div>
+    </div>
+  </section>
+
+  <section id="journal" class="section-warm" aria-label="The Journal">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">The Journal</span>
+        <h2>Notes from the Field, the Studio, and the Site Visit.</h2>
+        <p>Quiet writing about the work, posted when there is something worth saying. We do not publish on a schedule.</p>
+      </div>
+
+      <div class="journal-grid" role="list">
+        <article class="journal-entry" role="listitem">
+          <div class="journal-meta">
+            <span class="journal-date">March 2026</span>
+            <span class="journal-cat">Notes</span>
+          </div>
+          <h3 class="journal-title">On Cabinet Hardware, and Why It Matters More Than the Tile.</h3>
+          <p class="journal-excerpt">Hardware is the part of a kitchen your hand touches twenty times a day. Tile is the part you look at. Most owners spend three months choosing tile and an afternoon choosing hardware. The order should be reversed.</p>
+          <a href="#journal" class="journal-link">Continue reading</a>
+        </article>
+
+        <article class="journal-entry" role="listitem">
+          <div class="journal-meta">
+            <span class="journal-date">February 2026</span>
+            <span class="journal-cat">A Site Visit</span>
+          </div>
+          <h3 class="journal-title">A Visit to a Forty-Year-Old Park Cities Home.</h3>
+          <p class="journal-excerpt">A 1986 Highland Park residence by an architect we admire, returned to forty years later with the original owners still in residence. Notes on what survived, what failed, and what we now build differently because of it.</p>
+          <a href="#journal" class="journal-link">Continue reading</a>
+        </article>
+
+        <article class="journal-entry" role="listitem">
+          <div class="journal-meta">
+            <span class="journal-date">December 2025</span>
+            <span class="journal-cat">Practice</span>
+          </div>
+          <h3 class="journal-title">When the Architect, the Builder, and the Owner Disagree.</h3>
+          <p class="journal-excerpt">It happens on every project worth doing. The trick is not to avoid the disagreement. The trick is to have it early, in person, with the drawings on the table and a willingness to be wrong.</p>
+          <a href="#journal" class="journal-link">Continue reading</a>
+        </article>
+      </div>
+
+      <p class="journal-foot"><a href="#journal">Read the full journal &rarr;</a></p>
     </div>
   </section>
 
@@ -1098,13 +1744,16 @@ footer {
     <div class="footer-col">
       <h4>Ashworth &amp; Foster</h4>
       <p class="est">Builders, est. 2009</p>
+      <p class="footer-affil">AIA Dallas Member &middot; NARI Member<br>Texas Residential Construction License #45821</p>
     </div>
     <div class="footer-col">
+      <h4 class="footer-subhead">Visit</h4>
       <p>4516 Lovers Lane, Suite 220<br>Dallas, Texas 75209</p>
-      <p><a href="tel:+12145550428">(214) 555-0428</a><br><a href="mailto:studio@ashworthfoster.com">studio@ashworthfoster.com</a></p>
+      <p class="footer-hours">Studio: by appointment, Monday to Friday<br>Field visits: Saturday mornings by arrangement</p>
     </div>
     <div class="footer-col">
-      <p>Studio open by appointment,<br>Monday to Friday</p>
+      <h4 class="footer-subhead">Reach</h4>
+      <p><a href="tel:+12145550428">(214) 555-0428</a><br><a href="mailto:studio@ashworthfoster.com">studio@ashworthfoster.com</a></p>
       <p><a href="https://dbjtechnologies.com" class="footer-credit" rel="noopener">Website by DBJ Technologies</a></p>
     </div>
   </div>
