@@ -314,23 +314,33 @@ function ScanningMoon() {
         }}
       />
 
-      {/* Physical moon body. Texture rotates with libration wobble
-          (combined rotation + rotateX/Y over a 16s period) so the
-          face appears to shift like the moon viewed from changing
-          earth-perspective latitudes. Perspective set on the stage
-          parent so the rotateX/Y reads as a tilt, not a flatten. */}
+      {/* Physical moon body. Rotation and libration are split across
+          two nested elements so each runs on its own pure timing
+          function: the spinner rotates linearly at a constant 24s
+          period (perfectly smooth, no stagger), while the texture
+          librates rotateX/rotateY sinusoidally over an independent
+          18s period (sine via ease-in-out keyframes). The two
+          combine visually into a wobbling moon that never slows or
+          stops. Perspective set on the stage parent so rotateX/Y
+          reads as a tilt rather than a flatten. */}
       <div className="absolute inset-0 rounded-full bg-black overflow-hidden">
         <div
-          className="pathlight-moon-active w-full h-full bg-cover bg-center"
+          className="pathlight-moon-spinner h-full w-full"
           style={
             {
+              "--moon-spin-duration": "24s",
+            } as React.CSSProperties
+          }
+        >
+          <div
+            className="pathlight-moon-active h-full w-full bg-cover bg-center"
+            style={{
               backgroundImage: "url(/brand/moon.webp)",
               filter:
                 "sepia(8%) hue-rotate(-12deg) contrast(1.25) brightness(1.15) saturate(0.95)",
-              "--moon-spin-duration": "16s",
-            } as React.CSSProperties
-          }
-        />
+            }}
+          />
+        </div>
       </div>
 
       {/* Spherical terminator overlay */}

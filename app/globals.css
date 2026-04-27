@@ -602,32 +602,46 @@ select:focus-visible {
 }
 
 /* ─── PATHLIGHT MOON (active scan loading state) ──────
- * Spin combined with subtle libration wobble so the moon
- * face appears to shift the way it does when the same
- * moon is observed from changing earth latitudes (a Beijing
- * observer vs a Kampala observer at different points in
- * the lunar cycle). The combined keyframe locks the
- * rotation and tilt to the same period so they never go
- * out of phase. Distinct class from .pathlight-moon above
- * so the landing page's slow 1200s rotation is unaffected.
- * Stage parent adds perspective so the rotateX/Y reads as
- * a tilt rather than collapsing the disc.
+ * Rotation and libration are split across two nested
+ * elements so each runs on its own pure timing function:
+ *   - .pathlight-moon-spinner rotates linearly at constant
+ *     speed (no stagger, no easing per keyframe). Default
+ *     24s per revolution. Period is the only knob via the
+ *     --moon-spin-duration custom property.
+ *   - .pathlight-moon-active librates rotateX/rotateY
+ *     sinusoidally over an independent 18s period.
+ *     The 24/18 ratio is intentionally non-resonant so the
+ *     two never sync into a repeating pattern.
+ * The two combine visually into a wobbling moon that never
+ * slows or stops, mimicking how the same moon appears to
+ * shift slightly when observed from changing earth latitudes.
+ * Distinct from the landing page's .pathlight-moon (1200s)
+ * which is unaffected.
+ * Stage parent adds perspective so rotateX/Y reads as tilt
+ * rather than collapsing the disc.
  * ──────────────────────────────────────────────────── */
 .pathlight-moon-stage {
   perspective: 1000px;
   transform-style: preserve-3d;
 }
-@keyframes pathlight-moon-spin-libration {
-  0%   { transform: rotate(0deg)   rotateX(0deg)  rotateY(0deg); }
-  16%  { transform: rotate(58deg)  rotateX(6deg)  rotateY(-4deg); }
-  33%  { transform: rotate(120deg) rotateX(-3deg) rotateY(7deg); }
-  50%  { transform: rotate(180deg) rotateX(-6deg) rotateY(0deg); }
-  66%  { transform: rotate(238deg) rotateX(3deg)  rotateY(-7deg); }
-  83%  { transform: rotate(295deg) rotateX(7deg)  rotateY(4deg); }
-  100% { transform: rotate(360deg) rotateX(0deg)  rotateY(0deg); }
+
+@keyframes pathlight-moon-spin {
+  to { transform: rotate(360deg); }
+}
+.pathlight-moon-spinner {
+  animation: pathlight-moon-spin var(--moon-spin-duration, 24s) linear infinite;
+  will-change: transform;
+}
+
+@keyframes pathlight-moon-libration {
+  0%   { transform: rotateX(0deg)  rotateY(0deg); }
+  25%  { transform: rotateX(6deg)  rotateY(-5deg); }
+  50%  { transform: rotateX(0deg)  rotateY(0deg); }
+  75%  { transform: rotateX(-6deg) rotateY(5deg); }
+  100% { transform: rotateX(0deg)  rotateY(0deg); }
 }
 .pathlight-moon-active {
-  animation: pathlight-moon-spin-libration var(--moon-spin-duration, 16s) ease-in-out infinite;
+  animation: pathlight-moon-libration 18s ease-in-out infinite;
   will-change: transform;
 }
 
@@ -742,6 +756,7 @@ select:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .pathlight-moon-spinner,
   .pathlight-moon-active {
     animation: none;
   }
