@@ -3,7 +3,113 @@
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`).
 
-## Last Session: April 27, 2026 (evening) -- Resend bounce/complaint webhook (Feature #11)
+## Last Session: April 27, 2026 (late evening) -- hvac-contractor Pass 1 + Comfort Club
+
+### What shipped (this commit)
+
+Third of 8 template Pass 1 revisions, sequenced after luxury-builders Pass 1
+(`bc40c1a`) and restaurant Pass 1 (`569f147`). DFW reference: A-Star Air
+Conditioning, Plumbing & Electric. Goal: keep the steel/orange utility-vertical
+design language intact and add the conversion infrastructure real DFW HVAC
+contractors monetize. Section count grew 9 -> 12, nav restructured, footer
+expanded, hero trust line replaced with a four-card visual badge stack, and the
+SEO-spammy 20-pill city grid replaced with three coherent zone cards.
+
+- **NEW: PROMO STRIP** (steel-deep, top-most band, scrolls away with body).
+  Holds time-sensitive seasonal offers. Current copy: "Spring Special $89 AC
+  Tune-Up through May 31. Beat the Texas heat dome." plus a "View All Offers"
+  link to `#offers`. Sits ABOVE the existing orange emergency strip (which
+  remains sticky-relative as the second strip).
+- **NEW: TRUST BADGES** (replacing the inline trust line in the hero). Four
+  cards in a `repeat(4, 1fr)` grid (collapses to 2 cols on tablet, 1 on
+  mobile): Google 4.9 stars / 2,847 reviews; BBB A+ Rated / Accredited since
+  2008; NATE Certified Techs / Every tech on staff; Carrier Factory Authorized
+  / Premier Dealer. Each card uses `rgba(255,255,255,0.06)` glass background
+  with `rgba(255,255,255,0.14)` hairline border so the technician hero photo
+  reads through.
+- **NEW: SPECIAL OFFERS** (`#offers`, bone background, full-bleed orange
+  gradient top rule). Three coupon cards: $89 AC Tune-Up (was $129, "Most
+  Popular" featured banner with deeper orange-deep shadow), Free 2nd Opinion
+  ("Second Opinion" banner, no was-price), $50 Off Any Repair ("Save $50"
+  banner). Each card has dated fine print (May 31, all-year, July 31), 21-point
+  inspection list on the tune-up, dark CTA bar that flips to orange on hover.
+  Tabular numerals on every dollar figure.
+- **NEW: COMFORT CLUB** (`#club`, white background, between Reviews and
+  Financing). 2-column split: copy column has eyebrow Membership, H2 "The
+  Ironclad Comfort Club", `$189`/year price (or $19/month, +$9 for second
+  system), Join the Club orange button. Benefits aside on bone background with
+  6 checkmark items: two precision tune-ups (spring AC + fall heating),
+  priority dispatch, 15% off repairs, no after-hours fees, two-year parts
+  warranty, transferable on home sale.
+- **REPLACED: city pills -> ZONE CARDS** (`.zones-grid`). Old 20-pill grid
+  removed entirely (CSS rules `.city-grid`, `.city-pill`, `.city-pill__name`,
+  `.city-pill__star`, `.city-pill__suffix`, `.city-fallback` all deleted).
+  New `.zone-card` 3-up grid with three regional cards: 01 Mid-Cities (7
+  cities: Arlington, Fort Worth, Grapevine, Southlake, Keller, Mansfield,
+  Weatherford), 02 Dallas Metro (7: Dallas, Irving, Garland, Mesquite,
+  Richardson, Grand Prairie, Waxahachie), 03 North Suburbs (6: Plano, Frisco,
+  McKinney, Allen, Prosper, Denton). Each card has 3px orange top rule,
+  numbered tnum tag, zone name, geographic descriptor, and 2-column city list
+  with orange chevron bullets.
+- **NEW: MULTI-MODAL CONTACT STRIP** (`#contact`, bone, between Financing and
+  team transition image). Three cards (Call / Text / Book Online), each with
+  glyph (`☎` / `✉` / `📅`), label, title, supporting line, and outlined
+  orange action button. The Call and Text cards both surface the same number
+  with `tel:` and `sms:` schemes respectively. Book Online card surfaces
+  "Self-Schedule" with a 2-hour-window promise and 60-second confirmation
+  copy.
+- **NAV RESTRUCTURE.** Reordered + expanded from 5 links to 7: Services ->
+  Offers -> Club -> Service Area -> Reviews -> Financing -> Contact. Phone
+  number stays in nav as the orange tnum on the right (sticky preserved).
+  Misleading "Contact -> #financing" link replaced with proper "Contact ->
+  #contact" anchor mapping to the new multi-modal strip.
+- **FOOTER ENHANCED.** Brand column adds `.footer__social` row of 4 outlined
+  orange buttons (Google, Facebook, Nextdoor, BBB) linking to `#reviews`.
+  Service Area column replaced with new "Programs" column listing Comfort Club,
+  Special Offers, Financing, Reviews & Awards, About, Contact. Hours column
+  expanded: Mon-Fri 7am-7pm / Sat 8am-5pm / Sun by appointment / Emergency 24/7
+  in orange, plus the emergency phone as a tap-to-call line. License line
+  expanded: TACLA #12345 -> BBB A+ -> Carrier Factory Authorized -> Trane
+  Comfort Specialist -> NATE-Certified Technicians. Bottom strip now wraps
+  Accessibility / Privacy / Sitemap / Website by DBJ Technologies in a
+  `.footer__bottom-links` flex row.
+
+### QA
+
+- Zero em dashes. Zero `<script>` tags. Zero inline JS handlers (no onclick,
+  onsubmit, onload, etc).
+- HTML balance: 9/9 sections, 73/73 divs, 15/15 articles, 2/2 asides.
+- All 4 referenced images exist on disk (`hvac-equipment.jpg`,
+  `hvac-service.jpg`, `hvac-team.jpg`, `people/hvac-technician.jpg`,
+  ~1.2 MB total).
+- All 9 nav `href="#..."` anchors resolve to real section IDs (#area,
+  #club, #contact, #financing, #offers, #reviews, #services, #top, #why).
+- Mobile breakpoints added at 1024px (badges 4->2, services 3->2, zones
+  preserved at 3, financing 2->1) and 768px (badges 2->1, offers 3->1,
+  zones 3->1, club 2->1, contact 3->1, services 2->1).
+- `npx tsc --noEmit` clean (exit 0).
+- `npm run lint` clean (no warnings).
+
+### Known gap (Pass 3 photography sweep)
+
+Hero and review-featured photo both reference `images/people/hvac-technician.jpg`.
+Real-feeling branded-van + multi-tech photography is the upgrade path across the
+four image slots in this template. Pass 1 locks the structural pattern; Pass 3
+sources the photography across all 8 templates together.
+
+### Files changed (1 modified)
+
+- `public/templates/hvac-contractor.html` (1094 -> 1770 lines, +676 lines net)
+
+Plus this update to `docs/ai/session-handoff.md`.
+
+### Deep dive blueprint pending
+
+`docs/blueprints/hvac-contractor.md` (third of 8 vertical-expertise blueprints)
+not yet written. User typically invokes the deep-dive prompt as a follow-up
+after the template commit; will be a separate commit.
+
+## Previous Session: April 27, 2026 (evening) -- Resend bounce/complaint webhook (Feature #11)
 
 ### What shipped
 
@@ -450,4 +556,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `569f147` (feat(templates): restaurant Pass 1 + upscale-restaurant blueprint), confirmed pushed to `origin main`. Working tree clean. Today's chain (most recent first): `569f147` (restaurant Pass 1 content infrastructure: PROMO BAR, sticky Reserve CTA, THE GARNET® bar branded with named Bar Director, PANTRY + Gift Cards strip, two-room PRIVATE DINING with named GM Catherine Dao, AWARDS strip, day-by-day HOURS table, PREFERRED GUEST LIST email capture, footer enhanced with GM + TRA membership; companion `docs/blueprints/upscale-restaurant.md` deep dive blueprint, second of 8) → `4ee9171` (luxury-home-builder vertical deep dive blueprint, first of 8) → `1d3f23c` (snapshot) → `bc40c1a` (luxury-builders Pass 1 content infrastructure: COMMUNITIES, AVAILABLE HOMES & LOTS, RECOGNITION, JOURNAL added; Portfolio renamed Galleries; nav CTA removed; monogram added; footer expanded with affiliations) → `5334ad2` (snapshot) → `c8f8b62` (unique hero skeletons for financial / real-estate / restaurant) → `e5e1d57` (snapshot) → `9e5c1cc` (hero photo fixes for builders + real-estate) → `83fef7f` (snapshot) → `752a626` (photo-first rebuild: 11 portraits in images/people/, every nav/hero/custom-moment rewritten) → `d42f118` (snapshot) → `497a6d1` (real photography integrated across all 8 templates, 36 images) → `f14410c` (snapshot) → `c737f91` (all 8 templates rebuilt to perfected specs + docs/template-prompts/) → `3c346c3` (snapshot) → `add122b` (dental template) → `f2c9b29` (snapshot) → `064f89e` (first two templates) → `a89d139` (snapshot) → `d1d2a1f` (schema + robots) → `4bc2bf9` (snapshot) → `433fb82` (service detail pages + pricing subtitle) → `5a97a26` (snapshot) → `b5e1105` (history archive + compact handoff).
+`main` is at `(this commit)` -- hvac-contractor Pass 1 content infrastructure -- confirmed pushed to `origin main`. Working tree clean (will be after the snapshot commit that follows). Recent chain (most recent first): `(this commit)` (hvac-contractor Pass 1: promo strip, four-card visual badge stack, Special Offers section with 3 dated coupons, Comfort Club membership at $189/year, zone-card service area replacing 20 city pills, multi-modal contact strip, footer programs column + social row, expanded license line) -> `3dfec0b` (snapshot for aac418a) -> `aac418a` (Resend bounce/complaint webhook with auto-unsubscribe; migration 006 + Svix-verified handler + 2%/5% bounce-rate Sentry alerts) -> `320efad` (snapshot for e7f222d) -> `e7f222d` (Pathlight lockdown of public surfaces + Phase 2 audit + Phase 3 feasibility doc) -> `8a491a6` (snapshot) -> `569f147` (restaurant Pass 1 + upscale-restaurant blueprint) -> `a36cf2a` (snapshot) -> `4ee9171` (luxury-home-builder blueprint) -> `1d3f23c` (snapshot) -> `bc40c1a` (luxury-builders Pass 1) -> `5334ad2` (snapshot) -> `c8f8b62` (unique hero skeletons) -> earlier history elided.

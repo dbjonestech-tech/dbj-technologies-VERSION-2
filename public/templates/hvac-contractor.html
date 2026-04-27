@@ -134,6 +134,62 @@
     box-shadow: 0 12px 30px rgba(0,0,0,0.25);
   }
 
+  /* ------- PROMO STRIP (top-most band, scrollable away) ------- */
+  .promo-strip {
+    background: var(--steel-deep);
+    color: var(--gray-on-dark);
+    padding: 0.6rem clamp(1rem, 4vw, 2rem);
+    text-align: center;
+    border-bottom: 1px solid var(--hairline-dark);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .promo-strip__lead {
+    color: var(--orange);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    margin-right: 0.3rem;
+  }
+  .promo-strip__main {
+    color: var(--white);
+    font-weight: 600;
+  }
+  .promo-strip__main strong {
+    color: var(--orange);
+    font-weight: 700;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+    margin-right: 0.35em;
+  }
+  .promo-strip__sep {
+    color: var(--gray-dim);
+    margin: 0 0.4rem;
+  }
+  .promo-strip__link {
+    color: var(--orange);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
+    border-bottom: 1px solid rgba(249,115,22,0.4);
+    padding-bottom: 1px;
+    transition: color 140ms ease, border-color 140ms ease;
+  }
+  .promo-strip__link:hover {
+    color: var(--white);
+    border-bottom-color: var(--white);
+  }
+
   /* ------- EMERGENCY STRIP (above nav) ------- */
   .emergency-strip {
     background: var(--orange);
@@ -301,6 +357,56 @@
   }
   .hero__phone-icon { color: var(--white); }
 
+  .hero__badges {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.85rem;
+    max-width: 720px;
+    margin-top: 2.5rem;
+  }
+  .hero__badge {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 4px;
+    padding: 0.85rem 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+  }
+  .hero__badge-glyph {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 0.18rem;
+  }
+  .hero__badge-main {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.08rem;
+    color: var(--white);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+  .hero__badge-sub {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.78rem;
+    color: var(--gray-on-dark);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .hero__badge-stars {
+    color: var(--orange);
+    letter-spacing: 0.06em;
+    font-size: 0.92rem;
+    margin-right: 0.25rem;
+  }
+
   /* ------- SECTIONS ------- */
   section { padding: var(--section-pad); }
   .section--bone { background: var(--bone); }
@@ -384,6 +490,141 @@
   }
   .service-card__more:hover { gap: 0.6rem; color: var(--orange-deep); }
 
+  /* ------- SPECIAL OFFERS ------- */
+  .offers {
+    background: var(--bone);
+    position: relative;
+  }
+  .offers::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--orange) 0%, var(--orange-deep) 100%);
+  }
+  .offers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .offer-card {
+    position: relative;
+    background: var(--white);
+    border: 2px solid var(--orange);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+  .offer-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+  }
+  .offer-card__banner {
+    background: var(--orange);
+    color: var(--white);
+    padding: 0.55rem 1rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    text-align: center;
+  }
+  .offer-card__body {
+    padding: 1.5rem 1.5rem 1.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+  }
+  .offer-card__price-was {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    color: var(--slate-light);
+    text-decoration: line-through;
+    font-weight: 500;
+    margin: 0;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .offer-card__price {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 3.4rem;
+    color: var(--orange);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    margin: 0;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .offer-card__service {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+    margin: 0.3rem 0 0;
+  }
+  .offer-card__includes {
+    color: var(--slate);
+    font-size: 0.94rem;
+    line-height: 1.6;
+    margin: 0.3rem 0 0;
+  }
+  .offer-card__fine {
+    color: var(--slate-light);
+    font-size: 0.76rem;
+    line-height: 1.55;
+    border-top: 1px solid var(--hairline-light);
+    padding-top: 0.85rem;
+    margin-top: auto;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .offer-card__cta {
+    background: var(--ink);
+    color: var(--white);
+    padding: 0.95rem 1rem;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    transition: background 180ms ease, color 180ms ease;
+    display: block;
+  }
+  .offer-card__cta:hover {
+    background: var(--orange);
+    color: var(--white);
+  }
+  .offer-card--featured {
+    border-color: var(--orange-deep);
+    box-shadow: 0 12px 30px rgba(249,115,22,0.18);
+  }
+  .offer-card--featured .offer-card__banner {
+    background: var(--orange-deep);
+  }
+  .offers-foot {
+    margin-top: 2rem;
+    text-align: center;
+    color: var(--slate);
+    font-size: 0.95rem;
+  }
+  .offers-foot a {
+    color: var(--orange);
+    font-weight: 600;
+    border-bottom: 1px solid rgba(249,115,22,0.3);
+    padding-bottom: 1px;
+  }
+  .offers-foot a:hover { color: var(--orange-deep); border-bottom-color: var(--orange-deep); }
+
   /* ------- WHY IRONCLAD ------- */
   .why-photo {
     width: 100%;
@@ -460,56 +701,97 @@
     max-width: 780px;
   }
 
-  /* ------- SERVICE AREA ------- */
-  .city-grid {
+  /* ------- SERVICE AREA (zone cards, not city pills) ------- */
+  .zones-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
-    margin-top: 0.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 1rem;
   }
-  .city-pill {
-    background: var(--bone);
-    border: 1px solid var(--hairline-light);
-    border-radius: 4px;
-    padding: 0.7rem 1rem;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 600;
-    color: var(--ink);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    font-size: 1rem;
-    transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
-  }
-  .city-pill:hover {
-    border-color: var(--orange);
+  .zone-card {
     background: var(--white);
-    transform: translateY(-1px);
+    border: 1px solid var(--hairline-light);
+    border-radius: 6px;
+    padding: 1.85rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    transition: transform 180ms ease, box-shadow 180ms ease;
   }
-  .city-pill__name {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
+  .zone-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--orange);
   }
-  .city-pill__star { color: var(--orange); font-size: 0.95rem; }
-  .city-pill__suffix {
-    font-family: 'Source Sans 3', sans-serif;
-    font-weight: 600;
-    color: var(--slate-light);
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
-    font-variant-numeric: tabular-nums;
+  .zone-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+  }
+  .zone-card__header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.85rem;
+    margin-bottom: 0.55rem;
+  }
+  .zone-card__num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    color: var(--orange);
+    letter-spacing: -0.005em;
     font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
   }
-  .city-fallback {
+  .zone-card__header h3 {
+    font-size: 1.35rem;
+    text-transform: uppercase;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .zone-card__sub {
+    color: var(--slate);
+    font-size: 0.95rem;
+    margin: 0 0 1.35rem;
+    line-height: 1.55;
+  }
+  .zone-card__cities {
+    list-style: none;
+    margin: 0;
+    padding: 1.15rem 0 0;
+    border-top: 1px solid var(--hairline-light);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem 1rem;
+    flex: 1;
+  }
+  .zone-card__cities li {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 0.96rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .zone-card__cities li::before {
+    content: "\203A";
+    color: var(--orange);
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .zone-fallback {
     text-align: center;
     margin-top: 2.25rem;
     color: var(--slate);
   }
-  .city-fallback strong { color: var(--ink); font-weight: 600; }
+  .zone-fallback strong { color: var(--ink); font-weight: 600; }
 
   /* ------- REVIEWS ------- */
   .review-featured {
@@ -607,6 +889,107 @@
     margin-top: auto;
   }
 
+  /* ------- COMFORT CLUB MEMBERSHIP ------- */
+  .club-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  .club__copy h2 {
+    font-size: var(--fs-h2);
+    text-transform: uppercase;
+    color: var(--ink);
+    letter-spacing: 0.005em;
+    margin-bottom: 1.2rem;
+  }
+  .club__sub {
+    color: var(--slate);
+    font-size: 1.04rem;
+    line-height: 1.7;
+    margin: 0 0 1.6rem;
+    max-width: 480px;
+  }
+  .club__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    margin: 1.4rem 0 0.5rem;
+  }
+  .club__price-amount {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 4rem;
+    color: var(--orange);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .club__price-suffix {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .club__bonus {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.84rem;
+    margin: 0.5rem 0 1.6rem;
+    font-feature-settings: 'kern','liga','tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .club__benefits {
+    background: var(--bone);
+    border: 1px solid var(--hairline-light);
+    border-radius: 6px;
+    padding: 2rem 2.25rem;
+    box-shadow: var(--shadow-soft);
+  }
+  .club__benefits h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--orange);
+    margin: 0 0 1.4rem;
+  }
+  .club__benefits ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+  }
+  .club__benefits li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.85rem;
+    align-items: baseline;
+    color: var(--ink);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .club__benefits li::before {
+    content: '\2713';
+    color: var(--orange);
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .club__benefits li strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
   /* ------- FINANCING CTA ------- */
   .financing {
     display: grid;
@@ -662,6 +1045,79 @@
     font-size: 1rem;
     font-feature-settings: 'kern','liga','tnum';
     font-variant-numeric: tabular-nums;
+  }
+
+  /* ------- CONTACT STRIP (multi-modal) ------- */
+  .contact-strip {
+    background: var(--bone);
+    border-top: 1px solid var(--hairline-light);
+    border-bottom: 1px solid var(--hairline-light);
+  }
+  .contact-strip__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+  .contact-strip__card {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 1.85rem 1.85rem 1.65rem;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+    border-top: 3px solid var(--orange);
+  }
+  .contact-strip__icon {
+    font-size: 1.65rem;
+    color: var(--orange);
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+  .contact-strip__label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--orange);
+  }
+  .contact-strip__title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.55rem;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    margin: 0.1rem 0 0.35rem;
+  }
+  .contact-strip__sub {
+    color: var(--slate);
+    font-size: 0.94rem;
+    line-height: 1.55;
+    margin: 0 0 0.95rem;
+  }
+  .contact-strip__action {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--orange);
+    padding: 0.7rem 1.1rem;
+    border: 1px solid var(--orange);
+    border-radius: 4px;
+    transition: background 180ms ease, color 180ms ease;
+  }
+  .contact-strip__action:hover {
+    background: var(--orange);
+    color: var(--white);
   }
 
   /* ------- FOOTER ------- */
@@ -744,17 +1200,57 @@
   .footer__bottom a { color: var(--gray-dim); transition: color 140ms ease; }
   .footer__bottom a:hover { color: var(--white); }
 
+  .footer__social {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1.1rem;
+    flex-wrap: wrap;
+  }
+  .footer__social a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--orange);
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 4px;
+    padding: 0.45rem 0.85rem;
+    transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+  }
+  .footer__social a:hover {
+    background: var(--orange);
+    color: var(--white);
+    border-color: var(--orange);
+  }
+  .footer__bottom-links {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .footer__bottom-links a {
+    color: var(--gray-dim);
+  }
+
   /* ------- RESPONSIVE ------- */
   @media (max-width: 1024px) {
     .services-grid { grid-template-columns: repeat(2, 1fr); }
     .reviews-grid { grid-template-columns: 1fr; }
-    .city-grid { grid-template-columns: repeat(3, 1fr); }
+    .zones-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .offers-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+    .club-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .contact-strip__grid { grid-template-columns: 1fr; gap: 1rem; }
     .financing { grid-template-columns: 1fr; gap: 2.25rem; }
     .footer__cols { grid-template-columns: 1fr 1fr; }
     .hero__content { max-width: 60%; }
+    .hero__badges { grid-template-columns: repeat(2, 1fr); max-width: 100%; }
   }
 
   @media (max-width: 768px) {
+    .promo-strip { font-size: 0.78rem; padding: 0.5rem 1rem; gap: 0.5rem; line-height: 1.45; }
+    .promo-strip__lead { font-size: 0.7rem; letter-spacing: 0.14em; margin-right: 0; }
+    .promo-strip__sep { display: none; }
+
     .emergency-strip__line { font-size: 0.85rem; }
     .emergency-strip__sep { display: inline; margin: 0 0.4rem; }
 
@@ -774,7 +1270,7 @@
     .hero__trust { justify-content: flex-start; }
 
     .services-grid { grid-template-columns: 1fr; }
-    .city-grid { grid-template-columns: repeat(2, 1fr); }
+    .offers-grid { grid-template-columns: 1fr; }
 
     .review-featured { grid-template-columns: 1fr; }
     .review-featured__photo { min-height: 240px; }
@@ -795,6 +1291,14 @@
 </head>
 <body>
 
+<!-- ========== PROMO STRIP (top-most, seasonal offer) ========== -->
+<div class="promo-strip" role="region" aria-label="Seasonal offer">
+  <span class="promo-strip__lead">Spring Special</span>
+  <span class="promo-strip__main"><strong>$89 AC Tune-Up</strong>through May 31. Beat the Texas heat dome.</span>
+  <span class="promo-strip__sep" aria-hidden="true">|</span>
+  <a class="promo-strip__link" href="#offers">View All Offers</a>
+</div>
+
 <!-- ========== EMERGENCY STRIP (above nav) ========== -->
 <div class="emergency-strip" role="banner" aria-label="Emergency service availability">
   <span class="emergency-strip__line">
@@ -813,10 +1317,12 @@
     </a>
     <nav class="nav__links" aria-label="Primary">
       <a href="#services">Services</a>
-      <a href="#why">About</a>
+      <a href="#offers">Offers</a>
+      <a href="#club">Club</a>
       <a href="#area">Service Area</a>
       <a href="#reviews">Reviews</a>
-      <a href="#financing">Contact</a>
+      <a href="#financing">Financing</a>
+      <a href="#contact">Contact</a>
     </nav>
     <a href="tel:+18175550193" class="nav__phone" aria-label="Call Ironclad Air at (817) 555-0193">
       <span class="icon" aria-hidden="true">&#9742;</span>
@@ -836,16 +1342,78 @@
         <a href="#financing" class="btn btn--orange">Schedule Service</a>
         <a href="tel:+18175550193" class="btn btn--ghost-white"><span class="hero__phone-icon" aria-hidden="true">&#9742;</span> <span class="tnum">Call (817) 555-0193</span></a>
       </div>
-      <div class="hero__trust">
-        <span>Licensed &amp; Insured</span>
-        <span class="sep" aria-hidden="true">&middot;</span>
-        <span>BBB A+ Rated</span>
-        <span class="sep" aria-hidden="true">&middot;</span>
-        <span class="tnum">2,500+ 5&#9733; Reviews</span>
-        <span class="sep" aria-hidden="true">&middot;</span>
-        <span>Same-Day Available</span>
+      <div class="hero__badges" role="list" aria-label="Credentials and reviews">
+        <div class="hero__badge" role="listitem">
+          <span class="hero__badge-glyph">Google</span>
+          <span class="hero__badge-main"><span class="hero__badge-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>4.9</span>
+          <span class="hero__badge-sub tnum">2,847 reviews</span>
+        </div>
+        <div class="hero__badge" role="listitem">
+          <span class="hero__badge-glyph">BBB</span>
+          <span class="hero__badge-main">A+ Rated</span>
+          <span class="hero__badge-sub tnum">Accredited since 2008</span>
+        </div>
+        <div class="hero__badge" role="listitem">
+          <span class="hero__badge-glyph">NATE</span>
+          <span class="hero__badge-main">Certified Techs</span>
+          <span class="hero__badge-sub">Every tech on staff</span>
+        </div>
+        <div class="hero__badge" role="listitem">
+          <span class="hero__badge-glyph">Carrier</span>
+          <span class="hero__badge-main">Factory Authorized</span>
+          <span class="hero__badge-sub">Premier Dealer</span>
+        </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ========== SPECIAL OFFERS ========== -->
+<section class="offers" id="offers" aria-labelledby="offers-heading">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Special Offers</span>
+      <h2 id="offers-heading">Save Money This Season.</h2>
+      <p>Coupons valid through the dates shown. Mention them when you call. No printing, no clipping, no hoops.</p>
+    </div>
+
+    <div class="offers-grid">
+      <article class="offer-card offer-card--featured">
+        <div class="offer-card__banner">Most Popular</div>
+        <div class="offer-card__body">
+          <p class="offer-card__price-was tnum">Reg. $129</p>
+          <p class="offer-card__price tnum">$89</p>
+          <h3 class="offer-card__service">AC Tune-Up</h3>
+          <p class="offer-card__includes">21-point inspection, refrigerant check, capacitor test, drain flush, full system report.</p>
+          <p class="offer-card__fine tnum">Valid through May 31, 2026. One per household. Cannot combine with other offers.</p>
+        </div>
+        <a href="tel:+18175550193" class="offer-card__cta">Schedule My Tune-Up</a>
+      </article>
+
+      <article class="offer-card">
+        <div class="offer-card__banner">Second Opinion</div>
+        <div class="offer-card__body">
+          <p class="offer-card__price">Free</p>
+          <h3 class="offer-card__service">2nd Opinion Estimate</h3>
+          <p class="offer-card__includes">On any system replacement quote over $1,500. We come look, tell you the truth, and you decide.</p>
+          <p class="offer-card__fine">No obligation. Bring the other contractor's written estimate. Valid all year.</p>
+        </div>
+        <a href="tel:+18175550193" class="offer-card__cta">Get a 2nd Opinion</a>
+      </article>
+
+      <article class="offer-card">
+        <div class="offer-card__banner">Save $50</div>
+        <div class="offer-card__body">
+          <p class="offer-card__price tnum">$50</p>
+          <h3 class="offer-card__service">Off Any Repair</h3>
+          <p class="offer-card__includes">Applies to any service repair invoice over $300. Discount taken at the door, no rebate forms.</p>
+          <p class="offer-card__fine tnum">Valid through July 31, 2026. One per household per year.</p>
+        </div>
+        <a href="tel:+18175550193" class="offer-card__cta">Schedule Service</a>
+      </article>
+    </div>
+
+    <p class="offers-foot">Need a different offer? <a href="tel:+18175550193">Call us</a> and ask. We work with the budget, not against it.</p>
   </div>
 </section>
 
@@ -944,30 +1512,59 @@
       <p>From Denton to Waxahachie, McKinney to Weatherford. One call, one truck, same-day service.</p>
     </div>
 
-    <div class="city-grid">
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Arlington</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Dallas</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Fort Worth</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Plano</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Frisco</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> McKinney</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Denton</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Irving</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Grand Prairie</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Mansfield</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Southlake</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Keller</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Grapevine</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Richardson</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Garland</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Mesquite</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Weatherford</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Waxahachie</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Allen</span><span class="city-pill__suffix tnum">DFW</span></span>
-      <span class="city-pill"><span class="city-pill__name"><span class="city-pill__star" aria-hidden="true">&#9734;</span> Prosper</span><span class="city-pill__suffix tnum">DFW</span></span>
+    <div class="zones-grid" role="list" aria-label="DFW service zones">
+      <article class="zone-card" role="listitem">
+        <div class="zone-card__header">
+          <span class="zone-card__num tnum">01</span>
+          <h3>Mid-Cities</h3>
+        </div>
+        <p class="zone-card__sub">Tarrant County and the corridor between Dallas and Fort Worth.</p>
+        <ul class="zone-card__cities">
+          <li>Arlington</li>
+          <li>Fort Worth</li>
+          <li>Grapevine</li>
+          <li>Southlake</li>
+          <li>Keller</li>
+          <li>Mansfield</li>
+          <li>Weatherford</li>
+        </ul>
+      </article>
+
+      <article class="zone-card" role="listitem">
+        <div class="zone-card__header">
+          <span class="zone-card__num tnum">02</span>
+          <h3>Dallas Metro</h3>
+        </div>
+        <p class="zone-card__sub">Central and east Dallas County, where the older homes need the most help.</p>
+        <ul class="zone-card__cities">
+          <li>Dallas</li>
+          <li>Irving</li>
+          <li>Garland</li>
+          <li>Mesquite</li>
+          <li>Richardson</li>
+          <li>Grand Prairie</li>
+          <li>Waxahachie</li>
+        </ul>
+      </article>
+
+      <article class="zone-card" role="listitem">
+        <div class="zone-card__header">
+          <span class="zone-card__num tnum">03</span>
+          <h3>North Suburbs</h3>
+        </div>
+        <p class="zone-card__sub">Collin and Denton counties, where the new builds keep coming.</p>
+        <ul class="zone-card__cities">
+          <li>Plano</li>
+          <li>Frisco</li>
+          <li>McKinney</li>
+          <li>Allen</li>
+          <li>Prosper</li>
+          <li>Denton</li>
+        </ul>
+      </article>
     </div>
 
-    <p class="city-fallback"><strong>Don't see your city?</strong> Call us. If you're in DFW, we can get to you.</p>
+    <p class="zone-fallback"><strong>Don't see your city?</strong> Call us. If you are in DFW, we can get to you.</p>
 
     <img src="images/hvac-equipment.jpg" alt="Bank of rooftop AC condenser units installed on a commercial building serviced by Ironclad Air." width="1600" height="900" class="area-photo">
     <p class="area-photo-caption">Carrier Factory Authorized Equipment</p>
@@ -1010,6 +1607,37 @@
   </div>
 </section>
 
+<!-- ========== COMFORT CLUB (membership program) ========== -->
+<section id="club" aria-labelledby="club-heading">
+  <div class="container">
+    <div class="club-grid">
+      <div class="club__copy">
+        <span class="eyebrow">Membership</span>
+        <h2 id="club-heading">The Ironclad Comfort Club.</h2>
+        <p class="club__sub">Annual membership for homeowners who would rather know their HVAC works than wonder if it does. Designed to catch problems in spring, prevent them in summer, and keep you off the emergency call list.</p>
+        <div class="club__price">
+          <span class="club__price-amount tnum">$189</span>
+          <span class="club__price-suffix">/year</span>
+        </div>
+        <p class="club__bonus tnum">Or $19/month &middot; Add a second system for $9/month</p>
+        <a href="tel:+18175550193" class="btn btn--orange">Join the Club</a>
+      </div>
+
+      <aside class="club__benefits" aria-label="Comfort Club benefits">
+        <h3>What's Included</h3>
+        <ul>
+          <li><span><strong>Two precision tune-ups</strong> per year (spring AC, fall heating). Schedule when you want.</span></li>
+          <li><span><strong>Priority dispatch</strong> through the front of the queue, even on the worst summer day.</span></li>
+          <li><span><strong>15% off</strong> any repair, parts and labor.</span></li>
+          <li><span><strong>No after-hours or weekend fees</strong>, ever. Same flat rate as 2pm Tuesday.</span></li>
+          <li><span><strong>Two-year parts warranty</strong> on every repair we perform.</span></li>
+          <li><span><strong>Transferable</strong> if you sell your home (a small bonus for the buyer).</span></li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
 <!-- ========== FINANCING CTA ========== -->
 <section class="section--steel" id="financing">
   <div class="container">
@@ -1036,6 +1664,43 @@
   </div>
 </section>
 
+<!-- ========== CONTACT STRIP (multi-modal) ========== -->
+<section class="contact-strip" id="contact" aria-labelledby="contact-strip-heading">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Three Ways to Reach Us</span>
+      <h2 id="contact-strip-heading">Pick the Easiest One.</h2>
+      <p>Whatever works fastest for you. Someone is on the other end of all three, including overnight.</p>
+    </div>
+
+    <div class="contact-strip__grid">
+      <div class="contact-strip__card">
+        <span class="contact-strip__icon" aria-hidden="true">&#9742;</span>
+        <span class="contact-strip__label">Call</span>
+        <h3 class="contact-strip__title tnum">(817) 555-0193</h3>
+        <p class="contact-strip__sub">Live answer 24/7. Average wait under 20 seconds. Even at 3am.</p>
+        <a href="tel:+18175550193" class="contact-strip__action">Call Now</a>
+      </div>
+
+      <div class="contact-strip__card">
+        <span class="contact-strip__icon" aria-hidden="true">&#9993;</span>
+        <span class="contact-strip__label">Text</span>
+        <h3 class="contact-strip__title tnum">(817) 555-0193</h3>
+        <p class="contact-strip__sub">Text photos of the unit, the error code, the puddle. We diagnose and dispatch in one thread.</p>
+        <a href="sms:+18175550193" class="contact-strip__action">Text Us</a>
+      </div>
+
+      <div class="contact-strip__card">
+        <span class="contact-strip__icon" aria-hidden="true">&#128197;</span>
+        <span class="contact-strip__label">Book Online</span>
+        <h3 class="contact-strip__title">Self-Schedule</h3>
+        <p class="contact-strip__sub">Same-day or future-date. Pick a 2-hour window. Confirmation hits your inbox in 60 seconds.</p>
+        <a href="#contact" class="contact-strip__action">Open the Scheduler</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ========== TEAM TRANSITION STRIP ========== -->
 <img src="images/hvac-team.jpg" alt="An Ironclad Air service van staged for the next residential dispatch across the DFW metroplex." width="1600" height="900" class="team-strip">
 
@@ -1048,6 +1713,12 @@
         <span class="wordmark__text">Ironclad Air</span>
       </div>
       <p class="footer__tag">Trusted HVAC since <span class="tnum">2004</span> &middot; Arlington, TX. Family-owned, employee-staffed, customer-obsessed.</p>
+      <div class="footer__social" aria-label="Review platforms">
+        <a href="#reviews">Google</a>
+        <a href="#reviews">Facebook</a>
+        <a href="#reviews">Nextdoor</a>
+        <a href="#reviews">BBB</a>
+      </div>
     </div>
 
     <div class="footer-col">
@@ -1056,37 +1727,44 @@
         <li><a href="#services">AC Repair</a></li>
         <li><a href="#services">AC Installation</a></li>
         <li><a href="#services">Heating Repair</a></li>
-        <li><a href="#services">Maintenance Plans</a></li>
-        <li><a href="#services">Commercial HVAC</a></li>
         <li><a href="#services">Indoor Air Quality</a></li>
+        <li><a href="#services">Commercial HVAC</a></li>
+        <li><a href="#area">Service Area</a></li>
       </ul>
     </div>
 
     <div class="footer-col">
-      <h4>Service Area</h4>
+      <h4>Programs</h4>
       <ul>
-        <li><a href="#area">Arlington</a></li>
-        <li><a href="#area">Dallas</a></li>
-        <li><a href="#area">Fort Worth</a></li>
-        <li><a href="#area">Plano</a></li>
-        <li><a href="#area">Frisco</a></li>
-        <li><a href="#area">McKinney</a></li>
+        <li><a href="#club">Comfort Club Membership</a></li>
+        <li><a href="#offers">Special Offers</a></li>
+        <li><a href="#financing">Financing Available</a></li>
+        <li><a href="#reviews">Reviews &amp; Awards</a></li>
+        <li><a href="#why">About Ironclad</a></li>
+        <li><a href="#contact">Contact</a></li>
       </ul>
     </div>
 
     <div class="footer-col">
-      <h4>Hours</h4>
-      <p class="footer__hours-line">Mon&ndash;Fri 7am&ndash;7pm</p>
-      <p class="footer__hours-line">Sat 8am&ndash;5pm</p>
-      <p class="footer__hours-line">Emergency 24/7</p>
+      <h4>Hours &amp; Emergency</h4>
+      <p class="footer__hours-line">Mon to Fri 7am to 7pm</p>
+      <p class="footer__hours-line">Sat 8am to 5pm</p>
+      <p class="footer__hours-line">Sun by appointment</p>
+      <p class="footer__hours-line"><strong style="color:var(--orange);">Emergency 24/7</strong></p>
+      <p class="footer__hours-line tnum"><a href="tel:+18175550193">(817) 555-0193</a></p>
     </div>
   </div>
 
-  <p class="footer__license">TACLA License #<span class="tnum">12345</span> &middot; BBB A+ Accredited &middot; Carrier Factory Authorized Dealer</p>
+  <p class="footer__license">TACLA License #<span class="tnum">12345</span> &middot; BBB A+ Accredited &middot; Carrier Factory Authorized Dealer &middot; Trane Comfort Specialist &middot; NATE-Certified Technicians</p>
 
   <div class="footer__bottom">
     <span>&copy; <span class="tnum">2026</span> Ironclad Air. All rights reserved.</span>
-    <span>Website by <a href="https://dbjtechnologies.com">DBJ Technologies</a></span>
+    <span class="footer__bottom-links">
+      <a href="#contact">Accessibility</a>
+      <a href="#contact">Privacy</a>
+      <a href="#contact">Sitemap</a>
+      <a href="https://dbjtechnologies.com">Website by DBJ Technologies</a>
+    </span>
   </div>
 </footer>
 
