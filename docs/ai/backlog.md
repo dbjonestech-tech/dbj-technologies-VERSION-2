@@ -63,7 +63,7 @@
 - [x] Logo rebuild -- PAUSED (current logo works fine)
 - [x] Contact form gmail -> Resend migration -- DONE
 - [x] Social links (LinkedIn + GitHub) in footer -- DONE
-- [x] dbjonestech@gmail.com -> joshua@dbjtechnologies.com everywhere -- DONE
+- [x] Legacy email migration to joshua@dbjtechnologies.com everywhere -- DONE (verified clean in production code April 25)
 - [x] "Findability" -> "Search Visibility" rename -- DONE (type system, DB alias in coercePillarScores, and public case study copy in lib/work-data.ts)
 - [x] Curated vertical database integration -- DONE (206 entries, 51 high/medium skip API)
 - [x] All five pipeline hardening phases -- DONE

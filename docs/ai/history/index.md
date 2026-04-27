@@ -10,6 +10,7 @@ Pull them in only when a current task requires the historical detail
 
 ## Archive
 
+- [`2026-04-27.md`](2026-04-27.md) - April 27 omnibus: ElevenLabs cost gap closure (hard cap + hourly cron), Voice Report Delivery (Feature #5, ElevenLabs Adam), PDF Report Download (Feature #10, Browserless /pdf), Cost monitoring + alerting (Feature #12, api_usage_events table + /internal/cost dashboard), Resend bounce/complaint webhook (Feature #11), Pathlight lockdown of public surfaces, hvac-contractor Pass 1 + blueprint, restaurant Pass 1 + blueprint, luxury-builders Pass 1 + blueprint, ChatGPT external-audit triage (SEO/a11y/canonical fixes). Live handoff archived when it crossed 101 KB.
 - [`2026-04-25.md`](2026-04-25.md) - 26-item mega session: homepage hardening, About hydration fixes, repo-native AI memory system, Pathlight landing overhaul, founder photo chain, homepage strategic overhaul, brand-voice sweep, pricing detail pages refactor, package configurator at `/pricing/build`, twelve-pitfall Pathlight sweep, DOM commit-phase crash fix, Anthropic prompt caching, portal-chat context pack rebuild.
 
 ## When to archive
