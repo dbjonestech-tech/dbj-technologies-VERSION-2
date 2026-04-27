@@ -602,17 +602,95 @@ select:focus-visible {
 }
 
 /* ─── PATHLIGHT MOON (active scan loading state) ──────
- * Faster spin to signal "actively working" while keeping
- * the same texture/lighting as the landing page. The
- * --moon-spin-duration custom property is set inline on
- * the element (default 4s) so it can be tuned per usage
- * without touching this stylesheet. Distinct class from
- * .pathlight-moon above so the landing page's slow
- * rotation is unaffected.
+ * Spin combined with subtle libration wobble so the moon
+ * face appears to shift the way it does when the same
+ * moon is observed from changing earth latitudes (a Beijing
+ * observer vs a Kampala observer at different points in
+ * the lunar cycle). The combined keyframe locks the
+ * rotation and tilt to the same period so they never go
+ * out of phase. Distinct class from .pathlight-moon above
+ * so the landing page's slow 1200s rotation is unaffected.
+ * Stage parent adds perspective so the rotateX/Y reads as
+ * a tilt rather than collapsing the disc.
  * ──────────────────────────────────────────────────── */
+.pathlight-moon-stage {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+@keyframes pathlight-moon-spin-libration {
+  0%   { transform: rotate(0deg)   rotateX(0deg)  rotateY(0deg); }
+  16%  { transform: rotate(58deg)  rotateX(6deg)  rotateY(-4deg); }
+  33%  { transform: rotate(120deg) rotateX(-3deg) rotateY(7deg); }
+  50%  { transform: rotate(180deg) rotateX(-6deg) rotateY(0deg); }
+  66%  { transform: rotate(238deg) rotateX(3deg)  rotateY(-7deg); }
+  83%  { transform: rotate(295deg) rotateX(7deg)  rotateY(4deg); }
+  100% { transform: rotate(360deg) rotateX(0deg)  rotateY(0deg); }
+}
 .pathlight-moon-active {
-  animation: pathlight-moon-rotate var(--moon-spin-duration, 4s) linear infinite;
+  animation: pathlight-moon-spin-libration var(--moon-spin-duration, 16s) ease-in-out infinite;
   will-change: transform;
+}
+
+/* Aurora ribbons: a slowly counter-rotating conic gradient
+ * with tapered cyan/silver bands. Heavy blur turns the
+ * sharp gradient stops into ethereal arcs of moonlight.
+ * mix-blend-screen on the parent layer makes the ribbons
+ * additive over the dark sky. Period 28s so it never reads
+ * as "spinning" but as a slow orbital drift. */
+@keyframes pathlight-moon-aurora-spin {
+  0%   { transform: rotate(0deg)   scale(1); opacity: 0.85; }
+  50%  { transform: rotate(180deg) scale(1.06); opacity: 1; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.85; }
+}
+.pathlight-moon-aurora {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(186, 230, 253, 0.16) 22deg,
+    transparent 70deg,
+    rgba(26, 212, 234, 0.10) 120deg,
+    transparent 165deg,
+    rgba(232, 237, 242, 0.14) 200deg,
+    transparent 245deg,
+    rgba(26, 212, 234, 0.10) 290deg,
+    transparent 335deg,
+    transparent 360deg
+  );
+  filter: blur(28px);
+  animation: pathlight-moon-aurora-spin 28s linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Two pulsating rings expanding outward from the moon.
+ * Each starts at the moon's edge, scales to ~1.7x, and
+ * fades. Offset by half the period so a ring is always
+ * mid-flight. Reads as moonlight pulses radiating into
+ * space. */
+@keyframes pathlight-moon-ring-expand {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+    border-color: rgba(186, 230, 253, 0.45);
+  }
+  60% {
+    opacity: 0.18;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+    border-color: rgba(186, 230, 253, 0);
+  }
+}
+.pathlight-moon-ring {
+  border: 1px solid rgba(186, 230, 253, 0.35);
+  box-shadow: 0 0 12px 2px rgba(186, 230, 253, 0.18);
+  animation: pathlight-moon-ring-expand 5.4s ease-out infinite;
+  will-change: transform, opacity;
+}
+.pathlight-moon-ring-b {
+  animation-delay: 2.7s;
+  border-color: rgba(26, 212, 234, 0.30);
+  box-shadow: 0 0 12px 2px rgba(26, 212, 234, 0.15);
 }
 
 /* Particles drift from the moon center along a curved arc
@@ -668,6 +746,13 @@ select:focus-visible {
     animation: none;
   }
   .pathlight-moon-particles {
+    display: none;
+  }
+  .pathlight-moon-aurora {
+    animation: none;
+    opacity: 0.4;
+  }
+  .pathlight-moon-ring {
     display: none;
   }
   .pathlight-moon-eyebrow {

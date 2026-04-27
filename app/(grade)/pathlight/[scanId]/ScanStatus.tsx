@@ -264,9 +264,19 @@ function ScanningMoon() {
   return (
     <div
       aria-hidden="true"
-      className="relative h-[200px] w-[200px] sm:h-[220px] sm:w-[220px]"
+      className="pathlight-moon-stage relative h-[200px] w-[200px] sm:h-[220px] sm:w-[220px]"
     >
-      {/* Particles drifting outward (CSS animation only, behind the moon glow) */}
+      {/* Aurora ribbons (counter-rotating conic gradient, blurred).
+          Sits behind everything; provides slow ribbon-like motion that
+          reads as moonlight refracting through atmosphere. */}
+      <div className="pathlight-moon-aurora pointer-events-none absolute inset-[-65%] rounded-full mix-blend-screen" />
+
+      {/* Pulsating expansion rings. Two soft rings expand outward and
+          fade, offset by half their period so one is always visible. */}
+      <div className="pathlight-moon-ring pathlight-moon-ring-a pointer-events-none absolute inset-0 rounded-full" />
+      <div className="pathlight-moon-ring pathlight-moon-ring-b pointer-events-none absolute inset-0 rounded-full" />
+
+      {/* Particles drifting outward on curved arcs (CSS animation only) */}
       <div className="pathlight-moon-particles pointer-events-none absolute inset-0">
         {MOON_PARTICLES.map((p, i) => (
           <span
@@ -295,8 +305,7 @@ function ScanningMoon() {
         ))}
       </div>
 
-      {/* Atmospheric moonlight glow (matches landing page palette;
-          spread trimmed for the smaller loading-state moon) */}
+      {/* Atmospheric moonlight halo with breathing pulse */}
       <div
         className="pathlight-moon-pulse absolute inset-0 rounded-full mix-blend-screen"
         style={{
@@ -305,7 +314,11 @@ function ScanningMoon() {
         }}
       />
 
-      {/* Physical moon body (same texture as landing page, faster spin via custom property) */}
+      {/* Physical moon body. Texture rotates with libration wobble
+          (combined rotation + rotateX/Y over a 16s period) so the
+          face appears to shift like the moon viewed from changing
+          earth-perspective latitudes. Perspective set on the stage
+          parent so the rotateX/Y reads as a tilt, not a flatten. */}
       <div className="absolute inset-0 rounded-full bg-black overflow-hidden">
         <div
           className="pathlight-moon-active w-full h-full bg-cover bg-center"
@@ -314,7 +327,7 @@ function ScanningMoon() {
               backgroundImage: "url(/brand/moon.webp)",
               filter:
                 "sepia(8%) hue-rotate(-12deg) contrast(1.25) brightness(1.15) saturate(0.95)",
-              "--moon-spin-duration": "4s",
+              "--moon-spin-duration": "16s",
             } as React.CSSProperties
           }
         />
