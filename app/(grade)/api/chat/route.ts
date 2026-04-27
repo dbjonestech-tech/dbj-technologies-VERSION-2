@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getFullScanReport } from "@/lib/db/queries";
 import { buildChatSystemPrompt } from "@/lib/prompts/pathlight-chat";
 import { recordAnthropicUsage } from "@/lib/services/api-usage";
+import { chatLimiter, chatScanLimiter, extractIp } from "@/lib/rate-limit";
 
 /* runtime/dynamic exports removed; redundant with the default Node.js
    runtime for route handlers in Next 16 and incompatible with the
@@ -34,6 +35,11 @@ function jsonError(message: string, status: number): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const ipCheck = await chatLimiter(extractIp(request));
+  if (!ipCheck.success) {
+    return jsonError("Too many chat requests. Try again tomorrow.", 429);
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -49,6 +55,16 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
   const { scanId, messages } = parsed.data;
+
+  /* Per-scan ceiling complements the per-IP one above. Caps total
+     Haiku spend on any single scanId even when many IPs hit it. */
+  const scanCheck = await chatScanLimiter(scanId);
+  if (!scanCheck.success) {
+    return jsonError(
+      "This conversation has reached its daily limit. Try again tomorrow.",
+      429
+    );
+  }
 
   const report = await getFullScanReport(scanId);
   if (!report) {

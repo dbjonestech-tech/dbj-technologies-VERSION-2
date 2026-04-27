@@ -601,6 +601,83 @@ select:focus-visible {
   }
 }
 
+/* ─── PATHLIGHT MOON (active scan loading state) ──────
+ * Faster spin to signal "actively working" while keeping
+ * the same texture/lighting as the landing page. The
+ * --moon-spin-duration custom property is set inline on
+ * the element (default 4s) so it can be tuned per usage
+ * without touching this stylesheet. Distinct class from
+ * .pathlight-moon above so the landing page's slow
+ * rotation is unaffected.
+ * ──────────────────────────────────────────────────── */
+.pathlight-moon-active {
+  animation: pathlight-moon-rotate var(--moon-spin-duration, 4s) linear infinite;
+  will-change: transform;
+}
+
+/* Particles drift from the moon center along a curved arc
+ * (origin -> --mx,--my midpoint -> --dx,--dy endpoint).
+ * Three keyframes form a quadratic-Bezier-style path; the
+ * cubic-bezier easing on the animation itself decelerates
+ * motion so particles slow at the edge of the field, mimicking
+ * moonlight dust catching the air. Opacity ramps in over the
+ * first 18%, peaks through midflight, then falls off so the
+ * fade reads as ethereal rather than abrupt. */
+@keyframes pathlight-moon-particle {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(var(--mx, 0px), var(--my, 0px)) scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* Eyebrow glow pulse: subtle text-shadow that breathes in time
+ * with the moon, tying the eyebrow visually to the orb without
+ * shifting layout. Disabled under reduced-motion below. */
+@keyframes pathlight-moon-eyebrow-glow {
+  0%, 100% {
+    text-shadow: 0 0 6px rgba(26, 212, 234, 0.15);
+  }
+  50% {
+    text-shadow: 0 0 12px rgba(26, 212, 234, 0.45);
+  }
+}
+.pathlight-moon-eyebrow {
+  animation: pathlight-moon-eyebrow-glow 4s ease-in-out infinite;
+}
+
+/* Reduced-motion fallback: gentle opacity pulse on the
+ * glow layer, applied here only when the user opts in. */
+@keyframes pathlight-moon-pulse-rm {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pathlight-moon-active {
+    animation: none;
+  }
+  .pathlight-moon-particles {
+    display: none;
+  }
+  .pathlight-moon-eyebrow {
+    animation: none;
+  }
+  .pathlight-moon-pulse {
+    animation: pathlight-moon-pulse-rm 3.5s ease-in-out infinite;
+  }
+}
+
 /* ─── PATHLIGHT HERO HEADER ───────────────────────── */
 .header-glow-premium {
   background: linear-gradient(

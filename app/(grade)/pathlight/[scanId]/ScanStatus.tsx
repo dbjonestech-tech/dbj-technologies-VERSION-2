@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ScanningCore } from "./ScanningCore";
 import AskPathlightLoader from "./AskPathlightLoader";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
@@ -207,6 +206,132 @@ function TopBar() {
 
 /* ─────────────────────── Loading ─────────────────────── */
 
+/* Strip protocol + trailing slash for cleaner URL display.
+   Defensive: returns the original string if the result is empty. */
+function formatUrlForDisplay(raw: string): string {
+  if (!raw) return raw;
+  const stripped = raw
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/$/, "");
+  return stripped || raw;
+}
+
+/* Eighteen particles drifting outward from the moon center.
+   Each particle has a deterministic angle, distance, size, color
+   tint, animation duration, animation delay, and a perpendicular
+   midpoint offset that turns the otherwise-straight ray into a
+   gentle arc. The duration jitter (3.6s-6.4s range) plus the
+   independent delay stagger plus the curved path together produce
+   moonlight-dust drift instead of mechanical sparkle. CSS-driven
+   only (no JS RAF, no per-frame React updates). */
+const MOON_PARTICLE_COUNT = 18;
+const MOON_PARTICLES = Array.from({ length: MOON_PARTICLE_COUNT }, (_, i) => {
+  const angle = (i / MOON_PARTICLE_COUNT) * Math.PI * 2 + i * 0.31;
+  /* Vary travel distance by ~25% so the dust field has depth */
+  const distance = 100 + ((i * 7) % 30);
+  const dx = Math.cos(angle) * distance;
+  const dy = Math.sin(angle) * distance;
+  /* Perpendicular midpoint offset for curved arc; magnitude
+     varies so each path is unique */
+  const perp = Math.sin(i * 1.7) * 14;
+  const mx = dx * 0.5 + Math.cos(angle + Math.PI / 2) * perp;
+  const my = dy * 0.5 + Math.sin(angle + Math.PI / 2) * perp;
+  /* Sizes 1.5px through 4.5px with a smooth distribution */
+  const size = 1.5 + ((i * 0.43) % 3);
+  /* Every fifth particle picks up a brand-cyan tint; rest are
+     silvery moonlight white */
+  const cyan = i % 5 === 0;
+  const color = cyan ? "rgba(26, 212, 234, 0.45)" : "rgba(232, 237, 242, 1)";
+  const glow = cyan ? "rgba(26, 212, 234, 0.5)" : "rgba(232, 237, 242, 0.65)";
+  /* Duration jitter 3.6s-6.4s; delay distributes emission so 8-12
+     are visible at any moment */
+  const duration = 3.6 + ((i * 0.27) % 2.8);
+  const delay = (i * 0.32) % duration;
+  return {
+    dx,
+    dy,
+    mx,
+    my,
+    size,
+    color,
+    glow,
+    duration: duration.toFixed(2),
+    delay: delay.toFixed(2),
+  };
+});
+
+function ScanningMoon() {
+  return (
+    <div
+      aria-hidden="true"
+      className="relative h-[200px] w-[200px] sm:h-[220px] sm:w-[220px]"
+    >
+      {/* Particles drifting outward (CSS animation only, behind the moon glow) */}
+      <div className="pathlight-moon-particles pointer-events-none absolute inset-0">
+        {MOON_PARTICLES.map((p, i) => (
+          <span
+            key={i}
+            style={
+              {
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                marginLeft: `-${p.size / 2}px`,
+                marginTop: `-${p.size / 2}px`,
+                borderRadius: "9999px",
+                backgroundColor: p.color,
+                boxShadow: `0 0 ${p.size * 2}px ${p.size * 0.5}px ${p.glow}`,
+                willChange: "transform, opacity",
+                animation: `pathlight-moon-particle ${p.duration}s cubic-bezier(0.16, 1, 0.3, 1) ${p.delay}s infinite`,
+                "--mx": `${p.mx.toFixed(1)}px`,
+                "--my": `${p.my.toFixed(1)}px`,
+                "--dx": `${p.dx.toFixed(1)}px`,
+                "--dy": `${p.dy.toFixed(1)}px`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      </div>
+
+      {/* Atmospheric moonlight glow (matches landing page palette;
+          spread trimmed for the smaller loading-state moon) */}
+      <div
+        className="pathlight-moon-pulse absolute inset-0 rounded-full mix-blend-screen"
+        style={{
+          boxShadow:
+            "0 0 50px 12px rgba(248, 250, 252, 0.45), 0 0 110px 40px rgba(186, 230, 253, 0.22), 0 0 220px 90px rgba(147, 197, 253, 0.10)",
+        }}
+      />
+
+      {/* Physical moon body (same texture as landing page, faster spin via custom property) */}
+      <div className="absolute inset-0 rounded-full bg-black overflow-hidden">
+        <div
+          className="pathlight-moon-active w-full h-full bg-cover bg-center"
+          style={
+            {
+              backgroundImage: "url(/brand/moon.webp)",
+              filter:
+                "sepia(8%) hue-rotate(-12deg) contrast(1.25) brightness(1.15) saturate(0.95)",
+              "--moon-spin-duration": "4s",
+            } as React.CSSProperties
+          }
+        />
+      </div>
+
+      {/* Spherical terminator overlay */}
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle at 28% 32%, transparent 38%, rgba(0,0,0,0.97) 82%)",
+        }}
+      />
+    </div>
+  );
+}
+
 function LoadingState({ status, url }: { status: string; url: string }) {
   const [phaseIndex, setPhaseIndex] = useState<number>(() =>
     status === "scanning" ? SCANNING_PHASES[0]! : status === "analyzing" ? ANALYZING_PHASES[0]! : 0
@@ -235,21 +360,21 @@ function LoadingState({ status, url }: { status: string; url: string }) {
   return (
     <section className="flex flex-col items-center justify-center py-16 text-center">
       <p
-        className="text-xs uppercase tracking-[0.25em]"
-        style={{ color: "#6b7280" }}
+        className="pathlight-moon-eyebrow text-xs font-semibold uppercase tracking-[0.25em]"
+        style={{ color: "#1AD4EA" }}
       >
         Pathlight scan
       </p>
       <h1
-        className="mt-2 break-all font-display text-2xl font-semibold sm:text-3xl"
+        className="mt-1.5 break-all font-display text-2xl font-semibold sm:text-3xl"
         style={{ color: "#e7ebf2" }}
       >
-        {url}
+        {formatUrlForDisplay(url)}
       </h1>
 
-      <div className="mt-6 flex flex-col items-center gap-2">
-        <ScanningCore />
-        <div className="mt-2 mb-6 flex flex-col items-center">
+      <div className="mt-3 flex flex-col items-center gap-2 sm:mt-4">
+        <ScanningMoon />
+        <div className="mt-1 mb-4 flex flex-col items-center">
           <p
             className="text-base font-medium"
             style={{ color: "rgba(255,255,255,0.7)" }}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { getFullScanReport } from "@/lib/db/queries";
 import { generatePdf } from "@/lib/services/browserless";
+import { pdfLimiter, extractIp } from "@/lib/rate-limit";
 
 /* runtime/dynamic exports omitted: the default Node.js runtime is
    required so node:buffer + the Browserless POST work, and the
@@ -59,9 +60,17 @@ function buildFilename(report: { url: string; createdAt: string }): string {
  * URL" gap.
  */
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ scanId: string }> }
 ) {
+  const ipCheck = await pdfLimiter(extractIp(request));
+  if (!ipCheck.success) {
+    return NextResponse.json(
+      { error: "Too many PDF requests. Try again tomorrow." },
+      { status: 429, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const { scanId } = await params;
   const report = await getFullScanReport(scanId);
 
