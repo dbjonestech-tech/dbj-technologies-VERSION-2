@@ -200,11 +200,11 @@ Plus this update to `docs/ai/session-handoff.md` and an update to
   -- all internal/server, none in user-facing copy.
 - `dbjonestech@gmail.com` check in production code: clean.
 
-### Not committed yet
+### Commit + push status
 
-User asked "Do NOT commit yet" at the end of the prompt. All changes
-sit in working tree. `git status` shows the 9 modified files and the
-new feasibility doc + this updated handoff and backlog.
+Committed at `e7f222d` and pushed to `origin main`. Working tree clean
+after this handoff amend. 13 files in the commit (12 modified + 1 new
+feasibility doc). The amend re-pushed via --force-with-lease.
 
 ## Previous Session: April 26-27, 2026
 
