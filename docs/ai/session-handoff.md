@@ -91,6 +91,14 @@ These need to happen in this order after the next deploy fans out:
 - `docs/ai/backlog.md`, `docs/ai/session-handoff.md`, `docs/ai/current-state.md`
   (status updates)
 
+### Commit + push status
+
+Committed at `aac418a` and pushed to `origin main`. 7 files (5 modified
++ 2 new). Working tree carries one unrelated modification at
+`public/templates/hvac-contractor.html` from a prior local edit; left
+alone, not staged. The standalone snapshot pattern (vs amend +
+force-with-lease) applies again because main is force-push protected.
+
 ## Previous Session: April 27, 2026 (afternoon) -- Pathlight lockdown + audit + feasibility
 
 ### What shipped (Phase 1: Lockdown)
