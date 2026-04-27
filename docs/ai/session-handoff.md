@@ -84,7 +84,7 @@ Auth foundation plus the operations surface lifted into a unified `/admin/*` she
 
 ### Git status at session pause
 
-Working tree dirty. Stages 1 + 2 are not yet committed -- per session intent, no commit until the user explicitly approves. When approved, commit message draft: `feat(admin): Google OAuth login portal + unified /admin/* operations surface`.
+Working tree clean. Stages 1 + 2 shipped in commit `b1f59e4` (`feat(admin): Google OAuth login portal + unified /admin/* operations surface`), pushed to `origin main`. Vercel auto-deploy triggered.
 
 ### Next recommended task
 
