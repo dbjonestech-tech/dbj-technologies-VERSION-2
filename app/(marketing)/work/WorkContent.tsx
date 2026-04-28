@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { GridBackground } from "@/components/effects/GridBackground";
@@ -9,8 +9,13 @@ import { GradientBlob } from "@/components/effects/GradientBlob";
 import { CTASection } from "@/components/sections/CTA";
 import { Badge } from "@/components/ui/Badge";
 import { PROJECT_DETAILS } from "@/lib/work-data";
+import type { BlueprintMeta } from "@/lib/blueprints";
 
-export default function WorkContent() {
+interface WorkContentProps {
+  blueprints: BlueprintMeta[];
+}
+
+export default function WorkContent({ blueprints }: WorkContentProps) {
   return (
     <>
       {/* Hero */}
@@ -139,6 +144,111 @@ export default function WorkContent() {
                     >
                       Live Site
                       <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                    </a>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Vertical Blueprints + Reference Templates */}
+      <section className="relative py-24 border-t border-text-primary/10 overflow-hidden">
+        <GradientBlob className="-top-20 -left-40 opacity-50" />
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="max-w-3xl mb-14">
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-block rounded-full border border-accent-cyan/25 bg-accent-cyan/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-cyan mb-6"
+            >
+              Vertical Blueprints
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.05 }}
+              className="font-display text-[clamp(2rem,3.6vw,2.8rem)] font-bold leading-tight tracking-tight"
+            >
+              Reference architectures for{" "}
+              <span className="text-gradient">eight verticals.</span>
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="mt-5 text-text-secondary leading-relaxed"
+            >
+              Each blueprint is a paired set: a deep-dive on what the vertical
+              actually needs online, and a working static template that
+              executes every recommendation. Read the blueprint, then open the
+              template side by side.
+            </motion.p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {blueprints.map((bp, i) => (
+              <motion.article
+                key={bp.slug}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.05 }}
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-text-primary/10 bg-white/60 backdrop-blur-sm transition-all hover:border-text-primary/25 hover:shadow-lg"
+              >
+                <Link
+                  href={`/work/blueprints/${bp.slug}`}
+                  className="relative block aspect-[4/3] overflow-hidden bg-gray-100"
+                  aria-label={`Read the ${bp.vertical} blueprint`}
+                >
+                  <Image
+                    src={bp.thumbnail}
+                    alt={`${bp.vertical} reference template thumbnail`}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                  <span
+                    className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-text-primary shadow-sm"
+                  >
+                    <span
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ backgroundColor: bp.paletteAccent }}
+                      aria-hidden="true"
+                    />
+                    {bp.vertical}
+                  </span>
+                </Link>
+
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="font-display text-base font-bold leading-snug mb-2">
+                    {bp.headline}
+                  </h3>
+                  <p className="text-[13px] leading-relaxed text-text-secondary mb-5 flex-1">
+                    {bp.summary}
+                  </p>
+
+                  <div className="mt-auto flex items-center justify-between gap-3 pt-3 border-t border-text-primary/8">
+                    <Link
+                      href={`/work/blueprints/${bp.slug}`}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent-blue hover:text-accent-cyan transition-colors min-h-[40px]"
+                    >
+                      Read Blueprint
+                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    </Link>
+                    <a
+                      href={`/templates/${bp.template}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-text-primary transition-colors min-h-[40px]"
+                      aria-label={`Open the ${bp.vertical} live template`}
+                    >
+                      Live Template
+                      <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
                     </a>
                   </div>
                 </div>

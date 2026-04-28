@@ -175,60 +175,80 @@
     color: #fff;
   }
 
-  /* ======== HERO: CONTAINED GALLERY FRAME ======== */
-  /* Wireframe: text block centered above, then a contained framed photo with copper border. Dark space all around. */
+  /* ======== HERO: FULL-BLEED PROPERTY + OVERLAID LISTING CARD ======== */
   .hero {
     position: relative;
-    background:
-      radial-gradient(circle at 50% 110%, rgba(184,115,51,0.10), transparent 50%),
-      #0A0A0A;
-    min-height: 88vh;
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    align-items: stretch;
-    gap: clamp(1.5rem, 3vw, 3rem);
+    min-height: 92vh;
+    display: flex;
+    align-items: flex-end;
     overflow: hidden;
-    padding: clamp(2rem, 5vw, 4rem);
+    background: #0A0A0A;
+    padding: 0;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 55%;
+    display: block;
+  }
+  .hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.18) 38%, rgba(10,10,10,0.10) 60%, rgba(10,10,10,0.85) 100%),
+      linear-gradient(90deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.20) 45%, rgba(10,10,10,0.10) 100%);
+    pointer-events: none;
   }
   .hero-inner {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: 100%;
-    max-width: 540px;
+    max-width: 640px;
     margin: 0;
-    align-self: center;
     text-align: left;
-    padding-right: clamp(1rem, 3vw, 2.5rem);
+    padding: clamp(2rem, 5vw, 4rem);
+    padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
   }
-  .hero .eyebrow { display: block; margin-bottom: 1.6rem; }
+  .hero .eyebrow {
+    display: block;
+    margin-bottom: 1.4rem;
+    color: var(--copper);
+  }
   .hero h1 {
     color: var(--ivory);
     font-size: clamp(2.4rem, 4.4vw, 4rem);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.4rem;
     font-weight: 400;
     line-height: 1.04;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.3);
   }
   .hero-sub {
-    color: var(--on-dark-dim);
+    color: var(--on-dark);
     font-size: 1.05rem;
-    line-height: 1.85;
-    max-width: 480px;
-    margin: 0 0 2.2rem;
+    line-height: 1.8;
+    max-width: 520px;
+    margin: 0 0 2rem;
+    text-shadow: 0 1px 12px rgba(0,0,0,0.4);
   }
-  .hero-cta-row {
-    margin-bottom: 2rem;
-  }
+  .hero-cta-row { margin-bottom: 1.8rem; }
   .hero-rule {
     width: 200px;
     max-width: 200px;
     height: 1px;
     background: var(--copper);
-    opacity: 0.6;
-    margin: 0 0 1.4rem;
+    opacity: 0.7;
+    margin: 0 0 1.2rem;
   }
   .hero-stats {
     font-family: 'Karla', sans-serif;
-    color: var(--on-dark-dim);
+    color: var(--on-dark);
     font-size: 0.72rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -239,29 +259,110 @@
     color: var(--copper);
     margin: 0 0.7em;
   }
-  /* Gallery frame holding the property photo, presented like a print on a gallery wall.
-     Sits on the LEFT of the hero so the layout mirrors away from the centered-serif
-     wealth-advisor template. */
-  .hero-gallery-frame {
-    position: relative;
-    z-index: 1;
-    order: -1;
-    width: 100%;
-    max-width: none;
-    min-height: 60vh;
-    border: 1px solid var(--copper);
+
+  /* Featured-listing card overlaid in bottom-right corner of hero */
+  .hero-listing-card {
+    position: absolute;
+    bottom: clamp(2rem, 5vw, 4rem);
+    right: clamp(2rem, 5vw, 4rem);
+    z-index: 3;
+    width: 320px;
+    background: rgba(10,10,10,0.78);
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    border: 1px solid rgba(184,115,51,0.45);
     border-radius: 2px;
     overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    color: var(--ivory);
+    font-family: 'Karla', sans-serif;
+  }
+  .hero-listing-card__thumb {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
     background: #141414;
   }
-  .hero-gallery-frame img {
+  .hero-listing-card__thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
     display: block;
   }
+  .hero-listing-card__status {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--copper);
+    color: var(--ivory);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 0.32rem 0.65rem;
+    border-radius: 1px;
+  }
+  .hero-listing-card__body {
+    padding: 1.05rem 1.15rem 1.15rem;
+  }
+  .hero-listing-card__eyebrow {
+    color: var(--copper);
+    font-size: 0.64rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.45rem;
+  }
+  .hero-listing-card__price {
+    font-family: 'Libre Caslon Display', serif;
+    font-size: 1.55rem;
+    color: var(--ivory);
+    line-height: 1.05;
+    letter-spacing: -0.005em;
+    font-feature-settings: 'tnum';
+    margin-bottom: 0.35rem;
+  }
+  .hero-listing-card__address {
+    color: var(--ivory);
+    font-size: 0.92rem;
+    line-height: 1.35;
+    margin-bottom: 0.2rem;
+  }
+  .hero-listing-card__nh {
+    color: var(--on-dark-dim);
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+  }
+  .hero-listing-card__meta {
+    color: var(--on-dark);
+    font-size: 0.78rem;
+    border-top: 1px solid rgba(184,115,51,0.25);
+    padding-top: 0.65rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  .hero-listing-card__meta span + span::before {
+    content: "·";
+    color: var(--copper);
+    margin-right: 0.5rem;
+    margin-left: -0.1rem;
+  }
+  .hero-listing-card__cta {
+    display: block;
+    color: var(--copper);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 0.85rem;
+    border-top: 1px solid rgba(184,115,51,0.25);
+    padding-top: 0.7rem;
+    transition: color 200ms ease;
+  }
+  .hero-listing-card__cta:hover { color: var(--ivory); }
 
   /* ======== AGENT SECTION ======== */
   .agent {
@@ -1171,21 +1272,21 @@
     .wordmark { font-size: 0.78rem; letter-spacing: 0.28em; }
     .btn { padding: 0.85rem 1.6rem; font-size: 0.7rem; letter-spacing: 0.18em; }
     .hero {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      padding: clamp(3rem, 10vw, 5rem) 1.25rem;
-      min-height: auto;
+      min-height: 78vh;
+      align-items: flex-end;
     }
-    .hero-inner { max-width: 100%; padding-right: 0; }
+    .hero-inner {
+      max-width: 100%;
+      padding: 1.5rem 1.25rem 3rem;
+    }
     .hero-rule { width: 180px; }
     .hero-stats .sep { display: inline; margin: 0 0.4em; }
-    .hero-gallery-frame {
-      width: 100%;
-      max-width: 100%;
-      min-height: 280px;
-      height: 45vw;
-      order: -1;
+    .hero-listing-card {
+      position: static;
+      margin: -1.4rem 1.25rem 1.5rem;
+      width: auto;
     }
+    .hero-bg img { object-position: center 30%; }
     section { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
     .agent { padding: clamp(4rem, 12vw, 6rem) 1.25rem; }
     .agent-photo { min-height: 360px; }
@@ -1235,8 +1336,11 @@
   </div>
 </nav>
 
-<!-- ===== HERO: CONTAINED GALLERY FRAME ===== -->
+<!-- ===== HERO: FULL-BLEED PROPERTY + OVERLAID FEATURED-LISTING CARD ===== -->
 <header class="hero" role="banner">
+  <div class="hero-bg" aria-hidden="true">
+    <img src="images/real-estate-hero.jpg" alt="" width="2400" height="1350" loading="eager" decoding="async" fetchpriority="high">
+  </div>
   <div class="hero-inner">
     <span class="eyebrow">LUXURY RESIDENTIAL &middot; DALLAS</span>
     <h1>Your Home Should Be as Considered as the Life You&rsquo;ve Built.</h1>
@@ -1249,9 +1353,22 @@
       $340M Career Volume <span class="sep">&middot;</span> 200+ Transactions <span class="sep">&middot;</span> Park Cities Resident Since 2008
     </div>
   </div>
-  <figure class="hero-gallery-frame" aria-hidden="true">
-    <img src="images/real-estate-hero.jpg" alt="A Park Cities estate at dusk with warm interior light spilling through the front windows" width="1600" height="900" loading="eager" decoding="async" fetchpriority="high">
-  </figure>
+  <aside class="hero-listing-card" aria-label="Currently representing">
+    <div class="hero-listing-card__thumb">
+      <img src="images/real-estate-listing1.jpg" alt="4907 Lakeside Drive, Highland Park" width="640" height="400">
+      <span class="hero-listing-card__status">Now Showing</span>
+    </div>
+    <div class="hero-listing-card__body">
+      <span class="hero-listing-card__eyebrow">Currently Representing</span>
+      <div class="hero-listing-card__price">$4,250,000</div>
+      <div class="hero-listing-card__address">4907 Lakeside Drive</div>
+      <div class="hero-listing-card__nh">Highland Park</div>
+      <div class="hero-listing-card__meta">
+        <span>5 Bed</span><span>5.2 Bath</span><span>6,400 SF</span>
+      </div>
+      <a href="#properties" class="hero-listing-card__cta">View Listing &rarr;</a>
+    </div>
+  </aside>
 </header>
 
 <!-- ===== AGENT (MEET LAUREN) ===== -->

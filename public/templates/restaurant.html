@@ -150,45 +150,92 @@
     transform: translateY(-1px);
   }
 
-  /* ============ PROMO BAR (top-most strip, not sticky) ============ */
-  .promo-bar {
+  /* ============ RESERVATION STRIP (top-most, widget-style) ============ */
+  .reservation-strip {
     background: var(--espresso-deep);
-    color: var(--amber);
     border-bottom: 1px solid var(--hairline-amber);
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-    font-weight: 500;
-    padding: 0.7rem clamp(1.5rem, 5vw, 3rem);
+    padding: 0.7rem clamp(1rem, 4vw, 2.4rem);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 1.4rem;
-    text-align: center;
     flex-wrap: wrap;
+    font-family: 'Nunito Sans', sans-serif;
   }
-  .promo-bar .promo-text { color: var(--amber); }
-  .promo-bar .promo-text strong {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
+  .reservation-strip__pretext {
+    color: var(--amber);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     font-weight: 500;
-    font-size: 0.96rem;
-    letter-spacing: 0.02em;
-    margin-right: 0.45rem;
   }
-  .promo-bar .promo-divider {
-    color: rgba(201,169,110,0.4);
+  .reservation-strip__widget {
+    display: inline-flex;
+    align-items: stretch;
+    background: var(--cream);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 6px 18px -14px rgba(0,0,0,0.45);
+  }
+  .reservation-strip__field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0.45rem 0.95rem;
+    border-right: 1px solid rgba(38,28,21,0.12);
+    line-height: 1.1;
+  }
+  .reservation-strip__field:last-of-type { border-right: 0; }
+  .reservation-strip__label {
+    color: rgba(38,28,21,0.55);
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .reservation-strip__value {
+    color: var(--espresso);
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+  }
+  .reservation-strip__cta {
+    background: var(--amber);
+    color: var(--espresso-deep);
+    padding: 0 1.15rem;
+    display: flex;
+    align-items: center;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    transition: background 0.2s ease;
+  }
+  .reservation-strip__cta:hover { background: #e0c084; }
+  .reservation-strip__divider {
+    color: rgba(201,169,110,0.45);
     font-size: 0.85rem;
   }
-  .promo-bar a {
+  .reservation-strip__tonight {
     color: var(--cream);
-    border-bottom: 1px solid rgba(255,248,240,0.3);
-    padding-bottom: 1px;
-    transition: color 0.2s ease, border-color 0.2s ease;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
   }
-  .promo-bar a:hover {
+  .reservation-strip__tonight em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
     color: var(--amber);
-    border-bottom-color: var(--amber);
+    font-size: 0.95rem;
+    margin-right: 0.4rem;
+  }
+  @media (max-width: 720px) {
+    .reservation-strip { gap: 0.7rem; padding: 0.65rem 0.9rem; }
+    .reservation-strip__pretext { display: none; }
+    .reservation-strip__divider { display: none; }
+    .reservation-strip__tonight { font-size: 0.72rem; text-align: center; width: 100%; }
   }
 
   /* ============ NAV (centered split signature) ============ */
@@ -1739,15 +1786,6 @@
   }
 
   @media (max-width: 768px) {
-    .promo-bar {
-      font-size: 0.72rem;
-      padding: 0.55rem 1.2rem;
-      gap: 0.6rem;
-      line-height: 1.4;
-    }
-    .promo-bar .promo-text strong { font-size: 0.85rem; }
-    .promo-bar .promo-divider { display: none; }
-
     .nav-inner {
       grid-template-columns: 1fr;
       justify-items: center;
@@ -1815,13 +1853,26 @@
 </head>
 <body>
 
-<!-- ============ PROMO BAR (top-most strip, not sticky) ============ -->
-<div class="promo-bar" role="region" aria-label="Seasonal offerings">
-  <span class="promo-text"><strong>Mother&rsquo;s Day Brunch:</strong>Three-course prix fixe, Sunday May 11, two seatings.</span>
-  <span class="promo-divider" aria-hidden="true">|</span>
-  <a href="#reserve">Reserve a Table</a>
-  <span class="promo-divider" aria-hidden="true">|</span>
-  <a href="#gift-cards">Gift Cards</a>
+<!-- ============ RESERVATION STRIP (top-most, widget-style) ============ -->
+<div class="reservation-strip" role="region" aria-label="Reserve a table">
+  <span class="reservation-strip__pretext">Tonight, 5pm to 10pm</span>
+  <a href="#reserve" class="reservation-strip__widget" aria-label="Open reservation form">
+    <span class="reservation-strip__field">
+      <span class="reservation-strip__label">Date</span>
+      <span class="reservation-strip__value">Tonight</span>
+    </span>
+    <span class="reservation-strip__field">
+      <span class="reservation-strip__label">Party</span>
+      <span class="reservation-strip__value">2 guests</span>
+    </span>
+    <span class="reservation-strip__field">
+      <span class="reservation-strip__label">Time</span>
+      <span class="reservation-strip__value">7:30pm</span>
+    </span>
+    <span class="reservation-strip__cta">Reserve</span>
+  </a>
+  <span class="reservation-strip__divider" aria-hidden="true">|</span>
+  <span class="reservation-strip__tonight"><em>Tonight&rsquo;s Tasting</em>5 courses · $95</span>
 </div>
 
 <!-- ============ NAV (centered split signature) ============ -->

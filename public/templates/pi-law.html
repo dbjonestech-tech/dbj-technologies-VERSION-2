@@ -903,48 +903,134 @@
     letter-spacing: 0.04em;
   }
 
-  /* URGENT STRIP, above nav */
+  /* URGENT STRIP + RESULTS TICKER, above nav */
   .urgent-strip {
     background: var(--urgent);
     border-bottom: 1px solid var(--urgent-deep);
     color: var(--cream);
-    padding: 0.55rem clamp(1.25rem, 5vw, 3rem);
+    padding: 0;
+    overflow: hidden;
   }
 
   .urgent-strip__inner {
     max-width: 1280px;
     margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.25rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: stretch;
     font-family: 'DM Sans', sans-serif;
     font-size: 0.8125rem;
     font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-align: center;
+    letter-spacing: 0.06em;
+    padding: 0 clamp(1.25rem, 4vw, 2.4rem);
+    gap: 0;
   }
 
-  .urgent-strip__inner a {
+  .urgent-strip__phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 1.1rem 0.6rem 0;
     color: var(--cream);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    text-transform: uppercase;
+    border-right: 1px solid rgba(244,239,227,0.18);
     font-feature-settings: 'tnum' on, 'lnum' on, 'kern', 'liga';
   }
+  .urgent-strip__phone strong {
+    color: var(--gold);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .urgent-strip__phone .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 0 2px rgba(74,222,128,0.22);
+    display: inline-block;
+    animation: livepulse 2.4s ease-in-out infinite;
+  }
+  @keyframes livepulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
 
-  .urgent-strip__sep {
+  .urgent-strip__results {
+    overflow: hidden;
+    position: relative;
+    padding: 0 1.1rem;
+    border-right: 1px solid rgba(244,239,227,0.18);
+  }
+  .urgent-strip__results::before,
+  .urgent-strip__results::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 36px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .urgent-strip__results::before {
+    left: 1.1rem;
+    background: linear-gradient(90deg, var(--urgent), rgba(11,21,38,0));
+  }
+  .urgent-strip__results::after {
+    right: 1.1rem;
+    background: linear-gradient(-90deg, var(--urgent), rgba(11,21,38,0));
+  }
+  .urgent-strip__ticker {
+    display: inline-flex;
+    align-items: center;
+    gap: 2.2rem;
+    padding: 0.6rem 0;
+    white-space: nowrap;
+    animation: ticker 38s linear infinite;
+  }
+  .urgent-strip__ticker-eyebrow {
+    color: rgba(244,239,227,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.7rem;
+    margin-right: 0.6rem;
+  }
+  .urgent-strip__verdict {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    color: var(--cream);
+    font-size: 0.78rem;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-feature-settings: 'tnum' on, 'lnum' on;
+  }
+  .urgent-strip__verdict strong {
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1rem;
+    letter-spacing: 0;
+  }
+  .urgent-strip__verdict-tag {
     color: rgba(244,239,227,0.55);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+  }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
 
   .urgent-strip__bilingual {
+    display: inline-flex;
+    align-items: center;
     color: var(--cream);
     font-style: italic;
     font-family: 'Playfair Display', serif;
     text-transform: none;
     letter-spacing: 0.02em;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
+    padding: 0.6rem 0 0.6rem 1.1rem;
   }
 
   /* HERO no-fee badge cluster */
@@ -1604,11 +1690,28 @@
       grid-template-columns: 1fr 1fr;
     }
     .urgent-strip__inner {
-      font-size: 0.6875rem;
-      letter-spacing: 0.06em;
+      grid-template-columns: 1fr;
+      padding: 0 1rem;
+      gap: 0;
     }
+    .urgent-strip__phone {
+      border-right: 0;
+      border-bottom: 1px solid rgba(244,239,227,0.18);
+      justify-content: center;
+      padding: 0.55rem 0;
+    }
+    .urgent-strip__phone strong { font-size: 0.85rem; }
+    .urgent-strip__results {
+      padding: 0;
+      border-right: 0;
+      border-bottom: 1px solid rgba(244,239,227,0.18);
+    }
+    .urgent-strip__results::before { left: 0; }
+    .urgent-strip__results::after { right: 0; }
     .urgent-strip__bilingual {
-      font-size: 0.8125rem;
+      padding: 0.5rem 0;
+      justify-content: center;
+      font-size: 0.85rem;
     }
   }
 
@@ -1642,13 +1745,32 @@
 </head>
 <body>
 
-<!-- URGENT STRIP: 24/7 + bilingual, above nav -->
-<div class="urgent-strip" role="region" aria-label="Twenty-four hour intake">
+<!-- URGENT STRIP: 24/7 phone + results ticker + bilingual, above nav -->
+<div class="urgent-strip" role="region" aria-label="Twenty-four hour intake and recent results">
   <div class="urgent-strip__inner">
-    <span>Open 24/7. A Real Attorney Calls You Back Today.</span>
-    <span class="urgent-strip__sep" aria-hidden="true">·</span>
-    <a href="tel:2145550184">(214) 555-0184</a>
-    <span class="urgent-strip__sep" aria-hidden="true">·</span>
+    <a class="urgent-strip__phone" href="tel:2145550184">
+      <span class="dot" aria-hidden="true"></span>
+      <span>24/7 Live Answer</span>
+      <strong>(214) 555-0184</strong>
+    </a>
+    <div class="urgent-strip__results" aria-label="Recent verdicts and settlements">
+      <div class="urgent-strip__ticker" role="list">
+        <span class="urgent-strip__ticker-eyebrow" aria-hidden="true">Recent Results</span>
+        <span class="urgent-strip__verdict" role="listitem"><strong>$11.4M</strong> Trucking Verdict <span class="urgent-strip__verdict-tag">Dallas County, 2025</span></span>
+        <span class="urgent-strip__verdict" role="listitem"><strong>$4.8M</strong> Premises Settlement <span class="urgent-strip__verdict-tag">Tarrant County, 2025</span></span>
+        <span class="urgent-strip__verdict" role="listitem"><strong>$3.6M</strong> Wrongful Death <span class="urgent-strip__verdict-tag">Collin County, 2024</span></span>
+        <span class="urgent-strip__verdict" role="listitem"><strong>$1.2M</strong> Auto Collision <span class="urgent-strip__verdict-tag">Dallas County, 2024</span></span>
+        <span class="urgent-strip__verdict" role="listitem"><strong>$2.1M</strong> Construction Injury <span class="urgent-strip__verdict-tag">Denton County, 2024</span></span>
+        <span class="urgent-strip__verdict" role="listitem"><strong>$875K</strong> Drunk-Driver Case <span class="urgent-strip__verdict-tag">Dallas County, 2023</span></span>
+        <span class="urgent-strip__ticker-eyebrow" aria-hidden="true">Recent Results</span>
+        <span class="urgent-strip__verdict" aria-hidden="true"><strong>$11.4M</strong> Trucking Verdict <span class="urgent-strip__verdict-tag">Dallas County, 2025</span></span>
+        <span class="urgent-strip__verdict" aria-hidden="true"><strong>$4.8M</strong> Premises Settlement <span class="urgent-strip__verdict-tag">Tarrant County, 2025</span></span>
+        <span class="urgent-strip__verdict" aria-hidden="true"><strong>$3.6M</strong> Wrongful Death <span class="urgent-strip__verdict-tag">Collin County, 2024</span></span>
+        <span class="urgent-strip__verdict" aria-hidden="true"><strong>$1.2M</strong> Auto Collision <span class="urgent-strip__verdict-tag">Dallas County, 2024</span></span>
+        <span class="urgent-strip__verdict" aria-hidden="true"><strong>$2.1M</strong> Construction Injury <span class="urgent-strip__verdict-tag">Denton County, 2024</span></span>
+        <span class="urgent-strip__verdict" aria-hidden="true"><strong>$875K</strong> Drunk-Driver Case <span class="urgent-strip__verdict-tag">Dallas County, 2023</span></span>
+      </div>
+    </div>
     <span class="urgent-strip__bilingual">Hablamos Español</span>
   </div>
 </div>

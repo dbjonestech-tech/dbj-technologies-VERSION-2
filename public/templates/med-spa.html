@@ -900,49 +900,6 @@
       letter-spacing: 0.04em;
     }
 
-    /* PROMO BAR (top-most strip, not sticky) */
-    .promo-bar {
-      background: var(--plum-deep);
-      color: #F4E6E0;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.74rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      font-weight: 400;
-      padding: 0.7rem clamp(1.5rem, 5vw, 3rem);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.4rem;
-      text-align: center;
-      flex-wrap: wrap;
-    }
-    .promo-bar strong {
-      font-family: 'Bodoni Moda', serif;
-      font-style: italic;
-      font-weight: 500;
-      font-size: 0.95rem;
-      letter-spacing: 0.04em;
-      color: #F8C8C0;
-      text-transform: none;
-      margin-right: 0.4rem;
-    }
-    .promo-bar .promo-divider {
-      color: rgba(244,230,224,0.32);
-      font-size: 0.85rem;
-      letter-spacing: 0;
-    }
-    .promo-bar a {
-      color: #F4E6E0;
-      border-bottom: 1px solid rgba(244,230,224,0.32);
-      padding-bottom: 1px;
-      transition: color 200ms ease, border-color 200ms ease;
-    }
-    .promo-bar a:hover {
-      color: #F8C8C0;
-      border-bottom-color: #F8C8C0;
-    }
-
     /* SOCIETY / MEMBERSHIP */
     .society {
       background: linear-gradient(180deg, var(--bg-cream) 0%, var(--bg-blush) 100%);
@@ -1731,8 +1688,6 @@
       .gallery-grid { grid-template-columns: 1fr; }
       .safety-grid { grid-template-columns: 1fr; }
       .shop-brands { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .promo-bar { font-size: 0.68rem; gap: 0.7rem; padding: 0.6rem 1rem; }
-      .promo-bar .promo-divider { display: none; }
     }
 
     /* Reduced motion */
@@ -1748,16 +1703,7 @@
 </head>
 <body>
 
-  <!-- PROMO BAR (top-most strip, not sticky) -->
-  <div class="promo-bar" role="region" aria-label="Seasonal offers">
-    <span><strong>Spring Botox Days:</strong>$11 per unit, May 6 through May 9. Reserve a window in advance.</span>
-    <span class="promo-divider" aria-hidden="true">|</span>
-    <a href="#specials">See All Specials</a>
-    <span class="promo-divider" aria-hidden="true">|</span>
-    <a href="#society">Reverie Society</a>
-  </div>
-
-  <!-- NAV: CENTERED SPLIT -->
+  <!-- NAV: CENTERED SPLIT (no top promo · the quiet luxury move) -->
   <nav class="nav" aria-label="Primary">
     <div class="nav-inner">
       <ul class="nav-links nav-links-left">

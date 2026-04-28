@@ -171,44 +171,60 @@ a { color: inherit; text-decoration: none; }
 .nav-links a { transition: color 200ms ease; }
 .nav-links a:hover { color: var(--charcoal); }
 
-/* Hero · luxury home exterior on right, warm-white card on left */
-.hero {
-  position: relative;
-  min-height: 90vh;
+/* Location strip · quiet currently-building-in line, top-most band */
+.location-strip {
+  background: #FAF9F6;
+  border-bottom: 1px solid var(--sage-pale);
+  padding: 0.65rem clamp(1.5rem, 5vw, 4rem);
   display: flex;
   align-items: center;
-  background:
-    url('images/luxury-builders-hero.jpg') right center / cover no-repeat,
-    linear-gradient(135deg, #FAF9F6 0%, #F5F0EB 60%, #E5DCCE 100%);
-  overflow: hidden;
-  padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 4rem);
+  justify-content: center;
+  gap: 0.85rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.74rem;
+  color: var(--warm-gray);
 }
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      to right,
-      rgba(250,249,246,0.97) 0%,
-      rgba(250,249,246,0.94) 38%,
-      rgba(250,249,246,0.55) 56%,
-      rgba(250,249,246,0.18) 76%,
-      rgba(250,249,246,0.05) 100%
-    ),
-    radial-gradient(circle at 82% 70%, rgba(124,133,107,0.18), transparent 55%);
-  pointer-events: none;
+.location-strip__label {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.66rem;
+  color: var(--sage-deep);
+  font-weight: 500;
+}
+.location-strip__neighborhoods {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--charcoal);
+  letter-spacing: 0.005em;
+}
+.location-strip__sep {
+  color: var(--sage-pale);
+  margin: 0 0.55rem;
+}
+@media (max-width: 720px) {
+  .location-strip { padding: 0.55rem 0.9rem; flex-direction: column; gap: 0.25rem; }
+  .location-strip__neighborhoods { font-size: 0.85rem; text-align: center; }
+}
+
+/* Hero · stacked cinematic: text upper third, wide architectural image lower two-thirds */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: linear-gradient(180deg, #FAF9F6 0%, #F5F0EB 100%);
+  overflow: hidden;
+  padding: 0;
 }
 .hero-rule {
   position: absolute;
-  top: 12vh;
-  right: 12vw;
+  top: clamp(2rem, 4vw, 3.5rem);
+  left: 50%;
   width: 1px;
-  height: 66vh;
+  height: 56px;
   background: var(--sage);
-  pointer-events: none;
+  transform: translateX(-50%);
   z-index: 2;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.18);
 }
 .hero-rule::before,
 .hero-rule::after {
@@ -226,21 +242,23 @@ a { color: inherit; text-decoration: none; }
 .hero-card {
   position: relative;
   z-index: 3;
-  width: 45%;
-  max-width: 560px;
-  background: rgba(255,255,255,0.96);
-  border: 1px solid var(--sage-pale);
-  padding: clamp(2rem, 4vw, 4rem);
-  box-shadow: 0 12px 40px rgba(26,26,26,0.10);
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+  text-align: center;
+  background: transparent;
+  border: 0;
+  padding: clamp(5rem, 8vw, 7rem) clamp(1.5rem, 5vw, 3rem) clamp(2.4rem, 4vw, 3.5rem);
+  box-shadow: none;
 }
-.hero-eyebrow { display: inline-block; margin-bottom: 1.8rem; }
+.hero-eyebrow { display: inline-block; margin-bottom: 1.6rem; }
 .hero h1 {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-weight: 300;
-  font-size: var(--fs-display);
-  line-height: 1.02;
+  font-size: clamp(2.6rem, 5.4vw, 4.2rem);
+  line-height: 1.04;
   letter-spacing: -0.005em;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.4rem;
   color: var(--charcoal);
 }
 .hero h1 em {
@@ -252,9 +270,45 @@ a { color: inherit; text-decoration: none; }
   font-size: 1.025rem;
   color: var(--warm-gray);
   line-height: 1.85;
-  margin-bottom: 2.2rem;
+  margin-bottom: 2rem;
+  max-width: 660px;
+  margin-left: auto;
+  margin-right: auto;
 }
-.hero-actions { margin-bottom: 0; }
+.hero-actions { margin-bottom: 0; display: flex; justify-content: center; }
+
+.hero-cinema {
+  position: relative;
+  width: 100%;
+  height: clamp(380px, 56vh, 620px);
+  overflow: hidden;
+  background: #1a1a1a;
+}
+.hero-cinema img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 60%;
+  display: block;
+}
+.hero-cinema::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(26,26,26,0.10) 0%, rgba(26,26,26,0) 32%, rgba(26,26,26,0.18) 100%);
+  pointer-events: none;
+}
+.hero-cinema-caption {
+  position: absolute;
+  bottom: clamp(1.4rem, 3vw, 2.4rem);
+  right: clamp(1.4rem, 4vw, 3rem);
+  color: var(--warm-white);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.35);
+}
 
 /* Stats bar · charcoal full-width band beneath hero */
 .stats-bar {
@@ -1187,7 +1241,6 @@ footer {
   .footer-main { grid-template-columns: 1fr; gap: 2rem; }
   .principal-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .principal-photo { margin-top: 0; }
-  .hero-card { width: 70%; }
   .inventory-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -1198,10 +1251,11 @@ footer {
   .monogram-mark { width: 32px; height: 32px; font-size: 1rem; }
   .nav-tagline { font-size: 0.88rem; }
 
-  .hero { padding: 4rem 1.25rem; min-height: 80vh; }
-  .hero-card { width: 100%; max-width: none; padding: 1.75rem; background: rgba(255,255,255,0.92); }
-  .hero-rule { right: 1.5rem; height: 40vh; top: 18vh; }
+  .hero-card { padding: 3.4rem 1.25rem 2rem; }
+  .hero-rule { display: none; }
   .hero h1 { font-size: clamp(2.2rem, 9vw, 3.4rem); }
+  .hero-cinema { height: clamp(280px, 44vh, 420px); }
+  .hero-cinema-caption { font-size: 0.85rem; bottom: 1rem; right: 1rem; }
 
   .stats-bar { padding: 1.6rem 1.25rem; font-size: 0.7rem; letter-spacing: 0.22em; }
   .stats-bar .stats-inner { gap: 0.8rem 1.4rem; flex-direction: column; }
@@ -1260,6 +1314,11 @@ footer {
 </head>
 <body>
 
+<div class="location-strip" role="region" aria-label="Currently building in">
+  <span class="location-strip__label">Currently Building In</span>
+  <span class="location-strip__neighborhoods">Highland Park <span class="location-strip__sep" aria-hidden="true">·</span> Preston Hollow <span class="location-strip__sep" aria-hidden="true">·</span> Volk Estates <span class="location-strip__sep" aria-hidden="true">·</span> Bluffview</span>
+</div>
+
 <header class="nav" role="banner">
   <div class="nav-top">
     <a href="#" class="wordmark" aria-label="Ashworth and Foster, Builders">
@@ -1282,8 +1341,8 @@ footer {
 <main>
 
   <section class="hero" aria-label="Introduction">
-    <span class="hero-rule" aria-hidden="true"></span>
     <div class="hero-card">
+      <span class="hero-rule" aria-hidden="true"></span>
       <span class="eyebrow hero-eyebrow">Custom Residential &#10022; Dallas</span>
       <h1>Houses Are Built.<br>Homes Are <em>considered</em>.</h1>
       <p class="hero-sub">We design and build a small number of custom residences each year for clients who care as much about how a home is made as how it looks. Every detail is decided by the principal who runs the project, not delegated to a project manager.</p>
@@ -1291,6 +1350,10 @@ footer {
         <a href="#galleries" class="btn">View Recent Galleries</a>
       </div>
     </div>
+    <figure class="hero-cinema" aria-hidden="true">
+      <img src="images/luxury-builders-hero.jpg" alt="" width="2400" height="1280" loading="eager" decoding="async" fetchpriority="high">
+      <figcaption class="hero-cinema-caption">Highland Park Residence &#10022; Recently Completed</figcaption>
+    </figure>
   </section>
 
   <div class="stats-bar" role="region" aria-label="Firm credentials">

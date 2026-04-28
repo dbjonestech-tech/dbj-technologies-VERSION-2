@@ -6,7 +6,190 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
-## Last Session: April 27, 2026 -- Image swap + hero polish across all 8 portfolio templates
+## Last Session: April 27, 2026 -- Cross-template differentiation pass + Work page Blueprints grid
+
+### What shipped
+
+Eight portfolio templates were ruthlessly differentiated so they no longer read as variations of the same site when stacked side by side on the Work page. Every template now has a distinct top-band treatment AND a distinct hero composition. The Work page itself gained a "Vertical Blueprints" grid that exposes all eight, each linking to a deep-dive blueprint page and the live template.
+
+The user's two collage-screenshot complaints were addressed directly:
+1. Top promo banners no longer all read as the same thin colored strip.
+2. Hero portrait position is varied across the eight (left, right, full-bleed, stacked, no-portrait, listing-card-overlay, etc.).
+
+### Per-template differentiation (8 distinct hero composition + 8 distinct top-band treatments)
+
+| Template | Hero composition | Top-band treatment |
+|---|---|---|
+| dental-practice | 2-col, dentist portrait LEFT, copy RIGHT | Cream coupon-ticket card with tooth icon, dated end (`.welcome-ticket`) |
+| med-spa | Editorial 2-col, copy LEFT, framed portrait RIGHT | NO banner (the quiet luxury move) |
+| restaurant | Full-bleed pappardelle dish, copy overlaid lower-left | Reservation widget strip with date / party / time pickers + tonight's tasting price (`.reservation-strip`) |
+| financial-advisor | 2-col, copy LEFT, framed portrait RIGHT | "As Featured In" press row: Barron's, Forbes, Bloomberg, WSJ, D CEO (`.press-row`) |
+| pi-law | Typographic-dominant, no portrait, courthouse + attache diptych below | 24/7 phone (live pulse) + scrolling case-results ticker ($11.4M, $4.8M, $3.6M, $1.2M, $2.1M, $875K) + Hablamos Espanol (`.urgent-strip__ticker`) |
+| real-estate | Full-bleed Park Cities estate, copy lower-left, FEATURED-LISTING CARD overlaid bottom-right (price, address, beds/baths/SF, status badge) | NO banner (the listing card IS the offer) |
+| luxury-builders | STACKED CINEMATIC: copy upper third on parchment, wide architectural image filling lower 56vh with italic caption | Quiet "Currently Building In: Highland Park, Preston Hollow, Volk Estates, Bluffview" italic line (`.location-strip`) |
+| hvac-contractor | Copy-only utility hero with credential badges (already differentiated as the only no-image hero) | Chunky orange emergency ribbon: live-pulse dot + Same-Day badge + 24/7 Live Answer pill + tap-to-call CTA (`.emergency-ribbon`) |
+
+### Files changed (12)
+
+**Templates (8 modified):**
+- `public/templates/dental-practice.html` -- replaced thin promo-strip with cream coupon-ticket card
+- `public/templates/med-spa.html` -- removed promo-bar entirely (markup + CSS + mobile rules)
+- `public/templates/restaurant.html` -- promo-bar -> reservation widget strip with date/party/time fields
+- `public/templates/financial-advisor.html` -- added "As Featured In" press row above nav
+- `public/templates/pi-law.html` -- urgent-strip rebuilt with phone + scrolling verdict ticker (38s loop, doubled content for seamless wrap, masked edges, mobile single-column)
+- `public/templates/real-estate.html` -- hero rebuilt as full-bleed property image with overlaid featured-listing card (status badge, price, address, neighborhood, meta, CTA)
+- `public/templates/luxury-builders.html` -- added location-strip; hero rebuilt as stacked cinematic (text top, full-width image bottom)
+- `public/templates/hvac-contractor.html` -- removed redundant promo-strip; emergency-strip rebuilt as chunky 4-column ribbon (pulse + line + badge + CTA)
+
+**App (2 modified, 2 added):**
+- `app/(marketing)/work/WorkContent.tsx` -- now accepts `blueprints` prop; new "Vertical Blueprints" section renders an 8-card grid (4 cols on lg, 2 cols on sm). Each card has thumbnail + vertical pill + headline + summary + dual CTAs (Read Blueprint / Live Template)
+- `app/(marketing)/work/page.tsx` -- now a server component; calls `getAllBlueprintMeta()` and passes to client component
+- `app/(marketing)/work/blueprints/[slug]/page.tsx` -- NEW: blueprint deep-dive route. `generateStaticParams` for all 8. Layout: hero with vertical accent dot + headline + summary + dual CTAs, then numbered sections rendered from parsed markdown, then closing "See the Proof" CTA block.
+- `lib/blueprints.ts` -- NEW: tiny inline parser for `docs/blueprints/*.md`. Exports BlueprintMeta / BlueprintSection / BlueprintData types and getBlueprintBySlug / getAllBlueprintMeta / getAllBlueprintSlugs. No external deps. BLUEPRINT_INDEX (8 entries) maps slug -> file + vertical + thumbnail path + paletteAccent hex.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` exit 0.
+- 0 em-dashes across all 8 templates + lib/blueprints.ts + the work + blueprints routes.
+- All 9 thumbnail image paths resolved on disk (8 vertical thumbs + 1 listing thumb).
+
+### What this commit does NOT include
+
+The parallel client-portal / admin workstream (auth.config.ts, auth.ts, middleware.ts, types/next-auth.d.ts, lib/auth/*, lib/portal/*, lib/email-templates/admin-invitation.ts, app/admin/*, app/portal/*, app/invite/[token]/page.tsx, lib/db/migrations/013_clients.sql, scripts/check-admin-audit-table.mjs, app/robots.ts) is being shipped in a separate commit by another agent. None of those files are staged in this commit.
+
+### Next recommended task
+
+Capture proper rendered screenshots of each of the 8 templates for the Work-page thumbnails. Currently the thumbnails reuse each template's own hero image, which is acceptable for tonight but not ideal -- a screenshot of the actual rendered page would be stronger. After that, decide whether the new Vertical Blueprints section should sit above or below the existing 3 production projects on the Work page (currently below).
+
+## Last Session: April 27, 2026 -- Client portal v1: /portal + /admin/clients
+
+### What shipped
+
+The white-glove DBJ engagement portal at `/portal`, complete with project status dashboard, file vault, scoped Pathlight scan history, and account profile. Joshy provisions clients from `/admin/clients`; clients accept their invitation, sign in with Google, and land on a private dashboard. Auth is unified: one invitation flow, two destinations (admin vs client) gated by role.
+
+The decisions captured in `docs/ai/portal-strategy.md` were locked and implemented as written: split tables (admin_users vs clients), gated proxy for file delivery, N projects per client, manual milestone editing, 6 phases x 3 statuses orthogonal model, scan-by-email matching for Pathlight history, parameterized invitation email, role-aware session typing, /admin/clients as the seed mechanism (no scripts), notifications deferred to v2, audit log extended for client sign-ins, past-projects history view, and role-aware redirect after invitation acceptance.
+
+**Database (migration 013):**
+- `clients` (email PK, name, company, notes, invited_by, invited_at, accepted_at, last_signin_at, status active/archived). Partial index on active rows.
+- `client_projects` (UUID id, client_email FK, name, phase enum, status enum, current_milestone, next_deliverable, projected_eta, completed_at). Phase = discovery / design / build / review / launch / maintenance. Status = active / paused / completed (orthogonal to phase). Two indexes for client lookup and global active-project listing.
+- `client_files` (UUID id, project_id FK CASCADE, label, description, blob_url, blob_pathname, content_type, size_bytes, uploaded_by). Indexed by project + uploaded_at.
+- `admin_invitations.role` column added (CHECK admin/client, defaults admin). Single invitation table now provisions either user type.
+
+**Auth role split:**
+- New `lib/auth/clients.ts`: isClientUser, getClient, listClients, updateClientLastSignin, updateClient, archiveClient, reactivateClient, getClientStats.
+- New `lib/auth/access.ts`: `resolveAccess(email)` returns `{ role, source }` or null. Priority order: env -> admin_users -> clients -> valid invitation. Steps 2-4 issued in parallel.
+- `lib/auth/users.ts`: `acceptInvitationFor(email)` rewritten as a single CTE with admin and client INSERT branches gated on the consumed invitation's role. Returns the role consumed or null.
+- `auth.config.ts` signIn callback uses resolveAccess. JWT callback resolves role at sign-in time and trusts it on refresh. Session callback maps token.role onto session.user.role with a backwards-compat path for pre-Stage-6 admin JWTs (isAdmin=true but no role) so the cutover does not lock anyone out.
+- `auth.ts` events.signIn dispatches updates to the correct table based on resolved role and writes both `role` and `acceptedInvitation` (the role consumed) to audit metadata.
+- `types/next-auth.d.ts` adds `role?: "admin" | "client"` to Session.user (kept optional so that an unrecoverable role is treated as unauthenticated by the middleware rather than silently grant access).
+
+**Middleware:**
+- `middleware.ts` now distinguishes ADMIN_PREFIXES (/admin) from PORTAL_PREFIXES (/portal). Admins can access /portal (preview client view); clients are blocked from /admin. Anyone whose session lacks a role is bounced. /portal also added to CACHE_EXCLUDED_PREFIXES.
+
+**Portal data layer (`lib/portal/projects.ts`):**
+- listProjectsForClient, listAllActiveProjects, getProject, createProject, updateProject (full-state writes; null clears, undefined unsupported by design), deleteProject, listFilesForProject, listFilesForClient (returns project+files pairs), getFile, createFile, deleteFile, plus phaseIndex / phaseLabel helpers.
+
+**File proxy (`lib/portal/blob.ts`):**
+- REST upload to Vercel Blob via `BLOB_READ_WRITE_TOKEN` (same store Pathlight audio uses; namespaced under `clients/<projectId>/<random>/<safeName>` so URLs are unguessable).
+- The actual access boundary is `/portal/files/[id]/download` (route handler at runtime=nodejs). Validates session, checks ownership (admin sees all, client only own), tracks the download to monitoring_events as `client.file_download`, then fetches the underlying Blob URL server-side and streams the bytes back with `Content-Disposition: attachment` so the browser never sees the underlying URL.
+
+**Client portal pages:**
+- `/portal` (home): personalized greeting, active project cards each rendering a 6-step phase tracker (cyan current dot, dark for done, light for upcoming), current milestone, next deliverable, projected ETA, and a "View files" link scoped to that project. Paused projects render at half opacity with a "Paused" header. Completed projects appear in a Past projects section with read-only summary.
+- `/portal/files`: grouped tables per project. Download links go through the gated proxy.
+- `/portal/scans`: lists scans where `scan.email = client.email`, badge + score class (>=90 emerald, >=75 amber, otherwise red). Empty state CTAs to /pathlight.
+- `/portal/account`: profile fields (name, company, email, member since), sign-out form, copy nudge to email Joshua for changes.
+- `/portal/layout.tsx`: 4-item nav (Project / Files / Scans / Account), DBJ wordmark, "Client portal" subtitle. Admins see an "Admin preview" footer link back to /admin so previewing the client view does not leave them stuck.
+
+**Admin client management:**
+- `/admin/clients`: stat cards (active clients, total clients, active projects, completed projects), invite form (email + optional name + company), active and archived client tables. Invite action pre-creates the client row with name/company so the inviting admin can see context immediately, then the invitation flow upserts on acceptance.
+- `/admin/clients/[email]`: detail view. Client info edit form (name, company, internal-only notes). Per-project edit cards with full-state inputs (name, phase, status, current milestone, next deliverable, projected ETA, save + delete buttons). Per-project file list with download + delete. Per-project upload form (label + description + file picker; ~4MB limit per the Vercel function body cap; v2 will adopt a direct-upload pattern for larger files). "Create project" form at the bottom.
+- `/admin/clients/actions.ts`: 8 server actions, all auth-gated, all audit-logged via the `admin.action` event with action/target metadata. Flash banners drive user feedback through the search-param redirect pattern.
+
+**Invitation email + acceptance:**
+- `lib/email-templates/admin-invitation.ts` parameterized by role. Subject, heading, intro paragraph, button label, footer copy, and tagline switch on `role: "admin" | "client"`. Backwards-compat shim `buildAdminInvitationEmail` retained for code that still imports the old name.
+- `lib/auth/notify.ts` adds `sendInvitationEmail({ role })`. Resend tags now carry `category: client_portal | admin_security` and `email_type: client_invitation | admin_invitation`. Original `sendAdminInvitationEmail` shim routes to the new sender with role='admin'.
+- `/invite/[token]/page.tsx`: redirect-after-acceptance is role-aware. Admin invites land on /admin; client invites land on /portal. Already-signed-in users with a known role are short-circuited to their destination. Page copy adapts ("admin portal" vs "private DBJ client portal") based on invitation.role.
+
+**Wiring:**
+- `app/admin/layout.tsx`: Clients added to Operations nav (Briefcase icon, between Leads and Database).
+- `app/admin/page.tsx`: Clients card on the dashboard (live).
+- `app/robots.ts`: /portal/ added to disallow.
+
+### Files added (13)
+
+- `lib/db/migrations/013_clients.sql`
+- `lib/auth/clients.ts`
+- `lib/auth/access.ts`
+- `lib/portal/projects.ts`
+- `lib/portal/blob.ts`
+- `app/portal/layout.tsx`
+- `app/portal/page.tsx`
+- `app/portal/files/page.tsx`
+- `app/portal/files/[id]/download/route.ts`
+- `app/portal/scans/page.tsx`
+- `app/portal/account/page.tsx`
+- `app/admin/clients/page.tsx`
+- `app/admin/clients/[email]/page.tsx`
+- `app/admin/clients/actions.ts`
+
+### Files modified (8)
+
+- `auth.config.ts` (resolveAccess in signIn, role-aware jwt + session callbacks with cutover backward compat)
+- `auth.ts` (role-aware events.signIn; clients last_signin_at bookkeeping; expanded audit metadata)
+- `middleware.ts` (split prefixes, role-aware gate, /portal added to cache excludes)
+- `types/next-auth.d.ts` (role added; kept optional)
+- `lib/auth/users.ts` (CTE-with-UNION-ALL acceptInvitationFor, role-aware createInvitation, findValidInvitationRole)
+- `lib/auth/notify.ts` (sendInvitationEmail; sendAdminInvitationEmail kept as shim)
+- `lib/email-templates/admin-invitation.ts` (parameterized by role; backward-compat shim retained)
+- `app/admin/layout.tsx`, `app/admin/page.tsx`, `app/robots.ts`, `app/invite/[token]/page.tsx` (nav + dashboard + robots + role-aware redirect)
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` exit 0.
+- 0 em-dashes across all changed files.
+- 0 legacy `dbjonestech@gmail.com` references.
+- Migration 013 applied successfully to the linked Neon branch (8 statements ok).
+
+### Manual verification checklist
+
+1. Sign in to /admin as bootstrap admin. Visit /admin/clients. Stat cards should read 0/0/0/0.
+2. Invite yourself a second Google address as a CLIENT (different account than your admin one).
+3. Confirm Resend delivers the welcome email with subject "Welcome to your DBJ client portal" and a button labelled "Open the portal".
+4. Click the link in a private window. /invite/{token} should render with copy mentioning "your private DBJ client portal".
+5. Click "Accept and sign in with Google". Sign in with the client account. You should land on /portal (not /admin).
+6. Verify /portal shows your greeting, an empty active-projects state. Audit log should show signin.success with role=client and acceptedInvitation=client.
+7. Back on the admin account, visit /admin/clients/{client-email}. Add a project. Edit phase to "design". Save.
+8. Sign in as the client again. /portal home should show the project with the phase tracker reading Discovery -> Design highlighted.
+9. As admin: upload a file to the project. Verify it appears in both /admin/clients/{email} and /portal/files (in the client account).
+10. Click Download in /portal. Confirm the file downloads with Content-Disposition: attachment, and that monitoring_events received a client.file_download row.
+11. As admin: visit /portal directly. The "Admin preview" link in the sidebar should appear; you can see the client view. Clients viewing /admin should be denied with AccessDenied.
+12. Test invitation mismatch: send a client invite to one email, attempt to accept with a different Google account. signIn callback should deny.
+13. Archive the test client; their JWT remains valid 8 hours but a fresh sign-in should be denied.
+
+### Known minor items
+
+- Migration 013 was applied to the dev Postgres which is the same Neon branch as production via POSTGRES_URL. Confirm before next prod deploy that clients + client_projects + client_files + admin_invitations.role exist in the production Neon branch.
+- File uploads are capped at the Vercel function body limit (~4MB). Larger deliverables will need a direct-upload pattern (signed URL request + browser PUT to Blob); deferred to v2.
+- The session-callback backward compat path for pre-Stage-6 admin JWTs treats `isAdmin=true && role===undefined` as admin. Will be removable after the 8-hour cutover window ends and all in-flight cookies have expired.
+- Active-project constraint is application-level. The DB allows multiple status='active' rows per client (intentional for build + retainer concurrency).
+- /portal does NOT include payments, messaging, scope-add requests, or change-order forms. These belong to v2 (messaging + scope) and v3 (Stripe billing) per `docs/ai/portal-strategy.md`.
+- The Pathlight customer SaaS portal is a separate product, not on the near-term roadmap. Not to be confused with this client portal.
+
+### Git status at session pause
+
+Working tree dirty pending Joshy's review per protocol. Stages 1-3 and Stage 5 already on origin main. The portal v1 work plus all docs updates uncommitted.
+
+### Next recommended task
+
+Onboard Tyler. Create his client row + initial project + milestones in /admin/clients/[email]. Send him the invitation. Walk him through the portal. Capture feedback and feed it into the v2 scope (in-app messaging + scope-add request form per `docs/ai/portal-strategy.md`).
+
+If Tyler is not ready, ship the deferred Stage 4 polish (cmdk command palette, sonner toasts, theme toggle) which can land independently of the portal. Or pause the portal work and rotate to other backlog priorities (Tyler testimonial, Google Voice setup, Gemini Deep Research keyword pass).
+
+---
+
+## Earlier Session: April 27, 2026 -- Image swap + hero polish across all 8 portfolio templates
 
 ### What shipped
 
