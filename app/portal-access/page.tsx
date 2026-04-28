@@ -1,33 +1,39 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { auth, signIn } from "@/auth";
 
 export const dynamic = "force-dynamic";
 
 const ERROR_COPY: Record<string, string> = {
   AccessDenied:
-    "This Google account isn't authorized for the studio admin area.",
+    "This Google account isn't authorized. If you've been invited, sign in with the email address that received the invitation.",
   Verification: "That sign-in link is no longer valid. Try again.",
   Configuration:
     "Sign-in is temporarily unavailable. Please try again in a moment.",
   Default: "Something went wrong. Try again.",
 };
 
-export default async function SignInPage({
+export default async function PortalAccessPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; callbackUrl?: string }>;
 }) {
   const session = await auth();
   const params = await searchParams;
-  const callbackUrl = params.callbackUrl ?? "/admin";
+  const callbackUrl = params.callbackUrl ?? "/portal";
 
   if (session?.user?.isAdmin) {
+    redirect("/admin");
+  }
+  if (session?.user) {
     redirect(callbackUrl);
   }
 
-  const errorMessage = params.error ? ERROR_COPY[params.error] ?? ERROR_COPY.Default : null;
+  const errorMessage = params.error
+    ? ERROR_COPY[params.error] ?? ERROR_COPY.Default
+    : null;
 
   return (
     <main
@@ -51,14 +57,19 @@ export default async function SignInPage({
           </Link>
         </div>
 
-        <div
+        <section
+          aria-labelledby="portal-signin-heading"
           className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm sm:p-10"
         >
-          <h1 className="font-display text-2xl font-semibold text-zinc-900">
-            Studio admin
+          <h1
+            id="portal-signin-heading"
+            className="font-display text-2xl font-semibold text-zinc-900"
+          >
+            Client Portal
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-zinc-600">
-            Authorized accounts only. Sign in with the Google account on file.
+            Sign in with the Google account on file to reach your dashboard,
+            files, and Pathlight scan history.
           </p>
 
           {errorMessage ? (
@@ -106,7 +117,42 @@ export default async function SignInPage({
           <p className="mt-6 text-center text-xs text-zinc-500">
             Sign-in attempts are rate-limited and logged for security.
           </p>
+        </section>
+
+        <div
+          className="my-6 flex items-center gap-4"
+          role="separator"
+          aria-label="Or"
+        >
+          <div className="h-px flex-1 bg-zinc-200" />
+          <span className="text-[11px] uppercase tracking-widest text-zinc-400">
+            or
+          </span>
+          <div className="h-px flex-1 bg-zinc-200" />
         </div>
+
+        <section
+          aria-labelledby="request-access-heading"
+          className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8"
+        >
+          <h2
+            id="request-access-heading"
+            className="font-display text-lg font-semibold text-zinc-900"
+          >
+            Need access?
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+            I work with clients by invitation. Tell me a bit about your project
+            and I&apos;ll set up your portal access.
+          </p>
+          <Link
+            href="/contact?topic=portal-access"
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0891b2] focus-visible:ring-offset-2"
+          >
+            Request client access
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </section>
 
         <div className="mt-8 text-center">
           <Link

@@ -6,6 +6,53 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
+## Last Session: April 28, 2026 -- Auth surfaces split: /signin admin-only, /portal-access public client entry, "Admin login" moved to footer
+
+### What shipped
+
+The auth surface is now cleanly bifurcated. `/signin` reverts to the original simple Google-button-only admin entry (heading "Studio admin"), accessible only via a small "Admin login" text link in the Footer bottom bar. A new public route `/portal-access` (heading "Client Portal") is the dedicated client-facing entry with the two-track layout: Google sign-in for existing clients on top, "Need access?" request-access card pointing at `/contact?topic=portal-access` below. The Navbar's outlined "Client Portal" pill now targets `/portal-access`, and the prior "Sign in" text link is removed entirely from the public navbar. Downstream auth flows (`/portal` unauthenticated redirect, `/invite/[token]` invalid-state fallback link) follow the new client entry.
+
+### Files changed (8)
+
+**Created:**
+- `app/portal-access/layout.tsx` -- metadata. Title "Client Portal", description tuned for prospect SEO, `robots: { index: true, follow: true }`. The `/portal/` rule in `app/robots.ts` (with trailing slash) does not match `/portal-access`, verified.
+- `app/portal-access/page.tsx` -- client-facing entry. Heading "Client Portal", subtitle "Sign in with the Google account on file to reach your dashboard, files, and Pathlight scan history." Server-side: signed-in admin -> `/admin`, signed-in client -> `callbackUrl ?? "/portal"`, unauthenticated -> render the two-track page. Default `callbackUrl="/portal"`. Same accent-cyan focus rings, same role-neutral `ERROR_COPY`, same logo treatment as `/signin`. The "Request client access" CTA links to `/contact?topic=portal-access` (existing prefill path, untouched).
+
+**Modified:**
+- `app/signin/page.tsx` -- reverted to single Google-button-only layout. Heading "Client Portal" -> "Studio admin". `ERROR_COPY.AccessDenied` updated to "This Google account isn't authorized for the studio admin area." Two-track content removed (relocated to `/portal-access`). Default `callbackUrl="/admin"` unchanged.
+- `app/signin/layout.tsx` -- `metadata.title` "Client Portal" -> "Studio admin". `robots` unchanged (still noindex).
+- `components/layout/Navbar.tsx` -- removed the gray "Sign in" text link entirely from desktop and mobile. The outlined "Client Portal" pill now points to `/portal-access` (was `/signin`). About-page-aware white/dark variants kept.
+- `components/layout/Footer.tsx` -- bottom bar gains a third small text link "Admin login" pointing to `/signin`, alongside Privacy Policy and Terms of Service. Same gray text styling and hover treatment as those two.
+- `app/portal/layout.tsx` -- unauthenticated redirect destination changed from `/signin?callbackUrl=/portal` to `/portal-access?callbackUrl=/portal`. Existing clients hitting protected `/portal/*` routes now land on the client-friendly entry, not the admin entry.
+- `app/invite/[token]/page.tsx` -- invalid-invitation fallback "Go to sign-in" link changed from `/signin` to `/portal-access`. Most users with an invite link are clients; admins with an expired invite can still reach `/signin` via the footer.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` exit 0.
+- Em-dash grep on changed files: zero (one pre-existing em-dash on `app/layout.tsx:154` left untouched).
+- `\b(we|our)\b` grep on new files: zero.
+- `app/robots.ts` `/portal/` rule (trailing slash) does NOT match `/portal-access`: the public client entry stays crawlable by design.
+- HeroCinema, Pathlight pipeline, marketing/grade route boundaries, cookie banner, GA, /contact prefill: untouched.
+
+### Routing matrix after this commit
+
+| Surface | Audience | URL | Default callbackUrl | Indexable |
+|---|---|---|---|---|
+| Footer "Admin login" | Studio admin (Joshy) | `/signin` | `/admin` | no |
+| Navbar "Client Portal" pill | Existing clients + prospects | `/portal-access` | `/portal` | yes |
+| `/contact?topic=portal-access` | Prospects requesting access | `/contact` (form) | n/a | yes |
+| `/portal/*` unauthenticated redirect | Existing clients | `/portal-access?callbackUrl=/portal` | `/portal` | n/a |
+| `/admin/*` unauthenticated redirect | Admin | `/signin?callbackUrl=/admin` | `/admin` | n/a |
+
+### Why this design
+
+A single two-track `/signin` page mixed admin tooling into the public navbar and forced one URL to serve two semantically different audiences. Industry convention puts admin login in the footer (Stripe, Linear, GitHub all hide staff/admin login there), so the public navbar can focus on the client flow without internal-tooling noise. Splitting the routes lets each page do exactly one thing well, which is also what Joshy described in conversation: Admin Login = simple Google login like it was before, Client Portal = the welcoming entry as it stands today.
+
+### Next recommended task
+
+After deploy lands, verify in incognito: (1) navbar shows only the outlined "Client Portal" pill (no "Sign in" text link anywhere), (2) clicking the pill loads `/portal-access` with the two-track layout, (3) the request-access CTA still loads `/contact?topic=portal-access` with the cyan KeyRound badge and prefilled fields, (4) the footer's "Admin login" link is small and subtle next to Privacy/Terms and lands at `/signin` showing the "Studio admin" Google-button-only page, (5) sign in via the footer admin link with the studio Google account and confirm role-aware redirect to `/admin`, (6) accept a fresh client invitation in `/admin/clients` -> open the email -> click the invitation link -> confirm the Google sign-in works and lands at `/portal`.
+
 ## Last Session: April 28, 2026 -- Vertical "Blueprints" renamed to "Design Briefs" + 8 template screenshots wired in
 
 ### What shipped
@@ -1028,4 +1075,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `3a19312` (feat(nav): show both 'Sign in' and 'Client Portal' in the navbar), confirmed pushed to `origin main`. Working tree clean. Recent chain (most recent first): `3a19312` (navbar dual auth surfaces) -> `5fbf385` (snapshot for 3d4c2fe) -> `3d4c2fe` (Client Portal rename + two-track /signin) -> `483d42f` (snapshot for c97ba70) -> `c97ba70` (GA + consent banner + privacy disclosure) -> `3275b3d` (snapshot for 9775d0f) -> `9775d0f` (portal v1 + role split) -> `ef1e373` (snapshot for af176eb) -> `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (snapshot for fd84067) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.
+`main` is at the auth-surfaces-split commit, confirmed pushed to `origin main`. Working tree clean. Recent chain (most recent first): auth surfaces split (/signin admin-only, /portal-access public client entry) -> `6ade672` (snapshot for 5fd29b7) -> `5fd29b7` (Design Briefs rename + 8 template previews + project-card layout) -> `2c714ec` (snapshot for 3a19312) -> `3a19312` (navbar dual auth surfaces) -> `5fbf385` (snapshot for 3d4c2fe) -> `3d4c2fe` (Client Portal rename + two-track /signin) -> `483d42f` (snapshot for c97ba70) -> `c97ba70` (GA + consent banner + privacy disclosure) -> `3275b3d` (snapshot for 9775d0f) -> `9775d0f` (portal v1 + role split) -> `ef1e373` (snapshot for af176eb) -> `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (snapshot for fd84067) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.

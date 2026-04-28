@@ -179,6 +179,9 @@ export function Footer() {
             <Link href="/terms" className="hover:text-gray-900 transition-colors">
               Terms of Service
             </Link>
+            <Link href="/signin" className="hover:text-gray-900 transition-colors">
+              Admin login
+            </Link>
           </div>
         </div>
       </div>

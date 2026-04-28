@@ -25,7 +25,7 @@ export default async function PortalLayout({
 }) {
   const session = await auth();
   if (!session?.user || (session.user.role !== "client" && session.user.role !== "admin")) {
-    redirect("/signin?callbackUrl=/portal");
+    redirect("/portal-access?callbackUrl=/portal");
   }
 
   return (
