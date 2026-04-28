@@ -54,17 +54,29 @@ function shouldCachePathname(pathname: string): boolean {
   return !CACHE_EXCLUDED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
+/* Strict prefix match: a path matches `base` only when it equals
+ * `base` exactly or extends it via a `/` separator. Without this,
+ * `pathname.startsWith("/portal")` would also swallow `/portal-access`
+ * (the public client entry) into the protected portal namespace and
+ * redirect unauthenticated visitors to the admin sign-in page. */
+function isPathOrSubpath(pathname: string, base: string): boolean {
+  return pathname === base || pathname.startsWith(base + "/");
+}
+
 export default middlewareAuth((request: NextRequest & { auth: import("next-auth").Session | null }) => {
   const { pathname, search } = request.nextUrl;
-  const isAdminPath = ADMIN_PREFIXES.some((p) => pathname.startsWith(p));
-  const isPortalPath = PORTAL_PREFIXES.some((p) => pathname.startsWith(p));
+  const isAdminPath = ADMIN_PREFIXES.some((p) => isPathOrSubpath(pathname, p));
+  const isPortalPath = PORTAL_PREFIXES.some((p) => isPathOrSubpath(pathname, p));
 
   if (isAdminPath || isPortalPath) {
     const session = request.auth;
     const role = session?.user?.role;
 
     if (!session || !role) {
-      const signInUrl = new URL("/signin", request.url);
+      /* Admin paths bounce to /signin (Studio admin entry). Portal
+       * paths bounce to /portal-access (public client entry). */
+      const entry = isAdminPath ? "/signin" : "/portal-access";
+      const signInUrl = new URL(entry, request.url);
       signInUrl.searchParams.set("callbackUrl", pathname + search);
       return NextResponse.redirect(signInUrl);
     }
@@ -79,7 +91,7 @@ export default middlewareAuth((request: NextRequest & { auth: import("next-auth"
       return NextResponse.redirect(signInUrl);
     }
     if (isPortalPath && role !== "admin" && role !== "client") {
-      const signInUrl = new URL("/signin", request.url);
+      const signInUrl = new URL("/portal-access", request.url);
       signInUrl.searchParams.set("callbackUrl", pathname + search);
       signInUrl.searchParams.set("error", "AccessDenied");
       return NextResponse.redirect(signInUrl);
