@@ -32,7 +32,7 @@
 
 ### Open follow-ups for the dashboard expansion
 
-- [ ] Apply migrations 014-021 to production database. Currently only on disk.
+- [x] Apply migrations 014-021 to production database -- DONE April 28. `npx tsx lib/db/setup.ts` applied cleanly. Pre-migration: 15 tables, 0 materialized views; post-migration: 25 tables, 3 materialized views. All 21 read APIs smoke-tested against the migrated DB; visitor analytics already capturing real beacon traffic.
 - [ ] Set the new Vercel env vars: ANALYTICS_IP_SALT_BASE (required), VERCEL_API_TOKEN + VERCEL_PROJECT_ID + VERCEL_WEBHOOK_SECRET, INNGEST_WEBHOOK_SECRET, ANTHROPIC_ADMIN_KEY + ANTHROPIC_MONTHLY_BUDGET_USD, GOOGLE_SC_CREDENTIALS_JSON + GOOGLE_SC_SITE_URL, SENTRY_AUTH_TOKEN + SENTRY_ORG_SLUG + SENTRY_PROJECT_SLUG. Each is documented in the relevant service file's header comment.
 - [ ] Register the Vercel deployment webhook in the Vercel dashboard at /api/webhooks/vercel.
 - [ ] Register the Inngest run-lifecycle webhook in the Inngest dashboard at /api/webhooks/inngest.

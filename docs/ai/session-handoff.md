@@ -110,10 +110,12 @@ Ship migrations and the new envs to Vercel, deploy, and watch the dashboards hyd
 ### Final state (post-commit)
 
 - Feature commit: `1173bc2` -- feat(admin): expand dashboard into operations cockpit + move admin login to footer
-- Snapshot commit: this final-state block is captured in a standalone `chore: update session-handoff snapshot for 1173bc2` commit on top of the feature commit. The original `--amend && --force-with-lease` path was rejected by the protected-branch hook on `main`, so the standalone-commit fallback documented in CLAUDE.md was used instead.
-- Push: feature commit confirmed to `origin main` (`4e03df3..1173bc2`); snapshot commit pushes after this edit lands.
-- 4 required GitHub status checks were noted by the remote on the feature push but did not block the push.
-- Working tree is clean after the snapshot commit.
+- Hot-fix 1: `7e6e159` -- fix(admin): empty-state on missing tables + rebalance landing layout. The dashboard pages were crashing because the new tables didn't yet exist on prod and the read APIs let the error propagate. Wrapped all 21 read APIs in try/catch returning safe defaults.
+- Hot-fix 2: `da04239` -- fix(admin): align card heights across rows with single auto-rows-fr grid. The previous 4-column layout had each column independently stacking cards, so same-row cards in different columns drifted out of vertical alignment. Restructured into one row-major grid with auto-rows-fr.
+- Migrations applied to prod: `npx tsx lib/db/setup.ts` ran end-to-end with every statement returning `ok` and `Schema applied successfully.` Pre-migration snapshot showed 15 tables / 0 materialized views; post-migration shows 25 tables / 3 materialized views. Diff matches exactly: 10 new base tables (visitors, sessions, page_views, page_view_engagement, vercel_deployments, vercel_function_metrics, inngest_runs, infra_checks, anthropic_budget_snapshots, search_console_daily) and 3 materialized views (funnel_daily_v, funnel_cohort_weekly_v, email_kpi_daily_v).
+- Smoke test of all 21 read APIs against the migrated DB: every one returned without throwing. Visitor analytics already capturing real beacon traffic (1 session, 1 page view, 1 RUM measurement at the time of the test). Email KPI view picked up existing email_events history (1 row, 5 trend points). Modules awaiting their own integrations (Vercel webhook, Inngest webhook, Anthropic Admin key, GSC service account, Sentry token) correctly return empty rows; their dashboards will hydrate once env vars are set in Vercel.
+- Helper scripts added under `scripts/` for future migration verification: `snapshot-schema.ts` (lists all tables + materialized views) and `smoke-test-reads.ts` (calls every dashboard read function and prints the result counts).
+- Push: all three commits on `origin main`; working tree clean.
 - Committer identity was auto-configured from hostname (`doulosjones@Joshuas-MacBook-Pro.local`); Joshua may want to set `git config --global user.email` for cleaner blame on future commits. CLAUDE.md prohibits the assistant from touching git config.
 
 ## Last Session: April 28, 2026 -- Auth surfaces split: /signin admin-only, /portal-access public client entry, "Admin login" moved to footer
