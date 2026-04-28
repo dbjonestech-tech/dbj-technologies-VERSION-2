@@ -6,7 +6,43 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 28, 2026 -- First real testimonial on homepage + hyphen sweep across user-facing copy
+## Most Recent Session: April 28, 2026 -- Testimonial promoted to slim band between Hero and PathlightCTA
+
+### What shipped
+
+The single testimonial that landed earlier today as a buried section on the light marketing background (where the dark glass card I designed disappeared into the bg) is now a slim refined band sitting directly between Hero and PathlightCTA. Validates the studio claim from the hero before the prospect is asked to do anything.
+
+**Files changed (3 + 1 deleted):**
+- **Created** `components/sections/TestimonialBand.tsx`: light-bg-aware slim band. Top + bottom hairline gradient dividers (`bg-gradient-to-r from-transparent via-accent-blue/25 to-transparent`), centered figure with 5 small gold stars (h-4), `font-display text-lg md:text-xl` blockquote, `Name, Title · Business · Location` attribution row, mono uppercase `GOOGLE REVIEW · View live site →` micro-row. No card border (so it works on either light or dark backgrounds without needing to know the neighbor section's bg). `print-hidden`. Framer Motion entrance `initial={{ opacity: 0, y: 16 }} whileInView` matching other homepage sections, `viewport={{ once: true, margin: "-60px" }}`.
+- **Modified** `app/(marketing)/page.tsx`: added `<TestimonialBand />` between `<Hero />` and `<PathlightCTA />`. Removed the old `<TestimonialsSection />` import + render entirely (it was rendering nothing useful in the new placement model).
+- **Deleted** `components/sections/Testimonials.tsx`: deprecated. The dark glass card it shipped didn't read on the light marketing bg. When a second testimonial lands, either extend the band into a small carousel or build a new section component fresh against whichever bg it sits on. Old file is in git history (`8ca63ea`) for reference.
+
+### Design rationale
+
+A slim band on the light bg, immediately after the hero, does three things at once: (1) caps off the studio's pitch with social proof before any other narrative, (2) doesn't compete with the HeroCinema's "Architect The Impossible" message because it sits below the fold of the cinema, (3) primes the prospect for the dark Pathlight section that follows. The hairline gradient dividers give it editorial gravitas without adding a card border that would have to track the neighbor section's bg.
+
+### Lesson recorded
+
+Always verify the actual rendered background of the destination section before styling a new component. The earlier dark-glass styling for the SoloTestimonial assumed dark bg without checking; on the light marketing background the border + fill disappeared and the card looked unstyled. Going forward: a card design that needs to work in multiple page positions should either drop the card border entirely (like this band) or be explicitly bg-aware.
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean (exit 0).
+- Em-dash check on changed files: 0.
+- No stale `TestimonialsSection` references anywhere.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load the homepage and confirm: (1) the band sits cleanly between the Hero's "SCROLL ⌄" chevron and the dark Pathlight section, (2) the top + bottom hairline dividers fade in/out cleanly, (3) the 5 gold stars are visible against the light bg, (4) the quote reads at a comfortable size, (5) the attribution and source row wrap naturally on mobile, (6) "View live site" opens thestarautoservice.com in a new tab, (7) the section's vertical padding doesn't crush against PathlightCTA's top edge.
+
+### Final state (post-commit)
+
+(updated by snapshot commit after push)
+
+---
+
+## Previous Session: April 28, 2026 -- First real testimonial on homepage + hyphen sweep across user-facing copy
 
 ### What shipped
 
