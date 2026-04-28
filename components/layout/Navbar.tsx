@@ -129,7 +129,7 @@ export function Navbar() {
                 : "text-gray-500 hover:text-gray-900"
             }`}
           >
-            Sign in
+            Client Portal
           </Link>
           <Link
             href="/pathlight#scan-form"
@@ -224,7 +224,7 @@ export function Navbar() {
                   onClick={() => setIsOpen(false)}
                   className="mt-3 block w-full rounded-lg px-4 py-3 text-center text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
                 >
-                  Sign in
+                  Client Portal
                 </Link>
               </motion.div>
             </div>

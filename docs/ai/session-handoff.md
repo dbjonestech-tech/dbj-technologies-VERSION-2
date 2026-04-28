@@ -6,6 +6,44 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
+## Last Session: April 27, 2026 -- "Client Portal" navbar rename + two-track /signin page
+
+### What shipped
+
+The single navbar entry that used to read "Sign in" now reads "Client Portal" on desktop and mobile. The `/signin` page itself is now a clear two-track landing: existing clients sign in with Google in the top card, and prospective clients who do not yet have an invitation see a second "Need access?" card with a primary CTA that opens the contact form pre-filled for portal-access intake. No new submission infrastructure was added; the existing Resend contact pipeline is reused via a `topic=portal-access` query param that is read by the contact form.
+
+### Files changed (4)
+
+- `components/layout/Navbar.tsx` -- "Sign in" -> "Client Portal" on lines 132 (desktop) and 227 (mobile). Same `/signin` href, same styling, same active-state behavior. Wording change only.
+- `app/signin/layout.tsx` -- `metadata.title` changed from "Sign in" to "Client Portal" so the browser tab and any social-card preview match the navbar wording.
+- `app/signin/page.tsx` -- restructured into two stacked sections:
+  - Top section (`<section aria-labelledby="signin-heading">`): h1 "Client Portal", subtitle "Sign in with the Google account on file to reach your dashboard.", existing Google sign-in server action button, error region, rate-limit footnote. Functionally unchanged.
+  - "or" divider with `role="separator"` and `aria-label="Or"`.
+  - Bottom section (`<section aria-labelledby="request-access-heading">`): h2 "Need access?", subtitle "I work with clients by invitation. Tell me a bit about your project and I'll set up your portal access.", primary CTA "Request client access" with lucide ArrowRight icon linking to `/contact?topic=portal-access`. Same `#0891b2` accent-cyan focus ring as the Google button.
+  - `ERROR_COPY.AccessDenied` softened from "This Google account isn't authorized for the admin portal." to "This Google account isn't authorized. If you've been invited, sign in with the email address that received the invitation." -- role-neutral, accurate for both admin and client invitees.
+- `app/(marketing)/contact/ContactContent.tsx` -- new `topic=portal-access` prefill path:
+  - Module-scope `PORTAL_ACCESS_DEFAULTS` sets `budget="Not sure yet"`, `projectType="Other"`, `message="I'd like to request access to the DBJ client portal. A bit of context on what I'm working on:\n\n"`. Both option strings already exist in `lib/siteContent.ts` so the required selects validate cleanly.
+  - `isPortalAccessRequest = searchParams.get("topic") === "portal-access"`.
+  - New `formDefaults` memo prefers an existing pricing-package `selection` first, then falls back to `PORTAL_ACCESS_DEFAULTS` when only `topic=portal-access` is present, then `undefined`. Wired into `useForm({ defaultValues: formDefaults })`.
+  - New conditional badge above the form, styled to match the existing "Your Selected Package" glass-card: cyan accent ring, lucide `KeyRound` icon, monospace "Topic" eyebrow, "Client portal access" headline, one-sentence note explaining the invitation-email follow-up. Hidden when a pricing-package selection is also present so the two prefill paths never visually collide.
+  - lucide import line gained `KeyRound`.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` exit 0.
+- Em-dash grep on the four changed files: zero.
+- `\b(we|our)\b` grep on new copy: zero. /signin uses "I" / "you"; the contact prefill message is first-person.
+- Navbar HeroCinema, Pathlight, marketing/grade boundaries, cookie banner, GA, robots: untouched.
+
+### Visual flow
+
+Prospect lands on home -> notices "Client Portal" in navbar -> clicks -> /signin shows two cards stacked -> reads "Need access?" -> clicks "Request client access" -> /contact loads with KeyRound topic badge visible at the top of the form, budget and project-type pre-selected, message field pre-seeded with their intent -> fills name/email/short context -> submits -> email lands in joshua@dbjtechnologies.com via Resend with the prefilled message making it instantly clear this is a portal request -> Joshy provisions the client from `/admin/clients` as usual.
+
+### Next recommended task
+
+Run through the prospect path in an incognito browser once the deploy lands: (1) confirm "Client Portal" appears in navbar both at the home scroll-top transparent state and in the post-scroll white-panel state, (2) click to /signin, confirm both cards render and the "or" separator looks balanced on mobile and desktop, (3) click "Request client access", confirm /contact loads with the cyan topic card visible, message field pre-seeded, and budget/projectType pre-selected, (4) submit a test request and confirm the email arrives via Resend with the prefilled body intact.
+
 ## Last Session: April 27, 2026 -- Google Analytics + cookie consent banner + privacy policy disclosure
 
 ### What shipped
@@ -907,4 +945,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `c97ba70` (feat: Google Analytics with cookie consent banner + privacy policy update), confirmed pushed to `origin main`. Working tree clean. Recent chain (most recent first): `c97ba70` (GA + consent banner + privacy disclosure) -> `3275b3d` (snapshot for 9775d0f) -> `9775d0f` (portal v1 + role split) -> `ef1e373` (snapshot for af176eb) -> `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (snapshot for fd84067) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.
+`main` is at the "Client Portal" rename + two-track /signin commit, confirmed pushed to `origin main`. Working tree clean. Recent chain (most recent first): "Client Portal" rename + two-track /signin -> `483d42f` (snapshot for c97ba70) -> `c97ba70` (GA + consent banner + privacy disclosure) -> `3275b3d` (snapshot for 9775d0f) -> `9775d0f` (portal v1 + role split) -> `ef1e373` (snapshot for af176eb) -> `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (snapshot for fd84067) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.

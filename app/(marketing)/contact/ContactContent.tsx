@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MapPin, Send, CheckCircle2, AlertCircle, Loader2, Pencil } from "lucide-react";
+import { MapPin, Send, CheckCircle2, AlertCircle, Loader2, Pencil, KeyRound } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { GridBackground } from "@/components/effects/GridBackground";
@@ -94,6 +94,13 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+const PORTAL_ACCESS_DEFAULTS: Partial<FormData> = {
+  budget: "Not sure yet",
+  projectType: "Other",
+  message:
+    "I'd like to request access to the DBJ client portal. A bit of context on what I'm working on:\n\n",
+};
+
 export default function ContactContent() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const searchParams = useSearchParams();
@@ -103,6 +110,14 @@ export default function ContactContent() {
     return buildSelection(params);
   }, [searchParams]);
 
+  const isPortalAccessRequest = searchParams.get("topic") === "portal-access";
+
+  const formDefaults = useMemo<Partial<FormData> | undefined>(() => {
+    if (selection) return { message: selection.message };
+    if (isPortalAccessRequest) return PORTAL_ACCESS_DEFAULTS;
+    return undefined;
+  }, [selection, isPortalAccessRequest]);
+
   const {
     register,
     handleSubmit,
@@ -110,7 +125,7 @@ export default function ContactContent() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: selection ? { message: selection.message } : undefined,
+    defaultValues: formDefaults,
   });
 
   const onSubmit = async (data: FormData) => {
@@ -232,6 +247,36 @@ export default function ContactContent() {
                       ${selection.estimate.toLocaleString()}
                       {selection.tierSlug === "enterprise" ? "+" : ""}
                     </span>
+                  </div>
+                </motion.div>
+              )}
+
+              {isPortalAccessRequest && !selection && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 }}
+                  className="glass-card p-6 ring-1 ring-accent-blue/20"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue">
+                      <KeyRound className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-widest text-accent-blue mb-1 font-mono">
+                        Topic
+                      </p>
+                      <p className="font-display text-base font-bold">
+                        Client portal access
+                      </p>
+                      <p className="mt-2 text-sm text-text-secondary">
+                        Share a brief project summary below. Once your account
+                        is set up, you&apos;ll receive an invitation email with
+                        a sign-in link.
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
               )}
