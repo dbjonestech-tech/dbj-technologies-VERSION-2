@@ -99,6 +99,7 @@ export interface Testimonial {
   url: string;
   rating: number;
   source: string;
+  credential?: string;
 }
 
 export const TESTIMONIALS: Testimonial[] = [
@@ -112,6 +113,18 @@ export const TESTIMONIALS: Testimonial[] = [
     url: "https://thestarautoservice.com",
     rating: 5,
     source: "Google",
+  },
+  {
+    quote:
+      "Highly recommend DBJ Technologies for website development. Joshua did our company website and it looks incredible. I get comments all the time on how much people like the site. He is working on SEO now and we are already getting quite a bit of traffic. This is money well spent and will recommend him to all my friends.",
+    name: "Tyler Dirks",
+    title: "Owner",
+    business: "Soil Depot",
+    location: "Plano, TX",
+    url: "https://soil-depot.com",
+    rating: 5,
+    source: "Google",
+    credential: "Google Local Guide · 45 reviews · 17 photos",
   },
 ];
 

@@ -6,7 +6,35 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 28, 2026 -- Testimonial promoted to slim band between Hero and PathlightCTA
+## Most Recent Session: April 28, 2026 -- Tyler Dirks (Soil Depot) added as second testimonial; band rebuilt as dual-quote layout
+
+### What shipped
+
+The slim testimonial band now shows two real Google reviews side by side: Miguel Ibarra (Star Auto Service, Richardson) and Tyler Dirks (Soil Depot, Plano). Different verticals on purpose, so the band reads as breadth (auto service + commercial soil brokerage) rather than a single happy customer. Tyler's "Google Local Guide · 45 reviews · 17 photos" credential is surfaced as a small italic line under his attribution; Miguel doesn't have one and the asymmetry is honest, not awkward.
+
+### Files changed (2)
+
+- **`lib/constants.ts`**: Added Tyler's testimonial entry. Extended the `Testimonial` interface with an optional `credential?: string` field for verified-reviewer signals. Tyler's quote was lightly cleaned of two clear typos from the source Google review ("on his much people" -> "on how much people", "money will spent" -> "money well spent"); voice and meaning preserved verbatim otherwise.
+- **`components/sections/TestimonialBand.tsx`**: Refactored from single-quote to dual-quote layout. Extracted `StarRow` and `Quote` helpers. Outer grid is `grid-cols-1 md:grid-cols-2` with `md:divide-x md:divide-accent-blue/15` for the vertical hairline between columns on desktop; each column gets `md:px-8 lg:px-10` so content breathes off the divider. On mobile the columns stack and a small horizontal hairline (`w-32`) sits between them. Quote font slightly reduced (`text-base md:text-lg`) so two columns read at a comfortable density. Each `Quote` motion gets a staggered delay (`index * 0.08`) so they fade in one after the other.
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean (exit 0).
+- Em-dash check on changed files: 0 introduced.
+- Tyler quote typo cleanup is conservative; revert to verbatim with: `git show HEAD:lib/constants.ts` for the cleaned version (or paste verbatim text and I'll swap).
+
+### Next recommended task
+
+After Vercel rebuild settles, incognito-load the homepage and confirm: (1) two columns sit side by side on desktop with a thin vertical hairline between them, (2) on mobile both stack with a small horizontal hairline between them, (3) Tyler's "Google Local Guide · 45 reviews · 17 photos" italic line renders below his attribution and Miguel's column doesn't have an awkward gap where the same line would have been, (4) both "View live site" links open the correct site (thestarautoservice.com + soil-depot.com) in new tabs, (5) the staggered fade-in plays cleanly on first scroll, (6) columns don't visually weigh too unevenly despite Tyler's quote being ~3x longer than Miguel's.
+
+### Final state (post-commit)
+
+(updated by snapshot commit after push)
+
+---
+
+## Previous Session: April 28, 2026 -- Testimonial promoted to slim band between Hero and PathlightCTA
 
 ### What shipped
 
