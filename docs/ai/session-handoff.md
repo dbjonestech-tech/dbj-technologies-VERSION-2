@@ -38,6 +38,12 @@ The Work page's vertical reference-architecture section was rebuilt end to end. 
 - Em-dash grep across all changed files: zero hits.
 - HeroCinema phase strings (`"blueprint" | "build" | "reveal" | "complete"`), `pathlight-chat.ts` "blueprint" mention in process language, `browserless.ts` comment about a "blueprint overlay": untouched (none of these refer to the vertical reference architectures).
 
+### Commit + push state
+
+- Commit: `5fd29b7 feat(work): rename Blueprints to Design Briefs, add 8 template previews, match project-card layout`.
+- Pushed to `origin main` (confirmed: `2c714ec..5fd29b7  main -> main`).
+- Working tree: clean apart from this handoff amendment.
+
 ### Vertical -> screenshot map (for reference)
 
 | Slug | Vertical | Source filename |
