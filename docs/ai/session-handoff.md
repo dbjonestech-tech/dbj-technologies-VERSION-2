@@ -6,6 +6,43 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
+## Last Session: April 27, 2026 -- Google Analytics + cookie consent banner + privacy policy disclosure
+
+### What shipped
+
+Google Analytics (G-1Z1PVKKRW2) is wired up but loads only when a visitor accepts the cookie banner. Two new client components handle this without disturbing the marketing layout, the (grade) layout, or the HeroCinema chain. The privacy policy was extended with a dedicated Analytics section in first-person voice. The pre-existing `scripts/check-admin-audit-table.mjs` migration verifier was also bundled into this commit (carried over from the portal session, intentionally not shipped at the time).
+
+### Files changed (5)
+
+**Created:**
+- `components/layout/GoogleAnalytics.tsx` -- client component. Reads `dbj-cookie-consent` from `localStorage` after hydration, listens for the `dbj-cookie-consent-change` custom event, toggles `window['ga-disable-G-1Z1PVKKRW2']` based on consent. Returns `null` unless: env var `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set, component is hydrated, consent === "accepted", and pathname is NOT `/admin/*` and NOT `/pathlight/<anything>` (the `/pathlight` landing page IS tracked; only sub-paths carrying scan UUIDs or unsubscribe tokens are excluded). Renders two `<Script strategy="afterInteractive">` tags: gtag.js loader + init with `anonymize_ip: true`.
+- `components/layout/CookieConsent.tsx` -- fixed-bottom banner. `z-[60]` (above Navbar z-50, well below HeroCinema fallback z-100). `#06060a` background, `border-white/10` top border, `print-hidden` class. Reads localStorage in `useEffect` to avoid SSR hydration mismatch. Hidden on `/admin/*`. Decline/Accept buttons write the localStorage key and dispatch the consent-change event so GA reacts without a page reload. No animation, so `prefers-reduced-motion` is respected by default.
+- `scripts/check-admin-audit-table.mjs` -- carried over from the portal session. Verifies the `admin_audit_log` table exists in whatever DB `POSTGRES_URL` points to. Sanitizes credentials before logging the host. Pair with `node --env-file=.env.local` for local or `--env-file=.env.production.local` for prod Neon.
+
+**Modified:**
+- `app/layout.tsx` -- imports `GoogleAnalytics` and `CookieConsent`, mounts both at the end of `<body>`. The root layout is the only layout that wraps `/admin/*` and `/pathlight/*`, so the consent and path gating must live inside the components.
+- `app/(marketing)/privacy/page.tsx` -- section 4 (Cookies) no longer claims zero tracking cookies; it now points to the new Analytics section. New section 5 "Analytics" inserted in first-person voice covering Google Analytics (data collected, anonymous, IP anonymization, no PII to Google) and opt-out routes (banner Decline, clear storage key, Google opt-out add-on at `tools.google.com/dlpage/gaoptout`), and explicitly distinguishes the cookieless Vercel Speed Insights tool. Sections 5-8 renumbered to 6-9. `metadata.description` and `openGraph.description` updated to match.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` exit 0.
+- Em-dash grep on the four changed files: zero (one pre-existing em-dash on `app/layout.tsx:154` left untouched).
+- `\b(we|our)\b` grep on new copy: zero. Privacy Analytics section uses "I" / "you".
+- `app/robots.ts` already disallows `/admin/`, `/pathlight/`, `/api/`, `/internal/`, `/monitoring`, `/templates/`, `/portal/`, `/signin`, `/invite/`. No edit needed.
+
+### Manual step still required
+
+`NEXT_PUBLIC_GA_MEASUREMENT_ID=G-1Z1PVKKRW2` must be added to Vercel project env vars (Production, optionally Preview). With the var unset, the GoogleAnalytics component returns `null` and no scripts load. Local dev intentionally stays cookie-free without it. `.env.example` was NOT modified per the deployment rule.
+
+### Known limitation
+
+SPA pageview tracking on client-side route change is NOT wired up. The current implementation fires the initial pageview via `gtag('config', GA_ID)` once when the component mounts; subsequent `next/link` navigations within tracked paths do not register additional pageviews. The spec did not require this. If full SPA tracking is wanted later, the fix is a `useEffect([pathname, consent])` that calls `gtag('event', 'page_view', { page_path: pathname })`.
+
+### Next recommended task
+
+Add `NEXT_PUBLIC_GA_MEASUREMENT_ID` to Vercel, wait for the auto-deploy, then verify on prod: (1) banner appears on first visit, (2) clicking Accept loads `googletagmanager.com/gtag/js` (Network tab), (3) clicking Decline does not, (4) banner does NOT appear on `/admin/*`, (5) on a bare `/pathlight` visit GA loads but on `/pathlight/<scanId>` it does not, (6) Realtime in the GA console shows the visit.
+
 ## Last Session: April 27, 2026 -- Cross-template differentiation pass + Work page Blueprints grid
 
 ### What shipped
@@ -870,4 +907,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `9775d0f` (feat(portal): client portal v1 + auth role split + /admin/clients), confirmed pushed to `origin main`. Working tree clean except `scripts/check-admin-audit-table.mjs` (carried over from a prior session, intentionally untracked). Recent chain (most recent first): `9775d0f` (portal v1 + role split) -> `ef1e373` (snapshot for af176eb) -> `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (snapshot for fd84067) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.
+`main` is at `c97ba70` (feat: Google Analytics with cookie consent banner + privacy policy update), confirmed pushed to `origin main`. Working tree clean. Recent chain (most recent first): `c97ba70` (GA + consent banner + privacy disclosure) -> `3275b3d` (snapshot for 9775d0f) -> `9775d0f` (portal v1 + role split) -> `ef1e373` (snapshot for af176eb) -> `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (snapshot for fd84067) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.
