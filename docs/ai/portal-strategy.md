@@ -204,10 +204,19 @@ of the portal itself; it's the on-ramp INTO the portal.
 - April 27, 2026 (afternoon): **Stage 5 shipped.** `admin_users` +
   `admin_invitations` tables (migration 012), DB-backed allowlist in
   `lib/auth/users.ts`, invitation acceptance at `/invite/[token]`, and
-  the `/admin/users` invite/manage surface. The same invitation flow
-  is the foundation that client portal v1 will reuse with `role =
-  'client'` once the role CHECK is widened. See session-handoff.md
-  for the full file list and verification protocol.
-- Next up: client portal v1. The auth foundation no longer blocks it.
+  the `/admin/users` invite/manage surface.
+- April 27, 2026 (evening): **Client portal v1 shipped.** Migration 013
+  added `clients`, `client_projects`, `client_files`, and
+  `admin_invitations.role`. New `lib/auth/access.ts` resolves access
+  from env / admin_users / clients / pending invitations in priority
+  order. The `/portal` surface (home + files + scans + account) and the
+  `/admin/clients` management surface (invite + per-client detail with
+  project + file editing) are live. Invitation email parameterized by
+  role; acceptance redirects role-aware. Audit log extended with
+  `client.file_download` events via monitoring_events. See
+  session-handoff.md for the full file list and manual verification
+  checklist.
+- Next up: onboard Tyler as the first real client. Capture feedback,
+  then plan v2 (in-app messaging + scope-add request form).
 - This doc is the canonical strategy reference. Update it as decisions
   change; do not let session-handoff.md drift from it.

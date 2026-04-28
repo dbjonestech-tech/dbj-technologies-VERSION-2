@@ -2,6 +2,29 @@
 
 Last updated: April 27, 2026
 
+## Client portal v1 (white-glove engagement portal at `/portal`)
+
+Live as of April 27, 2026. Provisioned from `/admin/clients`; clients accept their invitation, sign in with Google, and land on a private dashboard.
+
+**Surfaces:**
+- `/portal` (home): personalized greeting; one card per active project with a 6-step phase tracker (discovery, design, build, review, launch, maintenance), current milestone, next deliverable, projected ETA, and "View files" link. Past projects appear as read-only summaries below.
+- `/portal/files`: deliverables grouped by project with download buttons. Downloads route through `/portal/files/[id]/download` (server proxy that validates session + ownership and streams from Vercel Blob; the browser never sees the underlying Blob URL).
+- `/portal/scans`: Pathlight scan history scoped by `scan.email = client.email`. Links to existing public report URLs.
+- `/portal/account`: profile (name, company, email, member since), sign-out, "email Joshua for changes" nudge.
+
+**Admin management at `/admin/clients`:**
+- Invite form (email + optional name/company). Pre-creates the client row, sends a Welcome email via Resend, and the invitation flow upserts on acceptance.
+- Per-client detail page edits client info (name, company, internal-only notes), creates/edits/deletes projects (full-state writes), and manages files per project (label, description, file picker; ~4MB limit).
+
+**Auth (extends Stage 5 invitation flow):**
+- `clients` table separate from `admin_users` (split tables, never unified). `admin_invitations.role` now selects which user table acceptance writes to.
+- `lib/auth/access.ts` resolveAccess(email) returns `{ role, source }` or null. signIn callback uses it to gate. JWT callback resolves role at sign-in time and trusts it on refresh; session callback maps token.role onto session.user.role with a cutover-safe backwards-compat path for pre-Stage-6 admin JWTs.
+- middleware.ts splits ADMIN_PREFIXES (/admin) from PORTAL_PREFIXES (/portal). Admins can preview /portal; clients are blocked from /admin.
+
+**Migration 013 applied:** clients + client_projects + client_files + admin_invitations.role.
+
+**Excluded from v1 (deferred):** payments / Stripe / billing portal / invoices, in-app messaging, scope-add request form, status-change notifications, real-time anything, public client signup. See `docs/ai/portal-strategy.md` for the phased plan.
+
 ## Admin portal (Stages 1 + 2 + 3 + 5 shipped)
 
 Auth: Auth.js v5 + Google OAuth, JWT sessions, `ADMIN_EMAILS` allowlist, `admin_audit_log` table with new-device email notifications. Sign-in at `/signin` (server component, white theme), middleware gates every `/admin/*` route, layout-level auth check is defense in depth. Sign-out via server action. IP-keyed rate limiter on the auth route handler (10/min, fail-open).

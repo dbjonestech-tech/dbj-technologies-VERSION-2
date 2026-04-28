@@ -34,6 +34,16 @@
 
 - [ ] Investigate intermittent "Some analysis steps could not be completed" banner (root cause traced April 27 to `s6` finalize: triggered when ANY of vision/remediation/revenue/score steps fail while audit + screenshots succeed; retry logic handles most cases, root cause for remaining occurrences still unknown)
 - [x] Pathlight admin dashboard for viewing captured lead data -- DONE April 27. Stage 3 shipped /admin/scans (filterable scans table), /admin/leads (Pathlight signups + contact form submissions in a two-tab inbox), /admin/audit (admin_audit_log read view), /admin/database (row counts + recent activity per table). Migration 011 added contact_submissions table; the contact form now persists every submission alongside the Resend send (best-effort).
+- [x] Client portal v1 -- DONE April 27. Migration 013 added clients + client_projects + client_files. /portal (home + files + scans + account) for clients; /admin/clients (list + detail with project + file management) for Joshy. Auth role split via lib/auth/access.ts; invitation email parameterized by role; acceptance redirects role-aware. See docs/ai/portal-strategy.md for the phased plan.
+
+## Client portal follow-ups
+
+- [ ] Onboard Tyler as the first real client. Create his client row + initial project + milestones in /admin/clients. Send invitation. Walk him through.
+- [ ] v2: in-app messaging thread between client and Joshy (deferred from v1 per strategy doc).
+- [ ] v2: scope-add request form on /portal that creates a draft change-order Joshy approves in /admin.
+- [ ] v2: status-change notifications (email when phase advances). Currently silent.
+- [ ] v2: file uploads larger than ~4MB via direct-to-Blob upload pattern.
+- [ ] v3: Stripe billing portal, deposit pay, recurring retainer charges, invoice PDF download.
 - [ ] Revenue confidence bands on reports (show range instead of single precise number)
 - [ ] Input validation gate v2: extend lib/services/url.ts to also reject social media URLs (facebook/instagram/twitter/linkedin/youtube/tiktok), Google Docs/Sheets/Drive links, file:// and data:// schemes, and known parked-domain patterns (godaddysites.com, wixsite.com holding pages). Today the gate only blocks private IPs, embedded credentials, and sensitive query params.
 - [x] Rate limiting per email/IP -- DONE (emailLimiter 3/24h + ipLimiter 5/24h enforced in app/(grade)/api/scan/route.ts:71-85; verified April 27)

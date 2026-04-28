@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import { Activity, DollarSign, FileText, Mail, Users, Database, ShieldCheck } from "lucide-react";
+import { Activity, DollarSign, FileText, Mail, Users, Database, ShieldCheck, Briefcase } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +37,13 @@ const QUICK_LINKS: {
     description: "Pathlight scan signups and contact-form submissions side by side.",
     href: "/admin/leads",
     icon: Mail,
+    status: "live",
+  },
+  {
+    label: "Clients",
+    description: "Engagement clients, projects, and deliverables. Drives the /portal experience.",
+    href: "/admin/clients",
+    icon: Briefcase,
     status: "live",
   },
   {

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { signOutAction } from "@/lib/auth/actions";
-import { LogOut, LayoutDashboard, Activity, DollarSign, Database, Mail, Users, FileText } from "lucide-react";
+import { LogOut, LayoutDashboard, Activity, DollarSign, Database, Mail, Users, FileText, Briefcase } from "lucide-react";
 
 export const metadata: Metadata = {
   title: { default: "Admin", template: "%s | DBJ Admin" },
@@ -28,6 +28,7 @@ const NAV_GROUPS: {
       { label: "Costs", href: "/admin/costs", icon: DollarSign },
       { label: "Scans", href: "/admin/scans", icon: FileText },
       { label: "Leads", href: "/admin/leads", icon: Mail },
+      { label: "Clients", href: "/admin/clients", icon: Briefcase },
       { label: "Database", href: "/admin/database", icon: Database },
     ],
   },

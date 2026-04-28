@@ -10,6 +10,10 @@ import {
   isAdminUser,
   updateLastSignin,
 } from "@/lib/auth/users";
+import {
+  isClientUser,
+  updateClientLastSignin,
+} from "@/lib/auth/clients";
 
 /* Full Auth.js v5 instance, used by route handlers, server components,
  * and server actions. Extends auth.config (edge-safe) with the events
@@ -45,18 +49,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const hash = await deviceHash(ip, userAgent);
         const fresh = await isNewDevice({ email, deviceHash: hash });
 
-        /* DB-side bookkeeping for non-env-allowlist users:
-         *   - existing admin_users row -> bump last_signin_at
-         *   - else -> consume any open invitation and create the row.
-         * env-allowlist users (the bootstrap admin) skip both branches;
-         * their identity lives only in process.env. */
-        let acceptedInvitation = false;
-        if (!isAdminEmail(email)) {
-          if (await isAdminUser(email)) {
-            await updateLastSignin(email);
-          } else {
-            acceptedInvitation = await acceptInvitationFor(email);
-          }
+        /* DB-side bookkeeping for non-env users. Resolution priority
+         * mirrors lib/auth/access.ts so the audit metadata reflects the
+         * source actually used:
+         *   - existing admin_users row  -> updateLastSignin (admin)
+         *   - existing clients row      -> updateClientLastSignin
+         *   - else                      -> acceptInvitationFor consumes
+         *     any pending invitation and upserts into the correct table
+         *     based on invitation.role.
+         * env-allowlist users skip all branches; their identity lives
+         * only in process.env. */
+        let resolvedRole: "admin" | "client" | "env" | null = null;
+        let acceptedInvitation: "admin" | "client" | null = null;
+        if (isAdminEmail(email)) {
+          resolvedRole = "env";
+        } else if (await isAdminUser(email)) {
+          await updateLastSignin(email);
+          resolvedRole = "admin";
+        } else if (await isClientUser(email)) {
+          await updateClientLastSignin(email);
+          resolvedRole = "client";
+        } else {
+          acceptedInvitation = await acceptInvitationFor(email);
+          resolvedRole = acceptedInvitation;
         }
 
         await writeAdminAudit({
@@ -66,7 +81,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           ip,
           userAgent,
           deviceHash: hash,
-          metadata: { newDevice: fresh, acceptedInvitation },
+          metadata: {
+            newDevice: fresh,
+            role: resolvedRole,
+            acceptedInvitation,
+          },
         });
         if (fresh) {
           await sendNewDeviceEmail({ toEmail: email, ip, userAgent });

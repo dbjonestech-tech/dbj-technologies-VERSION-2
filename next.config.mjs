@@ -14,6 +14,16 @@ const nextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  experimental: {
+    /* Client deliverables uploaded through /admin/clients/[email]
+     * server actions can include design files, PDFs, mockups. The
+     * default 1MB body limit is too small for studio work. 4MB is the
+     * Vercel function body cap; v2 will move large files to a direct-
+     * to-Blob upload pattern that bypasses the action route entirely. */
+    serverActions: {
+      bodySizeLimit: "4mb",
+    },
+  },
   async redirects() {
     return [
       {

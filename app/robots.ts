@@ -12,6 +12,7 @@ export default function robots(): MetadataRoute.Robots {
           "/pathlight/",
           "/templates/",
           "/admin/",
+          "/portal/",
           "/internal/",
           "/signin",
           "/invite/",

@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Accept admin invitation",
+  title: "Accept invitation",
   robots: { index: false, follow: false, nocache: true },
 };
 
@@ -62,16 +62,25 @@ export default async function InviteAcceptPage({
   const { token } = await params;
   const session = await auth();
 
-  /* Already signed in as an admin? The signIn callback handled access
-   * during the OAuth round-trip and the events.signIn hook consumed
-   * the invitation. Skip the landing page and send them straight in. */
-  if (session?.user?.isAdmin) {
+  /* Already signed in? The signIn callback handled access during the
+   * OAuth round-trip and the events.signIn hook consumed the invitation.
+   * Skip the landing page and send them straight to the destination
+   * matching their role. */
+  if (session?.user?.role === "admin") {
     redirect("/admin");
+  }
+  if (session?.user?.role === "client") {
+    redirect("/portal");
   }
 
   const invitation = await getInvitationByToken(token);
   const state = classifyInvitation(invitation);
   const copy = STATE_COPY[state];
+  const destination = invitation?.role === "client" ? "/portal" : "/admin";
+  const portalDescription =
+    invitation?.role === "client"
+      ? "your private DBJ client portal"
+      : "the DBJ admin portal";
 
   return (
     <main
@@ -105,6 +114,9 @@ export default async function InviteAcceptPage({
 
           {state === "valid" && invitation ? (
             <>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-700">
+                You're being invited to {portalDescription}.
+              </p>
               <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
                   Sign in as
@@ -129,7 +141,7 @@ export default async function InviteAcceptPage({
               <form
                 action={async () => {
                   "use server";
-                  await signIn("google", { redirectTo: "/admin" });
+                  await signIn("google", { redirectTo: destination });
                 }}
                 className="mt-6"
               >

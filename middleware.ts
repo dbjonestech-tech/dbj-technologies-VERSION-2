@@ -42,15 +42,13 @@ const CACHE_EXCLUDED_PREFIXES = [
   "/pathlight",
   "/monitoring",
   "/admin",
+  "/portal",
   "/signin",
   "/invite",
 ];
 
-const PROTECTED_PREFIXES = ["/admin"];
-
-function isProtected(pathname: string): boolean {
-  return PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
-}
+const ADMIN_PREFIXES = ["/admin"];
+const PORTAL_PREFIXES = ["/portal"];
 
 function shouldCachePathname(pathname: string): boolean {
   return !CACHE_EXCLUDED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
@@ -58,15 +56,32 @@ function shouldCachePathname(pathname: string): boolean {
 
 export default middlewareAuth((request: NextRequest & { auth: import("next-auth").Session | null }) => {
   const { pathname, search } = request.nextUrl;
+  const isAdminPath = ADMIN_PREFIXES.some((p) => pathname.startsWith(p));
+  const isPortalPath = PORTAL_PREFIXES.some((p) => pathname.startsWith(p));
 
-  if (isProtected(pathname)) {
+  if (isAdminPath || isPortalPath) {
     const session = request.auth;
-    if (!session?.user?.isAdmin) {
+    const role = session?.user?.role;
+
+    if (!session || !role) {
       const signInUrl = new URL("/signin", request.url);
       signInUrl.searchParams.set("callbackUrl", pathname + search);
-      if (session && !session.user?.isAdmin) {
-        signInUrl.searchParams.set("error", "AccessDenied");
-      }
+      return NextResponse.redirect(signInUrl);
+    }
+
+    /* Admins can access /portal too (preview client view). Clients
+     * cannot access /admin. Anyone else with a session somehow lacking
+     * a role gets bounced. */
+    if (isAdminPath && role !== "admin") {
+      const signInUrl = new URL("/signin", request.url);
+      signInUrl.searchParams.set("callbackUrl", pathname + search);
+      signInUrl.searchParams.set("error", "AccessDenied");
+      return NextResponse.redirect(signInUrl);
+    }
+    if (isPortalPath && role !== "admin" && role !== "client") {
+      const signInUrl = new URL("/signin", request.url);
+      signInUrl.searchParams.set("callbackUrl", pathname + search);
+      signInUrl.searchParams.set("error", "AccessDenied");
       return NextResponse.redirect(signInUrl);
     }
   }
