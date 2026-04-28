@@ -35,7 +35,3 @@ Special Offers is its own section with three dated coupons, each with real expir
 Service Area is three or four regional zone cards, not pills. Each zone lists the cities you actually drive to. Multi-modal contact is its own strip: Call (24/7 live answer), Text (photo-of-the-unit in one thread), Book Online (self-schedule with 60-second confirmation). All three surface the same number through `tel:` and `sms:` schemes so a tap from a phone does the right thing.
 
 The footer carries the state license number (TACLA in Texas), BBB rating, manufacturer authorizations, NATE certification, links to Google / Facebook / Nextdoor / BBB review platforms, hours by day, and an emergency tap-to-call line. Every page is mobile-first because that is where customers find you.
-
-## See the proof
-
-The template at /templates/hvac-contractor.html executes everything above. A working static page with seasonal promo strip, sticky orange emergency strip, four trust badges over the hero, Special Offers with three dated coupons, branded Comfort Club membership, three regional zone cards replacing the SEO city-pill grid, multi-modal contact strip (Call / Text / Book Online), and a footer with license number, social proof platform links, and emergency tap-to-call. The page is intentionally blocked from search indexing while the proof set is being assembled. Screenshots for the Work page card will be captured separately.

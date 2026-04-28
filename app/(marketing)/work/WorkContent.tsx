@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { GridBackground } from "@/components/effects/GridBackground";
@@ -9,13 +9,13 @@ import { GradientBlob } from "@/components/effects/GradientBlob";
 import { CTASection } from "@/components/sections/CTA";
 import { Badge } from "@/components/ui/Badge";
 import { PROJECT_DETAILS } from "@/lib/work-data";
-import type { BlueprintMeta } from "@/lib/blueprints";
+import type { DesignBriefMeta } from "@/lib/design-briefs";
 
 interface WorkContentProps {
-  blueprints: BlueprintMeta[];
+  designBriefs: DesignBriefMeta[];
 }
 
-export default function WorkContent({ blueprints }: WorkContentProps) {
+export default function WorkContent({ designBriefs }: WorkContentProps) {
   return (
     <>
       {/* Hero */}
@@ -153,7 +153,7 @@ export default function WorkContent({ blueprints }: WorkContentProps) {
         </div>
       </section>
 
-      {/* Vertical Blueprints + Reference Templates */}
+      {/* Design Briefs */}
       <section className="relative py-24 border-t border-text-primary/10 overflow-hidden">
         <GradientBlob className="-top-20 -left-40 opacity-50" />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
@@ -164,7 +164,7 @@ export default function WorkContent({ blueprints }: WorkContentProps) {
               viewport={{ once: true }}
               className="inline-block rounded-full border border-accent-cyan/25 bg-accent-cyan/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-cyan mb-6"
             >
-              Vertical Blueprints
+              Design Briefs
             </motion.span>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -173,8 +173,8 @@ export default function WorkContent({ blueprints }: WorkContentProps) {
               transition={{ delay: 0.05 }}
               className="font-display text-[clamp(2rem,3.6vw,2.8rem)] font-bold leading-tight tracking-tight"
             >
-              Reference architectures for{" "}
-              <span className="text-gradient">eight verticals.</span>
+              Reference{" "}
+              <span className="text-gradient">architectures.</span>
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -183,73 +183,108 @@ export default function WorkContent({ blueprints }: WorkContentProps) {
               transition={{ delay: 0.1 }}
               className="mt-5 text-text-secondary leading-relaxed"
             >
-              Each blueprint is a paired set: a deep-dive on what the vertical
-              actually needs online, and a working static template that
-              executes every recommendation. Read the blueprint, then open the
-              template side by side.
+              A design brief for each of eight verticals I work in. Each one is
+              a deep-dive on what the category actually needs online: how the
+              customer chooses, what most sites get wrong, and the load-bearing
+              surfaces that turn a search into a booking.
             </motion.p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {blueprints.map((bp, i) => (
+          <div className="grid gap-8 md:grid-cols-2">
+            {designBriefs.map((brief, i) => (
               <motion.article
-                key={bp.slug}
-                initial={{ opacity: 0, y: 24 }}
+                key={brief.slug}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.05 }}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-text-primary/10 bg-white/60 backdrop-blur-sm transition-all hover:border-text-primary/25 hover:shadow-lg"
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+                className="group glass-card-hover overflow-hidden flex flex-col"
               >
+                {/* Preview */}
                 <Link
-                  href={`/work/blueprints/${bp.slug}`}
-                  className="relative block aspect-[4/3] overflow-hidden bg-gray-100"
-                  aria-label={`Read the ${bp.vertical} blueprint`}
+                  href={`/work/design-briefs/${brief.slug}`}
+                  className="relative block h-52 overflow-hidden"
+                  aria-label={`Read the ${brief.vertical} design brief`}
                 >
                   <Image
-                    src={bp.thumbnail}
-                    alt={`${bp.vertical} reference template thumbnail`}
+                    src={brief.preview}
+                    alt={`${brief.vertical} reference architecture preview`}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
+                </Link>
+
+                <div className="flex flex-1 flex-col p-8">
                   <span
-                    className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-text-primary shadow-sm"
+                    className="inline-flex items-center self-start gap-2 rounded-full border px-3 py-1 mb-4 font-mono text-[10px] uppercase tracking-[0.16em]"
+                    style={{
+                      borderColor: `${brief.paletteAccent}40`,
+                      backgroundColor: `${brief.paletteAccent}0F`,
+                      color: brief.paletteAccent,
+                    }}
                   >
                     <span
                       className="h-1.5 w-1.5 rounded-full"
-                      style={{ backgroundColor: bp.paletteAccent }}
+                      style={{ backgroundColor: brief.paletteAccent }}
                       aria-hidden="true"
                     />
-                    {bp.vertical}
+                    {brief.vertical}
                   </span>
-                </Link>
 
-                <div className="flex flex-1 flex-col p-5">
-                  <h3 className="font-display text-base font-bold leading-snug mb-2">
-                    {bp.headline}
+                  <h3 className="font-display text-2xl font-bold mb-3 leading-tight">
+                    {brief.headline}
                   </h3>
-                  <p className="text-[13px] leading-relaxed text-text-secondary mb-5 flex-1">
-                    {bp.summary}
+                  <p className="text-sm text-text-secondary leading-relaxed mb-6">
+                    {brief.description}
                   </p>
 
-                  <div className="mt-auto flex items-center justify-between gap-3 pt-3 border-t border-text-primary/8">
+                  {/* Key surfaces (parallel to project metrics) */}
+                  <div className="grid grid-cols-3 gap-3 mb-6">
+                    {brief.keySurfaces.map((surface) => (
+                      <div
+                        key={surface}
+                        className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
+                      >
+                        <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-1.5">
+                          Surface
+                        </p>
+                        <p className="font-display text-[13px] font-bold text-text-primary leading-tight">
+                          {surface}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Brief callout */}
+                  <div
+                    className="rounded-xl border p-4 mb-8"
+                    style={{
+                      borderColor: `${brief.paletteAccent}26`,
+                      backgroundColor: `${brief.paletteAccent}0A`,
+                    }}
+                  >
+                    <p
+                      className="text-[10px] font-mono uppercase tracking-widest mb-2"
+                      style={{ color: brief.paletteAccent }}
+                    >
+                      In the Brief
+                    </p>
+                    <p className="text-sm text-text-secondary leading-relaxed">
+                      {brief.summary}
+                    </p>
+                  </div>
+
+                  {/* Single CTA */}
+                  <div className="mt-auto flex items-center gap-6 pt-2">
                     <Link
-                      href={`/work/blueprints/${bp.slug}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent-blue hover:text-accent-cyan transition-colors min-h-[40px]"
+                      href={`/work/design-briefs/${brief.slug}`}
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-accent-blue transition-colors hover:text-accent-cyan min-h-[44px]"
                     >
-                      Read Blueprint
-                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      Read the Design Brief
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      <span className="sr-only">: {brief.vertical}</span>
                     </Link>
-                    <a
-                      href={`/templates/${bp.template}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-text-primary transition-colors min-h-[40px]"
-                      aria-label={`Open the ${bp.vertical} live template`}
-                    >
-                      Live Template
-                      <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
-                    </a>
                   </div>
                 </div>
               </motion.article>

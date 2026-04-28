@@ -54,6 +54,19 @@ const nextConfig = {
         destination: "/admin",
         permanent: true,
       },
+      /* /work/blueprints/* was the original namespace for vertical
+       * reference architectures. Renamed to /work/design-briefs/* to
+       * match the refined "Design Brief" vocabulary surfaced site-wide. */
+      {
+        source: "/work/blueprints/:slug*",
+        destination: "/work/design-briefs/:slug*",
+        permanent: true,
+      },
+      {
+        source: "/work/blueprints",
+        destination: "/work#design-briefs",
+        permanent: true,
+      },
     ];
   },
 };

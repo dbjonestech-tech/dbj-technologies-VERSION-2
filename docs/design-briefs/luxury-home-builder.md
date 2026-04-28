@@ -31,7 +31,3 @@ Galleries should be organized by residence and by neighborhood, with each projec
 The principal section names the founding builder, shows their face, and includes a personal letter signed at the end. Trust at this price point is bought with first-person specificity, not third-person credentials. A journal section publishes four to eight essays a year on construction practice, written in plain language, with opinions.
 
 Compliance matters more than most builders think. Texas Residential Construction License number visible in the footer. AIA Dallas and NARI affiliations stated. Studio hours and address explicit. The contact path is direct: phone, email, and a contact section that promises a personal response from the principal within two business days, not a generic form that lands in a project manager's inbox.
-
-## See the proof
-
-The template at /templates/luxury-builders.html executes everything above. A working static page with the full information architecture, editorial typography, the overlay-panel pattern for the Communities grid, the inventory cards with three distinct status glyphs, the publication marks strip with dated honors, and a journal section previewing three editorial essays. The page is intentionally blocked from search indexing while the proof set is being assembled. Screenshots for the Work page card will be captured separately.

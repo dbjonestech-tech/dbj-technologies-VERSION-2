@@ -6,7 +6,56 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
-## Last Session: April 28, 2026 -- Navbar dual auth surfaces ("Sign in" + "Client Portal" both visible)
+## Last Session: April 28, 2026 -- Vertical "Blueprints" renamed to "Design Briefs" + 8 template screenshots wired in
+
+### What shipped
+
+The Work page's vertical reference-architecture section was rebuilt end to end. The "Blueprint" vocabulary is gone everywhere (URLs, labels, types, file names, docs folder). The replacement word is "Design Brief". The eight reference templates each got a real preview screenshot dropped in by the user, used both as the card image on `/work` and as the framed hero on each deep-dive page. The "Live Template" link is removed from every surface; the static HTML templates under `/public/templates/` still exist on disk but are no longer linked from the marketing site. Each card on `/work` now matches the size, density, and structure of the "What I've Built" project cards exactly: same `md:grid-cols-2`, same `h-52` image, same badge + title + 3-sentence description + 3-up tile grid + accented callout + single CTA. The 3-up tiles surface "Key Surfaces" (load-bearing architectural elements per vertical) instead of metrics.
+
+### Files changed (16)
+
+- **New asset directory**: `public/design-briefs/` containing 8 WebP previews (real-estate, luxury-home-builder, dental-practice, med-spa, hvac-contractor, upscale-restaurant, pi-law, financial-advisor) at q92. Source PNGs were ~25MB; final WebP set is ~2.2MB.
+- `lib/blueprints.ts` -> `lib/design-briefs.ts` (git mv + full rewrite). Types renamed (`BlueprintMeta` -> `DesignBriefMeta`, `BlueprintData` -> `DesignBriefData`, `BlueprintSection` -> `DesignBriefSection`). Functions renamed (`getAllBlueprintMeta` -> `getAllDesignBriefMeta`, `getBlueprintBySlug` -> `getDesignBriefBySlug`, `getAllBlueprintSlugs` -> `getAllDesignBriefSlugs`). Each entry gained two new fields: `description` (the rich 3-sentence card description matching the project-card density) and `keySurfaces` (a 3-string array surfaced in the 3-up tile grid). `thumbnail` field renamed to `preview` and pointed at the new `/design-briefs/{slug}.webp` paths.
+- `app/(marketing)/work/blueprints/[slug]/page.tsx` -> `app/(marketing)/work/design-briefs/[slug]/page.tsx` (git mv + full rewrite). New full-width framed preview image at the top of the page (border + accent-tinted shadow, w=2400 h=1500, priority, sizes capped at 1200px). Pill copy updated: "Vertical Blueprint" -> "Design Brief". Removed the two "View the Live Template" / "Open the Template" CTAs entirely. Closing CTA section rewritten ("Build It For Real" + "Want this architecture, executed for your practice?" + "Start a Project" / "See Other Briefs"). `generateMetadata` now sets canonical to the new `/work/design-briefs/...` path and adds the preview image to OpenGraph.
+- `app/(marketing)/work/WorkContent.tsx` -- card grid for the briefs section is now identical in shape to the "What I've Built" cards above. Pill copy "Vertical Blueprints" -> "Design Briefs". H2 changed from "Reference architectures for eight verticals." to "Reference architectures." (per Joshua's request). Description paragraph rewritten. Each card now renders: `h-52` preview image -> accent-tinted vertical badge with palette dot -> headline -> 3-sentence description -> 3-up Key Surfaces tile grid (parallel to the project metrics row) -> accent-tinted "In the Brief" callout (parallel to the "Notable" callout) -> single "Read the Design Brief ->" CTA. The "Live Template" external link is gone entirely.
+- `app/(marketing)/work/page.tsx` -- import path swap (`@/lib/blueprints` -> `@/lib/design-briefs`), prop name swap (`blueprints` -> `designBriefs`).
+- `docs/blueprints/` -> `docs/design-briefs/` (git mv on all 8 markdowns). Each file's trailing `## See the proof` paragraph (which described and linked to the live template) was removed since the template is no longer surfaced. The strong DBJ-voice DFW-aware body content (how the customer chooses, what most sites get wrong, what the site actually needs) is preserved verbatim.
+- `next.config.mjs` -- two new permanent redirects: `/work/blueprints/:slug*` -> `/work/design-briefs/:slug*` and `/work/blueprints` -> `/work#design-briefs`. Inserted after the existing `/internal` -> `/admin` redirect block, with a comment block explaining the rename.
+
+### Decisions locked
+
+- Word: **Design Brief** (chosen over "Brief", "Dossier", "Edition" -- pairs cleanly with "Reference architectures." heading without repeating "architecture", and works for restaurants and HVAC just as cleanly as for dental and PI law).
+- Route: `/work/design-briefs/[slug]` (full rename, with redirect from old path).
+- Image format: WebP at q92 via `cwebp -m 6` (Next/Image still serves AVIF/WebP responsively).
+- Card layout: `md:grid-cols-2`, identical to "What I've Built" -- per Joshua's "same size, detailed description, just like the live actual websites".
+- Live Template option: fully de-surfaced from the UI. Templates remain on disk under `/public/templates/` but no link points to them.
+- Preview image is reused: same WebP shows up as card preview on `/work` and as framed hero on the deep-dive page.
+
+### Verification
+
+- `npx tsc --noEmit` exit 0.
+- `npm run lint` exit 0.
+- Em-dash grep across all changed files: zero hits.
+- HeroCinema phase strings (`"blueprint" | "build" | "reveal" | "complete"`), `pathlight-chat.ts` "blueprint" mention in process language, `browserless.ts` comment about a "blueprint overlay": untouched (none of these refer to the vertical reference architectures).
+
+### Vertical -> screenshot map (for reference)
+
+| Slug | Vertical | Source filename |
+| --- | --- | --- |
+| `real-estate` | Luxury Real Estate | Lauren Prescott (Briggs Freeman Sotheby's) |
+| `luxury-home-builder` | Luxury Home Builder | Ashworth & Foster |
+| `dental-practice` | Dental Practice | Ridgeview Dental |
+| `med-spa` | Med Spa | Reverie Aesthetics |
+| `hvac-contractor` | HVAC Contractor | Ironclad Air |
+| `upscale-restaurant` | Upscale Restaurant | Ember & Vine |
+| `pi-law` | Personal Injury Law | Bauder & Associates |
+| `financial-advisor` | Financial Advisor | Beckett Wealth Partners |
+
+### Next recommended task
+
+After commit + push: open the deployed Work page in incognito and walk every card -> deep-dive -> back. Confirm: (1) all 8 preview images render crisp on retina, (2) the 3-up "Surface" tiles align cleanly with the 3-up Metrics tiles in the row above, (3) the framed hero on each deep-dive sits cleanly inside its accent-tinted shadow without clipping, (4) the old `/work/blueprints/dental-practice` URL 308-redirects to `/work/design-briefs/dental-practice`. If any card feels visually heavier than the "What I've Built" cards on a wide viewport, the likely culprit is the longer headline + 3-sentence description in some verticals -- can be balanced with `line-clamp-3` on description if needed.
+
+## Previous Session: April 28, 2026 -- Navbar dual auth surfaces ("Sign in" + "Client Portal" both visible)
 
 ### What shipped
 

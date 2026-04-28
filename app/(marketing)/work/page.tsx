@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import WorkContent from "./WorkContent";
-import { getAllBlueprintMeta } from "@/lib/blueprints";
+import { getAllDesignBriefMeta } from "@/lib/design-briefs";
 
 export const metadata: Metadata = {
   title: "Work",
@@ -15,6 +15,6 @@ export const metadata: Metadata = {
 };
 
 export default function WorkPage() {
-  const blueprints = getAllBlueprintMeta();
-  return <WorkContent blueprints={blueprints} />;
+  const designBriefs = getAllDesignBriefMeta();
+  return <WorkContent designBriefs={designBriefs} />;
 }
