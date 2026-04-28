@@ -30,7 +30,9 @@ After Vercel rebuild settles, incognito-load the homepage and confirm: (1) two c
 
 ### Final state (post-commit)
 
-(updated by snapshot commit after push)
+- Feature commit: `2b9ac31` -- feat(homepage): add Tyler Dirks (Soil Depot) testimonial; band -> dual quote. 3 files changed, 130 insertions, 59 deletions.
+- Pushed to `origin main` (`c76fa23..2b9ac31 main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
