@@ -89,8 +89,11 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                     {project.description}
                   </p>
 
-                  {/* Metrics */}
-                  <div className="grid grid-cols-3 gap-3 mb-6">
+                  {/* Metrics (stacked on mobile so long values like
+                      "Instant + Email" have the full card width to
+                      breathe; 3-up only kicks in once each tile has
+                      meaningful room) */}
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 mb-6">
                     {project.metrics.map((m) => (
                       <div
                         key={m.label}
@@ -99,7 +102,7 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                         <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-1.5">
                           {m.label}
                         </p>
-                        <p className="font-display text-xl sm:text-2xl font-bold text-gradient leading-tight break-words">
+                        <p className="font-display text-2xl font-bold text-gradient leading-tight break-words">
                           {m.value}
                         </p>
                       </div>
@@ -241,17 +244,20 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                     {brief.description}
                   </p>
 
-                  {/* Key surfaces (parallel to project metrics) */}
-                  <div className="grid grid-cols-3 gap-3 mb-6">
+                  {/* Key surfaces (parallel to project metrics; same
+                      mobile-stack pattern so long surface labels like
+                      "Society Membership" or "Signed Fiduciary Pledge"
+                      have full card width on phones) */}
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 mb-6">
                     {brief.keySurfaces.map((surface) => (
                       <div
                         key={surface}
-                        className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
+                        className="min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
                       >
                         <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-1.5">
                           Surface
                         </p>
-                        <p className="font-display text-[13px] font-bold text-text-primary leading-tight">
+                        <p className="font-display text-[13px] font-bold text-text-primary leading-tight break-words">
                           {surface}
                         </p>
                       </div>
