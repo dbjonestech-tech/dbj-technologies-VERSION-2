@@ -28,7 +28,7 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
             animate={{ opacity: 1, y: 0 }}
             className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue mb-6"
           >
-            Selected Work
+            Portfolio
           </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -36,9 +36,9 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
             transition={{ delay: 0.1 }}
             className="font-display text-section font-bold leading-tight"
           >
-            What I&apos;ve
+            Selected
             <br />
-            <span className="text-gradient">Built.</span>
+            <span className="text-gradient">Builds.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -46,8 +46,8 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto"
           >
-            Live production systems. Real metrics. Every project below is
-            running in production right now.
+            Each project below is running in production right now, with metrics
+            from real users.
           </motion.p>
         </div>
       </section>
@@ -92,12 +92,12 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                     {project.metrics.map((m) => (
                       <div
                         key={m.label}
-                        className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
+                        className="min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
                       >
                         <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-1.5">
                           {m.label}
                         </p>
-                        <p className="font-display text-2xl font-bold text-gradient leading-none">
+                        <p className="font-display text-xl sm:text-2xl font-bold text-gradient leading-tight break-words">
                           {m.value}
                         </p>
                       </div>
@@ -200,12 +200,10 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                 transition={{ duration: 0.5, delay: i * 0.05 }}
                 className="group glass-card-hover overflow-hidden flex flex-col"
               >
-                {/* Preview */}
-                <Link
-                  href={`/work/design-briefs/${brief.slug}`}
-                  className="relative block h-52 overflow-hidden"
-                  aria-label={`Read the ${brief.vertical} design brief`}
-                >
+                {/* Preview (intentionally not a tap target on mobile;
+                    only the explicit "Read the Design Brief" CTA below
+                    is the link, matching the project cards above) */}
+                <div className="relative h-52 overflow-hidden">
                   <Image
                     src={brief.preview}
                     alt={`${brief.vertical} reference architecture preview`}
@@ -213,7 +211,7 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                     className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
-                </Link>
+                </div>
 
                 <div className="flex flex-1 flex-col p-8">
                   <span

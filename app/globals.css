@@ -85,13 +85,19 @@ body {
   .glass-card-hover {
     @apply glass-card transition-all duration-500;
   }
-  .glass-card-hover:hover {
-    @apply border-gray-300/80;
-    box-shadow:
-      0 8px 30px rgba(0, 0, 0, 0.07),
-      0 2px 8px rgba(0, 0, 0, 0.04),
-      0 0 0 1px rgba(59, 130, 246, 0.05);
-    transform: translateY(-4px);
+  /* Scope :hover to devices with a real cursor. On touch screens, the
+   * UA fires :hover when a finger lands on an element and keeps it
+   * latched until the next tap, which made cards "pulse" as a user
+   * scrolled past them and felt like the scroll was halting. */
+  @media (hover: hover) and (pointer: fine) {
+    .glass-card-hover:hover {
+      @apply border-gray-300/80;
+      box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.07),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(59, 130, 246, 0.05);
+      transform: translateY(-4px);
+    }
   }
 
   .gradient-border {
