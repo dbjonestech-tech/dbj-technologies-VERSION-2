@@ -38,7 +38,9 @@ After Vercel rebuild settles (1-3 min), incognito-load the homepage and confirm:
 
 ### Final state (post-commit)
 
-(updated by snapshot commit after push)
+- Feature commit: `ed51823` -- feat(homepage): promote testimonial to slim band between Hero and Pathlight. 4 files changed, 127 insertions, 100 deletions.
+- Pushed to `origin main` (`309a61d..ed51823 main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
