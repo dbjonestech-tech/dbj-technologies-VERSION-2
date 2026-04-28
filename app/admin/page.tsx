@@ -222,17 +222,39 @@ export default async function AdminLanding() {
           )}
         </section>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Column headers (lg only). Below lg the categorization
+            collapses into a flat list because the 1- and 2-col
+            responsive grids do not align with the 4-column header. */}
+        <div className="mb-3 hidden gap-6 lg:grid lg:grid-cols-4">
           {COLUMNS.map((col) => (
-            <Column key={col.label} label={col.label} cards={col.cards} />
+            <h2
+              key={col.label}
+              className="font-display text-sm font-semibold uppercase tracking-wider text-zinc-500"
+            >
+              {col.label}
+            </h2>
           ))}
+        </div>
+
+        {/* Card grid rendered in row-major order so each visual row
+            has aligned heights via auto-rows-fr. Cards from each
+            column interleave: row N takes the Nth card from each
+            column in order. */}
+        <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          {Array.from({ length: maxRowCount() }).flatMap((_, rowIdx) =>
+            COLUMNS.map((col) => {
+              const card = col.cards[rowIdx];
+              if (!card) return null;
+              return <CardLink key={card.href} card={card} />;
+            })
+          )}
         </div>
 
         <section className="mt-8">
           <h2 className="mb-3 font-display text-sm font-semibold uppercase tracking-wider text-zinc-500">
             Account
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {ACCOUNT_CARDS.map((card) => (
               <CardLink key={card.href} card={card} />
             ))}
@@ -243,19 +265,8 @@ export default async function AdminLanding() {
   );
 }
 
-function Column({ label, cards }: { label: string; cards: Card[] }) {
-  return (
-    <div>
-      <h2 className="mb-3 font-display text-sm font-semibold uppercase tracking-wider text-zinc-500">
-        {label}
-      </h2>
-      <div className="space-y-3">
-        {cards.map((card) => (
-          <CardLink key={card.href} card={card} />
-        ))}
-      </div>
-    </div>
-  );
+function maxRowCount(): number {
+  return COLUMNS.reduce((max, col) => Math.max(max, col.cards.length), 0);
 }
 
 function CardLink({ card }: { card: Card }) {
