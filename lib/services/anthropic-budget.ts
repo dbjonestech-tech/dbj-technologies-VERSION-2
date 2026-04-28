@@ -128,41 +128,48 @@ export type CurrentBudgetState = {
   asOf: string | null;
 };
 
+const EMPTY_BUDGET: CurrentBudgetState = {
+  spendUsd: 0,
+  limitUsd: null,
+  pctUsed: null,
+  headroomPct: null,
+  source: null,
+  asOf: null,
+};
+
 export async function getCurrentBudgetState(): Promise<CurrentBudgetState> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT snapshot_at, monthly_spend_usd, monthly_limit_usd, details
-    FROM anthropic_budget_snapshots
-    ORDER BY snapshot_at DESC
-    LIMIT 1
-  `) as Array<{
-    snapshot_at: string;
-    monthly_spend_usd: number | string | null;
-    monthly_limit_usd: number | string | null;
-    details: { source?: string };
-  }>;
-  const r = rows[0];
-  if (!r) {
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT snapshot_at, monthly_spend_usd, monthly_limit_usd, details
+      FROM anthropic_budget_snapshots
+      ORDER BY snapshot_at DESC
+      LIMIT 1
+    `) as Array<{
+      snapshot_at: string;
+      monthly_spend_usd: number | string | null;
+      monthly_limit_usd: number | string | null;
+      details: { source?: string };
+    }>;
+    const r = rows[0];
+    if (!r) return EMPTY_BUDGET;
+    const spend = Number(r.monthly_spend_usd ?? 0);
+    const limit = r.monthly_limit_usd === null ? null : Number(r.monthly_limit_usd);
+    const pctUsed = limit && limit > 0 ? (spend / limit) * 100 : null;
     return {
-      spendUsd: 0,
-      limitUsd: null,
-      pctUsed: null,
-      headroomPct: null,
-      source: null,
-      asOf: null,
+      spendUsd: spend,
+      limitUsd: limit,
+      pctUsed: pctUsed === null ? null : Number(pctUsed.toFixed(1)),
+      headroomPct: pctUsed === null ? null : Number((100 - pctUsed).toFixed(1)),
+      source: r.details?.source ?? null,
+      asOf: r.snapshot_at,
     };
+  } catch (err) {
+    console.warn(
+      `[anthropic-budget] getCurrentBudgetState failed: ${err instanceof Error ? err.message : err}`
+    );
+    return EMPTY_BUDGET;
   }
-  const spend = Number(r.monthly_spend_usd ?? 0);
-  const limit = r.monthly_limit_usd === null ? null : Number(r.monthly_limit_usd);
-  const pctUsed = limit && limit > 0 ? (spend / limit) * 100 : null;
-  return {
-    spendUsd: spend,
-    limitUsd: limit,
-    pctUsed: pctUsed === null ? null : Number(pctUsed.toFixed(1)),
-    headroomPct: pctUsed === null ? null : Number((100 - pctUsed).toFixed(1)),
-    source: r.details?.source ?? null,
-    asOf: r.snapshot_at,
-  };
 }
 
 export type BudgetTrendPoint = {
@@ -171,17 +178,24 @@ export type BudgetTrendPoint = {
 };
 
 export async function getBudgetTrend(daysBack = 30): Promise<BudgetTrendPoint[]> {
-  const sql = getDb();
-  const days = Math.max(1, Math.min(90, daysBack));
-  const interval = `${days} days`;
-  const rows = (await sql`
-    SELECT snapshot_at, monthly_spend_usd
-    FROM anthropic_budget_snapshots
-    WHERE snapshot_at > now() - (${interval})::interval
-    ORDER BY snapshot_at ASC
-  `) as Array<{ snapshot_at: string; monthly_spend_usd: number | string | null }>;
-  return rows.map((r) => ({
-    hour: r.snapshot_at,
-    spendUsd: Number(r.monthly_spend_usd ?? 0),
-  }));
+  try {
+    const sql = getDb();
+    const days = Math.max(1, Math.min(90, daysBack));
+    const interval = `${days} days`;
+    const rows = (await sql`
+      SELECT snapshot_at, monthly_spend_usd
+      FROM anthropic_budget_snapshots
+      WHERE snapshot_at > now() - (${interval})::interval
+      ORDER BY snapshot_at ASC
+    `) as Array<{ snapshot_at: string; monthly_spend_usd: number | string | null }>;
+    return rows.map((r) => ({
+      hour: r.snapshot_at,
+      spendUsd: Number(r.monthly_spend_usd ?? 0),
+    }));
+  } catch (err) {
+    console.warn(
+      `[anthropic-budget] getBudgetTrend failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }

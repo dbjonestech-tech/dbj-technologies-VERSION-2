@@ -163,45 +163,52 @@ export type FunctionHealth = {
 export async function getFunctionHealth(
   intervalDays: number
 ): Promise<FunctionHealth[]> {
-  const sql = getDb();
-  const days = Math.max(1, Math.min(30, intervalDays));
-  const interval = `${days} days`;
-  const rows = (await sql`
-    SELECT
-      function_id,
-      COUNT(*)::int AS invocations,
-      COUNT(*) FILTER (WHERE status = 'failed')::int AS failed,
-      COUNT(*) FILTER (WHERE status = 'running')::int AS inflight,
-      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY duration_ms)::int AS p50,
-      PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY duration_ms)::int AS p95,
-      PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY duration_ms)::int AS p99
-    FROM inngest_runs
-    WHERE COALESCE(started_at, observed_at) > now() - (${interval})::interval
-    GROUP BY function_id
-    ORDER BY invocations DESC
-  `) as Array<{
-    function_id: string;
-    invocations: number;
-    failed: number;
-    inflight: number;
-    p50: number | null;
-    p95: number | null;
-    p99: number | null;
-  }>;
-  return rows.map((r) => {
-    const inv = Number(r.invocations);
-    const fail = Number(r.failed);
-    return {
-      functionId: r.function_id,
-      invocations: inv,
-      failed: fail,
-      failureRatePct: inv > 0 ? Number(((fail / inv) * 100).toFixed(2)) : 0,
-      p50Ms: r.p50,
-      p95Ms: r.p95,
-      p99Ms: r.p99,
-      inflight: Number(r.inflight),
-    };
-  });
+  try {
+    const sql = getDb();
+    const days = Math.max(1, Math.min(30, intervalDays));
+    const interval = `${days} days`;
+    const rows = (await sql`
+      SELECT
+        function_id,
+        COUNT(*)::int AS invocations,
+        COUNT(*) FILTER (WHERE status = 'failed')::int AS failed,
+        COUNT(*) FILTER (WHERE status = 'running')::int AS inflight,
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY duration_ms)::int AS p50,
+        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY duration_ms)::int AS p95,
+        PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY duration_ms)::int AS p99
+      FROM inngest_runs
+      WHERE COALESCE(started_at, observed_at) > now() - (${interval})::interval
+      GROUP BY function_id
+      ORDER BY invocations DESC
+    `) as Array<{
+      function_id: string;
+      invocations: number;
+      failed: number;
+      inflight: number;
+      p50: number | null;
+      p95: number | null;
+      p99: number | null;
+    }>;
+    return rows.map((r) => {
+      const inv = Number(r.invocations);
+      const fail = Number(r.failed);
+      return {
+        functionId: r.function_id,
+        invocations: inv,
+        failed: fail,
+        failureRatePct: inv > 0 ? Number(((fail / inv) * 100).toFixed(2)) : 0,
+        p50Ms: r.p50,
+        p95Ms: r.p95,
+        p99Ms: r.p99,
+        inflight: Number(r.inflight),
+      };
+    });
+  } catch (err) {
+    console.warn(
+      `[inngest-health] getFunctionHealth failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type RecentInngestRun = {
@@ -215,30 +222,37 @@ export type RecentInngestRun = {
 };
 
 export async function getRecentInngestRuns(limit = 50): Promise<RecentInngestRun[]> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT
-      run_id, function_id, scan_id::text AS scan_id, status,
-      started_at, duration_ms, error_message
-    FROM inngest_runs
-    ORDER BY COALESCE(started_at, observed_at) DESC
-    LIMIT ${Math.max(1, Math.min(200, limit))}
-  `) as Array<{
-    run_id: string;
-    function_id: string;
-    scan_id: string | null;
-    status: InngestRunStatus;
-    started_at: string | null;
-    duration_ms: number | null;
-    error_message: string | null;
-  }>;
-  return rows.map((r) => ({
-    runId: r.run_id,
-    functionId: r.function_id,
-    scanId: r.scan_id,
-    status: r.status,
-    startedAt: r.started_at,
-    durationMs: r.duration_ms,
-    errorMessage: r.error_message,
-  }));
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        run_id, function_id, scan_id::text AS scan_id, status,
+        started_at, duration_ms, error_message
+      FROM inngest_runs
+      ORDER BY COALESCE(started_at, observed_at) DESC
+      LIMIT ${Math.max(1, Math.min(200, limit))}
+    `) as Array<{
+      run_id: string;
+      function_id: string;
+      scan_id: string | null;
+      status: InngestRunStatus;
+      started_at: string | null;
+      duration_ms: number | null;
+      error_message: string | null;
+    }>;
+    return rows.map((r) => ({
+      runId: r.run_id,
+      functionId: r.function_id,
+      scanId: r.scan_id,
+      status: r.status,
+      startedAt: r.started_at,
+      durationMs: r.duration_ms,
+      errorMessage: r.error_message,
+    }));
+  } catch (err) {
+    console.warn(
+      `[inngest-health] getRecentInngestRuns failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }

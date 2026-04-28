@@ -219,60 +219,82 @@ export type VisitorOverview = {
   contactConversions: number;
 };
 
+const EMPTY_OVERVIEW = (interval: string): VisitorOverview => ({
+  windowLabel: interval,
+  pageViews: 0,
+  sessions: 0,
+  uniqueVisitors: 0,
+  bounceRatePct: 0,
+  avgPagesPerSession: 0,
+  scanConversions: 0,
+  contactConversions: 0,
+});
+
 export async function getVisitorOverview(
   interval: string
 ): Promise<VisitorOverview> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT
-      COUNT(*)::int AS page_views,
-      COUNT(DISTINCT session_id)::int AS sessions,
-      COUNT(DISTINCT visitor_id)::int AS unique_visitors
-    FROM page_views
-    WHERE created_at > now() - (${interval})::interval
-      AND is_bot = false
-  `) as { page_views: number; sessions: number; unique_visitors: number }[];
+  /* Best-effort read: if the visitor analytics tables do not yet exist
+   * (migrations 014 not applied) or the DB is briefly unreachable, the
+   * dashboard renders a zeroed empty state rather than crashing. Same
+   * pattern as the other admin read APIs (api-usage.getProviderSpendUsd). */
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        COUNT(*)::int AS page_views,
+        COUNT(DISTINCT session_id)::int AS sessions,
+        COUNT(DISTINCT visitor_id)::int AS unique_visitors
+      FROM page_views
+      WHERE created_at > now() - (${interval})::interval
+        AND is_bot = false
+    `) as { page_views: number; sessions: number; unique_visitors: number }[];
 
-  const conv = (await sql`
-    SELECT
-      COUNT(*) FILTER (WHERE converted_scan_id IS NOT NULL)::int AS scans,
-      COUNT(*) FILTER (WHERE converted_contact_id IS NOT NULL)::int AS contacts,
-      COUNT(*)::int AS total_sessions,
-      COUNT(*) FILTER (WHERE page_count = 1)::int AS bounced_sessions,
-      COALESCE(AVG(page_count), 0)::float8 AS avg_pages
-    FROM sessions
-    WHERE started_at > now() - (${interval})::interval
-      AND is_bot = false
-  `) as {
-    scans: number;
-    contacts: number;
-    total_sessions: number;
-    bounced_sessions: number;
-    avg_pages: number;
-  }[];
+    const conv = (await sql`
+      SELECT
+        COUNT(*) FILTER (WHERE converted_scan_id IS NOT NULL)::int AS scans,
+        COUNT(*) FILTER (WHERE converted_contact_id IS NOT NULL)::int AS contacts,
+        COUNT(*)::int AS total_sessions,
+        COUNT(*) FILTER (WHERE page_count = 1)::int AS bounced_sessions,
+        COALESCE(AVG(page_count), 0)::float8 AS avg_pages
+      FROM sessions
+      WHERE started_at > now() - (${interval})::interval
+        AND is_bot = false
+    `) as {
+      scans: number;
+      contacts: number;
+      total_sessions: number;
+      bounced_sessions: number;
+      avg_pages: number;
+    }[];
 
-  const r = rows[0] ?? { page_views: 0, sessions: 0, unique_visitors: 0 };
-  const c = conv[0] ?? {
-    scans: 0,
-    contacts: 0,
-    total_sessions: 0,
-    bounced_sessions: 0,
-    avg_pages: 0,
-  };
+    const r = rows[0] ?? { page_views: 0, sessions: 0, unique_visitors: 0 };
+    const c = conv[0] ?? {
+      scans: 0,
+      contacts: 0,
+      total_sessions: 0,
+      bounced_sessions: 0,
+      avg_pages: 0,
+    };
 
-  const bounce =
-    c.total_sessions > 0 ? (c.bounced_sessions / c.total_sessions) * 100 : 0;
+    const bounce =
+      c.total_sessions > 0 ? (c.bounced_sessions / c.total_sessions) * 100 : 0;
 
-  return {
-    windowLabel: interval,
-    pageViews: r.page_views,
-    sessions: r.sessions,
-    uniqueVisitors: r.unique_visitors,
-    bounceRatePct: Number(bounce.toFixed(1)),
-    avgPagesPerSession: Number(c.avg_pages.toFixed(2)),
-    scanConversions: c.scans,
-    contactConversions: c.contacts,
-  };
+    return {
+      windowLabel: interval,
+      pageViews: r.page_views,
+      sessions: r.sessions,
+      uniqueVisitors: r.unique_visitors,
+      bounceRatePct: Number(bounce.toFixed(1)),
+      avgPagesPerSession: Number(c.avg_pages.toFixed(2)),
+      scanConversions: c.scans,
+      contactConversions: c.contacts,
+    };
+  } catch (err) {
+    console.warn(
+      `[analytics] getVisitorOverview failed: ${err instanceof Error ? err.message : err}`
+    );
+    return EMPTY_OVERVIEW(interval);
+  }
 }
 
 export type TopPageRow = {
@@ -287,37 +309,44 @@ export async function getTopPages(
   interval: string,
   limit = 25
 ): Promise<TopPageRow[]> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT
-      pv.path,
-      COUNT(*)::int AS views,
-      COUNT(DISTINCT pv.session_id)::int AS sessions,
-      COUNT(DISTINCT pv.visitor_id)::int AS unique_visitors,
-      AVG(eng.dwell_ms)::float8 AS avg_dwell_ms
-    FROM page_views pv
-    LEFT JOIN page_view_engagement eng ON eng.page_view_id = pv.id
-    WHERE pv.created_at > now() - (${interval})::interval
-      AND pv.is_bot = false
-    GROUP BY pv.path
-    ORDER BY views DESC
-    LIMIT ${Math.max(1, Math.min(200, limit))}
-  `) as {
-    path: string;
-    views: number;
-    sessions: number;
-    unique_visitors: number;
-    avg_dwell_ms: number | null;
-  }[];
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        pv.path,
+        COUNT(*)::int AS views,
+        COUNT(DISTINCT pv.session_id)::int AS sessions,
+        COUNT(DISTINCT pv.visitor_id)::int AS unique_visitors,
+        AVG(eng.dwell_ms)::float8 AS avg_dwell_ms
+      FROM page_views pv
+      LEFT JOIN page_view_engagement eng ON eng.page_view_id = pv.id
+      WHERE pv.created_at > now() - (${interval})::interval
+        AND pv.is_bot = false
+      GROUP BY pv.path
+      ORDER BY views DESC
+      LIMIT ${Math.max(1, Math.min(200, limit))}
+    `) as {
+      path: string;
+      views: number;
+      sessions: number;
+      unique_visitors: number;
+      avg_dwell_ms: number | null;
+    }[];
 
-  return rows.map((r) => ({
-    path: r.path,
-    views: Number(r.views),
-    sessions: Number(r.sessions),
-    uniqueVisitors: Number(r.unique_visitors),
-    avgDwellMs:
-      r.avg_dwell_ms === null ? null : Math.round(Number(r.avg_dwell_ms)),
-  }));
+    return rows.map((r) => ({
+      path: r.path,
+      views: Number(r.views),
+      sessions: Number(r.sessions),
+      uniqueVisitors: Number(r.unique_visitors),
+      avgDwellMs:
+        r.avg_dwell_ms === null ? null : Math.round(Number(r.avg_dwell_ms)),
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] getTopPages failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type TopSourceRow = {
@@ -336,32 +365,39 @@ export async function getTopSources(
   interval: string,
   limit = 25
 ): Promise<TopSourceRow[]> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT
-      COALESCE(utm_source, referrer_host, '(direct)') AS source,
-      COUNT(*)::int AS sessions,
-      COUNT(*) FILTER (WHERE converted_scan_id IS NOT NULL)::int AS scan_conversions,
-      COUNT(*) FILTER (WHERE converted_contact_id IS NOT NULL)::int AS contact_conversions
-    FROM sessions
-    WHERE started_at > now() - (${interval})::interval
-      AND is_bot = false
-    GROUP BY source
-    ORDER BY sessions DESC
-    LIMIT ${Math.max(1, Math.min(100, limit))}
-  `) as {
-    source: string;
-    sessions: number;
-    scan_conversions: number;
-    contact_conversions: number;
-  }[];
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        COALESCE(utm_source, referrer_host, '(direct)') AS source,
+        COUNT(*)::int AS sessions,
+        COUNT(*) FILTER (WHERE converted_scan_id IS NOT NULL)::int AS scan_conversions,
+        COUNT(*) FILTER (WHERE converted_contact_id IS NOT NULL)::int AS contact_conversions
+      FROM sessions
+      WHERE started_at > now() - (${interval})::interval
+        AND is_bot = false
+      GROUP BY source
+      ORDER BY sessions DESC
+      LIMIT ${Math.max(1, Math.min(100, limit))}
+    `) as {
+      source: string;
+      sessions: number;
+      scan_conversions: number;
+      contact_conversions: number;
+    }[];
 
-  return rows.map((r) => ({
-    source: r.source,
-    sessions: Number(r.sessions),
-    scanConversions: Number(r.scan_conversions),
-    contactConversions: Number(r.contact_conversions),
-  }));
+    return rows.map((r) => ({
+      source: r.source,
+      sessions: Number(r.sessions),
+      scanConversions: Number(r.scan_conversions),
+      contactConversions: Number(r.contact_conversions),
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] getTopSources failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type GeoRow = {
@@ -375,28 +411,35 @@ export async function getGeoBreakdown(
   interval: string,
   limit = 50
 ): Promise<GeoRow[]> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT country, region, city, COUNT(*)::int AS sessions
-    FROM sessions
-    WHERE started_at > now() - (${interval})::interval
-      AND is_bot = false
-      AND country IS NOT NULL
-    GROUP BY country, region, city
-    ORDER BY sessions DESC
-    LIMIT ${Math.max(1, Math.min(200, limit))}
-  `) as {
-    country: string | null;
-    region: string | null;
-    city: string | null;
-    sessions: number;
-  }[];
-  return rows.map((r) => ({
-    country: r.country,
-    region: r.region,
-    city: r.city,
-    sessions: Number(r.sessions),
-  }));
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT country, region, city, COUNT(*)::int AS sessions
+      FROM sessions
+      WHERE started_at > now() - (${interval})::interval
+        AND is_bot = false
+        AND country IS NOT NULL
+      GROUP BY country, region, city
+      ORDER BY sessions DESC
+      LIMIT ${Math.max(1, Math.min(200, limit))}
+    `) as {
+      country: string | null;
+      region: string | null;
+      city: string | null;
+      sessions: number;
+    }[];
+    return rows.map((r) => ({
+      country: r.country,
+      region: r.region,
+      city: r.city,
+      sessions: Number(r.sessions),
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] getGeoBreakdown failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type DeviceRow = {
@@ -408,23 +451,30 @@ export type DeviceRow = {
 export async function getDeviceBreakdown(
   interval: string
 ): Promise<DeviceRow[]> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT
-      COALESCE(device_type, 'unknown') AS device_type,
-      COUNT(*)::int AS sessions
-    FROM sessions
-    WHERE started_at > now() - (${interval})::interval
-      AND is_bot = false
-    GROUP BY device_type
-    ORDER BY sessions DESC
-  `) as { device_type: string; sessions: number }[];
-  const total = rows.reduce((sum, r) => sum + Number(r.sessions), 0);
-  return rows.map((r) => ({
-    deviceType: r.device_type,
-    sessions: Number(r.sessions),
-    pct: total > 0 ? Number(((Number(r.sessions) / total) * 100).toFixed(1)) : 0,
-  }));
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        COALESCE(device_type, 'unknown') AS device_type,
+        COUNT(*)::int AS sessions
+      FROM sessions
+      WHERE started_at > now() - (${interval})::interval
+        AND is_bot = false
+      GROUP BY device_type
+      ORDER BY sessions DESC
+    `) as { device_type: string; sessions: number }[];
+    const total = rows.reduce((sum, r) => sum + Number(r.sessions), 0);
+    return rows.map((r) => ({
+      deviceType: r.device_type,
+      sessions: Number(r.sessions),
+      pct: total > 0 ? Number(((Number(r.sessions) / total) * 100).toFixed(1)) : 0,
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] getDeviceBreakdown failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type LiveVisitorRow = {
@@ -439,42 +489,49 @@ export type LiveVisitorRow = {
 };
 
 export async function getLiveVisitors(): Promise<LiveVisitorRow[]> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT DISTINCT ON (pv.visitor_id)
-      pv.visitor_id::text AS visitor_id,
-      pv.session_id::text AS session_id,
-      pv.path,
-      pv.country,
-      pv.city,
-      pv.device_type,
-      pv.browser,
-      pv.created_at AS last_seen_at
-    FROM page_views pv
-    WHERE pv.created_at > now() - interval '5 minutes'
-      AND pv.is_bot = false
-    ORDER BY pv.visitor_id, pv.created_at DESC
-    LIMIT 100
-  `) as {
-    visitor_id: string;
-    session_id: string;
-    path: string;
-    country: string | null;
-    city: string | null;
-    device_type: string | null;
-    browser: string | null;
-    last_seen_at: string;
-  }[];
-  return rows.map((r) => ({
-    visitorId: r.visitor_id,
-    sessionId: r.session_id,
-    path: r.path,
-    country: r.country,
-    city: r.city,
-    deviceType: r.device_type,
-    browser: r.browser,
-    lastSeenAt: r.last_seen_at,
-  }));
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT DISTINCT ON (pv.visitor_id)
+        pv.visitor_id::text AS visitor_id,
+        pv.session_id::text AS session_id,
+        pv.path,
+        pv.country,
+        pv.city,
+        pv.device_type,
+        pv.browser,
+        pv.created_at AS last_seen_at
+      FROM page_views pv
+      WHERE pv.created_at > now() - interval '5 minutes'
+        AND pv.is_bot = false
+      ORDER BY pv.visitor_id, pv.created_at DESC
+      LIMIT 100
+    `) as {
+      visitor_id: string;
+      session_id: string;
+      path: string;
+      country: string | null;
+      city: string | null;
+      device_type: string | null;
+      browser: string | null;
+      last_seen_at: string;
+    }[];
+    return rows.map((r) => ({
+      visitorId: r.visitor_id,
+      sessionId: r.session_id,
+      path: r.path,
+      country: r.country,
+      city: r.city,
+      deviceType: r.device_type,
+      browser: r.browser,
+      lastSeenAt: r.last_seen_at,
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] getLiveVisitors failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type RecentPageViewRow = {
@@ -493,33 +550,40 @@ export async function getRecentPageViews(
   limit = 100,
   includeBots = false
 ): Promise<RecentPageViewRow[]> {
-  const sql = getDb();
-  const cap = Math.max(1, Math.min(500, limit));
-  const rows = includeBots
-    ? ((await sql`
-        SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
-        FROM page_views
-        ORDER BY id DESC
-        LIMIT ${cap}
-      `) as RecentPageViewRowDb[])
-    : ((await sql`
-        SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
-        FROM page_views
-        WHERE is_bot = false
-        ORDER BY id DESC
-        LIMIT ${cap}
-      `) as RecentPageViewRowDb[]);
-  return rows.map((r) => ({
-    id: r.id,
-    path: r.path,
-    referrerHost: r.referrer_host,
-    country: r.country,
-    city: r.city,
-    deviceType: r.device_type,
-    browser: r.browser,
-    isBot: r.is_bot,
-    createdAt: r.created_at,
-  }));
+  try {
+    const sql = getDb();
+    const cap = Math.max(1, Math.min(500, limit));
+    const rows = includeBots
+      ? ((await sql`
+          SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
+          FROM page_views
+          ORDER BY id DESC
+          LIMIT ${cap}
+        `) as RecentPageViewRowDb[])
+      : ((await sql`
+          SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
+          FROM page_views
+          WHERE is_bot = false
+          ORDER BY id DESC
+          LIMIT ${cap}
+        `) as RecentPageViewRowDb[]);
+    return rows.map((r) => ({
+      id: r.id,
+      path: r.path,
+      referrerHost: r.referrer_host,
+      country: r.country,
+      city: r.city,
+      deviceType: r.device_type,
+      browser: r.browser,
+      isBot: r.is_bot,
+      createdAt: r.created_at,
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] getRecentPageViews failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 type RecentPageViewRowDb = {
@@ -535,9 +599,16 @@ type RecentPageViewRowDb = {
 };
 
 export async function getMaxPageViewId(): Promise<string> {
-  const sql = getDb();
-  const rows = (await sql`SELECT COALESCE(MAX(id), 0)::text AS id FROM page_views`) as { id: string }[];
-  return rows[0]?.id ?? "0";
+  try {
+    const sql = getDb();
+    const rows = (await sql`SELECT COALESCE(MAX(id), 0)::text AS id FROM page_views`) as { id: string }[];
+    return rows[0]?.id ?? "0";
+  } catch (err) {
+    console.warn(
+      `[analytics] getMaxPageViewId failed: ${err instanceof Error ? err.message : err}`
+    );
+    return "0";
+  }
 }
 
 export async function getPageViewsAfterId(
@@ -545,37 +616,44 @@ export async function getPageViewsAfterId(
   limit = 100,
   includeBots = false
 ): Promise<RecentPageViewRow[]> {
-  const sql = getDb();
-  const cleaned = afterId.replace(/[^0-9]/g, "");
-  const safe = cleaned.length > 0 ? cleaned : "0";
-  const cap = Math.max(1, Math.min(500, limit));
-  const rows = includeBots
-    ? ((await sql`
-        SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
-        FROM page_views
-        WHERE id > ${safe}::bigint
-        ORDER BY id ASC
-        LIMIT ${cap}
-      `) as RecentPageViewRowDb[])
-    : ((await sql`
-        SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
-        FROM page_views
-        WHERE id > ${safe}::bigint
-          AND is_bot = false
-        ORDER BY id ASC
-        LIMIT ${cap}
-      `) as RecentPageViewRowDb[]);
-  return rows.map((r) => ({
-    id: r.id,
-    path: r.path,
-    referrerHost: r.referrer_host,
-    country: r.country,
-    city: r.city,
-    deviceType: r.device_type,
-    browser: r.browser,
-    isBot: r.is_bot,
-    createdAt: r.created_at,
-  }));
+  try {
+    const sql = getDb();
+    const cleaned = afterId.replace(/[^0-9]/g, "");
+    const safe = cleaned.length > 0 ? cleaned : "0";
+    const cap = Math.max(1, Math.min(500, limit));
+    const rows = includeBots
+      ? ((await sql`
+          SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
+          FROM page_views
+          WHERE id > ${safe}::bigint
+          ORDER BY id ASC
+          LIMIT ${cap}
+        `) as RecentPageViewRowDb[])
+      : ((await sql`
+          SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
+          FROM page_views
+          WHERE id > ${safe}::bigint
+            AND is_bot = false
+          ORDER BY id ASC
+          LIMIT ${cap}
+        `) as RecentPageViewRowDb[]);
+    return rows.map((r) => ({
+      id: r.id,
+      path: r.path,
+      referrerHost: r.referrer_host,
+      country: r.country,
+      city: r.city,
+      deviceType: r.device_type,
+      browser: r.browser,
+      isBot: r.is_bot,
+      createdAt: r.created_at,
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] getPageViewsAfterId failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type SessionDetail = {
@@ -603,8 +681,9 @@ export type SessionDetail = {
 export async function getSessionDetail(
   sessionId: string
 ): Promise<SessionDetail | null> {
-  const sql = getDb();
-  const rows = (await sql`
+  try {
+    const sql = getDb();
+    const rows = (await sql`
     SELECT
       id::text, visitor_id::text, started_at, last_seen_at, page_count,
       entry_path, exit_path, referrer, referrer_host,
@@ -635,29 +714,35 @@ export async function getSessionDetail(
     converted_scan_id: string | null;
     converted_contact_id: string | null;
   }[];
-  const r = rows[0];
-  if (!r) return null;
-  return {
-    id: r.id,
-    visitorId: r.visitor_id,
-    startedAt: r.started_at,
-    lastSeenAt: r.last_seen_at,
-    pageCount: r.page_count,
-    entryPath: r.entry_path,
-    exitPath: r.exit_path,
-    referrer: r.referrer,
-    referrerHost: r.referrer_host,
-    utmSource: r.utm_source,
-    utmMedium: r.utm_medium,
-    utmCampaign: r.utm_campaign,
-    country: r.country,
-    region: r.region,
-    city: r.city,
-    deviceType: r.device_type,
-    isBot: r.is_bot,
-    convertedScanId: r.converted_scan_id,
-    convertedContactId: r.converted_contact_id,
-  };
+    const r = rows[0];
+    if (!r) return null;
+    return {
+      id: r.id,
+      visitorId: r.visitor_id,
+      startedAt: r.started_at,
+      lastSeenAt: r.last_seen_at,
+      pageCount: r.page_count,
+      entryPath: r.entry_path,
+      exitPath: r.exit_path,
+      referrer: r.referrer,
+      referrerHost: r.referrer_host,
+      utmSource: r.utm_source,
+      utmMedium: r.utm_medium,
+      utmCampaign: r.utm_campaign,
+      country: r.country,
+      region: r.region,
+      city: r.city,
+      deviceType: r.device_type,
+      isBot: r.is_bot,
+      convertedScanId: r.converted_scan_id,
+      convertedContactId: r.converted_contact_id,
+    };
+  } catch (err) {
+    console.warn(
+      `[analytics] getSessionDetail failed: ${err instanceof Error ? err.message : err}`
+    );
+    return null;
+  }
 }
 
 export type SessionPath = {
@@ -672,35 +757,42 @@ export type SessionPath = {
 export async function getSessionPath(
   sessionId: string
 ): Promise<SessionPath[]> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT
-      pv.id::text AS id,
-      pv.path,
-      pv.query,
-      pv.created_at,
-      eng.dwell_ms,
-      eng.max_scroll_pct
-    FROM page_views pv
-    LEFT JOIN page_view_engagement eng ON eng.page_view_id = pv.id
-    WHERE pv.session_id = ${sessionId}::uuid
-    ORDER BY pv.id ASC
-  `) as {
-    id: string;
-    path: string;
-    query: string | null;
-    created_at: string;
-    dwell_ms: number | null;
-    max_scroll_pct: number | null;
-  }[];
-  return rows.map((r) => ({
-    id: r.id,
-    path: r.path,
-    query: r.query,
-    createdAt: r.created_at,
-    dwellMs: r.dwell_ms,
-    scrollPct: r.max_scroll_pct,
-  }));
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        pv.id::text AS id,
+        pv.path,
+        pv.query,
+        pv.created_at,
+        eng.dwell_ms,
+        eng.max_scroll_pct
+      FROM page_views pv
+      LEFT JOIN page_view_engagement eng ON eng.page_view_id = pv.id
+      WHERE pv.session_id = ${sessionId}::uuid
+      ORDER BY pv.id ASC
+    `) as {
+      id: string;
+      path: string;
+      query: string | null;
+      created_at: string;
+      dwell_ms: number | null;
+      max_scroll_pct: number | null;
+    }[];
+    return rows.map((r) => ({
+      id: r.id,
+      path: r.path,
+      query: r.query,
+      createdAt: r.created_at,
+      dwellMs: r.dwell_ms,
+      scrollPct: r.max_scroll_pct,
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] getSessionPath failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 /**

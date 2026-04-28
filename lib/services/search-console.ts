@@ -223,27 +223,34 @@ export async function getTopQueries(
   daysBack: number,
   limit = 50
 ): Promise<GscQueryRow[]> {
-  const sql = getDb();
-  const days = Math.max(1, Math.min(90, daysBack));
-  const rows = (await sql`
-    SELECT query,
-           SUM(impressions)::int AS impressions,
-           SUM(clicks)::int AS clicks,
-           CASE WHEN SUM(impressions) > 0 THEN SUM(clicks)::float8 / SUM(impressions) ELSE 0 END AS ctr,
-           AVG(position)::float8 AS position
-    FROM search_console_daily
-    WHERE date > current_date - (${`${days} days`})::interval
-    GROUP BY query
-    ORDER BY clicks DESC
-    LIMIT ${Math.max(1, Math.min(200, limit))}
-  `) as Array<{ query: string; impressions: number; clicks: number; ctr: number; position: number }>;
-  return rows.map((r) => ({
-    query: r.query,
-    impressions: Number(r.impressions),
-    clicks: Number(r.clicks),
-    ctr: Number(Number(r.ctr).toFixed(4)),
-    position: Number(Number(r.position).toFixed(2)),
-  }));
+  try {
+    const sql = getDb();
+    const days = Math.max(1, Math.min(90, daysBack));
+    const rows = (await sql`
+      SELECT query,
+             SUM(impressions)::int AS impressions,
+             SUM(clicks)::int AS clicks,
+             CASE WHEN SUM(impressions) > 0 THEN SUM(clicks)::float8 / SUM(impressions) ELSE 0 END AS ctr,
+             AVG(position)::float8 AS position
+      FROM search_console_daily
+      WHERE date > current_date - (${`${days} days`})::interval
+      GROUP BY query
+      ORDER BY clicks DESC
+      LIMIT ${Math.max(1, Math.min(200, limit))}
+    `) as Array<{ query: string; impressions: number; clicks: number; ctr: number; position: number }>;
+    return rows.map((r) => ({
+      query: r.query,
+      impressions: Number(r.impressions),
+      clicks: Number(r.clicks),
+      ctr: Number(Number(r.ctr).toFixed(4)),
+      position: Number(Number(r.position).toFixed(2)),
+    }));
+  } catch (err) {
+    console.warn(
+      `[search-console] getTopQueries failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type GscPageRow = {
@@ -258,27 +265,34 @@ export async function getTopPages(
   daysBack: number,
   limit = 50
 ): Promise<GscPageRow[]> {
-  const sql = getDb();
-  const days = Math.max(1, Math.min(90, daysBack));
-  const rows = (await sql`
-    SELECT page,
-           SUM(impressions)::int AS impressions,
-           SUM(clicks)::int AS clicks,
-           CASE WHEN SUM(impressions) > 0 THEN SUM(clicks)::float8 / SUM(impressions) ELSE 0 END AS ctr,
-           AVG(position)::float8 AS position
-    FROM search_console_daily
-    WHERE date > current_date - (${`${days} days`})::interval
-    GROUP BY page
-    ORDER BY clicks DESC
-    LIMIT ${Math.max(1, Math.min(200, limit))}
-  `) as Array<{ page: string; impressions: number; clicks: number; ctr: number; position: number }>;
-  return rows.map((r) => ({
-    page: r.page,
-    impressions: Number(r.impressions),
-    clicks: Number(r.clicks),
-    ctr: Number(Number(r.ctr).toFixed(4)),
-    position: Number(Number(r.position).toFixed(2)),
-  }));
+  try {
+    const sql = getDb();
+    const days = Math.max(1, Math.min(90, daysBack));
+    const rows = (await sql`
+      SELECT page,
+             SUM(impressions)::int AS impressions,
+             SUM(clicks)::int AS clicks,
+             CASE WHEN SUM(impressions) > 0 THEN SUM(clicks)::float8 / SUM(impressions) ELSE 0 END AS ctr,
+             AVG(position)::float8 AS position
+      FROM search_console_daily
+      WHERE date > current_date - (${`${days} days`})::interval
+      GROUP BY page
+      ORDER BY clicks DESC
+      LIMIT ${Math.max(1, Math.min(200, limit))}
+    `) as Array<{ page: string; impressions: number; clicks: number; ctr: number; position: number }>;
+    return rows.map((r) => ({
+      page: r.page,
+      impressions: Number(r.impressions),
+      clicks: Number(r.clicks),
+      ctr: Number(Number(r.ctr).toFixed(4)),
+      position: Number(Number(r.position).toFixed(2)),
+    }));
+  } catch (err) {
+    console.warn(
+      `[search-console] getTopPages failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type GscOpportunityRow = {
@@ -297,26 +311,33 @@ export async function getOpportunities(
   daysBack: number,
   limit = 25
 ): Promise<GscOpportunityRow[]> {
-  const sql = getDb();
-  const days = Math.max(1, Math.min(90, daysBack));
-  const rows = (await sql`
-    SELECT page, query,
-           SUM(impressions)::int AS impressions,
-           SUM(clicks)::int AS clicks,
-           AVG(position)::float8 AS position
-    FROM search_console_daily
-    WHERE date > current_date - (${`${days} days`})::interval
-    GROUP BY page, query
-    HAVING SUM(impressions) >= 50
-       AND AVG(position) BETWEEN 5 AND 15
-    ORDER BY SUM(impressions) DESC, AVG(position) ASC
-    LIMIT ${Math.max(1, Math.min(100, limit))}
-  `) as Array<{ page: string; query: string; impressions: number; clicks: number; position: number }>;
-  return rows.map((r) => ({
-    page: r.page,
-    query: r.query,
-    impressions: Number(r.impressions),
-    clicks: Number(r.clicks),
-    position: Number(Number(r.position).toFixed(2)),
-  }));
+  try {
+    const sql = getDb();
+    const days = Math.max(1, Math.min(90, daysBack));
+    const rows = (await sql`
+      SELECT page, query,
+             SUM(impressions)::int AS impressions,
+             SUM(clicks)::int AS clicks,
+             AVG(position)::float8 AS position
+      FROM search_console_daily
+      WHERE date > current_date - (${`${days} days`})::interval
+      GROUP BY page, query
+      HAVING SUM(impressions) >= 50
+         AND AVG(position) BETWEEN 5 AND 15
+      ORDER BY SUM(impressions) DESC, AVG(position) ASC
+      LIMIT ${Math.max(1, Math.min(100, limit))}
+    `) as Array<{ page: string; query: string; impressions: number; clicks: number; position: number }>;
+    return rows.map((r) => ({
+      page: r.page,
+      query: r.query,
+      impressions: Number(r.impressions),
+      clicks: Number(r.clicks),
+      position: Number(Number(r.position).toFixed(2)),
+    }));
+  } catch (err) {
+    console.warn(
+      `[search-console] getOpportunities failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }

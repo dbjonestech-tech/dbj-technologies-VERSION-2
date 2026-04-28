@@ -176,35 +176,42 @@ function pickString(meta: Record<string, unknown>, key: string): string | null {
 export async function getRecentDeployments(
   limit = 25
 ): Promise<DeploymentRow[]> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT id, url, state, target, created_at, ready_at, build_duration_ms, meta
-    FROM vercel_deployments
-    ORDER BY created_at DESC
-    LIMIT ${Math.max(1, Math.min(100, limit))}
-  `) as Array<{
-    id: string;
-    url: string | null;
-    state: string;
-    target: string | null;
-    created_at: string;
-    ready_at: string | null;
-    build_duration_ms: number | null;
-    meta: Record<string, unknown>;
-  }>;
-  return rows.map((r) => ({
-    id: r.id,
-    url: r.url,
-    state: r.state,
-    target: r.target,
-    createdAt: r.created_at,
-    readyAt: r.ready_at,
-    buildDurationMs: r.build_duration_ms,
-    branch: pickString(r.meta ?? {}, "githubCommitRef"),
-    commitSha: pickString(r.meta ?? {}, "githubCommitSha"),
-    commitMessage: pickString(r.meta ?? {}, "githubCommitMessage"),
-    author: pickString(r.meta ?? {}, "githubCommitAuthorName"),
-  }));
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT id, url, state, target, created_at, ready_at, build_duration_ms, meta
+      FROM vercel_deployments
+      ORDER BY created_at DESC
+      LIMIT ${Math.max(1, Math.min(100, limit))}
+    `) as Array<{
+      id: string;
+      url: string | null;
+      state: string;
+      target: string | null;
+      created_at: string;
+      ready_at: string | null;
+      build_duration_ms: number | null;
+      meta: Record<string, unknown>;
+    }>;
+    return rows.map((r) => ({
+      id: r.id,
+      url: r.url,
+      state: r.state,
+      target: r.target,
+      createdAt: r.created_at,
+      readyAt: r.ready_at,
+      buildDurationMs: r.build_duration_ms,
+      branch: pickString(r.meta ?? {}, "githubCommitRef"),
+      commitSha: pickString(r.meta ?? {}, "githubCommitSha"),
+      commitMessage: pickString(r.meta ?? {}, "githubCommitMessage"),
+      author: pickString(r.meta ?? {}, "githubCommitAuthorName"),
+    }));
+  } catch (err) {
+    console.warn(
+      `[vercel] getRecentDeployments failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
 
 export type CurrentDeploymentSummary = {
@@ -215,31 +222,46 @@ export type CurrentDeploymentSummary = {
   buildingNow: number;
 };
 
+const EMPTY_DEPLOY_SUMMARY: CurrentDeploymentSummary = {
+  productionState: null,
+  productionUrl: null,
+  productionAge: null,
+  failedLast24h: 0,
+  buildingNow: 0,
+};
+
 export async function getCurrentDeploymentSummary(): Promise<CurrentDeploymentSummary> {
-  const sql = getDb();
-  const prodRows = (await sql`
-    SELECT state, url, created_at
-    FROM vercel_deployments
-    WHERE target = 'production'
-    ORDER BY created_at DESC
-    LIMIT 1
-  `) as { state: string; url: string | null; created_at: string }[];
+  try {
+    const sql = getDb();
+    const prodRows = (await sql`
+      SELECT state, url, created_at
+      FROM vercel_deployments
+      WHERE target = 'production'
+      ORDER BY created_at DESC
+      LIMIT 1
+    `) as { state: string; url: string | null; created_at: string }[];
 
-  const counts = (await sql`
-    SELECT
-      COUNT(*) FILTER (WHERE state = 'ERROR' AND created_at > now() - interval '1 day')::int AS failed,
-      COUNT(*) FILTER (WHERE state IN ('BUILDING', 'INITIALIZING', 'QUEUED'))::int AS building
-    FROM vercel_deployments
-    WHERE created_at > now() - interval '7 days'
-  `) as { failed: number; building: number }[];
+    const counts = (await sql`
+      SELECT
+        COUNT(*) FILTER (WHERE state = 'ERROR' AND created_at > now() - interval '1 day')::int AS failed,
+        COUNT(*) FILTER (WHERE state IN ('BUILDING', 'INITIALIZING', 'QUEUED'))::int AS building
+      FROM vercel_deployments
+      WHERE created_at > now() - interval '7 days'
+    `) as { failed: number; building: number }[];
 
-  const r = prodRows[0];
-  const c = counts[0] ?? { failed: 0, building: 0 };
-  return {
-    productionState: r?.state ?? null,
-    productionUrl: r?.url ?? null,
-    productionAge: r?.created_at ?? null,
-    failedLast24h: Number(c.failed),
-    buildingNow: Number(c.building),
-  };
+    const r = prodRows[0];
+    const c = counts[0] ?? { failed: 0, building: 0 };
+    return {
+      productionState: r?.state ?? null,
+      productionUrl: r?.url ?? null,
+      productionAge: r?.created_at ?? null,
+      failedLast24h: Number(c.failed),
+      buildingNow: Number(c.building),
+    };
+  } catch (err) {
+    console.warn(
+      `[vercel] getCurrentDeploymentSummary failed: ${err instanceof Error ? err.message : err}`
+    );
+    return EMPTY_DEPLOY_SUMMARY;
+  }
 }

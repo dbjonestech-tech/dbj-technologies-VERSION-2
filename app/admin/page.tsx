@@ -91,7 +91,7 @@ const COLUMNS: { label: string; cards: Card[] }[] = [
     ],
   },
   {
-    label: "Health & operations",
+    label: "Operations",
     cards: [
       {
         label: "Costs",
@@ -99,6 +99,29 @@ const COLUMNS: { label: string; cards: Card[] }[] = [
         href: "/admin/costs",
         icon: DollarSign,
       },
+      {
+        label: "Database",
+        description: "Row counts and recent activity by table.",
+        href: "/admin/database",
+        icon: Database,
+      },
+      {
+        label: "Clients",
+        description: "Engagement clients, projects, deliverables. Drives the /portal.",
+        href: "/admin/clients",
+        icon: Briefcase,
+      },
+      {
+        label: "Audit log",
+        description: "Sign-in attempts, allowlist denials, protected-route access.",
+        href: "/admin/audit",
+        icon: ShieldCheck,
+      },
+    ],
+  },
+  {
+    label: "Health",
+    cards: [
       {
         label: "Pipeline",
         description: "Inngest run history, p50 / p95 / p99 by function, failure rate.",
@@ -123,29 +146,11 @@ const COLUMNS: { label: string; cards: Card[] }[] = [
         href: "/admin/infrastructure",
         icon: Wifi,
       },
-      {
-        label: "Database",
-        description: "Row counts and recent activity by table.",
-        href: "/admin/database",
-        icon: Database,
-      },
-      {
-        label: "Clients",
-        description: "Engagement clients, projects, deliverables. Drives the /portal.",
-        href: "/admin/clients",
-        icon: Briefcase,
-      },
     ],
   },
 ];
 
 const ACCOUNT_CARDS: Card[] = [
-  {
-    label: "Audit log",
-    description: "Sign-in attempts, allowlist denials, protected-route access.",
-    href: "/admin/audit",
-    icon: ShieldCheck,
-  },
   {
     label: "Users",
     description: "Invite admins. Bootstrap allowlist plus DB-backed members.",
@@ -166,7 +171,7 @@ export default async function AdminLanding() {
 
   return (
     <div className="px-6 py-10 sm:px-10">
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="mx-auto w-full max-w-7xl">
         <header className="mb-8">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
             Admin
@@ -217,7 +222,7 @@ export default async function AdminLanding() {
           )}
         </section>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {COLUMNS.map((col) => (
             <Column key={col.label} label={col.label} cards={col.cards} />
           ))}
@@ -227,7 +232,7 @@ export default async function AdminLanding() {
           <h2 className="mb-3 font-display text-sm font-semibold uppercase tracking-wider text-zinc-500">
             Account
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {ACCOUNT_CARDS.map((card) => (
               <CardLink key={card.href} card={card} />
             ))}

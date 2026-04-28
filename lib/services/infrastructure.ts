@@ -333,26 +333,33 @@ export type InfraStatusRow = {
 };
 
 export async function getLatestInfraStatuses(): Promise<InfraStatusRow[]> {
-  const sql = getDb();
-  const rows = (await sql`
-    SELECT DISTINCT ON (target, resource)
-      target, resource, status, expires_at, details, checked_at
-    FROM infra_checks
-    ORDER BY target, resource, checked_at DESC
-  `) as Array<{
-    target: string;
-    resource: string;
-    status: string;
-    expires_at: string | null;
-    details: Record<string, unknown>;
-    checked_at: string;
-  }>;
-  return rows.map((r) => ({
-    target: r.target,
-    resource: r.resource,
-    status: r.status,
-    expiresAt: r.expires_at,
-    details: r.details,
-    checkedAt: r.checked_at,
-  }));
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT DISTINCT ON (target, resource)
+        target, resource, status, expires_at, details, checked_at
+      FROM infra_checks
+      ORDER BY target, resource, checked_at DESC
+    `) as Array<{
+      target: string;
+      resource: string;
+      status: string;
+      expires_at: string | null;
+      details: Record<string, unknown>;
+      checked_at: string;
+    }>;
+    return rows.map((r) => ({
+      target: r.target,
+      resource: r.resource,
+      status: r.status,
+      expiresAt: r.expires_at,
+      details: r.details,
+      checkedAt: r.checked_at,
+    }));
+  } catch (err) {
+    console.warn(
+      `[infra] getLatestInfraStatuses failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
 }
