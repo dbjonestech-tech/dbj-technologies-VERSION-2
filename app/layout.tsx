@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Outfit } from "next/font/google";
 import { headers } from "next/headers";
 import { JsonLd } from "@/components/layout/JsonLd";
+import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 import "./globals.css";
 
 /* ─── FONTS ─────────────────────────────────────────── */
@@ -164,6 +166,8 @@ export default async function RootLayout({
           />
         )}
         {children}
+        <CookieConsent />
+        <GoogleAnalytics />
       </body>
     </html>
   );
