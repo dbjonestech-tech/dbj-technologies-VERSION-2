@@ -10,7 +10,18 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { Zap, Eye, Target, Heart } from "lucide-react";
+import {
+  Zap,
+  Eye,
+  Target,
+  Heart,
+  Activity,
+  Gauge,
+  Mail,
+  ShieldCheck,
+  Workflow,
+  Receipt,
+} from "lucide-react";
 import { GradientBlob } from "@/components/effects/GradientBlob";
 import { CTASection } from "@/components/sections/CTA";
 import {
@@ -23,6 +34,43 @@ import {
 const valueIcons = [Zap, Eye, Target, Heart];
 
 const headlineChars = ABOUT_CONTENT.headline.split("");
+
+/* ─── OPERATIONS COCKPIT CAPABILITY TILES ──────────
+   The 6 tiles surfaced on the About page as proof-of-craft
+   for the Operations Cockpit engagement. Body copy is
+   outcome-led and avoids exposing Pathlight internals. */
+const OPS_CAPABILITIES = [
+  {
+    icon: Activity,
+    title: "First-party analytics",
+    body: "Visitor, session, and funnel data joined to actual business outcomes. No vendor between you and your numbers.",
+  },
+  {
+    icon: Gauge,
+    title: "Real-user performance",
+    body: "Core Web Vitals from real visitors, not synthetic tests. The metrics Google actually uses to rank you.",
+  },
+  {
+    icon: Mail,
+    title: "Deliverability monitoring",
+    body: "Sent, delivered, bounced, complained. Joined to the sending platform so you see problems before they cost domain reputation.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Infrastructure watchers",
+    body: "Daily TLS, WHOIS, and DNS authentication checks across every domain. Pages me before a cert expires, not after.",
+  },
+  {
+    icon: Workflow,
+    title: "Pipeline observability",
+    body: "Function health, retry behavior, and success rates for every async job that runs in the background.",
+  },
+  {
+    icon: Receipt,
+    title: "Cost telemetry",
+    body: "Every third-party API call tracked by provider, operation, and run. No surprise invoices.",
+  },
+] as const;
 
 const storySections = [
   ABOUT_STORY.whyThisWay,
@@ -700,6 +748,153 @@ export default function AboutContent() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Gradient divider before Operations Cockpit showcase */}
+      <motion.div
+        initial={{ opacity: 0.3, scaleX: 0.6 }}
+        whileInView={{ opacity: 1, scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        aria-hidden="true"
+        className="relative z-[2] h-px w-full"
+        style={{
+          background:
+            "linear-gradient(to right, transparent, #3b82f6, transparent)",
+        }}
+      />
+
+      {/* Built for Myself First (Operations Cockpit showcase) */}
+      <section
+        className="relative overflow-hidden py-20"
+        style={{ backgroundColor: "#06060a" }}
+      >
+        <div className="relative z-[2] mb-16 mx-auto max-w-3xl text-center px-6">
+          <motion.span
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs font-medium uppercase tracking-widest text-accent-blue"
+          >
+            The Stack Behind the Studio
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mt-4 font-display text-section font-bold leading-tight text-white"
+          >
+            Built for Myself First.
+          </motion.h2>
+          <motion.div
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="mt-6 h-[1px] w-24 mx-auto bg-gradient-to-r from-accent-blue to-accent-cyan"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-6 text-base leading-relaxed sm:text-lg"
+            style={{ color: "#9ca3af" }}
+          >
+            Most agencies hand you a website and tell you to outsource the rest
+            to five different SaaS vendors. I built an operations stack for the
+            studio myself. First-party analytics, real-user performance,
+            deliverability, infrastructure watchers, error tracking, and
+            pipeline health. One auth wall. One database. One source of truth.
+          </motion.p>
+        </div>
+
+        <div className="relative z-[2] mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {OPS_CAPABILITIES.map((cap, i) => {
+              const Icon = cap.icon;
+              return (
+                <motion.div
+                  key={cap.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: i * 0.08 }}
+                  className="rounded-2xl border border-white/[0.06] p-6 transition-shadow duration-300 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.25)] md:p-8"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
+                  }}
+                >
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue">
+                    <Icon className="h-6 w-6" aria-hidden="true" />
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-white mb-2">
+                    {cap.title}
+                  </h3>
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: "#9ca3af" }}
+                  >
+                    {cap.body}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="relative z-[2] mx-auto mt-16 max-w-3xl px-6 text-center">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-base leading-relaxed sm:text-lg"
+            style={{ color: "#c5ccd8" }}
+          >
+            I built it because I needed it. If you want the same stack on your
+            domain, I will build it for you. Same architecture. Your data. Your
+            auth wall.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-4"
+          >
+            <Link
+              href="/pricing/operations"
+              className="inline-flex transform items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:scale-[1.02] hover:gap-3 hover:shadow-[0_0_20px_-2px_rgba(59,130,246,0.4)] hover:brightness-110"
+              style={{ backgroundColor: "#3b82f6" }}
+            >
+              See Pricing
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </Link>
+            <Link
+              href="/contact?topic=operations-cockpit"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:border-accent-blue/40 hover:bg-white/[0.04]"
+            >
+              Request a Private Walkthrough
+            </Link>
+          </motion.div>
         </div>
       </section>
 

@@ -39,7 +39,7 @@ The `dbjcontext` zsh alias copies a curated context pack to the macOS clipboard 
 - Missing files in the file list
 - session-handoff.md exceeding 30 KB (archive trigger)
 - Em dashes anywhere in the pack (CLAUDE.md forbids them)
-- Legacy email `dbjonestech@gmail.com` beyond the baseline of 2 known structural references
+- Legacy gmail address beyond the known structural baseline (the deployment.md pre-commit grep)
 
 **Maintenance triggers:**
 - When session-handoff.md crosses 30 KB, archive its contents to `docs/ai/history/YYYY-MM-DD.md`, add an entry to `docs/ai/history/index.md`, and replace the live handoff with a compact summary.

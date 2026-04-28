@@ -165,6 +165,57 @@ export const PRICING_DETAILS: PricingDetail[] = [
     ctaHref: "/contact",
   },
   {
+    slug: "operations",
+    name: "Operations Cockpit",
+    price: "Starting at $25,000",
+    timeline: "4-8 weeks",
+    heroDescription:
+      "Most businesses run on a stack of five to seven SaaS tools that do not talk to each other. Analytics in one place, performance in another, error tracking in a third, deliverability and infrastructure scattered across more. Operations Cockpit consolidates all of it into a single dashboard you own, on your domain, with one auth wall and one source of truth.",
+    idealFor:
+      "Businesses paying fifteen thousand dollars or more per year on analytics, performance monitoring, error tracking, and deliverability subscriptions that still cannot answer 'how many of last week's visitors actually became customers.' Founders and operators who want their data joined to their business outcomes, not just plotted in someone else's dashboard.",
+    sections: [
+      {
+        heading: "What Is Included",
+        body:
+          "First-party visitor and session analytics with funnel attribution to your business outcomes. Real-user performance monitoring (LCP, INP, CLS) collected directly from real visitors, not synthetic tests. Email deliverability KPIs joined to your sending platform. Daily TLS, WHOIS, and DNS authentication watchers for every domain you own. Search Console integration for query and opportunity tracking. Error tracking integration with Sentry or your existing observability tool. Cost telemetry for any third-party API spend. Single auth wall with role-based access. All data lives in your Postgres database.",
+      },
+      {
+        heading: "How It Works",
+        body:
+          "I start by mapping your existing SaaS stack and identifying what data is locked away versus what is accessible. Then I build the cockpit on your domain using the same architecture I run for DBJ. You get the source code, the schema, the deployment, and a written runbook for every integration. Most builds ship in four to eight weeks depending on the number of integrations and the depth of customization.",
+      },
+      {
+        heading: "What You Get at the End",
+        body:
+          "A production-grade operations stack on your own infrastructure. Source code in your repository. Postgres schema with daily backups. Documented runbooks for every integration. 30 days of post-launch support included. Optional ongoing monthly retainer for new integrations, dashboards, and alerts.",
+      },
+    ],
+    faq: [
+      {
+        question: "Why not just use Datadog or PostHog?",
+        answer:
+          "Those are excellent products. The reason to build in-house is when you need data joined to your specific business outcomes, like visitor-to-customer attribution across marketing, product, and sales, or when SaaS sprawl is costing you more annually than the build pays back in. If a single SaaS works for you, use it. Operations Cockpit is for the cases where it does not.",
+      },
+      {
+        question: "Why is the price 'Starting at $25,000'?",
+        answer:
+          "The replacement cost to assemble this kind of stack from scratch is $30,000 to $80,000 depending on integration depth. I have already built and tested the architecture for my own studio, so a productized engagement is faster and cheaper than a clean-slate custom build. The price scales based on how many integrations and dashboards your business needs.",
+      },
+      {
+        question: "Do I own the data?",
+        answer:
+          "Yes. The entire stack runs on your infrastructure with your Postgres database. No third party sits between you and your numbers. You can export, archive, or delete every byte at any time.",
+      },
+      {
+        question: "What if my needs grow later?",
+        answer:
+          "The architecture is built to grow. Adding new integrations, new dashboards, or new alerting is straightforward because every signal feeds a common schema. New work is scoped as a separate engagement or rolled into an optional monthly retainer.",
+      },
+    ],
+    ctaText: "Request a Scoping Call",
+    ctaHref: "/contact?topic=operations-cockpit",
+  },
+  {
     slug: "maintenance",
     name: "Maintenance",
     price: "$299/month",

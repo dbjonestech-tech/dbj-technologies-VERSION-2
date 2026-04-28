@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MapPin, Send, CheckCircle2, AlertCircle, Loader2, Pencil, KeyRound } from "lucide-react";
+import { MapPin, Send, CheckCircle2, AlertCircle, Loader2, Pencil, KeyRound, Gauge } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { GridBackground } from "@/components/effects/GridBackground";
@@ -101,6 +101,13 @@ const PORTAL_ACCESS_DEFAULTS: Partial<FormData> = {
     "I'd like to request access to the DBJ client portal. A bit of context on what I'm working on:\n\n",
 };
 
+const OPERATIONS_COCKPIT_DEFAULTS: Partial<FormData> = {
+  budget: "$25,000+",
+  projectType: "Other",
+  message:
+    "I'd like to scope an Operations Cockpit engagement. A bit of context on what we're currently using and what I want to consolidate:\n\n",
+};
+
 export default function ContactContent() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const searchParams = useSearchParams();
@@ -111,12 +118,14 @@ export default function ContactContent() {
   }, [searchParams]);
 
   const isPortalAccessRequest = searchParams.get("topic") === "portal-access";
+  const isOperationsCockpitRequest = searchParams.get("topic") === "operations-cockpit";
 
   const formDefaults = useMemo<Partial<FormData> | undefined>(() => {
     if (selection) return { message: selection.message };
     if (isPortalAccessRequest) return PORTAL_ACCESS_DEFAULTS;
+    if (isOperationsCockpitRequest) return OPERATIONS_COCKPIT_DEFAULTS;
     return undefined;
-  }, [selection, isPortalAccessRequest]);
+  }, [selection, isPortalAccessRequest, isOperationsCockpitRequest]);
 
   const {
     register,
@@ -275,6 +284,37 @@ export default function ContactContent() {
                         Share a brief project summary below. Once your account
                         is set up, you&apos;ll receive an invitation email with
                         a sign-in link.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {isOperationsCockpitRequest && !selection && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 }}
+                  className="glass-card p-6 ring-1 ring-accent-blue/20"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue">
+                      <Gauge className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-widest text-accent-blue mb-1 font-mono">
+                        Topic
+                      </p>
+                      <p className="font-display text-base font-bold">
+                        Operations Cockpit scoping
+                      </p>
+                      <p className="mt-2 text-sm text-text-secondary">
+                        Tell me what you&apos;re currently using for analytics,
+                        performance, error tracking, and deliverability, plus
+                        anything you want consolidated. I&apos;ll respond with a
+                        scoping outline and proposed timeline.
                       </p>
                     </div>
                   </div>

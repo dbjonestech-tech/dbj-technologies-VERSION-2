@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, X, Sparkles } from "lucide-react";
+import { Check, X, Sparkles, Gauge, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GridBackground } from "@/components/effects/GridBackground";
@@ -156,6 +156,58 @@ export default function PricingContent() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Specialty Engagement: Operations Cockpit */}
+      <section className="py-20">
+        <SectionHeading
+          label="Specialty Engagement"
+          title="Operations Cockpit"
+        />
+        <div className="mx-auto max-w-5xl px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative glass-card p-8 lg:p-12 ring-1 ring-accent-blue/25 shadow-[0_0_60px_-15px_rgba(59,130,246,0.25)]"
+          >
+            <div className="grid gap-10 lg:grid-cols-5 lg:gap-12 items-center">
+              <div className="lg:col-span-3">
+                <div className="inline-flex items-center gap-2 rounded-full border border-accent-blue/20 bg-accent-blue/5 px-3 py-1 font-mono text-xs uppercase tracking-widest text-accent-blue">
+                  <Gauge className="h-3.5 w-3.5" aria-hidden="true" />
+                  Operations Stack on Your Domain
+                </div>
+                <h3 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">
+                  Replace 5 to 7 SaaS subscriptions with code you own.
+                </h3>
+                <p className="mt-4 text-base text-text-secondary leading-relaxed">
+                  First-party analytics, real-user performance, deliverability
+                  monitoring, infrastructure watchers, error tracking, pipeline
+                  health, and cost telemetry. One operations stack on your own
+                  infrastructure with one auth wall and one source of truth.
+                  The same stack I built for DBJ, productized for your business.
+                </p>
+              </div>
+              <div className="lg:col-span-2 lg:border-l lg:border-white/[0.08] lg:pl-12">
+                <div className="font-display text-5xl font-bold text-gradient">
+                  $25,000
+                </div>
+                <div className="mt-1 text-sm text-text-muted">Starting at</div>
+                <div className="mt-3 text-sm text-text-secondary">
+                  Delivered in 4 to 8 weeks
+                </div>
+                <Link
+                  href="/pricing/operations"
+                  className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent-blue px-6 py-3.5 text-sm font-semibold text-white shadow-glow-blue transition-all duration-300 hover:shadow-[0_0_50px_rgba(59,130,246,0.4)]"
+                >
+                  See What&apos;s Included
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 

@@ -1,6 +1,18 @@
 # Current State
 
-Last updated: April 28, 2026
+Last updated: April 28, 2026 (post-archive cleanup)
+
+## Operations Cockpit (productized engagement, April 28)
+
+The internal admin dashboard is now positioned publicly as a productized engagement called **Operations Cockpit**, "Starting at $25,000," 4-8 week delivery. Pitched as a consolidation of 5-7 SaaS subscriptions into one stack the buyer owns: first-party analytics, real-user performance, deliverability monitoring, infrastructure watchers, error tracking, pipeline observability, cost telemetry. Same architecture I run for DBJ.
+
+Surfaces (all on the marketing site, no admin internals exposed):
+- **About page**: new section "Built for Myself First" (eyebrow "The Stack Behind the Studio") between Operating Principles and the CTA. 6-tile glass-card capability grid; dual CTAs to `/pricing/operations` (primary) and `/contact?topic=operations-cockpit` (private walkthrough).
+- **Pricing page**: new "Specialty Engagement" section between the 3-tier grid and the Add-Ons grid. Single full-width feature card with $25,000 price block linking to detail page.
+- **Detail page** at `/pricing/operations`: rendered by existing `[slug]/page.tsx` from a new entry in `PRICING_DETAILS` (`lib/pricing-data.ts`). Hero, idealFor, three sections, four FAQs.
+- **Contact form**: `topic=operations-cockpit` query param prefills budget `$25,000+`, projectType `Other`, and a scoping-context message; renders a Gauge-icon topic card above the form.
+
+Sitemap auto-includes via `getPricingSlugs()`. No new env vars. No new migrations. Public copy is outcome-led; no Pathlight internals (model names, function IDs, vertical database) leak through.
 
 ## Client portal v1 (white-glove engagement portal at `/portal`)
 
@@ -77,11 +89,6 @@ Contact form persistence: `app/(marketing)/api/contact/route.ts` writes to `cont
 - Schema.org: JSON-LD with sameAs for social profiles
 - Professional email: joshua@dbjtechnologies.com (Google Workspace, SPF/DKIM/DMARC verified)
 - Pathlight landing page (overhauled April 25): hero tagline updated to "Find where your website is losing trust, leads, and revenue." with subtext "Free. No credit card. Results in minutes." DBJ emblem + "by DBJ Technologies" link under wordmark. Form unchanged (id="scan-form" added as anchor target). New server-rendered sections below the form via app/(grade)/pathlight/PathlightContent.tsx: (3) "What Your Report Includes" 2x2 dark glass card grid covering Pathlight Score, Revenue Impact Estimate, Top 3 Priority Fixes, Full Desktop & Mobile Screenshots; (4) "Most audits check code. Pathlight checks the experience." three-paragraph differentiator; (5) "Built for businesses where one lead matters" audience flow line; (6) Secondary CTA card with "Scan My Website Free" anchor + "Book a Strategy Call" link to /contact; (7) "Powered by DBJ Technologies" footer line. PathlightBackdrop (fixed inset-0) continues to span behind all sections as user scrolls.
-
-### Active Bugs Being Fixed (April 25)
-- About page: ScrollWordBatch component has words running together (inline-block whitespace collapse). CC prompt actively executing fix.
-- About page: Headline "The Anti-Agency" wraps mid-word at certain viewport widths. Fix in same CC prompt.
-- Homepage white flash: Multiple fix attempts (CSS class, !important, inline script). May still be occurring on first visit. Anti-flicker script in layout.tsx sets dark background before paint on homepage only.
 
 ### Known Gaps (Not Blocking Launch)
 - No email capture or lead magnets anywhere on the site

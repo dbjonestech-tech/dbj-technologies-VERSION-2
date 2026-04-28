@@ -11,8 +11,6 @@
 
 ## Priority 2: Site Polish (Quick Wins)
 
-- [ ] Verify About page word spacing and headline fix deployed correctly
-- [ ] Verify homepage white flash is resolved (hard refresh test)
 - [ ] Add Tyler's testimonial to homepage or about page once received
 - [ ] Verify all ~24 pages look correct (full visual audit -- Chrome MCP couldn't complete this due to scroll-triggered animations)
 - [ ] **Manual: register `www.dbjtechnologies.com` as an alias domain in the Vercel dashboard so the new vercel.json www-host redirect actually fires.** Without the domain attached to the project, requests to www never reach Vercel's routing layer. After adding, verify `curl -I https://www.dbjtechnologies.com/` returns `301` to `https://dbjtechnologies.com/`.
