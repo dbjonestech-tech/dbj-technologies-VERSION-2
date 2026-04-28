@@ -1075,7 +1075,7 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `f14ccc5` (feat(nav): add 'Admin Login' text link back to the navbar), confirmed pushed to `origin main`. Working tree clean. Recent chain (most recent first): `f14ccc5` (Admin Login text link in navbar) -> `299409a` (snapshot for d45df5d) -> `d45df5d` (middleware prefix-match fix) -> `14343d2` (snapshot for 7353a41) -> `7353a41` (auth surfaces split) -> `6ade672` (snapshot for 5fd29b7) -> `5fd29b7` (Design Briefs rename + 8 template previews + project-card layout) -> `2c714ec` (snapshot for 3a19312) -> `3a19312` (navbar dual auth surfaces) -> `5fbf385` (snapshot for 3d4c2fe) -> `3d4c2fe` (Client Portal rename + two-track /signin) -> `483d42f` (snapshot for c97ba70) -> `c97ba70` (GA + consent banner + privacy disclosure)
+`main` is at `0450119` (feat(work): 'Selected Builds.' header + tighter subhead + mobile UX polish), confirmed pushed to `origin main`. Working tree clean. Recent chain (most recent first): `0450119` (Selected Builds + mobile work-page polish) -> `cd4d555` (snapshot for f14ccc5) -> `f14ccc5` (Admin Login text link in navbar) -> `299409a` (snapshot for d45df5d) -> `d45df5d` (middleware prefix-match fix) -> `14343d2` (snapshot for 7353a41) -> `7353a41` (auth surfaces split) -> `6ade672` (snapshot for 5fd29b7) -> `5fd29b7` (Design Briefs rename + 8 template previews + project-card layout) -> `2c714ec` (snapshot for 3a19312) -> `3a19312` (navbar dual auth surfaces) -> `5fbf385` (snapshot for 3d4c2fe) -> `3d4c2fe` (Client Portal rename + two-track /signin) -> `483d42f` (snapshot for c97ba70) -> `c97ba70` (GA + consent banner + privacy disclosure)
 
 ### Why this followup was needed
 
