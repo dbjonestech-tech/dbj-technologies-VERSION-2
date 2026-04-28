@@ -179,7 +179,7 @@ The decisions captured in `docs/ai/portal-strategy.md` were locked and implement
 
 ### Git status at session pause
 
-Working tree dirty pending Joshy's review per protocol. Stages 1-3 and Stage 5 already on origin main. The portal v1 work plus all docs updates uncommitted.
+Working tree clean for portal v1 work. Shipped in commit `9775d0f` (`feat(portal): client portal v1 + auth role split + /admin/clients`), pushed to `origin main`. Vercel auto-deploy triggered. `scripts/check-admin-audit-table.mjs` remains untracked (carried over from a prior session, intentionally left out).
 
 ### Next recommended task
 
@@ -870,4 +870,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `af176eb` (feat(work): cross-template differentiation pass + Vertical Blueprints grid), confirmed pushed to `origin main`. Working tree contains the parallel client-portal / admin workstream that another agent has staged in their own commit chain (auth.config.ts, auth.ts, middleware.ts, types/next-auth.d.ts, lib/auth/*, lib/portal/*, lib/email-templates/admin-invitation.ts, app/admin/*, app/portal/*, app/invite/[token]/page.tsx, lib/db/migrations/013_clients.sql, scripts/check-admin-audit-table.mjs, app/robots.ts, plus updates to docs/ai/current-state.md, docs/ai/backlog.md, docs/ai/portal-strategy.md). Those are NOT part of `af176eb`. Recent chain (most recent first): `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (parallel: portal v1 commit chain) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.
+`main` is at `9775d0f` (feat(portal): client portal v1 + auth role split + /admin/clients), confirmed pushed to `origin main`. Working tree clean except `scripts/check-admin-audit-table.mjs` (carried over from a prior session, intentionally untracked). Recent chain (most recent first): `9775d0f` (portal v1 + role split) -> `ef1e373` (snapshot for af176eb) -> `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (snapshot for fd84067) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.
