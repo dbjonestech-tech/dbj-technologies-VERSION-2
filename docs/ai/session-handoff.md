@@ -107,6 +107,15 @@ The dashboard pages render an empty-state hint if the upstream config is missing
 
 Ship migrations and the new envs to Vercel, deploy, and watch the dashboards hydrate. Once the first 24 hours of real-user CWV data is captured the RUM page becomes useful for prioritizing performance work; before that it shows an empty state.
 
+### Final state (post-commit)
+
+- Feature commit: `1173bc2` -- feat(admin): expand dashboard into operations cockpit + move admin login to footer
+- Snapshot commit: this final-state block is captured in a standalone `chore: update session-handoff snapshot for 1173bc2` commit on top of the feature commit. The original `--amend && --force-with-lease` path was rejected by the protected-branch hook on `main`, so the standalone-commit fallback documented in CLAUDE.md was used instead.
+- Push: feature commit confirmed to `origin main` (`4e03df3..1173bc2`); snapshot commit pushes after this edit lands.
+- 4 required GitHub status checks were noted by the remote on the feature push but did not block the push.
+- Working tree is clean after the snapshot commit.
+- Committer identity was auto-configured from hostname (`doulosjones@Joshuas-MacBook-Pro.local`); Joshua may want to set `git config --global user.email` for cleaner blame on future commits. CLAUDE.md prohibits the assistant from touching git config.
+
 ## Last Session: April 28, 2026 -- Auth surfaces split: /signin admin-only, /portal-access public client entry, "Admin login" moved to footer
 
 ### What shipped
