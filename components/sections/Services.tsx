@@ -12,7 +12,7 @@ export function ServicesSection() {
       <SectionHeading
         label="Capabilities"
         title="What I Build"
-        description="Every project is custom-built around your business goals, not pulled from a template library."
+        description="Every project is custom built around your business goals, not pulled from a template library."
       />
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

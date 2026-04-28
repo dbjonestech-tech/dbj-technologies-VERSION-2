@@ -44,12 +44,12 @@ const differentiators = [
   {
     icon: Layers,
     title: "Modern Stack",
-    description: "I use the same technologies as top product companies: Next.js, React, TypeScript, Vercel, AWS. Your engagement gets production-grade tooling.",
+    description: "I use the same technologies as top product companies: Next.js, React, TypeScript, Vercel, AWS. Your engagement gets production grade tooling.",
   },
   {
     icon: ShieldCheck,
     title: "Built for the Long Run",
-    description: "I don't disappear after launch. I offer ongoing maintenance retainers and architect every system for long-term maintainability.",
+    description: "I don't disappear after launch. I offer ongoing maintenance retainers and architect every system for long term maintainability.",
   },
   {
     icon: Zap,

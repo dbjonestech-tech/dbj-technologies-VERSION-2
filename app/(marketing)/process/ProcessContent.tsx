@@ -39,7 +39,7 @@ const phases = [
     step: "03",
     title: "Engineer & Test",
     description:
-      "I build with clean, typed, maintainable code on production-grade frameworks. I work in focused sprints with regular demos so you see progress in real time. Every feature is tested for performance, accessibility, and cross-browser compatibility.",
+      "I build with clean, typed, maintainable code on production grade frameworks. I work in focused sprints with regular demos so you see progress in real time. Every feature is tested for performance, accessibility, and cross browser compatibility.",
     activities: [
       "Architecture setup and development environment",
       "Focused sprint cycles with progress demos",

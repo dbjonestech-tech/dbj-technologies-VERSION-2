@@ -47,7 +47,7 @@ export const SITE = {
   name: "DBJ Technologies",
   tagline: "Architect The Impossible.",
   description:
-    "DBJ Technologies is a bespoke digital engineering studio in Dallas, TX. I build high-performance websites, production-grade web applications, and cloud infrastructure using Next.js, React, and TypeScript.",
+    "DBJ Technologies is a bespoke digital engineering studio in Dallas, TX. I build high performance websites, production grade web applications, and cloud infrastructure using Next.js, React, and TypeScript.",
   url: "https://dbjtechnologies.com",
   address: "Dallas, TX",
   email: "joshua@dbjtechnologies.com",
@@ -90,7 +90,30 @@ export const SUPPORT_LINKS = [
 ] as const;
 
 /* ─── TESTIMONIALS ──────────────────────────────────── */
-export const TESTIMONIALS: { quote: string; name: string; role: string }[] = [];
+export interface Testimonial {
+  quote: string;
+  name: string;
+  title: string;
+  business: string;
+  location: string;
+  url: string;
+  rating: number;
+  source: string;
+}
+
+export const TESTIMONIALS: Testimonial[] = [
+  {
+    quote:
+      "Created an amazing business website for us! Very impressed and would highly recommend to anyone!",
+    name: "Miguel Ibarra",
+    title: "Owner",
+    business: "Star Auto Service",
+    location: "Richardson, TX",
+    url: "https://thestarautoservice.com",
+    rating: 5,
+    source: "Google",
+  },
+];
 
 /* ─── CLIENT LOGOS ─────────────────────────────────── */
 export const CLIENT_LOGOS: string[] = [];

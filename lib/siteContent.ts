@@ -366,7 +366,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     title: "Frontend Architecture",
     category: "Core Discipline",
     description:
-      "Component-driven systems with Next.js, React, and TypeScript, engineered for sub-second renders and long-term maintainability.",
+      "Component driven systems with Next.js, React, and TypeScript, engineered for sub-second renders and long term maintainability.",
     tags: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
     gradient: "from-blue-600 to-cyan-500",
   },
@@ -374,7 +374,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     title: "Backend Infrastructure",
     category: "Core Discipline",
     description:
-      "API design, database architecture, and cloud-native services, typed end-to-end and built for zero-downtime deployments.",
+      "API design, database architecture, and cloud native services, typed end to end and built for zero downtime deployments.",
     tags: ["Node.js", "PostgreSQL", "AWS", "Docker"],
     gradient: "from-violet-600 to-pink-500",
   },
@@ -413,7 +413,7 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     name: "Professional",
     description:
-      "For growing companies that need a high-performance site with advanced features and integrations.",
+      "For growing companies that need a high performance site with advanced features and integrations.",
     price: 9500,
     timeline: "5–8 weeks",
     popular: true,

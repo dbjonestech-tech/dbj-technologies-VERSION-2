@@ -36,7 +36,7 @@ const BUILD_TIERS: BuildTier[] = [
     priceLabel: "$9,500",
     timeline: "5-8 weeks",
     summary:
-      "A high-performance site with CMS, analytics, and custom interactions.",
+      "A high performance site with CMS, analytics, and custom interactions.",
     popular: true,
   },
   {

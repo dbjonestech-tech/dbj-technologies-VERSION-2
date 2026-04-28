@@ -39,7 +39,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "pathlight",
     name: "Pathlight",
     description:
-      "Find the problems. Find the money drain. Find the fix. AI-powered analysis with industry-specific revenue modeling, not generic scores.",
+      "Find the problems. Find the money drain. Find the fix. AI powered analysis with industry specific revenue modeling, not generic scores.",
     category: "Internal Product",
     gradient: "from-violet-600 to-pink-500",
     liveUrl: "https://dbjtechnologies.com/pathlight",
@@ -58,7 +58,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "The only free tool that translates website problems into dollar signs, calibrated to your specific business type, with consistent results scan after scan.",
     image: "/images/pathlight-landing.webp",
     heroDescription:
-      "A full-stack AI platform built from the ground up to scan any business website and produce a complete intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list. All in minutes, for free. Proof that AI-powered analysis, when properly engineered, delivers genuine business insight instead of generic summaries.",
+      "A full stack AI platform built from the ground up to scan any business website and produce a complete intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list. All in minutes, for free. Proof that AI powered analysis, when properly engineered, delivers genuine business insight instead of generic summaries.",
     sections: [
       {
         heading: "The Problem",
@@ -144,7 +144,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       {
         name: "Next.js 16",
         reason:
-          "Server-side rendering for instant first paint and SEO-friendly HTML. App Router with static generation for zero-latency page loads.",
+          "Server side rendering for instant first paint and SEO friendly HTML. App Router with static generation for zero latency page loads.",
       },
       {
         name: "Tailwind CSS 4",
@@ -199,10 +199,10 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "Google Maps API",
     ],
     notable:
-      "Full LocalBusiness JSON-LD coverage with geo coordinates, NAICS codes, and areaServed for every market. Google Business Profile entity-aligned with the website. TDPSA-compliant privacy policy built for the actual data practices, not a template.",
+      "Full LocalBusiness JSON-LD coverage with geo coordinates, NAICS codes, and areaServed for every market. Google Business Profile entity aligned with the website. TDPSA compliant privacy policy built for the actual data practices, not a template.",
     image: "/images/case-studies/soil-depot-desktop.webp",
     heroDescription:
-      "Building local search dominance for a Texas commercial soil logistics broker. A complete local SEO infrastructure and digital presence buildout covering structured data architecture, Google Business Profile entity wiring, city-specific landing pages across five major Texas metros, TDPSA legal compliance, and a technical SEO foundation engineered to compound organic growth across both Google and Bing.",
+      "Building local search dominance for a Texas commercial soil logistics broker. A complete local SEO infrastructure and digital presence buildout covering structured data architecture, Google Business Profile entity wiring, city specific landing pages across five major Texas metros, TDPSA legal compliance, and a technical SEO foundation engineered to compound organic growth across both Google and Bing.",
     sections: [
       {
         heading: "The Client",
@@ -210,31 +210,31 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
       {
         heading: "The Challenge",
-        body: "Three core problems. First, Google could not connect the website to the Google Business Profile. There was no entity wiring: no matching NAP data, no structured markup, no Maps integration linking the two. This meant the website and the business profile were functioning as two separate entities in Google's eyes, splitting authority instead of building it. Second, city-level search terms were completely untapped. Contractors searching for 'fill dirt delivery Houston' or 'topsoil supplier Austin' had no Soil Depot page to find. The site was a single domain with no geographic targeting, competing against local suppliers who had dedicated pages for each service area. Third, the site had no privacy policy and no compliance with the Texas Data Privacy and Security Act (TDPSA). For a business that collects contact information through quote request forms, this was a legal gap that needed closing.",
+        body: "Three core problems. First, Google could not connect the website to the Google Business Profile. There was no entity wiring: no matching NAP data, no structured markup, no Maps integration linking the two. This meant the website and the business profile were functioning as two separate entities in Google's eyes, splitting authority instead of building it. Second, city level search terms were completely untapped. Contractors searching for 'fill dirt delivery Houston' or 'topsoil supplier Austin' had no Soil Depot page to find. The site was a single domain with no geographic targeting, competing against local suppliers who had dedicated pages for each service area. Third, the site had no privacy policy and no compliance with the Texas Data Privacy and Security Act (TDPSA). For a business that collects contact information through quote request forms, this was a legal gap that needed closing.",
       },
       {
         heading: "Structured Data Architecture",
-        body: "Implemented comprehensive LocalBusiness schema markup using JSON-LD, giving Google an unambiguous machine-readable definition of the business. The markup includes precise geo coordinates, NAICS industry classification codes, areaServed definitions covering all five Texas metros, and openingHoursSpecification. When Google crawls Soil Depot, it now knows exactly what the business is, where it operates, what industry it serves, and when it is open. This is the foundation that every other local SEO improvement builds on.",
+        body: "Implemented comprehensive LocalBusiness schema markup using JSON-LD, giving Google an unambiguous machine readable definition of the business. The markup includes precise geo coordinates, NAICS industry classification codes, areaServed definitions covering all five Texas metros, and openingHoursSpecification. When Google crawls Soil Depot, it now knows exactly what the business is, where it operates, what industry it serves, and when it is open. This is the foundation that every other local SEO improvement builds on.",
       },
       {
         heading: "Google Business Profile Entity Wiring",
         body: "Connected the Google Business Profile to the website with consistent NAP (name, address, phone) data across every touchpoint. Embedded a Google Maps widget that references the verified business entity, creating a closed loop: the GBP points to the website, the website references the GBP, and the structured data confirms the relationship. This entity alignment is what tells Google these are the same business, consolidating search authority instead of fragmenting it.",
       },
       {
-        heading: "City-Level Search Targeting",
-        body: "Built dedicated landing pages targeting commercial soil and fill dirt keywords in each of Soil Depot's five primary markets. Each page is optimized through Rank Math with city-specific meta titles, descriptions, and content targeting terms like 'fill dirt delivery [city]', 'topsoil supplier [city]', and 'bulk soil [city]'. Set up Bing Webmaster Tools in parallel to ensure the site is indexed and optimized for Microsoft's search engine, which handles a meaningful share of B2B searches.",
+        heading: "City Level Search Targeting",
+        body: "Built dedicated landing pages targeting commercial soil and fill dirt keywords in each of Soil Depot's five primary markets. Each page is optimized through Rank Math with city specific meta titles, descriptions, and content targeting terms like 'fill dirt delivery [city]', 'topsoil supplier [city]', and 'bulk soil [city]'. Set up Bing Webmaster Tools in parallel to ensure the site is indexed and optimized for Microsoft's search engine, which handles a meaningful share of B2B searches.",
       },
       {
         heading: "Legal Compliance",
-        body: "Deployed a TDPSA-compliant privacy policy configured for Soil Depot's specific data collection practices. This is not a generic template paste. The policy addresses the actual forms on the site, the types of data collected through quote requests and the soil calculator, cookie usage, and third-party service integrations. It meets the requirements of the Texas Data Privacy and Security Act that took effect in 2024.",
+        body: "Deployed a TDPSA compliant privacy policy configured for Soil Depot's specific data collection practices. This is not a generic template paste. The policy addresses the actual forms on the site, the types of data collected through quote requests and the soil calculator, cookie usage, and third party service integrations. It meets the requirements of the Texas Data Privacy and Security Act that took effect in 2024.",
       },
       {
         heading: "Technical SEO Foundation",
-        body: "Configured Rank Math across the entire site for on-page SEO optimization: XML sitemap generation, Open Graph and Twitter Card meta tags, canonical URL management, and breadcrumb structured data. Set up Google Search Console and Bing Webmaster Tools for ongoing performance monitoring. The site now has a complete technical SEO foundation that compounds over time as Google indexes new content and processes the structured data.",
+        body: "Configured Rank Math across the entire site for on page SEO optimization: XML sitemap generation, Open Graph and Twitter Card meta tags, canonical URL management, and breadcrumb structured data. Set up Google Search Console and Bing Webmaster Tools for ongoing performance monitoring. The site now has a complete technical SEO foundation that compounds over time as Google indexes new content and processes the structured data.",
       },
       {
         heading: "The Outcome",
-        body: "The site went from zero structured data to complete LocalBusiness schema coverage. Five city-specific landing pages now target previously untapped local search terms. Google Business Profile and website are entity-aligned with consistent NAP data. TDPSA compliance is in place. The technical SEO foundation supports long-term organic growth across both Google and Bing.",
+        body: "The site went from zero structured data to complete LocalBusiness schema coverage. Five city specific landing pages now target previously untapped local search terms. Google Business Profile and website are entity aligned with consistent NAP data. TDPSA compliance is in place. The technical SEO foundation supports long term organic growth across both Google and Bing.",
       },
     ],
     techDetails: [

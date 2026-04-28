@@ -84,13 +84,13 @@ export const PRICING_DETAILS: PricingDetail[] = [
     price: "$9,500",
     timeline: "5-8 weeks",
     heroDescription:
-      "For businesses that need more than a brochure site. I build a high-performance website with content management, custom interactions, advanced SEO, and analytics. This is what I recommend for businesses that are actively growing and need their website to work as hard as they do.",
+      "For businesses that need more than a brochure site. I build a high performance website with content management, custom interactions, advanced SEO, and analytics. This is what I recommend for businesses that are actively growing and need their website to work as hard as they do.",
     idealFor:
-      "Growing businesses, multi-location companies, and established brands that need a site with real functionality. Law firms, dental practices, contractors, auto shops, and service businesses with 5+ employees that are investing in growth.",
+      "Growing businesses, multi location companies, and established brands that need a site with real functionality. Law firms, dental practices, contractors, auto shops, and service businesses with 5+ employees that are investing in growth.",
     sections: [
       {
         heading: "What Is Included",
-        body: "Up to 15 custom-designed pages, CMS integration so you can update content without a developer, custom animations and interactions, advanced SEO with analytics dashboards, performance optimization targeting 95+ Lighthouse scores, and three rounds of design revisions. I also set up conversion tracking so you can measure what the site is actually doing for your business.",
+        body: "Up to 15 custom designed pages, CMS integration so you can update content without a developer, custom animations and interactions, advanced SEO with analytics dashboards, performance optimization targeting 95+ Lighthouse scores, and three rounds of design revisions. I also set up conversion tracking so you can measure what the site is actually doing for your business.",
       },
       {
         heading: "How It Works",
@@ -137,11 +137,11 @@ export const PRICING_DETAILS: PricingDetail[] = [
       },
       {
         heading: "How Discovery Works",
-        body: "I spend 1-2 weeks understanding your business requirements, technical constraints, integration needs, and growth plans. The output is a comprehensive specification document, architecture diagram, timeline, and fixed-price quote. If you proceed, the discovery fee is credited toward the project.",
+        body: "I spend 1-2 weeks understanding your business requirements, technical constraints, integration needs, and growth plans. The output is a comprehensive specification document, architecture diagram, timeline, and fixed price quote. If you proceed, the discovery fee is credited toward the project.",
       },
       {
         heading: "What You Get at the End",
-        body: "A production-grade system built to your exact specifications, fully documented, with source code ownership, deployment infrastructure, monitoring, and ongoing support. The system is built to run independently. You are never locked in.",
+        body: "A production grade system built to your exact specifications, fully documented, with source code ownership, deployment infrastructure, monitoring, and ongoing support. The system is built to run independently. You are never locked in.",
       },
     ],
     faq: [
@@ -187,7 +187,7 @@ export const PRICING_DETAILS: PricingDetail[] = [
       {
         heading: "What You Get at the End",
         body:
-          "A production-grade operations stack on your own infrastructure. Source code in your repository. Postgres schema with daily backups. Documented runbooks for every integration. 30 days of post-launch support included. Optional ongoing monthly retainer for new integrations, dashboards, and alerts.",
+          "A production grade operations stack on your own infrastructure. Source code in your repository. Postgres schema with daily backups. Documented runbooks for every integration. 30 days of post launch support included. Optional ongoing monthly retainer for new integrations, dashboards, and alerts.",
       },
     ],
     faq: [
@@ -242,17 +242,17 @@ export const PRICING_DETAILS: PricingDetail[] = [
       {
         question: "Can I cancel anytime?",
         answer:
-          "Yes. Month-to-month, no long-term contract. I keep clients by delivering value, not by locking them in.",
+          "Yes. Month to month, no long term contract. I keep clients by delivering value, not by locking them in.",
       },
       {
         question: "What if I need a bigger change?",
         answer:
-          "Anything beyond routine updates gets scoped as a mini-project with a fixed quote. The maintenance relationship means I already know your codebase, so those projects are faster and cheaper than starting cold.",
+          "Anything beyond routine updates gets scoped as a mini project with a fixed quote. The maintenance relationship means I already know your codebase, so those projects are faster and cheaper than starting cold.",
       },
       {
         question: "Do I need this if I just launched?",
         answer:
-          "The first 30 days of post-launch support are included with every project. After that, the maintenance plan is optional but recommended. Most clients sign up after the first time they need a change and realize they do not want to do it themselves.",
+          "The first 30 days of post launch support are included with every project. After that, the maintenance plan is optional but recommended. Most clients sign up after the first time they need a change and realize they do not want to do it themselves.",
       },
     ],
     ctaText: "Get Started",
@@ -264,9 +264,9 @@ export const PRICING_DETAILS: PricingDetail[] = [
     price: "$175/hour",
     timeline: "2-hour minimum",
     heroDescription:
-      "Sometimes you do not need a full project. You need an experienced architect to look at what you have, tell you what is wrong, and give you a plan. I offer hourly consulting for businesses that need expert guidance without a long-term commitment.",
+      "Sometimes you do not need a full project. You need an experienced architect to look at what you have, tell you what is wrong, and give you a plan. I offer hourly consulting for businesses that need expert guidance without a long term commitment.",
     idealFor:
-      "Businesses that already have a website or development team but need senior-level guidance. Second opinions on agency proposals, technical audits, architecture reviews, vendor evaluations, and strategic planning for digital initiatives.",
+      "Businesses that already have a website or development team but need senior level guidance. Second opinions on agency proposals, technical audits, architecture reviews, vendor evaluations, and strategic planning for digital initiatives.",
     sections: [
       {
         heading: "What I Cover",

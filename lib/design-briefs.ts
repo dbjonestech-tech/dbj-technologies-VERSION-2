@@ -138,11 +138,11 @@ const BRIEF_INDEX: Array<
     preview: "/design-briefs/hvac-contractor.webp",
     paletteAccent: "#F97316",
     description:
-      "How a homeowner finds a contractor when the AC dies on a 105-degree Dallas-Fort Worth August afternoon. A tap-to-call phone as the loudest element, a 24/7 live-answer promise that is actually live, a Comfort Club membership, regional service-area zones (not SEO city pills), multi-modal contact, and a TACLA license number in the footer. The dispatch desk that fills the board in the heat dome.",
+      "How a homeowner finds a contractor when the AC dies on a 105-degree Dallas-Fort Worth August afternoon. A tap to call phone as the loudest element, a 24/7 live answer promise that is actually live, a Comfort Club membership, regional service area zones (not SEO city pills), multimodal contact, and a TACLA license number in the footer. The dispatch desk that fills the board in the heat dome.",
     keySurfaces: [
-      "Tap-to-Call Hero",
+      "Tap to Call Hero",
       "Comfort Club Membership",
-      "Service-Area Zones",
+      "Service Area Zones",
     ],
   },
 ];

@@ -163,8 +163,8 @@ export default async function DesignBriefPage({
             Want this architecture, executed for your practice?
           </h3>
           <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-            I build the version of this that ships. Designed end-to-end,
-            launched on production-grade infrastructure, with the surfaces
+            I build the version of this that ships. Designed end to end,
+            launched on production grade infrastructure, with the surfaces
             above tuned to your actual book of business.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">

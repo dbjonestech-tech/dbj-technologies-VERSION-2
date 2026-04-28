@@ -6,7 +6,37 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 28, 2026 -- Operations Cockpit productized as $25K Specialty Engagement on About + Pricing
+## Most Recent Session: April 28, 2026 -- First real testimonial on homepage + hyphen sweep across user-facing copy
+
+### What shipped
+
+**Real client testimonial wired in:**
+- `lib/constants.ts`: replaced the empty `TESTIMONIALS` stub with a typed `Testimonial` interface (`quote, name, title, business, location, url, rating, source`) and seeded it with Miguel Ibarra's first Google review for Star Auto Service ("Created an amazing business website for us! Very impressed and would highly recommend to anyone!"). 5 stars, source "Google", url thestarautoservice.com.
+- `components/sections/Testimonials.tsx`: full rewrite. Inline 5-star SVG (no lucide for the rating, hand-rolled `Star` + `StarRow` helpers, `text-amber-400` filled / `opacity-20` unfilled, `sr-only` "5 out of 5 stars"). Single-quote layout (`SoloTestimonial`): centered `<motion.figure>` `max-w-3xl` with dark glass card (`border-white/10 bg-white/[0.02] backdrop-blur-sm rounded-2xl`), star row, `font-display text-2xl md:text-3xl` blockquote, attribution figcaption with `Name, Title · Business · Location` mid-dot separators, source row showing "GOOGLE REVIEW · View live site →" (link `target="_blank" rel="noopener noreferrer"`). Render branch: `length === 1` only renders `SoloTestimonial`; `length === 0` early-returns null (preserved); `length >= 2` renders nothing (intentional, future multi-card branch deferred). Section gained `print-hidden`. SectionHeading kept `label="Testimonials"` and `title="What Clients Say"`; the plural-leaning `description` was dropped so the section reads cleanly with one quote.
+- `app/(marketing)/page.tsx`: TestimonialsSection import + position untouched (static import preserved; no dynamic import existed despite the original prompt assuming one).
+
+**Work-page copy rewrite:**
+- `app/(marketing)/work/WorkContent.tsx`: replaced "A design brief for each of eight verticals I work in. Each one is a deep-dive on what the category actually needs online: how the customer chooses, what most sites get wrong, and the load-bearing surfaces that turn a search into a booking." with "Design briefs covering a selection of verticals I work in. Each one digs into what the category actually needs online: how the customer chooses, what most sites get wrong, and the surfaces that turn a search into a booking." Softens the "eight" rigidity, drops "deep-dive" and "load-bearing".
+
+**Hyphen sweep across user-facing copy** (per Joshua: "us English speakers and writers just don't use them that much"):
+- Dropped: production-grade, high-performance, long-term, custom-built, custom-designed, fixed-price, end-to-end, zero-downtime, zero-latency, cloud-native, component-driven, mobile-first contexts where natural, post-launch, mini-project, senior-level, multi-location, AI-powered, industry-specific, full-stack, Server-side, SEO-friendly, machine-readable, on-page, third-party (in soil-depot copy), entity-aligned, city-specific, city-level, TDPSA-compliant, Dallas-based, Dallas-area, Principal-level, cross-browser, Month-to-month, tap-to-call, live-answer, service-area; "multi-modal" -> "multimodal".
+- Kept (standard usage / grammar / clarity required): in-house, real-time, first-party, JSON-LD, e-commerce, sub-second, 105-degree, 24/7, Dallas-Fort Worth (proper noun), 30-day / 13-month (number+unit modifiers).
+- Files touched: `lib/constants.ts`, `lib/siteContent.ts`, `lib/work-data.ts`, `lib/pricing-data.ts`, `lib/design-briefs.ts`, `app/(marketing)/page.tsx`, `app/(marketing)/about/page.tsx`, `app/(marketing)/why-dbj/WhyDBJContent.tsx`, `app/(marketing)/services/page.tsx`, `app/(marketing)/services/ServicesContent.tsx`, `app/(marketing)/process/ProcessContent.tsx`, `app/(marketing)/pricing/build/BuildContent.tsx`, `app/(marketing)/work/WorkContent.tsx`, `app/(marketing)/work/design-briefs/[slug]/page.tsx`, `app/(grade)/layout.tsx`, `app/(grade)/pathlight/page.tsx`, `app/(grade)/pathlight/[scanId]/page.tsx`, `components/sections/Services.tsx`.
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean (exit 0).
+- Em-dash check on changed files: 0 introduced (one pre-existing comment-header em dash on `lib/constants.ts:4` left alone, outside the dbjcontext pack).
+- Not visually verified in-browser; user has known preference to validate from incognito after deploy.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), open the deployed homepage in incognito and confirm: (1) Testimonials section renders below ProcessSteps and above TechStack, (2) 5 gold stars centered above the blockquote, (3) "Miguel Ibarra, Owner · Star Auto Service · Richardson, TX" line and "GOOGLE REVIEW · View live site →" row both render with mid-dots, (4) "View live site" opens thestarautoservice.com in a new tab, (5) scroll-trigger entrance fires once, (6) layout is clean on mobile (figcaption row uses `flex-wrap`). Then spot-check `/work`, `/services`, `/pricing/professional`, and `/why-dbj` to confirm the dehyphenated copy still reads naturally on retina + mobile.
+
+---
+
+## Previous Session: April 28, 2026 -- Operations Cockpit productized as $25K Specialty Engagement on About + Pricing
 
 ### What shipped
 

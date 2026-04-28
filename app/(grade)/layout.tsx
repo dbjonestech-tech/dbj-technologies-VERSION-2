@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     default: "Pathlight | Website Intelligence by DBJ Technologies",
     template: "%s | Pathlight",
   },
-  description: "Free AI-powered website analysis for local businesses. Find the problems. Find the money drain. Find the fix. No credit card. Results in minutes.",
+  description: "Free AI powered website analysis for local businesses. Find the problems. Find the money drain. Find the fix. No credit card. Results in minutes.",
   robots: { index: true, follow: true },
 };
 

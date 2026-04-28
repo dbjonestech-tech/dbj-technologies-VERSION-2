@@ -188,10 +188,10 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
               transition={{ delay: 0.1 }}
               className="mt-5 text-text-secondary leading-relaxed"
             >
-              A design brief for each of eight verticals I work in. Each one is
-              a deep-dive on what the category actually needs online: how the
-              customer chooses, what most sites get wrong, and the load-bearing
-              surfaces that turn a search into a booking.
+              Design briefs covering a selection of verticals I work in. Each
+              one digs into what the category actually needs online: how the
+              customer chooses, what most sites get wrong, and the surfaces
+              that turn a search into a booking.
             </motion.p>
           </div>
 

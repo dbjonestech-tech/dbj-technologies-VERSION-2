@@ -12,7 +12,7 @@ import { CTASection } from "@/components/sections/CTA";
 export const metadata: Metadata = {
   title: "Web Development & Digital Systems Studio | Dallas, TX",
   description:
-    "DBJ Technologies builds high-performance websites, production-grade web applications, and cloud infrastructure for Dallas-area businesses. Principal-level engineering, fixed pricing, full code ownership.",
+    "DBJ Technologies builds high performance websites, production grade web applications, and cloud infrastructure for Dallas area businesses. Principal level engineering, fixed pricing, full code ownership.",
   alternates: { canonical: "https://dbjtechnologies.com" },
 };
 
