@@ -180,7 +180,7 @@ export function Footer() {
               Terms of Service
             </Link>
             <Link href="/signin" className="hover:text-gray-900 transition-colors">
-              Admin login
+              Admin Login
             </Link>
           </div>
         </div>
