@@ -129,6 +129,16 @@ export function Navbar() {
                 : "text-gray-500 hover:text-gray-900"
             }`}
           >
+            Sign in
+          </Link>
+          <Link
+            href="/signin"
+            className={`hidden items-center rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-300 xl:inline-flex ${
+              isAboutPage && !scrolled
+                ? "border-white/30 text-white hover:bg-white/10"
+                : "border-gray-300 text-gray-900 hover:border-gray-400 hover:bg-gray-50"
+            }`}
+          >
             Client Portal
           </Link>
           <Link
@@ -222,9 +232,16 @@ export function Navbar() {
                 <Link
                   href="/signin"
                   onClick={() => setIsOpen(false)}
-                  className="mt-3 block w-full rounded-lg px-4 py-3 text-center text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                  className="mt-3 block w-full rounded-full border border-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-900 transition-colors hover:border-gray-400 hover:bg-gray-50"
                 >
                   Client Portal
+                </Link>
+                <Link
+                  href="/signin"
+                  onClick={() => setIsOpen(false)}
+                  className="mt-2 block w-full rounded-lg px-4 py-3 text-center text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                >
+                  Sign in
                 </Link>
               </motion.div>
             </div>

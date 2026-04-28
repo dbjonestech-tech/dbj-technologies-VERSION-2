@@ -6,6 +6,34 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
+## Last Session: April 28, 2026 -- Navbar dual auth surfaces ("Sign in" + "Client Portal" both visible)
+
+### What shipped
+
+The navbar now exposes both "Sign in" and "Client Portal" instead of just one. They both link to `/signin`, but each label and visual treatment serves a distinct audience: "Sign in" is a subtle low-emphasis text link for returning clients who already know they need to authenticate, "Client Portal" is a small outlined pill for prospects who would skip past "Sign in" but click an inviting portal entry. The `/signin` page's two-track layout (shipped 3d4c2fe) handles both audiences once they arrive.
+
+### Files changed (1)
+
+- `components/layout/Navbar.tsx`
+  - Desktop right cluster (xl breakpoint): `Sign in` (plain gray text, About-page-aware white variant) -> `Client Portal` (rounded-full pill with border, padding, hover) -> `Run Free Scan` (existing btn-primary). The pill border/text colors swap on the dark About page hero so the pill stays legible at scroll-top transparent state and on the white scrolled panel.
+  - Mobile drawer auth section: `Run Free Scan` (primary) -> `Client Portal` (rounded-full outlined pill, mirroring desktop) -> `Sign in` (plain text tertiary). Tightened spacing from `mt-3` to `mt-2` for the second item so the three CTAs read as a single cluster.
+  - Both auth links route to `/signin`. No new pages, no new env vars.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` exit 0.
+- Em-dash grep on the changed file: zero.
+- HeroCinema, Pathlight, marketing/grade boundaries, cookie banner, GA, robots, /signin page, /contact prefill: untouched.
+
+### Why this design
+
+A single label cannot satisfy both "I am a returning client" (needs immediate sign-in cue) and "I am a prospect curious whether I can engage" (skips past Sign in because it reads as a closed door). Two labels with different visual weight let each audience self-select without bloating the navbar or fragmenting the destination. The /signin page already has a two-track layout, so this navbar change does not require any backend or page work.
+
+### Next recommended task
+
+Once the deploy lands, view in incognito: (1) confirm both "Sign in" text and "Client Portal" pill are visible in the desktop navbar at home scroll-top, after scroll, on About (dark hero), and on light pages, (2) confirm the pill border and text remain legible in all four states, (3) open the mobile drawer and confirm the three-CTA stack reads cleanly on a small viewport, (4) click each label and confirm both reach `/signin`.
+
 ## Last Session: April 27, 2026 -- "Client Portal" navbar rename + two-track /signin page
 
 ### What shipped
@@ -945,4 +973,4 @@ Additional Pathlight technical surface beyond the twelve pitfalls, captured for 
 
 ## Current Git Status
 
-`main` is at `3d4c2fe` (feat: rename navbar 'Sign in' to 'Client Portal' + two-track /signin page), confirmed pushed to `origin main`. Working tree clean. Recent chain (most recent first): `3d4c2fe` (Client Portal rename + two-track /signin) -> `483d42f` (snapshot for c97ba70) -> `c97ba70` (GA + consent banner + privacy disclosure) -> `3275b3d` (snapshot for 9775d0f) -> `9775d0f` (portal v1 + role split) -> `ef1e373` (snapshot for af176eb) -> `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (snapshot for fd84067) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.
+`main` is at the navbar dual-auth-surfaces commit, confirmed pushed to `origin main`. Working tree clean. Recent chain (most recent first): navbar dual auth surfaces -> `5fbf385` (snapshot for 3d4c2fe) -> `3d4c2fe` (Client Portal rename + two-track /signin) -> `483d42f` (snapshot for c97ba70) -> `c97ba70` (GA + consent banner + privacy disclosure) -> `3275b3d` (snapshot for 9775d0f) -> `9775d0f` (portal v1 + role split) -> `ef1e373` (snapshot for af176eb) -> `af176eb` (cross-template differentiation + Blueprints grid) -> `7723bd4` (snapshot for fd84067) -> `fd84067` (Stage 5 admin users + invitations) -> `30aeb6d` (snapshot for 551cd6f) -> `551cd6f` (templates image swap + hero polish) -> `f8808ef` (snapshot for 97051ca) -> `97051ca` (Stage 3 operational tools) -> `1ccc863` (snapshot for b1f59e4) -> `b1f59e4` (Stages 1+2 admin login portal) -> `8289370` (5 templates Pass 1 + blueprints) -> `b9b8dfe` (monitoring V1+V2) -> earlier chain elided in archive.
