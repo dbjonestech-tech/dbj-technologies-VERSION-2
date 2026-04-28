@@ -34,6 +34,12 @@ archive.
 
 After Vercel rebuild settles (1-3 min), open the deployed homepage in incognito and confirm: (1) Testimonials section renders below ProcessSteps and above TechStack, (2) 5 gold stars centered above the blockquote, (3) "Miguel Ibarra, Owner · Star Auto Service · Richardson, TX" line and "GOOGLE REVIEW · View live site →" row both render with mid-dots, (4) "View live site" opens thestarautoservice.com in a new tab, (5) scroll-trigger entrance fires once, (6) layout is clean on mobile (figcaption row uses `flex-wrap`). Then spot-check `/work`, `/services`, `/pricing/professional`, and `/why-dbj` to confirm the dehyphenated copy still reads naturally on retina + mobile.
 
+### Final state (post-commit)
+
+- Feature commit: `8ca63ea` -- feat(homepage): real Star Auto testimonial + hyphen sweep across copy. 20 files changed, 185 insertions, 88 deletions.
+- Pushed to `origin main` (`9bdc8b5..8ca63ea  main -> main`).
+- Working tree clean apart from this snapshot amendment.
+
 ---
 
 ## Previous Session: April 28, 2026 -- Operations Cockpit productized as $25K Specialty Engagement on About + Pricing
