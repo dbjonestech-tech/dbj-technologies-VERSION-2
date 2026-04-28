@@ -6,7 +6,52 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 28, 2026 -- Admin headquarters expansion + prod migration application
+## Most Recent Session: April 28, 2026 -- Operations Cockpit productized as $25K Specialty Engagement on About + Pricing
+
+### What shipped
+
+The internal admin dashboard built earlier today is now positioned publicly as a productized engagement called **Operations Cockpit**, "Starting at $25,000," 4-8 week delivery, sister to the three website-build tiers. Public surfaces:
+
+- **About page** (`app/(marketing)/about/AboutContent.tsx`): new "Built for Myself First" section between Operating Principles and the CTA. Eyebrow "The Stack Behind the Studio". Six glass-card capability tiles (first-party analytics, real-user performance, deliverability monitoring, infrastructure watchers, pipeline observability, cost telemetry) styled to match the existing Values grid. Dual CTAs: primary "See Pricing" -> `/pricing/operations`, secondary "Request a Private Walkthrough" -> `/contact?topic=operations-cockpit`.
+- **Pricing page** (`app/(marketing)/pricing/PricingContent.tsx`): new "Specialty Engagement" section between the 3-tier grid and the Add-Ons grid. Single full-width feature card with "$25,000 / Starting at / Delivered in 4 to 8 weeks" right-column block linking to the detail page.
+- **Detail page** (`/pricing/operations`): new entry in `PRICING_DETAILS` (`lib/pricing-data.ts`); rendered by the existing `[slug]/page.tsx` route with hero, idealFor, three sections (What Is Included / How It Works / What You Get at the End), four FAQs, and `ctaHref: "/contact?topic=operations-cockpit"`. Sitemap auto-includes via `getPricingSlugs()`.
+- **Contact form** (`app/(marketing)/contact/ContactContent.tsx`): topic-prefill pattern extended for `topic=operations-cockpit`. New `OPERATIONS_COCKPIT_DEFAULTS` (budget `$25,000+`, projectType `Other`, scoping-context message). New Gauge-icon topic card mirroring the portal-access pattern.
+
+No screenshots of the actual admin appear on any public surface; copy is outcome-led so no Pathlight internals leak through. First-person "I" throughout. No em dashes.
+
+### Pricing rationale
+
+Asset replacement cost: $30K-$80K. $25K floor positioned just above Enterprise ("Starting at $15,000"), under typical SMB board-approval thresholds. "Starting at" framing leaves explicit upward room (~$60K ceiling for fully integrated multi-property builds). FAQ acknowledges the price scaling so prospects do not feel ambushed. Naming "Operations Cockpit" chosen over "Operations Dashboard" because (1) "Dashboard" is commoditized SaaS vocabulary, (2) "Cockpit" maps to the buyer's self-image of piloting the business, (3) the language was already battle-tested in internal docs.
+
+### Commit
+
+`56ee1b2` -- feat(marketing): launch Operations Cockpit as $25K productized engagement. Pushed to `origin main`. Vercel auto-build in progress. Working tree clean.
+
+### Files changed (4 code, 7 docs incl. archive cleanup the linter performed during the session)
+
+- `lib/pricing-data.ts`
+- `app/(marketing)/about/AboutContent.tsx`
+- `app/(marketing)/pricing/PricingContent.tsx`
+- `app/(marketing)/contact/ContactContent.tsx`
+- `docs/ai/session-handoff.md` (this entry + archive condensation)
+- `docs/ai/current-state.md` (Operations Cockpit section added at top)
+- `docs/ai/decision-log.md` (productization decision entry)
+- `docs/ai/backlog.md`, `docs/ai/index.md`, `docs/ai/history/index.md`, `docs/ai/history/2026-04-28.md` (archive cleanup)
+
+### Verification
+
+- `npx tsc --noEmit` exit 0
+- `npm run lint` exit 0
+- Em-dash audit across all changed files: 0
+- `dbjonestech@gmail.com` in production code: 0 (only legitimate references in archived history docs)
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/pricing/operations` to confirm canonical URL, OG metadata, and breadcrumb JSON-LD render. Then a Lighthouse pass on `/about` to confirm the new section did not regress Performance/Accessibility. If the offering produces leads in the first 30 days, consider a one-line credibility callout on `/why-dbj` and a discreet capabilities mention in the homepage Services section.
+
+---
+
+## Previous Session: April 28, 2026 -- Admin headquarters expansion + prod migration application
 
 ### What shipped (condensed)
 
