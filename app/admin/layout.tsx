@@ -4,7 +4,25 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { signOutAction } from "@/lib/auth/actions";
-import { LogOut, LayoutDashboard, Activity, DollarSign, Database, Mail, Users, FileText, Briefcase } from "lucide-react";
+import {
+  LogOut,
+  LayoutDashboard,
+  Activity,
+  DollarSign,
+  Database,
+  Mail,
+  Users,
+  FileText,
+  Briefcase,
+  Globe,
+  Filter,
+  Search,
+  Server,
+  Workflow,
+  Wifi,
+  AlertTriangle,
+  Zap,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: { default: "Admin", template: "%s | DBJ Admin" },
@@ -22,6 +40,15 @@ const NAV_GROUPS: {
     ],
   },
   {
+    label: "Acquisition",
+    items: [
+      { label: "Visitors", href: "/admin/visitors", icon: Globe },
+      { label: "Funnel", href: "/admin/funnel", icon: Filter },
+      { label: "Search", href: "/admin/search", icon: Search },
+      { label: "RUM", href: "/admin/performance/rum", icon: Zap },
+    ],
+  },
+  {
     label: "Operations",
     items: [
       { label: "Monitor", href: "/admin/monitor", icon: Activity },
@@ -30,6 +57,16 @@ const NAV_GROUPS: {
       { label: "Leads", href: "/admin/leads", icon: Mail },
       { label: "Clients", href: "/admin/clients", icon: Briefcase },
       { label: "Database", href: "/admin/database", icon: Database },
+    ],
+  },
+  {
+    label: "Health",
+    items: [
+      { label: "Pipeline", href: "/admin/pipeline", icon: Workflow },
+      { label: "Platform", href: "/admin/platform", icon: Server },
+      { label: "Errors", href: "/admin/errors", icon: AlertTriangle },
+      { label: "Email", href: "/admin/email", icon: Mail },
+      { label: "Infrastructure", href: "/admin/infrastructure", icon: Wifi },
     ],
   },
   {

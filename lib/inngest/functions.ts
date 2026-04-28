@@ -19,6 +19,13 @@ import {
 import { generateVoiceSummary } from "../services/voice";
 import { getProviderSpendUsd } from "../services/api-usage";
 import { track } from "../services/monitoring";
+import { refreshFunnelViews } from "../services/funnel";
+import { runInfrastructureChecks } from "../services/infrastructure";
+import { snapshotInngestRuns } from "../services/inngest-health";
+import { snapshotVercelDeployments } from "../services/vercel-platform";
+import { snapshotAnthropicBudget } from "../services/anthropic-budget";
+import { importSearchConsoleDaily } from "../services/search-console";
+import { refreshEmailKpi } from "../services/email-kpi";
 import {
   MONITORED_PAGES,
   STRATEGIES,
@@ -1213,6 +1220,167 @@ export const monitoringPurgeDaily = inngest.createFunction(
         RETURNING id
       `) as { id: string }[];
       return { dropped: rows.length };
+    });
+    /* Visitor analytics retention. page_views/page_view_engagement are
+     * kept 90 days raw; sessions and visitors retain 13 months from
+     * last_seen. The funnel materialized views aggregate up to 180d
+     * of session data so cohort queries continue to work after the
+     * raw page_views drop. */
+    await step.run("purge-page-views", async () => {
+      const sql = getDb();
+      const rows = (await sql`
+        DELETE FROM page_views
+        WHERE created_at < now() - interval '90 days'
+        RETURNING id
+      `) as { id: string }[];
+      return { dropped: rows.length };
+    });
+    await step.run("purge-sessions", async () => {
+      const sql = getDb();
+      const rows = (await sql`
+        DELETE FROM sessions
+        WHERE COALESCE(last_seen_at, started_at) < now() - interval '395 days'
+        RETURNING id
+      `) as { id: string }[];
+      return { dropped: rows.length };
+    });
+    await step.run("purge-visitors", async () => {
+      const sql = getDb();
+      const rows = (await sql`
+        DELETE FROM visitors
+        WHERE last_seen_at < now() - interval '395 days'
+        RETURNING id
+      `) as { id: string }[];
+      return { dropped: rows.length };
+    });
+  }
+);
+
+/**
+ * Hourly funnel materialized view refresh. Cheap, covers the lag
+ * between dashboard reads and live session data without holding a
+ * long lock on the source tables.
+ */
+export const funnelRefreshHourly = inngest.createFunction(
+  {
+    id: "funnel-refresh-hourly",
+    triggers: [{ cron: "5 * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("refresh-views", async () => {
+      const result = await refreshFunnelViews();
+      return result;
+    });
+  }
+);
+
+/**
+ * Hourly Vercel deployment + function-metric snapshot. Pulls from the
+ * Vercel REST API. Webhook ingestion is the primary path for
+ * deployment state changes; this cron is the catch-up for anything
+ * missed and the source of function metric history.
+ */
+export const vercelTelemetryHourly = inngest.createFunction(
+  {
+    id: "vercel-telemetry-hourly",
+    triggers: [{ cron: "10 * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("snapshot-vercel", async () => {
+      return await snapshotVercelDeployments();
+    });
+  }
+);
+
+/**
+ * Inngest run-history snapshot. Inngest's webhook is the realtime
+ * path; this hourly cron back-fills any missed events and keeps
+ * the inngest_runs table aligned with reality even if the webhook
+ * endpoint was briefly down.
+ */
+export const inngestHealthHourly = inngest.createFunction(
+  {
+    id: "inngest-health-hourly",
+    triggers: [{ cron: "15 * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("snapshot-runs", async () => {
+      return await snapshotInngestRuns();
+    });
+  }
+);
+
+/**
+ * Daily infrastructure check at 08:00 UTC. WHOIS, TLS, and DNS
+ * authentication checks for every domain DBJ manages. Sentry-warns at
+ * <=14 days from any expiry so renewal happens before silent outage.
+ */
+export const infrastructureCheckDaily = inngest.createFunction(
+  {
+    id: "infrastructure-check-daily",
+    triggers: [{ cron: "0 8 * * *" }],
+    retries: 0,
+  },
+  async ({ step }) => {
+    return await step.run("run-checks", async () => {
+      return await runInfrastructureChecks();
+    });
+  }
+);
+
+/**
+ * Anthropic budget snapshot. Hourly Admin API pull; used by the cost
+ * dashboard banner to render headroom and by Sentry alerts when
+ * monthly spend or rate-limit headroom drops below threshold.
+ */
+export const anthropicBudgetHourly = inngest.createFunction(
+  {
+    id: "anthropic-budget-hourly",
+    triggers: [{ cron: "20 * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("snapshot-budget", async () => {
+      return await snapshotAnthropicBudget();
+    });
+  }
+);
+
+/**
+ * Daily Search Console import at 06:00 UTC. Pulls the trailing 7 days
+ * of impressions/clicks per page+query+country+device using the
+ * googleapis SDK. ON CONFLICT updates handle late-arriving GSC data
+ * (which routinely lags 2-3 days).
+ */
+export const searchConsoleDaily = inngest.createFunction(
+  {
+    id: "search-console-daily",
+    triggers: [{ cron: "0 6 * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("import-gsc", async () => {
+      return await importSearchConsoleDaily();
+    });
+  }
+);
+
+/**
+ * Hourly email KPI rollup refresh. Cheap aggregate over
+ * email_webhook_events; backs the deliverability dashboard.
+ */
+export const emailKpiRefreshHourly = inngest.createFunction(
+  {
+    id: "email-kpi-refresh-hourly",
+    triggers: [{ cron: "25 * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("refresh-kpi", async () => {
+      return await refreshEmailKpi();
     });
   }
 );

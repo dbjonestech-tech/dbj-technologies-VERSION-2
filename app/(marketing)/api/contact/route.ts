@@ -3,9 +3,13 @@ import { Resend } from "resend";
 import { z } from "zod";
 import { track } from "@/lib/services/monitoring";
 import { getDb } from "@/lib/db";
+import { attachContactToSession } from "@/lib/services/analytics";
+import { readSessionIdFromRequest } from "@/lib/services/visitor-id";
 
 /* Best-effort: a DB outage must not block lead capture once the
- * Resend send has already happened. Failures swallow to console.warn. */
+ * Resend send has already happened. Failures swallow to console.warn.
+ * Returns the inserted contact_submissions.id (or null on failure) so
+ * the caller can attribute it back to the analytics session. */
 async function persistContactSubmission(input: {
   name: string;
   email: string;
@@ -17,10 +21,10 @@ async function persistContactSubmission(input: {
   resendId: string | null;
   ip: string | null;
   userAgent: string | null;
-}): Promise<void> {
+}): Promise<string | null> {
   try {
     const sql = getDb();
-    await sql`
+    const rows = (await sql`
       INSERT INTO contact_submissions
         (name, email, phone, company, budget, project_type, message, resend_id, ip, user_agent)
       VALUES (
@@ -35,10 +39,13 @@ async function persistContactSubmission(input: {
         ${input.ip},
         ${input.userAgent}
       )
-    `;
+      RETURNING id::text AS id
+    `) as { id: string }[];
+    return rows[0]?.id ?? null;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.warn(`[contact] persist failed: ${message}`);
+    return null;
   }
 }
 
@@ -234,10 +241,16 @@ export async function POST(request: Request) {
       );
     }
 
-    await persistContactSubmission({
+    const contactSubmissionId = await persistContactSubmission({
       ...persistArgs,
       resendId: sendData?.id ?? null,
     });
+    /* Attribute this submission to the visitor's analytics session if
+     * one exists. Best-effort; runs only after the durable insert. */
+    const sessionId = readSessionIdFromRequest(request);
+    if (sessionId && contactSubmissionId) {
+      await attachContactToSession({ sessionId, contactSubmissionId });
+    }
     await track("contact.submitted", {
       projectType: safe.projectType,
       hasBudget: Boolean(safe.budget),

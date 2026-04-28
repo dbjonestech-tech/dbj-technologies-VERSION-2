@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { JsonLd } from "@/components/layout/JsonLd";
 import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
 import { CookieConsent } from "@/components/layout/CookieConsent";
+import { AnalyticsBeacon } from "@/components/analytics/AnalyticsBeacon";
 import "./globals.css";
 
 /* ─── FONTS ─────────────────────────────────────────── */
@@ -168,6 +169,7 @@ export default async function RootLayout({
         {children}
         <CookieConsent />
         <GoogleAnalytics />
+        <AnalyticsBeacon />
       </body>
     </html>
   );

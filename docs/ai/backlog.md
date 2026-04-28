@@ -28,6 +28,17 @@
 ## Priority 2.5: Monitoring + Observability (Net New as of April 27)
 
 - [x] In-house real-time monitoring dashboard at /internal/monitor -- DONE April 27. monitoring_events + lighthouse_history tables (migration 009 applied to prod), track() helper in lib/services/monitoring.ts, daily Lighthouse cron, 4-hourly synthetic canary cron, 30-day events purge cron, server-component dashboard with funnel/severity/Lighthouse/SSE-live-tail, per-scan drill-down at /internal/monitor/scan/[scanId], public /api/status JSON endpoint. Gated by INTERNAL_ADMIN_PIN. Optional env: MONITORING_LIGHTHOUSE_FLOOR (default 90), MONITORING_CANARY_URL (default thestarautoservice.com).
+- [x] Admin headquarters expansion -- DONE April 28. First-party visitor analytics (visitors / sessions / page_views / page_view_engagement, migration 014), funnel cohort views (015), Vercel telemetry (016), Inngest run history (017), infrastructure watcher (018), Anthropic budget snapshots (019), Search Console daily import (020), email KPI rollup (021). Twelve admin surfaces total: Visitors / Funnel / Search / RUM / Monitor / Costs / Scans / Leads / Database / Pipeline / Platform / Errors / Email / Infrastructure / Audit / Users / Clients. Three-column landing with green/yellow/red worst-of status bar. Migrations + new env vars are listed in session-handoff.md and need to be set in Vercel before the dashboards hydrate.
+
+### Open follow-ups for the dashboard expansion
+
+- [ ] Apply migrations 014-021 to production database. Currently only on disk.
+- [ ] Set the new Vercel env vars: ANALYTICS_IP_SALT_BASE (required), VERCEL_API_TOKEN + VERCEL_PROJECT_ID + VERCEL_WEBHOOK_SECRET, INNGEST_WEBHOOK_SECRET, ANTHROPIC_ADMIN_KEY + ANTHROPIC_MONTHLY_BUDGET_USD, GOOGLE_SC_CREDENTIALS_JSON + GOOGLE_SC_SITE_URL, SENTRY_AUTH_TOKEN + SENTRY_ORG_SLUG + SENTRY_PROJECT_SLUG. Each is documented in the relevant service file's header comment.
+- [ ] Register the Vercel deployment webhook in the Vercel dashboard at /api/webhooks/vercel.
+- [ ] Register the Inngest run-lifecycle webhook in the Inngest dashboard at /api/webhooks/inngest.
+- [ ] Wait one full day after deploy for the funnel + cohort + RUM views to accumulate enough data to be useful. The empty-state hints render in the meantime.
+- [ ] After the first 24-48 hours of real-user CWV data, evaluate whether mobile LCP p75 needs the perf optimization Joshua skipped earlier. RUM is the source of truth, not Lighthouse.
+- [ ] Consider extending MANAGED_DOMAINS in lib/services/infrastructure.ts when new client sites move to DBJ DNS.
 - [ ] V3 monitoring extensions: deep end-to-end Pathlight canary scan (full pipeline) once daily, Lighthouse trend sparklines per page on the dashboard, public /status HTML page (vs the JSON endpoint already shipped), lead-heat scoring layer on top of contact + scan + chat counts.
 
 ## Priority 3: Pathlight Hardening

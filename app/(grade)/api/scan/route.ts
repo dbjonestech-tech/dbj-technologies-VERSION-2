@@ -5,6 +5,8 @@ import { getDb } from "@/lib/db";
 import { inngest } from "@/lib/inngest/client";
 import { emailLimiter, ipLimiter } from "@/lib/rate-limit";
 import { track } from "@/lib/services/monitoring";
+import { attachScanToSession } from "@/lib/services/analytics";
+import { readSessionIdFromRequest } from "@/lib/services/visitor-id";
 
 const scanSchema = z.object({
   url: z.string().url(),
@@ -142,6 +144,13 @@ export async function POST(request: Request) {
       name: "pathlight/scan.requested",
       data: { scanId },
     });
+
+    /* Attribute this scan to the visitor's analytics session if one
+     * exists. Best-effort; missing or expired session is fine. */
+    const sessionId = readSessionIdFromRequest(request);
+    if (sessionId) {
+      await attachScanToSession({ sessionId, scanId });
+    }
 
     await track("scan.requested", { url, hasBusinessName: Boolean(businessName) }, { scanId });
 

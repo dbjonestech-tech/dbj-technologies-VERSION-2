@@ -6,6 +6,107 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this one before
 archive.
 
+## Last Session: April 28, 2026 -- Admin headquarters expansion: in-house analytics + funnel cohorts + RUM + platform telemetry + infra watcher + Sentry/GSC/budget integration
+
+### What shipped
+
+The admin dashboard now functions as the definitive headquarters Joshua asked for. The marketing site continues to ship Google Analytics through the consent banner; alongside it, a first-party measurement layer captures every page view, session, and Core Web Vital into Postgres. The Pathlight scan endpoint and the contact form now attribute conversions back to the originating session, so the funnel cohort views can answer "of N visitors from source X, how many ran a scan and how many submitted the contact form" in pure SQL. The admin landing was reorganized into a three-column Today / Acquisition / Health-and-operations layout with a green/yellow/red status bar that rolls up signals across deployments, pipeline failure rate, budget headroom, infrastructure expiry, error volume, and mobile RUM.
+
+The Admin Login link was also removed from the public Navbar (desktop and mobile). It already lived in the footer; `/signin` is already `noindex`. Public navbar is now Client Portal + Run Free Scan only, which is what Joshua wanted.
+
+Eight new migrations cover: visitor analytics + page_view_engagement, funnel materialized views, Vercel telemetry, Inngest run history, infrastructure checks, Anthropic budget snapshots, Search Console daily import, and email KPI rollup. None of the existing tables were modified.
+
+### Files changed (40 created, 8 modified)
+
+**Migrations (8 new):**
+- `lib/db/migrations/014_visitor_analytics.sql` -- visitors, sessions, page_views, page_view_engagement
+- `lib/db/migrations/015_funnel_cohorts.sql` -- funnel_daily_v + funnel_cohort_weekly_v materialized views
+- `lib/db/migrations/016_vercel_telemetry.sql` -- vercel_deployments + vercel_function_metrics
+- `lib/db/migrations/017_inngest_health.sql` -- inngest_runs (one row per function run)
+- `lib/db/migrations/018_infrastructure_watch.sql` -- infra_checks (TLS / WHOIS / MX / SPF / DKIM / DMARC)
+- `lib/db/migrations/019_anthropic_budget.sql` -- anthropic_budget_snapshots (hourly)
+- `lib/db/migrations/020_search_console.sql` -- search_console_daily
+- `lib/db/migrations/021_email_kpi.sql` -- email_kpi_daily_v materialized view
+
+**Services (14 new):**
+- `lib/services/visitor-id.ts`, `geo.ts`, `bot-filter.ts`, `analytics.ts` -- Module 1 plumbing
+- `lib/services/funnel.ts`, `rum.ts` -- Modules 2 + 3 read APIs
+- `lib/services/vercel-platform.ts`, `inngest-health.ts` -- Modules 5 + 7
+- `lib/services/infrastructure.ts`, `anthropic-budget.ts` -- Modules 9 + 10
+- `lib/services/search-console.ts`, `sentry-summary.ts`, `email-kpi.ts` -- Modules 4 + 6 + 8
+- `lib/services/health-status.ts` -- worst-of status bar computation
+
+**Client beacon (1 new):**
+- `components/analytics/AnalyticsBeacon.tsx` -- single mounted component handling page-view post, CWV via PerformanceObserver (no web-vitals dependency), scroll depth, dwell tracking, and engagement flush on visibilitychange / pagehide / beforeunload via navigator.sendBeacon.
+
+**API routes (4 new):**
+- `app/api/track/view/route.ts` + `app/api/track/engage/route.ts` -- ingestion
+- `app/api/webhooks/vercel/route.ts` -- HMAC-verified Vercel deployment webhook
+- `app/api/webhooks/inngest/route.ts` -- HMAC-verified Inngest run-lifecycle webhook
+
+**Admin pages (10 new):**
+- `app/admin/visitors/{page.tsx, VisitorsLive.tsx, api/presence/route.ts, api/stream/route.ts, sessions/[id]/page.tsx}`
+- `app/admin/funnel/page.tsx` -- Sankey-ish stages + by-source funnel + cohort retention grid
+- `app/admin/performance/rum/page.tsx` -- per-page p50 / p75 / p95 LCP / INP / CLS / TTFB / FCP, device tabs
+- `app/admin/platform/page.tsx` -- Vercel deploys + summary
+- `app/admin/pipeline/page.tsx` -- Inngest function health + recent runs
+- `app/admin/infrastructure/page.tsx` -- per-domain TLS / WHOIS / MX / SPF / DKIM / DMARC grid
+- `app/admin/search/page.tsx` -- top queries + top pages + opportunities (high impressions, position 5-15)
+- `app/admin/errors/page.tsx` -- top unresolved Sentry issues, 5-min Upstash cache
+- `app/admin/email/page.tsx` -- deliverability KPIs by type + 30-day daily trend
+
+**Modified:**
+- `components/layout/Navbar.tsx` -- Admin Login removed from desktop + mobile (footer-only now).
+- `app/layout.tsx` -- AnalyticsBeacon mounted alongside the existing CookieConsent + GoogleAnalytics.
+- `app/admin/layout.tsx` -- sidebar gains Acquisition (Visitors / Funnel / Search / RUM) and Health (Pipeline / Platform / Errors / Email / Infrastructure) groups.
+- `app/admin/page.tsx` -- new three-column landing with the status bar and per-card descriptions.
+- `app/(grade)/api/scan/route.ts` -- reads dbj_sid cookie, calls attachScanToSession after the scan row inserts.
+- `app/(marketing)/api/contact/route.ts` -- persistContactSubmission now returns the inserted id; the route attaches it to the originating session.
+- `lib/inngest/functions.ts` -- adds funnelRefreshHourly, vercelTelemetryHourly, inngestHealthHourly, infrastructureCheckDaily, anthropicBudgetHourly, searchConsoleDaily, emailKpiRefreshHourly. The existing monitoringPurgeDaily was extended to drop page_views >90d, sessions/visitors >395d.
+- `app/(marketing)/privacy/page.tsx` -- Cookies and Analytics sections rewritten to disclose the new in-house first-party measurement, the dbj_vid / dbj_sid cookies, daily-rotated IP hashing, and the 90-day raw / 13-month aggregate retention windows.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` exit 0.
+- IP storage: only sha256(ip || daily_salt) hash and request-derived geo land in page_views. Raw IP is never persisted.
+- Bot filtering: classifyBot in lib/services/bot-filter.ts layers UA pattern matching, length floor, and Accept-Language fallback. Default dashboard reads exclude bots; the live feed shows a bot pill so an unfiltered eye is still possible.
+- Tracking exclusions: client beacon and server route both exclude /admin, /portal, /signin, /api, /pathlight/[scanId]. Matches existing GoogleAnalytics.tsx exclusion logic.
+
+### New env vars (set in Vercel before deploy)
+
+| Var | Required by | Purpose |
+|---|---|---|
+| ANALYTICS_IP_SALT_BASE | always | base secret for daily IP-hash salt rotation |
+| VERCEL_API_TOKEN | platform module | Vercel REST API for hourly snapshot |
+| VERCEL_PROJECT_ID | platform module | which project to query |
+| VERCEL_TEAM_ID | platform module (optional) | omit for personal scope |
+| VERCEL_WEBHOOK_SECRET | webhook ingestion | HMAC verification |
+| INNGEST_WEBHOOK_SECRET | inngest webhook | HMAC verification (falls back to INNGEST_SIGNING_KEY) |
+| ANTHROPIC_ADMIN_KEY | budget module (optional) | Admin API for org-level spend; falls back to api_usage_events |
+| ANTHROPIC_MONTHLY_BUDGET_USD | budget module (optional) | configured cap shown in headroom calculations |
+| GOOGLE_SC_CREDENTIALS_JSON | search console | service-account JSON key, full file as a string |
+| GOOGLE_SC_SITE_URL | search console | e.g. sc-domain:dbjtechnologies.com |
+| SENTRY_AUTH_TOKEN | errors page | personal token with project:read scope |
+| SENTRY_ORG_SLUG | errors page | e.g. dbj-technologies |
+| SENTRY_PROJECT_SLUG | errors page | e.g. dbj-technologies |
+
+The dashboard pages render an empty-state hint if the upstream config is missing, so the deploy never breaks if any of these are not yet set.
+
+### Verification + deploy steps
+
+1. Set the new env vars listed above in Vercel.
+2. Run `npm run db:setup` (or whatever the project's migration runner is) to apply migrations 014-021.
+3. Deploy. The first hourly cron pass will hydrate the materialized views and snapshot tables.
+4. Visit `/admin` in incognito after sign-in: confirm three-column layout, status bar reads green, all cards link.
+5. Visit `/admin/visitors` and verify the live presence card updates as you navigate.
+6. Run a Pathlight scan, then check `/admin/funnel` and the originating session's drill-down (`/admin/visitors/sessions/<id>`) to confirm the conversion attribution wired through.
+7. Configure the Vercel deployment webhook (project settings -> Webhooks) and Inngest webhook (app settings -> Webhooks) to point at the new endpoints with the secrets above.
+
+### Next recommended task
+
+Ship migrations and the new envs to Vercel, deploy, and watch the dashboards hydrate. Once the first 24 hours of real-user CWV data is captured the RUM page becomes useful for prioritizing performance work; before that it shows an empty state.
+
 ## Last Session: April 28, 2026 -- Auth surfaces split: /signin admin-only, /portal-access public client entry, "Admin login" moved to footer
 
 ### What shipped

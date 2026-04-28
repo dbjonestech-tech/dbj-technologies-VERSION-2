@@ -122,16 +122,6 @@ export function Navbar() {
         {/* CTA + Mobile toggle */}
         <div className="flex items-center gap-4">
           <Link
-            href="/signin"
-            className={`hidden text-sm font-medium transition-colors duration-300 xl:inline-flex ${
-              isAboutPage && !scrolled
-                ? "text-white/70 hover:text-white"
-                : "text-gray-500 hover:text-gray-900"
-            }`}
-          >
-            Admin Login
-          </Link>
-          <Link
             href="/portal-access"
             className={`hidden items-center rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-300 xl:inline-flex ${
               isAboutPage && !scrolled
@@ -235,13 +225,6 @@ export function Navbar() {
                   className="mt-3 block w-full rounded-full border border-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-900 transition-colors hover:border-gray-400 hover:bg-gray-50"
                 >
                   Client Portal
-                </Link>
-                <Link
-                  href="/signin"
-                  onClick={() => setIsOpen(false)}
-                  className="mt-2 block w-full rounded-lg px-4 py-3 text-center text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
-                >
-                  Admin Login
                 </Link>
               </motion.div>
             </div>

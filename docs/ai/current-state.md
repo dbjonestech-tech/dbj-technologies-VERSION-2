@@ -25,21 +25,41 @@ Live as of April 27, 2026. Provisioned from `/admin/clients`; clients accept the
 
 **Excluded from v1 (deferred):** payments / Stripe / billing portal / invoices, in-app messaging, scope-add request form, status-change notifications, real-time anything, public client signup. See `docs/ai/portal-strategy.md` for the phased plan.
 
-## Admin portal (Stages 1 + 2 + 3 + 5 shipped)
+## Admin portal (operations cockpit, expanded April 28)
 
-Auth: Auth.js v5 + Google OAuth, JWT sessions, `ADMIN_EMAILS` allowlist, `admin_audit_log` table with new-device email notifications. Sign-in at `/signin` (server component, white theme), middleware gates every `/admin/*` route, layout-level auth check is defense in depth. Sign-out via server action. IP-keyed rate limiter on the auth route handler (10/min, fail-open).
+Auth: Auth.js v5 + Google OAuth, JWT sessions, `ADMIN_EMAILS` allowlist, `admin_audit_log` table with new-device email notifications. Sign-in at `/signin` (Studio admin, footer-only entry, noindex), middleware gates every `/admin/*` route, layout-level auth check is defense in depth. Sign-out via server action. IP-keyed rate limiter on the auth route handler (10/min, fail-open).
 
-Operations surface (all live at `/admin/*`):
-- Dashboard landing with quick-link cards.
+Landing: three-column layout (Today / Acquisition / Health & operations) with a green/yellow/red status bar that rolls up worst-of across deployments, pipeline failure rate, Anthropic budget headroom, infrastructure expiry, recent error volume, and mobile RUM LCP. Each non-green signal renders inline with its area label and message.
+
+Acquisition surface (live at `/admin/*`):
+- **Visitors**: 24h/7d/30d overviews (page views, sessions, unique visitors, bounce rate, pages/session, conversions), top pages, top sources, geo, devices, plus a live presence card (5-min window) and an SSE feed of incoming page views. Per-session drill-down at `/admin/visitors/sessions/[id]` shows full path, dwell, scroll depth, UTM/referrer attribution, and direct links to the converted scan or contact submission.
+- **Funnel**: stages bar (Sessions -> Pathlight scan started -> Scans completed -> Contact submissions) for 7d and 30d, by-source funnel table with scan rate and contact rate, and an 8-week cohort retention grid. Powered by `funnel_daily_v` and `funnel_cohort_weekly_v` materialized views (refreshed hourly).
+- **Search**: top queries, top pages, and an opportunities table (high impressions + position 5-15) for the trailing 28 days. Daily import via service-account JWT against `searchconsole.googleapis.com` (no `googleapis` SDK; minimal node:crypto JWT signer).
+- **RUM**: per-page p50 / p75 / p95 LCP, INP, CLS, TTFB, FCP from real visitor measurements, with device tabs (all / mobile / desktop / tablet). Cells colored against web.dev/vitals thresholds. Distinct from synthetic Lighthouse history on the Monitor page.
+
+Operations surface:
+- Dashboard landing with status bar.
 - Monitor: funnel counts (24h/7d/30d), severity, Lighthouse latest grid, SSE-driven live event tail, per-scan drill-down.
 - Costs: provider/operation totals, top scans by spend across 24h/7d/30d.
-- **Scans**: filterable scans table (status + date + revenue bucket + search), 50 per page, links to report and per-scan event timeline.
-- **Leads**: two-tab inbox. "Pathlight signups" reads `leads`; "Contact form" reads `contact_submissions` (new). Stat cards across the top.
-- **Database**: row counts + 24h/7d/30d insert volume + newest/oldest timestamps for all 10 tracked tables, grouped by domain (Pathlight / Email / Telemetry / Admin).
-- **Audit log**: filterable view of `admin_audit_log` (event, result, time window, email partial match) with badged success/denied/error and expandable JSON metadata.
-- **Users**: invite-by-email surface backed by `admin_users` and `admin_invitations` (migration 012). Bootstrap allowlist remains in `ADMIN_EMAILS` env. Invitations are 7-day single-use tokens delivered via Resend; the public accept page lives at `/invite/[token]` and finalizes via Google OAuth + the `events.signIn` consume-and-upsert CTE in `lib/auth/users.ts`. Disable / reactivate / revoke supported.
+- Scans: filterable scans table (status + date + revenue bucket + search), 50 per page, links to report and per-scan event timeline.
+- Leads: two-tab inbox. "Pathlight signups" reads `leads`; "Contact form" reads `contact_submissions`.
+- Database: row counts + 24h/7d/30d insert volume + newest/oldest timestamps for all tracked tables.
+- Audit log: filterable view of `admin_audit_log`.
+- Users: invite-by-email surface backed by `admin_users` + `admin_invitations`.
+- Clients: engagement clients, projects, files (drives `/portal`).
 
-Contact form persistence: `app/(marketing)/api/contact/route.ts` now writes to `contact_submissions` (migration 011) on every path -- dev / Resend success / Resend failure -- via a best-effort helper that swallows DB errors so the form never breaks. Resend remains the canonical delivery; this is the durable record.
+Health surface:
+- **Pipeline**: Inngest function health (invocations, failure rate, p50 / p95 / p99) and recent runs. Sourced from `/api/webhooks/inngest` HMAC-verified webhook with hourly catch-up cron.
+- **Platform**: Vercel deployment lifecycle with branch / commit / build duration. Sourced from `/api/webhooks/vercel` plus hourly REST snapshot.
+- **Errors**: top unresolved Sentry issues from the trailing 24 hours, cached 5 minutes via Upstash Redis.
+- **Email**: deliverability KPIs by type (sent / delivered / bounced / complained / delivery rate), 30-day daily trend. Bounce rate >1% colored amber, >2% red; complaint rate >0.05% amber, >0.1% red. Powered by `email_kpi_daily_v` MV.
+- **Infrastructure**: per-domain TLS / WHOIS / MX / SPF / DKIM / DMARC checks. Daily cron at 08:00 UTC; Sentry-warns at 14 days from cert expiry, 30 days from registration expiry, or any DNS auth fail. Currently watches dbjtechnologies.com (Resend DKIM) and thestarautoservice.com.
+
+First-party analytics layer: `AnalyticsBeacon` mounted in the root layout posts page-view + engagement (CWV via PerformanceObserver, scroll depth, dwell) to `/api/track/{view,engage}`. Cookies `dbj_vid` (13-month) and `dbj_sid` (30-min idle) stitch sessions. `attachScanToSession` and `attachContactToSession` are called from the scan and contact endpoints so funnel cohort math joins cleanly. Raw IP is never persisted; only sha256(ip || daily_salt) and the request-derived geo. Bot filtering layered (UA pattern + length + Accept-Language fallback). Tracking exclusions match the existing GA exclusions: /admin, /portal, /signin, /api, /pathlight/[scanId].
+
+Inngest crons added: funnelRefreshHourly, vercelTelemetryHourly, inngestHealthHourly, infrastructureCheckDaily (08:00 UTC), anthropicBudgetHourly, searchConsoleDaily (06:00 UTC), emailKpiRefreshHourly. The existing monitoringPurgeDaily was extended to drop page_views >90d and sessions/visitors >395d.
+
+Contact form persistence: `app/(marketing)/api/contact/route.ts` writes to `contact_submissions` (migration 011) on every path and now also returns the inserted id so the route can attach it to the originating session for funnel attribution.
 
 ## DBJ Technologies Site (dbjtechnologies.com)
 
