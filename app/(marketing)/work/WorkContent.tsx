@@ -65,14 +65,16 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="group glass-card-hover overflow-hidden flex flex-col"
               >
-                {/* Screenshot */}
-                <div className="relative h-52 overflow-hidden">
+                {/* Screenshot (3:2 aspect matches the native viewport
+                    screenshot ratio so the full hero is visible without
+                    bottom-cropping) */}
+                <div className="relative aspect-[3/2] overflow-hidden">
                   <Image
                     src={project.image}
                     alt={`${project.name} screenshot`}
                     fill
                     className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 600px"
                   />
                 </div>
 
@@ -202,14 +204,16 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
               >
                 {/* Preview (intentionally not a tap target on mobile;
                     only the explicit "Read the Design Brief" CTA below
-                    is the link, matching the project cards above) */}
-                <div className="relative h-52 overflow-hidden">
+                    is the link, matching the project cards above. 3:2
+                    aspect matches the native 3024x1964 screenshot ratio
+                    so the full template hero is visible at any width.) */}
+                <div className="relative aspect-[3/2] overflow-hidden">
                   <Image
                     src={brief.preview}
                     alt={`${brief.vertical} reference architecture preview`}
                     fill
                     className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 600px"
                   />
                 </div>
 
