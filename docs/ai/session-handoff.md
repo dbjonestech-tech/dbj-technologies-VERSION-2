@@ -37,7 +37,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/star-auto-service`
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `3cc63bd` -- feat(work): rewrite Star Auto case study as a comprehensive deep dive. 2 files changed, 96 insertions, 24 deletions.
+- Pushed to `origin main` (`8ebb0cb..3cc63bd main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
