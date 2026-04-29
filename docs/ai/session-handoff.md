@@ -6,7 +6,42 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Star Auto work-card hero refreshed to include "4.8 · 136 REVIEWS" pill in nav
+## Most Recent Session: April 29, 2026 -- Star Auto case study deep-dive comprehensively rewritten
+
+### What shipped
+
+The `/work/star-auto-service` case study on the DBJ marketing site was a 4-section, ~325-word generic write-up that didn't reflect the scope of what's actually been built on the Star Auto site over the last several weeks (six service-area pages, twelve service pages, five resource guides, sitewide reviews chip, desktop call modal fix, cinematic hero entrance, sitewide mobile optimization pass). Rewrote it end to end into a 12-section, ~1,800-word comprehensive deep dive that opens with the two real load-bearing problems (Google visibility gap; desktop tel: link silently failing for years) and walks through every layer of the rebuild that addressed them.
+
+### Files changed (1)
+
+- **`lib/work-data.ts`**: Full rewrite of the `star-auto-service` `ProjectDetail` entry. Refreshed `description`, `notable`, `heroDescription`, `timeline`. Replaced the 4-section `sections[]` array with 12 sections: The Client / The Visibility Problem / The Phone That Did Not Ring / The Foundation / The Service Area Network / The Service Pages / The Resources Hub / Bilingual, Warranty, and Trust Signal / The Phone, Fixed / Real Photography, Real Motion / Mobile, Down to 360px / The Result. `techDetails[]` refreshed from 6 entries to 7, replacing Google Analytics with TypeScript, broadening JSON-LD entry to "JSON-LD (LocalBusiness, Service, FAQPage)", adding Google Maps + GBP entity-wiring entry. `techStack` updated from `["Next.js 16", "Tailwind CSS 4", "Resend", "Google Analytics"]` to `["Next.js 16", "TypeScript", "Tailwind CSS", "Resend"]`. `slug`, `name`, `category`, `gradient`, `liveUrl`, `metrics`, `image`, `ctaText`, `ctaHref` all preserved.
+
+### Voice and rules adherence
+
+- Zero em dashes (audited; CLAUDE.md non-negotiable).
+- First-person "I" used sparingly and naturally ("I rebuilt the site from zero..."); no "we"/"our" referring to the studio.
+- Third-person "the team" / "the shop" used for Miguel's side; "Miguel" named at the top and where it adds warmth.
+- No DBJ commodity-agency framing; case study reads as principal-architect work, not deliverables list.
+- Substantial copy per the luxury-means-substantial rule (~1,800 words vs prior ~325).
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean (exit 0).
+- Em-dash audit on `lib/work-data.ts`: 0.
+- Brand-voice audit on `lib/work-data.ts`: no stray "we"/"our"/"us" outside word-boundary false positives (audited via word-boundary grep with the standard ignore list).
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/star-auto-service` and confirm: (1) all 12 sections render in order with proper headings, (2) the new `techStack` and `techDetails` show on the right rail, (3) the new `description` populates the card preview correctly on `/work`, (4) the metrics stay 100/100/100 (kept intact), (5) the page still scores well on Lighthouse despite the substantially longer copy. If the page feels too long visually, candidates to merge are "Real Photography, Real Motion" + "Mobile, Down to 360px" into a single "The Polish Layer" section, or to split "The Phone That Did Not Ring" + "The Phone, Fixed" if the narrative tension across them reads forced.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Star Auto work-card hero refreshed to include "4.8 · 136 REVIEWS" pill in nav
 
 ### What shipped
 

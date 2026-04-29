@@ -107,7 +107,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "star-auto-service",
     name: "Star Auto Service",
     description:
-      "Production website for a 25-year Richardson, TX auto repair shop. Perfect Lighthouse scores across the board, automated lead capture, and local SEO architecture. Built and deployed from zero in a single focused session.",
+      "A complete rebuild for a 28-year Richardson, TX auto repair shop. Six service-area pages, twelve service pages, five long-form guides, a fixed desktop call button after years of silently dropped leads, and a cinematic hero entrance. Next.js 16. Perfect Lighthouse 100s across every category, every page.",
     category: "Client Project",
     gradient: "from-blue-600 to-cyan-500",
     liveUrl: "https://thestarautoservice.com",
@@ -116,64 +116,101 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       { label: "Accessibility", value: "100" },
       { label: "SEO", value: "100" },
     ],
-    techStack: ["Next.js 16", "Tailwind CSS 4", "Resend", "Google Analytics"],
+    techStack: ["Next.js 16", "TypeScript", "Tailwind CSS", "Resend"],
     notable:
-      "Every inquiry hits the owner's inbox instantly. Every page loads in under a second. Every Lighthouse category scores 100.",
+      "Six metros indexed for the searches their drivers run every day. Twelve services indexed for the problems their customers Google before they call. A phone number that finally rings on every device. Every Lighthouse category scores 100.",
     image: "/images/case-studies/star-auto-desktop.webp",
     heroDescription:
-      "A complete digital presence for a family-owned, ASE-certified auto repair shop serving Richardson, TX since 1998. Engineered from zero to production with perfect Lighthouse scores, automated email delivery, and local SEO architecture that puts Miguel's shop in front of every nearby search.",
+      "A complete digital rebuild for a family-owned, ASE-Certified auto repair shop serving Richardson, TX since 1998. Twenty-eight years of word-of-mouth trust, finally matched by a site that ranks where it should, converts on every device, and reflects the quality of the work the shop actually delivers. Six service-area pages, twelve service pages, five long-form guides, a fixed desktop call button after years of silently dropped leads, real photography sitewide, and a cinematic hero entrance that reads as a brand statement, not a template. Perfect Lighthouse 100s across every category, every page.",
     sections: [
       {
         heading: "The Client",
-        body: "Miguel Ibarra runs The Star Auto Service, a family-owned, ASE-certified auto repair shop in Richardson, TX that's been serving the community since 1998. With a 4.8-star rating, bilingual service, and NAPA Auto Care certification, the shop had decades of trust built in person. What it didn't have was a web presence that matched.",
+        body: "Miguel Ibarra runs The Star Auto Service in Richardson, Texas. ASE-Certified technicians, NAPA Auto Care Center, bilingual service, twenty-eight years on the corner of Belt Line Road. A 4.8-star Google rating across one hundred and thirty-six reviews, built customer by customer. The shop's reputation in person was unimpeachable. The shop's reputation online did not exist.",
       },
       {
-        heading: "The Challenge",
-        body: "Every local auto repair search in Richardson returns shops with modern websites, online booking, and Google reviews front and center. Without a professional site, Star Auto was invisible to anyone who didn't already drive past the shop. The goal was clear: build a site that ranks for local searches, converts visitors to phone calls, and reflects the quality of the work Miguel's team actually delivers.",
+        heading: "The Visibility Problem",
+        body: "Every neighbor in Richardson, Garland, Plano, Allen, Murphy, and the surrounding metros searches for 'state inspection near me,' 'auto repair Richardson,' 'brake shop Plano,' and a hundred other variations every day. None of those searches were finding Miguel's shop. The previous website had no local SEO architecture: no service-area pages tied to the metros the team actually drives to, no service-specific landing pages tied to the problems customers actually have, no structured data telling Google what the business is or where it operates. The Google Business Profile sat in isolation, not connected to the website by any signal Google could read. Years of search traffic that should have landed on the shop's site landed on competitors instead.",
       },
       {
-        heading: "The Approach",
-        body: "Mobile-first, because over 60% of local service searches happen on phones. Sub-second load times, because every extra second of load time costs conversions. Local SEO from day one, not as an afterthought. The site was architected around a single conversion goal: get the visitor to call (972) 231-2886 or submit the contact form. Every design decision serves that goal.",
+        heading: "The Phone That Did Not Ring",
+        body: "Worse than a missing search rank: the previous site's phone link silently failed on desktop browsers. Every visitor on a laptop who saw the headline, scrolled past the trust signals, and clicked 'Call (972) 231-2886' hit either an unhandled tel-protocol dialog or nothing at all. Phone is the primary conversion channel for a local auto shop. Every desktop click that did not dial was a customer who had already done the work of finding the shop, decided they wanted to call, and was sent into a dead end by the website itself. There is no instrument left to measure how many years of leads were lost to that single broken link, but the math is grim.",
       },
       {
-        heading: "What I Delivered",
-        body: "A 4-page production website with hero imagery, service breakdowns, about page with trust signals, and a contact form wired to automated email delivery via Resend. JSON-LD structured data for local business schema. Google Analytics for traffic visibility. Security headers, custom 404 page, skip navigation for accessibility, and Cloudflare DNS for speed and protection. Every page responsive across all device sizes.",
+        heading: "The Foundation",
+        body: "I rebuilt the site from zero on Next.js 16 with strict TypeScript end to end, Tailwind CSS for layout, and Vercel for deployment. Mobile-first from the first pixel. Sub-second time-to-interactive on the hero across every common device. Perfect Lighthouse scores across Performance, Accessibility, Best Practices, and SEO. The technical foundation is what makes everything that follows possible: when Google's crawler hits the site, every signal it needs to read renders cleanly in HTML, in JSON-LD, in the right place in the page, every time.",
+      },
+      {
+        heading: "The Service Area Network",
+        body: "Six dedicated service-area pages, one for each metro the shop actually services: Richardson, Garland, Plano, Dallas, Allen, Murphy. Each page leads with a real photo of the area, names the specific neighborhoods customers come from (Canyon Creek, Heights, J.J. Pearce, Cottonwood Heights for Richardson; equivalents for the rest), publishes drive-time and distance from the shop, lists the top services for that area's drivers, and embeds a Google Map referencing the verified business entity. Every area page carries complete LocalBusiness JSON-LD with geo coordinates, NAICS code, areaServed, and openingHoursSpecification. This is the architecture that tells Google 'this shop services this metro' in machine-readable terms, on a page indexed for the keywords that metro searches every day.",
+      },
+      {
+        heading: "The Service Pages",
+        body: "Twelve dedicated service pages, one for every common service the shop performs: brake repair, oil change, transmission, electrical systems, state inspections, HVAC and AC repair, tire repair, cooling systems, fuel injection, battery service, engine repair, and timing belts. Each page leads with a real photo from the shop, follows with a symptom checklist in the language a customer actually uses to describe what is wrong, explains what the service involves, sets honest price expectations, and answers four to six questions with FAQPage schema. Every page is internal-linked from the services index and from the relevant area page. This is the architecture that tells Google 'this shop fixes that thing' in machine-readable terms, on a page that ranks for the problem a customer is actually searching.",
+      },
+      {
+        heading: "The Resources Hub",
+        body: "Five long-form guides answering the questions customers Google before they ever pick up the phone: what gets checked at a Texas state inspection and what to do if you fail, season-by-season car care for North Texas drivers, the five signs you need new brakes, how often modern engines actually need an oil change, and what the check engine light really means. Each guide is written from the shop's actual diagnostic experience, hundreds of cars a year, the patterns the team sees that the typical 'top ten things to know' article never will. This is the architecture that tells Google 'this shop has authority on the topic,' not just 'this shop performs the service.'",
+      },
+      {
+        heading: "Bilingual, Warranty, and Trust Signal",
+        body: "'Hablamos Español' surfaces in the sitewide utility bar so Spanish-speaking customers see it the moment the page loads, before they have to read English to find out the shop speaks their language. A dedicated warranty page explains the NAPA AutoCare 24-month / 24,000-mile coverage plainly, with the actual NAPA sign on the storefront photographed and front and center. A sitewide reviews chip in the header shows the 4.8-star rating across 136 Google reviews and links to a real reviews page surfacing actual customer reviews. Trust signal lives on every page, not just the homepage.",
+      },
+      {
+        heading: "The Phone, Fixed",
+        body: "The desktop call failure is solved with a custom call modal. When any desktop visitor clicks any phone number anywhere on the site, a polished overlay opens with the number large and legible, a one-click copy button, and a clean exit. Mobile visitors continue to dial directly. The drop is closed. Every call attempt now resolves into either a placed call or a copyable number on screen. Every contact form submission also routes to Miguel's inbox in seconds via Resend, so neither channel leaves a lead unanswered.",
+      },
+      {
+        heading: "Real Photography, Real Motion",
+        body: "Twenty-one bespoke photos taken at the shop and across the metros, replacing every generic stock image: the storefront on Belt Line in golden hour, the NAPA sign mounted on the building, the bays in operation, the neighborhoods the shop services. The previous site pulled stock from a free CDN, identical to a hundred competitor sites and tied to nothing local. Every image on the new site is owned and unique to this business; no photo on the site appears twice. The homepage hero opens cinematically in roughly one and a half seconds: the eyebrow slides in from the left, 'Expert auto repair,' lifts up with a blur-to-clear effect, 'done right.' races in from the right trailing a gold streak that sweeps under the line and dissolves (the brand color, the brand metaphor, a car arriving with a touch of exhaust), the subhead fades up, the two CTAs spring into place with a tiny overshoot, the trust strip resolves last. Every gold star sitewide carries a subtle pulse and a quick twinkle on hover so the brand mark reads as alive across every page. Every animation respects prefers-reduced-motion: any visitor with that system preference set sees the same content with no motion at all.",
+      },
+      {
+        heading: "Mobile, Down to 360px",
+        body: "Type scale tuned so even the narrowest phone viewports render two-line hero headlines instead of word-per-line stacks. Section padding rebalanced from desktop-first stretches down to mobile-appropriate spacing that does not waste a screenful between sections. CTAs sized for thumbs. Maps that switch aspect ratio between mobile and desktop so the embed is legible on either form factor. Every route audited and tuned from a 360px viewport upward.",
+      },
+      {
+        heading: "The Result",
+        body: "The site went from a digital placeholder that Google could not parse and desktop visitors could not call into a complete local presence. Six metros indexed for the searches their drivers run every day. Twelve services indexed for the problems their customers Google before they call. Five guides ranking on the questions before the call ever happens. Bilingual signal on every page. NAPA warranty plainly explained. Real reviews one click away from any nav. A phone number that finally rings on every device. Performance, Accessibility, Best Practices, and SEO all 100, every page, every render. The shop's twenty-eight years of in-person trust now have a digital surface that matches.",
       },
     ],
     techDetails: [
       {
         name: "Next.js 16",
         reason:
-          "Server side rendering for instant first paint and SEO friendly HTML. App Router with static generation for zero latency page loads.",
+          "App Router with static generation for instant page loads, server-rendered HTML for the SEO crawl, and Vercel deployment for global edge delivery. The substrate that lets every Lighthouse category score 100, every page, every render.",
       },
       {
-        name: "Tailwind CSS 4",
+        name: "TypeScript",
         reason:
-          "Utility-first styling for precise, responsive design without CSS bloat. Every breakpoint tested on real devices.",
+          "Strict mode end to end, from data files (areas, services, resources) to component props to API handlers. Type errors caught at build time mean Miguel never gets a 'that page is broken' email.",
+      },
+      {
+        name: "Tailwind CSS",
+        reason:
+          "Utility-first styling for precise, responsive design without CSS bloat. Every breakpoint tested on real devices, every spacing token tuned for mobile down to a 360px viewport.",
+      },
+      {
+        name: "JSON-LD (LocalBusiness, Service, FAQPage)",
+        reason:
+          "Structured data on every page tells Google what the business is, where it operates, what services it performs, and what questions it answers. Critical for local pack ranking and rich results in search.",
+      },
+      {
+        name: "Google Maps + Google Business Profile",
+        reason:
+          "Verified Maps embeds on every area page and on contact, all referencing the same business entity. NAP data (name, address, phone) consistent across the site, the GBP, and the schema. Entity alignment is what consolidates search authority instead of fragmenting it.",
       },
       {
         name: "Resend",
         reason:
-          "Transactional email API for the contact form. Every inquiry hits Miguel's inbox within seconds. No missed leads.",
-      },
-      {
-        name: "Google Analytics",
-        reason:
-          "Traffic and conversion visibility from day one. Miguel can see exactly where visitors come from and what they click.",
+          "Transactional email API for the contact form. Every inquiry hits Miguel's inbox within seconds. Combined with the desktop call modal, no lead leaves the site unanswered.",
       },
       {
         name: "Cloudflare DNS",
         reason:
-          "Enterprise-grade DNS with DDoS protection, CDN caching, and global edge delivery. Professional infrastructure for a local business.",
-      },
-      {
-        name: "JSON-LD",
-        reason:
-          "Structured data markup tells Google exactly what this business is, where it is, and what it does. Critical for local pack ranking.",
+          "Enterprise-grade DNS with DDoS protection, CDN caching, and global edge delivery. Professional infrastructure for a local business; the kind of resilience customers never have to know about.",
       },
     ],
     timeline:
-      "Built and deployed from zero to production in a single focused session.",
+      "Built across multiple focused engagements: zero-to-launch first, then iterative rebuilds adding the six service-area pages, the twelve service pages, the resources hub, the bilingual layer, the desktop call fix, the cinematic motion system, and a sitewide mobile optimization pass. Every iteration shipped to production with all Lighthouse 100s preserved.",
     ctaText: "Ready for Results Like These?",
     ctaHref: "/contact",
   },
