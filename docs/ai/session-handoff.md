@@ -6,7 +6,43 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Star Auto case study deep-dive comprehensively rewritten
+## Most Recent Session: April 29, 2026 -- Soil Depot case study deep-dive comprehensively rewritten
+
+### What shipped
+
+The `/work/soil-depot` case study read like a technical SEO audit (8 sections heavy on JSON-LD, NAICS codes, entity wiring, TDPSA mechanics). Joshua asked for a wholesome, broad rewrite that opens with the zero-visibility framing, walks through the build at the right altitude (without enumerating every micro-enhancement), and closes with the AI-search validation anecdote (a major commercial developer found Soil Depot through an AI search engine, not Google, and reached out for a real-money project). Rewrote it end to end into 10 sections at a comfortable narrative altitude.
+
+### Files changed (1)
+
+- **`lib/work-data.ts`**: Full rewrite of the `soil-depot` `ProjectDetail` entry. Refreshed `description`, `notable`, `heroDescription`, `timeline`. Replaced the 8-section `sections[]` array (Client / Challenge / Structured Data / GBP / City Targeting / Compliance / Tech SEO / Outcome) with 10 sections at broader altitude: The Client / Zero Visibility Before This Build / The Goal / The Foundation / City-Level Search Architecture / The Soil Calculator / The Regional Team, Surfaced / An Ongoing Engagement / AI Search Validated the Architecture / The Result. `techDetails[]` collapsed from 7 SEO-jargon entries (Rank Math, Schema.org, GBP, Google Maps API, Bing Webmaster Tools, Google Search Console as separate items) to 5 broader entries: WordPress / Custom Soil Calculator / Schema.org (JSON-LD) / Google Business Profile + Maps / Technical SEO Foundation. `techStack` simplified from 6 SEO-tool labels to 4 broader items: WordPress, Custom Soil Calculator, Schema.org (JSON-LD), Google Business Profile. `slug`, `name`, `category`, `gradient`, `liveUrl`, `metrics`, `image`, `ctaText`, `ctaHref` all preserved.
+
+### Voice and rules adherence
+
+- Zero em dashes (audited).
+- First-person "I" used sparingly ("I built", "Tyler now refers other Texas businesses to me organically..."); no "we"/"our".
+- Tyler named once where it adds warmth; "the team" / "the operation" elsewhere for client-side third-person.
+- "Zero visibility before DBJ Technologies" is explicit in section 2 per Joshua's instruction.
+- AI search anecdote phrased as "a major commercial developer" (no scale or industry name claim) for credibility without overclaiming.
+- Wholesome and broad per Joshua's explicit ask: not too specific on any one enhancement, healthy overview throughout.
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean (exit 0).
+- Em-dash audit on `lib/work-data.ts`: 0.
+- Brand-voice audit: no stray "we"/"our"/"us" outside word-boundary false positives (audited via word-boundary grep with the standard ignore list plus business/customer/use/etc).
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/soil-depot` and confirm: (1) all 10 sections render in order with proper headings, (2) the new `techStack` (4 items) and `techDetails` (5 items) display correctly on the right rail without breaking the visual rhythm of the page, (3) the new `description` populates the card preview correctly on `/work`, (4) the metrics stay 5/5/TDPSA (kept intact), (5) the AI Search Validated section reads as credible and not over-claiming. If Joshua wants to expand the AI-search section with more specifics about the developer or the project, that is a content edit available now that the foundation is in place.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Star Auto case study deep-dive comprehensively rewritten
 
 ### What shipped
 

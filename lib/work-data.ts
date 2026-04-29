@@ -218,7 +218,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "soil-depot",
     name: "Soil Depot",
     description:
-      "Local SEO infrastructure and full digital presence buildout for a Texas commercial soil logistics broker serving Dallas, Fort Worth, Houston, Austin, and San Antonio.",
+      "A complete digital presence for a Texas commercial soil brokerage serving five major metros. Zero organic visibility before this build. Now a working tool for the operation: city pages, a custom soil calculator, regional team profiles, and a foundation that surfaces in Google, Bing, and AI search alike.",
     category: "Client Project",
     gradient: "from-amber-600 to-yellow-500",
     liveUrl: "https://soil-depot.com",
@@ -229,90 +229,86 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     techStack: [
       "WordPress",
-      "Rank Math SEO",
+      "Custom Soil Calculator",
       "Schema.org (JSON-LD)",
       "Google Business Profile",
-      "Bing Webmaster Tools",
-      "Google Maps API",
     ],
     notable:
-      "Full LocalBusiness JSON-LD coverage with geo coordinates, NAICS codes, and areaServed for every market. Google Business Profile entity aligned with the website. TDPSA compliant privacy policy built for the actual data practices, not a template.",
+      "From zero local visibility to a foundation that earns organic traffic across Google, Bing, and AI search. Five Texas metros indexed. A custom soil calculator that turns curiosity into a number a contractor can act on. A regional team surfaced as named, photographed humans on every page where buyers actually look.",
     image: "/images/case-studies/soil-depot-desktop.webp",
     heroDescription:
-      "Building local search dominance for a Texas commercial soil logistics broker. A complete local SEO infrastructure and digital presence buildout covering structured data architecture, Google Business Profile entity wiring, city specific landing pages across five major Texas metros, TDPSA legal compliance, and a technical SEO foundation engineered to compound organic growth across both Google and Bing.",
+      "A complete digital presence for a Texas commercial soil brokerage serving Dallas, Fort Worth, Houston, Austin, and San Antonio. The team's reputation on the ground was already strong; the digital footprint generated nothing. Now: a foundation that earns organic visibility across Google, Bing, and AI search, a custom soil calculator that turns 'how much dirt do I need?' into cubic yards, tons, and trucks in a single screen, and a regional team surfaced as named, photographed people on every page where buyers actually look. An ongoing engagement, not a one-time deliverable.",
     sections: [
       {
         heading: "The Client",
-        body: "Soil Depot is a commercial soil brokerage and logistics company serving contractors, developers, and landscapers across five major Texas markets: Dallas, Fort Worth, Houston, Austin, and San Antonio. They supply fill dirt, topsoil, select fill, and sand, brokered from vetted sources and delivered on schedule to active job sites. The team needed their digital infrastructure to match their operational scale. The website existed but had no structured data, no local SEO strategy, no legal compliance with Texas data privacy requirements, and no connection between their Google Business Profile and their website. Google had no clear signal about what the business was, where it operated, or how it related to the search profile prospects were finding.",
+        body: "Soil Depot is a Texas commercial soil brokerage and logistics company that supplies fill dirt, topsoil, select fill, and sand to contractors, developers, and landscapers across five major metros: Dallas, Fort Worth, Houston, Austin, and San Antonio. The team brokers from vetted sources and delivers on schedule to active job sites, day in and day out. The operation is real, the relationships are real, the trucks are real. What was missing was a digital presence that matched the ground game.",
       },
       {
-        heading: "The Challenge",
-        body: "Three core problems. First, Google could not connect the website to the Google Business Profile. There was no entity wiring: no matching NAP data, no structured markup, no Maps integration linking the two. This meant the website and the business profile were functioning as two separate entities in Google's eyes, splitting authority instead of building it. Second, city level search terms were completely untapped. Contractors searching for 'fill dirt delivery Houston' or 'topsoil supplier Austin' had no Soil Depot page to find. The site was a single domain with no geographic targeting, competing against local suppliers who had dedicated pages for each service area. Third, the site had no privacy policy and no compliance with the Texas Data Privacy and Security Act (TDPSA). For a business that collects contact information through quote request forms, this was a legal gap that needed closing.",
+        heading: "Zero Visibility Before This Build",
+        body: "Before DBJ Technologies, Soil Depot had a website but it earned zero organic visibility. None of the searches a Texas commercial soil buyer runs every day, 'fill dirt Dallas,' 'topsoil Houston,' 'bulk soil Austin,' 'select fill San Antonio,' 'commercial dirt Fort Worth,' were finding them. The Google Business Profile sat in isolation, disconnected from the website by any signal Google could read. Years of customer searches for the exact services this team performs every day were converting into business for someone else. The phone was ringing only because of who the team already knew, not because of anyone discovering them online.",
       },
       {
-        heading: "Structured Data Architecture",
-        body: "Implemented comprehensive LocalBusiness schema markup using JSON-LD, giving Google an unambiguous machine readable definition of the business. The markup includes precise geo coordinates, NAICS industry classification codes, areaServed definitions covering all five Texas metros, and openingHoursSpecification. When Google crawls Soil Depot, it now knows exactly what the business is, where it operates, what industry it serves, and when it is open. This is the foundation that every other local SEO improvement builds on.",
+        heading: "The Goal",
+        body: "Build a digital presence that earns ongoing organic visibility across every metro the team services, holds up under the scrutiny of Texas commercial buyers, and becomes a working part of the operation rather than a brochure. Not a redesign for the sake of looking new. A foundation for the next decade.",
       },
       {
-        heading: "Google Business Profile Entity Wiring",
-        body: "Connected the Google Business Profile to the website with consistent NAP (name, address, phone) data across every touchpoint. Embedded a Google Maps widget that references the verified business entity, creating a closed loop: the GBP points to the website, the website references the GBP, and the structured data confirms the relationship. This entity alignment is what tells Google these are the same business, consolidating search authority instead of fragmenting it.",
+        heading: "The Foundation",
+        body: "The site stayed on WordPress because Tyler needed editorial control, and forcing a stack change for stack-change reasons would have been ego, not engineering. From there I built a complete technical SEO architecture: structured data on every page that tells Google exactly what the business is, where it operates, what services it performs, and which markets it serves. Google Business Profile wired into the site as a single business entity rather than two disconnected ones. A privacy and compliance layer that meets the Texas Data Privacy and Security Act head on. A technical foundation that compounds across both Google and Bing as the site is indexed and crawled month over month.",
       },
       {
-        heading: "City Level Search Targeting",
-        body: "Built dedicated landing pages targeting commercial soil and fill dirt keywords in each of Soil Depot's five primary markets. Each page is optimized through Rank Math with city specific meta titles, descriptions, and content targeting terms like 'fill dirt delivery [city]', 'topsoil supplier [city]', and 'bulk soil [city]'. Set up Bing Webmaster Tools in parallel to ensure the site is indexed and optimized for Microsoft's search engine, which handles a meaningful share of B2B searches.",
+        heading: "City-Level Search Architecture",
+        body: "Five dedicated landing pages, one for each major Texas metro the team services. Each page is anchored to its market, written in the language a buyer in that city actually uses, optimized through a proper SEO toolset for the keywords the team actually wants to win, and connected back to the broader business entity through consistent name, address, and phone data. This is the architecture that tells Google 'this team services this market' in machine-readable terms, on a page that ranks for the searches that market runs every day.",
       },
       {
-        heading: "Legal Compliance",
-        body: "Deployed a TDPSA compliant privacy policy configured for Soil Depot's specific data collection practices. This is not a generic template paste. The policy addresses the actual forms on the site, the types of data collected through quote requests and the soil calculator, cookie usage, and third party service integrations. It meets the requirements of the Texas Data Privacy and Security Act that took effect in 2024.",
+        heading: "The Soil Calculator",
+        body: "The most practical thing on the site is the soil calculator. Turn 'how much dirt do I need?' into a single screen with cubic yards, tons, and a count of trucks. A quick mode for a contractor pulling out their phone on a job site (rectangle or acreage, dimensions, material, depth, calculate). A full mode for complex multi-zone projects with mixed shapes, materials, and depths, plus a 'how much dirt do I have to move?' export mode for jobs that move dirt off-site instead of on, sticky sidebar totals, and a complete summary the buyer can copy and forward to a project manager in two taps. Built to feel like a tool, not a marketing experience. The contractor who lands here from a Google search gets a number they can act on immediately. That number is the start of the conversation.",
       },
       {
-        heading: "Technical SEO Foundation",
-        body: "Configured Rank Math across the entire site for on page SEO optimization: XML sitemap generation, Open Graph and Twitter Card meta tags, canonical URL management, and breadcrumb structured data. Set up Google Search Console and Bing Webmaster Tools for ongoing performance monitoring. The site now has a complete technical SEO foundation that compounds over time as Google indexes new content and processes the structured data.",
+        heading: "The Regional Team, Surfaced",
+        body: "Real photographs of the regional managers across every market the team services, integrated into the service area pages, the contact page, and the parts of the site where buyers want to know who is going to pick up the phone. James in North Texas, Gordon in the Houston area, Charlie across Central and South Central Texas. The cards are not decoration. They convert anonymous 'some Texas company' into named human beings with faces and direct phone numbers. Trust signal where it matters, on every relevant page, not just the about us section.",
       },
       {
-        heading: "The Outcome",
-        body: "The site went from zero structured data to complete LocalBusiness schema coverage. Five city specific landing pages now target previously untapped local search terms. Google Business Profile and website are entity aligned with consistent NAP data. TDPSA compliance is in place. The technical SEO foundation supports long term organic growth across both Google and Bing.",
+        heading: "An Ongoing Engagement",
+        body: "This is not a build-and-leave engagement. The site keeps evolving. New regional team members get added when the team grows. The calculator gets refined as patterns emerge from how contractors actually use it. The compliance layer gets updated when Texas privacy law changes again. The technical SEO foundation gets fed with new content and fresh signals because the work compounds only if it keeps moving. Tyler now refers other Texas businesses to me organically because the relationship has held up through real iteration.",
+      },
+      {
+        heading: "AI Search Validated the Architecture",
+        body: "The clearest signal that the work is paying off arrived in a way no one was planning for: a major commercial developer found Soil Depot through an AI search engine, not Google, and reached out for a real-money project. That kind of inbound is not an accident. AI search models read the same structured data, the same entity wiring, the same authority signals that Google has always read, and they surface businesses whose digital presence is clean enough to be parsed as authoritative. The technical foundation built here is exactly that kind of foundation, and the lead it produced is the kind of validation a brochure site never delivers.",
+      },
+      {
+        heading: "The Result",
+        body: "The site went from generating zero organic business to becoming a working part of operations. Five Texas metros indexed for the searches their drivers run every day. A calculator that turns curiosity into conversation. A regional team surfaced as real people on every page that matters. Compliance and trust signals locked in. A foundation that earns visibility on Google, Bing, and now AI search engines, all at the same time. The operation's reputation in person, finally matched online.",
       },
     ],
     techDetails: [
       {
         name: "WordPress",
         reason:
-          "Battle-tested CMS that gives the owners full editorial control over service descriptions, city pages, and quote request flows without needing a developer for every content change.",
+          "Tyler runs the site day to day. WordPress gives the team full editorial control over service descriptions, city pages, calculator copy, and regional team profiles, without needing a developer for every content change. The right tool for an operation that needs to keep moving.",
       },
       {
-        name: "Rank Math SEO",
+        name: "Custom Soil Calculator",
         reason:
-          "On-page SEO configured at scale: city-specific meta titles, descriptions, Open Graph tags, canonical URLs, XML sitemaps, and breadcrumb structured data wired into every page template.",
+          "Built from the ground up for the way Texas commercial soil buyers actually estimate jobs. Quick mode for contractors on a phone, Full mode for complex multi-zone projects, an export mode for jobs that move dirt off-site instead of on, and a complete summary buyers can copy and forward. The conversion engine of the site.",
       },
       {
         name: "Schema.org (JSON-LD)",
         reason:
-          "Full LocalBusiness markup with geo coordinates, NAICS industry codes, areaServed definitions for all five Texas metros, and openingHoursSpecification. The unambiguous machine-readable identity Google uses for local pack ranking.",
+          "Full LocalBusiness markup with geo coordinates, areaServed across all five Texas metros, and openingHoursSpecification. The unambiguous machine-readable identity Google, Bing, and AI search engines all read to decide whether a business is authoritative for a given query.",
       },
       {
-        name: "Google Business Profile",
+        name: "Google Business Profile + Maps",
         reason:
-          "Entity-aligned with the website through consistent NAP data, structured markup, and a verified Maps embed. Tells Google the business profile and the website are the same entity, consolidating search authority instead of splitting it.",
+          "Entity-aligned with the website through consistent name, address, and phone data, a verified Maps embed, and structured data that confirms the relationship. Tells Google the business profile and the website are the same entity, consolidating search authority across every market the team services instead of fragmenting it.",
       },
       {
-        name: "Google Maps API",
+        name: "Technical SEO Foundation",
         reason:
-          "Embedded map referencing the verified business entity, closing the loop between the Google Business Profile and the website. Visitors get instant location context, Google gets reinforced entity signals.",
-      },
-      {
-        name: "Bing Webmaster Tools",
-        reason:
-          "Indexing and optimization for Microsoft's search engine, which handles a meaningful share of B2B and contractor search traffic that Google-only setups miss entirely.",
-      },
-      {
-        name: "Google Search Console",
-        reason:
-          "Ongoing performance visibility into impressions, clicks, average position, and indexing status. The dashboard the owners check to watch their organic footprint grow.",
+          "Rank Math configured across the site for on-page optimization: city-specific titles, descriptions, Open Graph tags, canonical URLs, XML sitemaps, and breadcrumb structured data. Bing Webmaster Tools and Google Search Console connected for ongoing visibility into impressions, clicks, and indexing across both major search ecosystems.",
       },
     ],
     timeline:
-      "Delivered across a focused engagement covering structured data architecture, Google Business Profile entity wiring, five city-specific landing pages, TDPSA legal compliance, and a complete technical SEO foundation.",
+      "An ongoing engagement that began with the digital foundation (structured data, city pages, compliance layer, Google Business Profile entity wiring) and continues through iterative improvements: the custom soil calculator, the regional team surfacing, a sitewide phone audit when the team changed, manager banner refinements when buyers asked for more breathing room. The work compounds because it never stops.",
     ctaText: "Ready for Results Like These?",
     ctaHref: "/contact",
   },
