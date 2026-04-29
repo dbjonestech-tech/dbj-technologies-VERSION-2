@@ -47,7 +47,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/dent
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `bb4074f` -- feat(design-briefs): Dental Practice image-anchored rewrite (Ridgeview Dental). 13 files changed, 135 insertions, 17 deletions (markdown rewrite + hero replacement + 10 new section images + this snapshot).
+- Pushed to `origin main` (`ada76c6..bb4074f main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
