@@ -6,7 +6,37 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 28, 2026 -- "Operations Cockpit" rebranded to "Canopy"; surgical rename across DBJ marketing site + new Canopy starter repo
+## Most Recent Session: April 29, 2026 -- Star Auto work-card hero swapped to current "Expert auto repair, done right" screenshot
+
+### What shipped
+
+The Work page card for Star Auto Service was using an older desktop screenshot. Joshua provided the current hero shot (the gold-on-dark "Expert auto repair, done right." headline with the NAPA AutoCare badge in the upper right and the shop's actual storefront photo as the bg). Replaced the existing webp asset in place so no code or data changed.
+
+### Files changed (1)
+
+- **`public/images/case-studies/star-auto-desktop.webp`**: replaced. Source was a 3022x1896 PNG screenshot (3.46 MB). Resized to 1600px wide (1600x1004, preserving native aspect) and re-encoded as webp at q=82 via `cwebp`. Final size 81 KB (down from the prior 86 KB at 1600x882). Filename and path identical, so `lib/work-data.ts:122` (the `image` field on the `star-auto-service` `ProjectDetail`) needed no edit.
+
+### Why no aspect/code changes
+
+The Work-page card renders the image inside `aspect-[3/2]` with `object-cover object-top` (`app/(marketing)/work/WorkContent.tsx:71-78`). The new image's native aspect is ~1.594 (closer to 3:2 than the prior 1.814), so object-cover crops a slightly narrower band off the bottom than before -- the hero headline, NAPA badge, and "Book a Service" / "Call" buttons all stay visible. The bottom stats band (28 / 4.8 / ASE / NAPA banner) gets cropped at the card edge, which is consistent with how the prior screenshot behaved.
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean (exit 0).
+- `magick identify` on the new file: `WEBP 1600x1004 8-bit sRGB 81174B`.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work` and confirm: (1) the Star Auto card preview shows the gold "Expert auto repair, done right." headline, (2) the NAPA AutoCare badge is visible in the upper right of the card, (3) the image isn't visibly stretched or letterboxed, (4) the card hover scale animation still plays cleanly. If the bottom-of-screenshot stats band feels too cropped, regenerate the webp from the same source PNG with a taller crop (or output at 1600x1066 -- 3:2 exact -- via `cwebp -crop` before resize) and re-replace.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 28, 2026 -- "Operations Cockpit" rebranded to "Canopy"; surgical rename across DBJ marketing site + new Canopy starter repo
 
 ### What shipped
 
