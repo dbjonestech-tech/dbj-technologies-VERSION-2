@@ -46,7 +46,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/med-
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `6d488c2` -- feat(design-briefs): Med Spa image-anchored rewrite (Reverie Aesthetics). 14 files changed, 146 insertions, 17 deletions (markdown rewrite + slug fix in frontmatter + hero replacement + 11 new section images + this snapshot).
+- Pushed to `origin main` (`a01b492..6d488c2 main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
