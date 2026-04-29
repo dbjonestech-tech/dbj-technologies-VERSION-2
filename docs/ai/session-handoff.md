@@ -28,7 +28,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work` and confirm the S
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `f5fa36f` -- chore(work): refresh Star Auto card preview to capture new reviews pill.
+- Pushed to `origin main` (`e6f2e8e..f5fa36f main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
