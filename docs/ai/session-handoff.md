@@ -44,7 +44,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/real
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `29a9db5` -- feat(design-briefs): image-anchored sections + Luxury Residential rewrite. 13 files changed (4 modified + 8 new images + handoff entry).
+- Pushed to `origin main` (`1355d23..29a9db5 main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
