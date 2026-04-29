@@ -38,7 +38,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/soil-depot` and co
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `e31c14d` -- feat(work): rewrite Soil Depot case study as a wholesome, broad deep dive. 2 files changed, 73 insertions, 41 deletions.
+- Pushed to `origin main` (`093dd88..e31c14d main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
