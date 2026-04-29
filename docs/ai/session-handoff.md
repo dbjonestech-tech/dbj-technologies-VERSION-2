@@ -44,7 +44,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/hvac
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `6a46e56` -- feat(design-briefs): HVAC Contractor image-anchored rewrite (Ironclad Air). 12 files changed, 121 insertions, 18 deletions (markdown rewrite + hero replacement + 9 new section images + this snapshot).
+- Pushed to `origin main` (`3eaebcc..6a46e56 main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
