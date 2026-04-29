@@ -6,7 +6,54 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 28, 2026 -- Tyler Dirks (Soil Depot) added as second testimonial; band rebuilt as dual-quote layout
+## Most Recent Session: April 28, 2026 -- "Operations Cockpit" rebranded to "Canopy"; surgical rename across DBJ marketing site + new Canopy starter repo
+
+### What shipped
+
+Productized engagement renamed from "Operations Cockpit" to **Canopy**. Same product, same scope, same $25K starting price. Single proprietary product name, no brand qualifier needed. Naming exercise covered roughly 25 candidates across 6 brainstorm rounds; full disqualifier list and shape-of-the-right-answer rule captured in `docs/ai/decision-log.md`.
+
+### What changed in the DBJ marketing site
+
+- `lib/pricing-data.ts`: `slug: "operations" -> "canopy"`, `name: "Operations Cockpit" -> "Canopy"`, `ctaHref: "/contact?topic=operations-cockpit" -> "/contact?topic=canopy"`, hero/FAQ copy updated. URL becomes `/pricing/canopy`.
+- `app/(marketing)/about/AboutContent.tsx`: both CTA hrefs updated (primary -> `/pricing/canopy`, secondary -> `/contact?topic=canopy`).
+- `app/(marketing)/pricing/PricingContent.tsx`: SectionHeading title `"Operations Cockpit" -> "Canopy"`, card link href updated.
+- `app/(marketing)/contact/ContactContent.tsx`: `OPERATIONS_COCKPIT_DEFAULTS` renamed to `CANOPY_DEFAULTS`, topic detection accepts both `topic=canopy` (canonical) and `topic=operations-cockpit` (legacy, transition safety), topic card title `"Operations Cockpit scoping" -> "Canopy scoping"`, message text updated.
+- `next.config.mjs`: added 308 redirect from `/pricing/operations` to `/pricing/canopy`.
+
+### What changed in the Canopy starter repo (separate codebase)
+
+Repo `dbjonestech-tech/operations-cockpit` renamed to `dbjonestech-tech/canopy` via `gh repo rename`. Local remote URL updated. Internal renames:
+- Component `OpsBeacon.tsx` -> `CanopyBeacon.tsx` (file + export)
+- Cookies `ops_vid/ops_sid` -> `cnp_vid/cnp_sid`
+- Env vars `OPS_ALLOWED_ORIGINS` -> `CANOPY_ALLOWED_ORIGINS`, `NEXT_PUBLIC_OPS_BEACON_URL` -> `NEXT_PUBLIC_CANOPY_URL`
+- Admin sidebar + signin page heading -> "Canopy"
+- `package.json` name -> `canopy`
+- README, install runbook, engagement-owner runbook all rewritten
+
+Vercel env updated: `OPS_ALLOWED_ORIGINS` removed, `CANOPY_ALLOWED_ORIGINS` added with same value (`https://thestarautoservice.com,https://www.thestarautoservice.com`). Vercel project name kept as `starauto-ops` (internal label, not customer-facing). Local working directory `/Users/doulosjones/Desktop/operations-cockpit/` will be renamed to `/canopy/` post-session; pre-session disk-name drift is a known artifact.
+
+### Star Auto first install: status
+
+Round 2 in progress. Done: cockpit repo + GitHub + Vercel project + 5 env vars (NEXTAUTH_SECRET, ANALYTICS_IP_SALT_BASE, NEXTAUTH_URL, CANOPY_ALLOWED_ORIGINS, ADMIN_EMAILS). Star Auto owner (Miguel) consented to the case study and beacon integration; admin email is `thestarautoservice1@gmail.com` (personal Gmail). Blocked on:
+1. Joshua to set up Google OAuth client (Google Cloud Console, ~5 min) and paste back GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET
+2. Joshua to provision Neon Postgres (Vercel dashboard -> Storage -> Neon, auto-injects POSTGRES_URL)
+3. Joshua to add Cloudflare DNS record (CNAME `ops` -> `cname.vercel-dns.com`, grey cloud)
+
+After those three, next steps autonomous: run migrations, deploy, clone Star Auto repo via gh, integrate `<CanopyBeacon />` into Star Auto's root layout, smoke-test, then add Star Auto Canopy as the 4th Work case study on the DBJ site.
+
+### Verification
+
+- Cockpit repo: `npx tsc --noEmit` clean post-rename
+- DBJ marketing site: typecheck + lint TBD this commit (pending below)
+- Memory updated: `MEMORY.md` index + new `project_canopy_brand.md` entry capture the brand decision so future sessions do not relitigate
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 28, 2026 -- Tyler Dirks (Soil Depot) added as second testimonial; band rebuilt as dual-quote layout
 
 ### What shipped
 

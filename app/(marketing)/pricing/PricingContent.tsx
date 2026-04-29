@@ -159,11 +159,11 @@ export default function PricingContent() {
         </div>
       </section>
 
-      {/* Specialty Engagement: Operations Cockpit */}
+      {/* Specialty Engagement: Canopy */}
       <section className="py-20">
         <SectionHeading
           label="Specialty Engagement"
-          title="Operations Cockpit"
+          title="Canopy"
         />
         <div className="mx-auto max-w-5xl px-6 lg:px-8">
           <motion.div
@@ -199,7 +199,7 @@ export default function PricingContent() {
                   Delivered in 4 to 8 weeks
                 </div>
                 <Link
-                  href="/pricing/operations"
+                  href="/pricing/canopy"
                   className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent-blue px-6 py-3.5 text-sm font-semibold text-white shadow-glow-blue transition-all duration-300 hover:shadow-[0_0_50px_rgba(59,130,246,0.4)]"
                 >
                   See What&apos;s Included

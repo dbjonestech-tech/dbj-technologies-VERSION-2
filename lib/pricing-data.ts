@@ -165,12 +165,12 @@ export const PRICING_DETAILS: PricingDetail[] = [
     ctaHref: "/contact",
   },
   {
-    slug: "operations",
-    name: "Operations Cockpit",
+    slug: "canopy",
+    name: "Canopy",
     price: "Starting at $25,000",
     timeline: "4-8 weeks",
     heroDescription:
-      "Most businesses run on a stack of five to seven SaaS tools that do not talk to each other. Analytics in one place, performance in another, error tracking in a third, deliverability and infrastructure scattered across more. Operations Cockpit consolidates all of it into a single dashboard you own, on your domain, with one auth wall and one source of truth.",
+      "Most businesses run on a stack of five to seven SaaS tools that do not talk to each other. Analytics in one place, performance in another, error tracking in a third, deliverability and infrastructure scattered across more. Canopy consolidates all of it into a single dashboard you own, on your domain, with one auth wall and one source of truth.",
     idealFor:
       "Businesses paying fifteen thousand dollars or more per year on analytics, performance monitoring, error tracking, and deliverability subscriptions that still cannot answer 'how many of last week's visitors actually became customers.' Founders and operators who want their data joined to their business outcomes, not just plotted in someone else's dashboard.",
     sections: [
@@ -194,7 +194,7 @@ export const PRICING_DETAILS: PricingDetail[] = [
       {
         question: "Why not just use Datadog or PostHog?",
         answer:
-          "Those are excellent products. The reason to build in-house is when you need data joined to your specific business outcomes, like visitor-to-customer attribution across marketing, product, and sales, or when SaaS sprawl is costing you more annually than the build pays back in. If a single SaaS works for you, use it. Operations Cockpit is for the cases where it does not.",
+          "Those are excellent products. The reason to build in-house is when you need data joined to your specific business outcomes, like visitor-to-customer attribution across marketing, product, and sales, or when SaaS sprawl is costing you more annually than the build pays back in. If a single SaaS works for you, use it. Canopy is for the cases where it does not.",
       },
       {
         question: "Why is the price 'Starting at $25,000'?",
@@ -213,7 +213,7 @@ export const PRICING_DETAILS: PricingDetail[] = [
       },
     ],
     ctaText: "Request a Scoping Call",
-    ctaHref: "/contact?topic=operations-cockpit",
+    ctaHref: "/contact?topic=canopy",
   },
   {
     slug: "maintenance",

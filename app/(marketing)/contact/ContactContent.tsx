@@ -101,11 +101,11 @@ const PORTAL_ACCESS_DEFAULTS: Partial<FormData> = {
     "I'd like to request access to the DBJ client portal. A bit of context on what I'm working on:\n\n",
 };
 
-const OPERATIONS_COCKPIT_DEFAULTS: Partial<FormData> = {
+const CANOPY_DEFAULTS: Partial<FormData> = {
   budget: "$25,000+",
   projectType: "Other",
   message:
-    "I'd like to scope an Operations Cockpit engagement. A bit of context on what we're currently using and what I want to consolidate:\n\n",
+    "I'd like to scope a Canopy engagement. A bit of context on what we're currently using and what I want to consolidate:\n\n",
 };
 
 export default function ContactContent() {
@@ -118,14 +118,17 @@ export default function ContactContent() {
   }, [searchParams]);
 
   const isPortalAccessRequest = searchParams.get("topic") === "portal-access";
-  const isOperationsCockpitRequest = searchParams.get("topic") === "operations-cockpit";
+  const topicParam = searchParams.get("topic");
+  // Accept both the new "canopy" topic and the legacy "operations-cockpit"
+  // topic so any link published before the rename still routes correctly.
+  const isCanopyRequest = topicParam === "canopy" || topicParam === "operations-cockpit";
 
   const formDefaults = useMemo<Partial<FormData> | undefined>(() => {
     if (selection) return { message: selection.message };
     if (isPortalAccessRequest) return PORTAL_ACCESS_DEFAULTS;
-    if (isOperationsCockpitRequest) return OPERATIONS_COCKPIT_DEFAULTS;
+    if (isCanopyRequest) return CANOPY_DEFAULTS;
     return undefined;
-  }, [selection, isPortalAccessRequest, isOperationsCockpitRequest]);
+  }, [selection, isPortalAccessRequest, isCanopyRequest]);
 
   const {
     register,
@@ -290,7 +293,7 @@ export default function ContactContent() {
                 </motion.div>
               )}
 
-              {isOperationsCockpitRequest && !selection && (
+              {isCanopyRequest && !selection && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -308,7 +311,7 @@ export default function ContactContent() {
                         Topic
                       </p>
                       <p className="font-display text-base font-bold">
-                        Operations Cockpit scoping
+                        Canopy scoping
                       </p>
                       <p className="mt-2 text-sm text-text-secondary">
                         Tell me what you&apos;re currently using for analytics,

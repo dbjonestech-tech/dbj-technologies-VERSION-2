@@ -2,17 +2,22 @@
 
 Last updated: April 28, 2026 (post-archive cleanup)
 
-## Operations Cockpit (productized engagement, April 28)
+## Canopy (productized engagement, April 28; renamed from Operations Cockpit later same day)
 
-The internal admin dashboard is now positioned publicly as a productized engagement called **Operations Cockpit**, "Starting at $25,000," 4-8 week delivery. Pitched as a consolidation of 5-7 SaaS subscriptions into one stack the buyer owns: first-party analytics, real-user performance, deliverability monitoring, infrastructure watchers, error tracking, pipeline observability, cost telemetry. Same architecture I run for DBJ.
+The internal admin dashboard is now positioned publicly as a productized engagement called **Canopy**, "Starting at $25,000," 4-8 week delivery. Pitched as a consolidation of 5-7 SaaS subscriptions into one stack the buyer owns: first-party analytics, real-user performance, deliverability monitoring, infrastructure watchers, error tracking, pipeline observability, cost telemetry. Same architecture I run for DBJ.
 
 Surfaces (all on the marketing site, no admin internals exposed):
-- **About page**: new section "Built for Myself First" (eyebrow "The Stack Behind the Studio") between Operating Principles and the CTA. 6-tile glass-card capability grid; dual CTAs to `/pricing/operations` (primary) and `/contact?topic=operations-cockpit` (private walkthrough).
-- **Pricing page**: new "Specialty Engagement" section between the 3-tier grid and the Add-Ons grid. Single full-width feature card with $25,000 price block linking to detail page.
-- **Detail page** at `/pricing/operations`: rendered by existing `[slug]/page.tsx` from a new entry in `PRICING_DETAILS` (`lib/pricing-data.ts`). Hero, idealFor, three sections, four FAQs.
-- **Contact form**: `topic=operations-cockpit` query param prefills budget `$25,000+`, projectType `Other`, and a scoping-context message; renders a Gauge-icon topic card above the form.
+- **About page**: section "Built for Myself First" (eyebrow "The Stack Behind the Studio") between Operating Principles and the CTA. 6-tile glass-card capability grid; dual CTAs to `/pricing/canopy` (primary) and `/contact?topic=canopy` (private walkthrough).
+- **Pricing page**: "Specialty Engagement" section between the 3-tier grid and the Add-Ons grid. Single full-width feature card with $25,000 price block linking to the detail page.
+- **Detail page** at `/pricing/canopy`: rendered by existing `[slug]/page.tsx` from a `slug: "canopy"` entry in `PRICING_DETAILS` (`lib/pricing-data.ts`). Hero, idealFor, three sections, four FAQs.
+- **Contact form**: `topic=canopy` query param prefills budget `$25,000+`, projectType `Other`, and a scoping-context message; renders a Gauge-icon topic card above the form. Legacy `topic=operations-cockpit` still routes through the same prefill for transition safety.
+- **Redirect**: `/pricing/operations` 308-redirects to `/pricing/canopy` (configured in `next.config.mjs`).
 
-Sitemap auto-includes via `getPricingSlugs()`. No new env vars. No new migrations. Public copy is outcome-led; no Pathlight internals (model names, function IDs, vertical database) leak through.
+Sitemap auto-includes via `getPricingSlugs()`. No new env vars on the DBJ marketing site. No new migrations. Public copy is outcome-led; no Pathlight internals (model names, function IDs, vertical database) leak through.
+
+### Canopy starter repo (separate codebase)
+
+Productized template lives at `github.com/dbjonestech-tech/canopy` (private). Local working directory is `/Users/doulosjones/Desktop/operations-cockpit/`, slated to rename to `/canopy/` post-session (pre-session disk-name drift is a known artifact). Vercel project `starauto-ops` is the Star Auto deployment instance, linked to that repo, currently env-configured but not yet deployed (waiting on Google OAuth credentials, Neon Postgres, and Cloudflare DNS for `ops.thestarautoservice.com`).
 
 ## Client portal v1 (white-glove engagement portal at `/portal`)
 

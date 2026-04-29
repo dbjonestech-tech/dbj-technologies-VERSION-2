@@ -67,6 +67,15 @@ const nextConfig = {
         destination: "/work#design-briefs",
         permanent: true,
       },
+      /* /pricing/operations was the slug under which the Operations
+       * Cockpit engagement was originally published. Renamed to
+       * /pricing/canopy on 2026-04-28 when the offering was rebranded
+       * to Canopy. Same engagement, same scope, different name. */
+      {
+        source: "/pricing/operations",
+        destination: "/pricing/canopy",
+        permanent: true,
+      },
     ];
   },
 };

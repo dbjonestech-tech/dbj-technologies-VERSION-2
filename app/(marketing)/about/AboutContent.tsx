@@ -35,10 +35,10 @@ const valueIcons = [Zap, Eye, Target, Heart];
 
 const headlineChars = ABOUT_CONTENT.headline.split("");
 
-/* ─── OPERATIONS COCKPIT CAPABILITY TILES ──────────
+/* ─── CANOPY CAPABILITY TILES ──────────────────────
    The 6 tiles surfaced on the About page as proof-of-craft
-   for the Operations Cockpit engagement. Body copy is
-   outcome-led and avoids exposing Pathlight internals. */
+   for the Canopy engagement. Body copy is outcome-led and
+   avoids exposing Pathlight internals. */
 const OPS_CAPABILITIES = [
   {
     icon: Activity,
@@ -751,7 +751,7 @@ export default function AboutContent() {
         </div>
       </section>
 
-      {/* Gradient divider before Operations Cockpit showcase */}
+      {/* Gradient divider before Canopy showcase */}
       <motion.div
         initial={{ opacity: 0.3, scaleX: 0.6 }}
         whileInView={{ opacity: 1, scaleX: 1 }}
@@ -765,7 +765,7 @@ export default function AboutContent() {
         }}
       />
 
-      {/* Built for Myself First (Operations Cockpit showcase) */}
+      {/* Built for Myself First (Canopy showcase) */}
       <section
         className="relative overflow-hidden py-20"
         style={{ backgroundColor: "#06060a" }}
@@ -868,7 +868,7 @@ export default function AboutContent() {
             className="mt-8 flex flex-wrap items-center justify-center gap-4"
           >
             <Link
-              href="/pricing/operations"
+              href="/pricing/canopy"
               className="inline-flex transform items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:scale-[1.02] hover:gap-3 hover:shadow-[0_0_20px_-2px_rgba(59,130,246,0.4)] hover:brightness-110"
               style={{ backgroundColor: "#3b82f6" }}
             >
@@ -889,7 +889,7 @@ export default function AboutContent() {
               </svg>
             </Link>
             <Link
-              href="/contact?topic=operations-cockpit"
+              href="/contact?topic=canopy"
               className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:border-accent-blue/40 hover:bg-white/[0.04]"
             >
               Request a Private Walkthrough
