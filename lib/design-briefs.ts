@@ -9,6 +9,7 @@ export interface DesignBriefMeta {
   summary: string;
   vertical: string;
   preview: string;
+  previewAlt?: string;
   paletteAccent: string;
   description: string;
   keySurfaces: string[];
@@ -205,6 +206,7 @@ export function getDesignBriefBySlug(slug: string): DesignBriefData | null {
     template: fm.template || `${idx.slug}.html`,
     headline: fm.headline || "",
     summary: fm.summary || "",
+    previewAlt: fm.previewAlt || undefined,
     sections,
   };
 }

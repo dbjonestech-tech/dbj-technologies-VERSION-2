@@ -96,7 +96,10 @@ export default async function DesignBriefPage({
           >
             <Image
               src={brief.preview}
-              alt={`${brief.vertical} reference architecture preview`}
+              alt={
+                brief.previewAlt ||
+                `${brief.vertical} reference architecture preview`
+              }
               width={2400}
               height={1500}
               priority

@@ -6,7 +6,51 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Luxury Residential design brief rebuilt as image-anchored deep dive
+## Most Recent Session: April 29, 2026 -- Luxury Home Builder design brief rebuilt as image-anchored deep dive (Ashworth & Foster template) + previewAlt support added across all briefs
+
+### What shipped
+
+Second of the eight image-anchored design-brief rewrites. Joshua handed over 8 screenshots of the Ashworth & Foster custom-residential template (Custom Residential, Park Cities, Dallas) and asked me to apply the same image-anchored deep-dive pattern that landed yesterday for the Luxury Residential brief. The schema, parser, and section-image renderer were already in place from the previous session, so the bulk of this session was content + assets: replace the hero, save the seven section screenshots, rewrite the markdown into seven image-anchored sections, and tune the surrounding prose. After the rewrite landed, Joshua asked me to audit alt text across both shipped briefs (real-estate + luxury-home-builder), which surfaced one factual drift in the new principal alt and one structural gap: the page-top hero used a generic auto-alt for every brief. Closed both gaps in the same session.
+
+### Files changed (4 modified + 1 hero replacement + 7 new section images)
+
+- **`lib/design-briefs.ts`**: `DesignBriefMeta` interface gained an optional `previewAlt?: string` field. `getDesignBriefBySlug` now reads the new `previewAlt` frontmatter key and returns it on the parsed object. Backward-compatible: any brief that omits `previewAlt` falls through to the existing auto-generated alt phrasing in the renderer.
+- **`app/(marketing)/work/design-briefs/[slug]/page.tsx`**: page-top hero `<Image alt>` now uses `brief.previewAlt || `${brief.vertical} reference architecture preview``. The fallback string preserves the prior behavior for any brief that has not yet been rewritten with a custom previewAlt.
+- **`docs/design-briefs/luxury-home-builder.md`**: full content rewrite. Headline `"What Custom Home Builders Need Online"` -> `"The Architecture of a Park Cities Custom Builder"`. Summary refreshed to seven-surfaces framing. The previous 4-section analytical essay (How buyers use your website / What most builder sites get wrong / What your site actually needs) was replaced with 7 image-anchored sections: Begin With a Face, Not a Brand Mark / Neighborhoods, Not a Service Area / Documented Projects, Organized by Residence / Three Featured Galleries, Then the Catalogue / A Journal, Posted Slowly / Closeout, Warranty, and the Conversation / A Footer That Earns the License. Each section opens with one `![alt](path)` block followed by 2-3 paragraphs of editorial commentary on what the surface does and why. New `previewAlt` frontmatter line (749 chars) describes the Ashworth & Foster page-top hero in detail. Fixed a factual drift in the `02-principal` section alt: my first draft said "two-year apprenticeship" but the actual letter on the screenshot says "twelve years working under two of the most exacting builders in Texas"; corrected.
+- **`docs/design-briefs/real-estate.md`**: added a `previewAlt` frontmatter line (950 chars) describing the Lauren Prescott page-top hero in detail (wordmark, full nav, golden-hour photograph of the stone-and-glass traditional, the headline overlay, the brand-orange CTA, the floating Now Showing listing card at 4807 Lakeside Drive, and the bottom stat row reading $340M / 200+ / Park Cities resident since 2008). Section image alts on this brief were already substantial from yesterday's commit; spot-audited and left unchanged.
+- **`public/design-briefs/luxury-home-builder.webp`**: replaced with the new Ashworth & Foster hero (Highland Park residence + pool + black stat band reading "Founded 2009 - 47 Homes Completed - AIA Dallas Member"). 1800px wide, q=82, 93 KB (down from prior placeholder).
+- **`public/design-briefs/luxury-home-builder/`** (new directory, 7 files): `02-principal.webp` (William Ashworth founder portrait in walnut kitchen), `03-communities.webp` (Where We Build neighborhoods grid, Park Cities + Preston Hollow visible), `04-galleries.webp` (Documented Projects table with year/project/location/sf/architect columns), `05-featured.webp` (three featured project cards: Lakeside / Strait Lane / Beverly Drive), `06-journal.webp` (three article cards: hardware / 40-year visit / disagreement), `07-considering.webp` (process step 05 Closeout + "If You Are Considering a Project" CTA), `08-footer.webp` (compliance footer: AIA + NARI + Texas Residential Construction License #45821 + studio address + phone + email + DBJ credit). All 1600px wide, q=82, 33-77 KB each.
+
+### Voice and rules adherence
+
+- Zero em dashes across all changed files (audited; `grep -c $'\xe2\x80\x94'` returned 0).
+- First-person "I" used for the architect voice in the framing prose (`I built this surface...`, `I treat this as...`); studio-voice "we" appears only inside paraphrased Ashworth & Foster brand copy ("we accept four to six commissions a year", "we have spent twenty years learning"), which is acceptable per the real-estate-brief precedent (their brand voice can use "we", DBJ's framing voice cannot).
+- Substantial copy per the luxury-means-substantial rule: 7 sections, ~2-3 paragraphs each, ~1,800-2,000 total words.
+- Image alt text is descriptive enough for screen readers, mirroring the real-estate brief alt-text length.
+
+### Pattern continuity (next briefs queued)
+
+Schema and renderer untouched in this session. The next brief (dental-practice, med-spa, upscale-restaurant, financial-advisor, pi-law, hvac-contractor) follows the exact same flow: Joshua hands over screenshots, I save them under `public/design-briefs/<slug>/` with `02-` through `0X-` numeric prefixes, replace the hero `public/design-briefs/<slug>.webp` if a fresh one is provided, and rewrite the matching `docs/design-briefs/<slug>.md` with `![alt](path)` lines under each `## Heading`. No code changes required.
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- Section count check on rewritten brief: `grep -c "^## " docs/design-briefs/luxury-home-builder.md` = 7. Image-block count: `grep -c "^!\[" docs/design-briefs/luxury-home-builder.md` = 7. One image per section, parser picks them all up.
+- Parser smoke test (node import of `getDesignBriefBySlug`): real-estate `previewAlt` length 950 chars, luxury-home-builder `previewAlt` length 749 chars; both deserialize cleanly under the existing simple frontmatter regex (no double quotes inside the alt bodies).
+- Em-dash audit on all 4 changed files: 0.
+- Image dimensions verified: 8 source PNGs all 3024x1964; outputs are 1800w (hero) and 1600w (sections) at q=82.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/luxury-home-builder` and confirm: (1) the new Ashworth & Foster hero renders cleanly at the page top with the pool and stat band visible, (2) each of the 7 body sections shows its anchor screenshot in the framed accent-tinted container between the heading and the prose, (3) the visual rhythm reads (heading > image > 2-3 paragraphs > next section) without feeling top-heavy, (4) the page card preview on `/work` picks up the new hero. Once approved, hand me the screenshots for the next brief (likely dental-practice, med-spa, or upscale-restaurant) and I will repeat the pattern. Six briefs remain.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Luxury Residential design brief rebuilt as image-anchored deep dive
 
 ### What shipped
 

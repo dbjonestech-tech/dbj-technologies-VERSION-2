@@ -4,6 +4,7 @@ slug: "luxury-residential-agent"
 template: "real-estate.html"
 headline: "The Architecture of a Luxury Residential Practice"
 summary: "How a Park Cities agent's site earns the private call from a four-million-dollar buyer who has already seen everything else. Eight surfaces, each tuned for the way the buyer actually decides."
+previewAlt: "The home page of Lauren Prescott's luxury residential practice in Park Cities, Dallas. A thin black navigation strip carries the wordmark in serif caps and a single row of links reading Listings, Sold, Neighborhoods, About, Process, Concierge, Press, and Contact, with a small Briggs Freeman Sotheby's brokerage credit on the right. The hero photograph beneath is a stone-and-glass traditional residence at golden hour, mature trees framing the lawn and warm light spilling from the windows. Overlaid in serif at left is the headline 'Your Home Should Be as Considered as the Life You've Built,' followed by a short first-person paragraph and a brand-orange button reading 'Begin a Conversation.' A floating dark card on the right anchors the Now Showing listing at 4807 Lakeside Drive, Highland Park, $4,250,000, 5 bed, 5.2 bath, 8,400 square feet. A bottom stat row reads $340M career volume, 200-plus transactions, Park Cities resident since 2008."
 ---
 
 ## A Practice, Not a Brokerage Template
