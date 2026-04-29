@@ -135,6 +135,24 @@ export default async function DesignBriefPage({
               <h2 className="font-display text-[clamp(1.6rem,2.8vw,2.2rem)] font-bold leading-tight tracking-tight mb-6">
                 {section.heading}
               </h2>
+              {section.image ? (
+                <div
+                  className="relative overflow-hidden rounded-xl border mb-8"
+                  style={{
+                    borderColor: `${accent}33`,
+                    boxShadow: `0 24px 60px -28px ${accent}33, 0 8px 24px -12px rgba(0,0,0,0.12)`,
+                  }}
+                >
+                  <Image
+                    src={section.image.src}
+                    alt={section.image.alt}
+                    width={1600}
+                    height={1000}
+                    className="w-full h-auto"
+                    sizes="(max-width: 1024px) 100vw, 768px"
+                  />
+                </div>
+              ) : null}
               <div className="space-y-5">
                 {section.paragraphs.map((para, j) => (
                   <p

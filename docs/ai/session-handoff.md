@@ -6,7 +6,49 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Soil Depot case study deep-dive comprehensively rewritten
+## Most Recent Session: April 29, 2026 -- Luxury Residential design brief rebuilt as image-anchored deep dive
+
+### What shipped
+
+The `/work/design-briefs/real-estate` brief (the Lauren Prescott Luxury Residential template) was a 3-section analytical essay (How buyers use an agent's website / What most agent sites get wrong / What your agent site actually needs). Joshua wants the eight design-brief deep dives restructured so screenshots anchor each section's prose. This session shipped the schema/parser/renderer change that makes inline section images possible across all eight briefs, plus the full rewrite of the Luxury Residential brief as the first proof-of-concept (8 image-anchored sections, one screenshot per section).
+
+### Files changed (4 + 8 new images)
+
+- **`lib/design-briefs.ts`**: `DesignBriefSection` interface gained an optional `image?: { src: string; alt: string }` field. `parseBody` updated to recognize markdown image syntax (`![alt](src)`) inside section bodies and extract them onto the `image` field. Backward-compatible: any section that omits an image renders exactly as before.
+- **`app/(marketing)/work/design-briefs/[slug]/page.tsx`**: section renderer now renders the image (when present) in a framed container between the heading and the paragraphs, with the same accent-tinted border and shadow treatment as the page-top hero preview.
+- **`docs/design-briefs/real-estate.md`**: full content rewrite. 8 sections (A Practice Not a Brokerage Template / Currently Representing / A Public Ledger of Recent Closings / Trust Built on Specifics / Recognition Dated / The Private List / A Quiet Conversation / A Footer That Does the Compliance Work Quietly), each anchored by a markdown image referencing the matching screenshot. Headline updated from "What Luxury Residential Agents Need Online" to "The Architecture of a Luxury Residential Practice". Summary refreshed.
+- **`public/design-briefs/real-estate.webp`**: replaced with the new clean hero screenshot (1800px wide, q=84, 185 KB, down from 588 KB).
+- **`public/design-briefs/real-estate/`** (new directory, 8 files): `02-meet.webp` through `09-footer.webp`, all 1600px wide, q=82, 27-100 KB each. One inline image per body section.
+
+### Voice and rules adherence
+
+- Zero em dashes across all changed files (audited).
+- First-person "I" used sparingly in the architect voice ("I built this surface to read like a working ledger...", "I treat this as the most valuable form...", "I did not put a form here..."); no studio-voice "we"/"our".
+- Two "we"/"our" hits in the brand-voice scan are both inside quoted material (the agent's "shared in our first conversation" pull-quote and a client testimonial from the Sutton family). Acceptable.
+- Substantial copy per section per the luxury-means-substantial rule.
+
+### Pattern established for the remaining 7 briefs
+
+The schema and renderer are now generic. To do the next brief (e.g. dental-practice, med-spa, upscale-restaurant, financial-advisor, pi-law, luxury-home-builder, hvac-contractor), Joshua provides the screenshots, I save them under `public/design-briefs/<slug>/` with numeric prefixes, and I rewrite the matching `docs/design-briefs/<slug>.md` with `![alt](path)` lines under each `## Heading`. The slug page renders without further code changes.
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean (exit 0).
+- Em-dash audit on all 3 changed code/content files: 0.
+- Brand-voice audit: only quoted material contains we/our (correct).
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/real-estate` and confirm: (1) the new hero preview renders cleanly at the page top, (2) each of the 8 body sections shows its anchor screenshot in a framed container between the heading and the prose, (3) the visual rhythm reads (heading > image > 3 paragraphs > next section) without the page feeling top-heavy or image-drowned, (4) the image alt text is descriptive enough for screen readers, (5) the page card preview on `/work` still picks up the right metadata. Once approved, hand me the screenshots for the next brief and I will repeat the pattern.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Soil Depot case study deep-dive comprehensively rewritten
 
 ### What shipped
 

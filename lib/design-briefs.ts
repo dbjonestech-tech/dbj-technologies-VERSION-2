@@ -17,6 +17,7 @@ export interface DesignBriefMeta {
 export interface DesignBriefSection {
   heading: string;
   paragraphs: string[];
+  image?: { src: string; alt: string };
 }
 
 export interface DesignBriefData extends DesignBriefMeta {
@@ -156,6 +157,8 @@ function parseFrontmatter(raw: string): Record<string, string> {
   return out;
 }
 
+const IMAGE_BLOCK = /^!\[([^\]]*)\]\(([^)]+)\)$/;
+
 function parseBody(body: string): DesignBriefSection[] {
   const normalized = body.startsWith("## ") ? body : "\n" + body;
   const chunks = normalized.split(/\n## /).filter((c) => c.trim().length > 0);
@@ -163,11 +166,21 @@ function parseBody(body: string): DesignBriefSection[] {
     const lines = chunk.split("\n");
     const heading = lines[0].replace(/^## /, "").trim();
     const rest = lines.slice(1).join("\n").trim();
-    const paragraphs = rest
+    const blocks = rest
       .split(/\n\s*\n/)
       .map((p) => p.trim())
       .filter((p) => p.length > 0);
-    return { heading, paragraphs };
+    let image: DesignBriefSection["image"];
+    const paragraphs: string[] = [];
+    for (const block of blocks) {
+      const m = block.match(IMAGE_BLOCK);
+      if (m && !image) {
+        image = { alt: m[1].trim(), src: m[2].trim() };
+      } else {
+        paragraphs.push(block);
+      }
+    }
+    return { heading, paragraphs, image };
   });
 }
 
