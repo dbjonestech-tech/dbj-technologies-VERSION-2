@@ -6,7 +6,51 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Dental Practice design brief rebuilt as image-anchored deep dive (Ridgeview Dental template)
+## Most Recent Session: April 29, 2026 -- Med Spa design brief rebuilt as image-anchored deep dive (Reverie Aesthetics template)
+
+### What shipped
+
+Fourth of the eight image-anchored design-brief rewrites. Joshua handed over 16 screenshots of the Reverie Aesthetics template (physician-led medical aesthetics practice, Highland Park, Dallas) and asked me to apply editorial judgment about which to include based on professionalism, redundancy, and unfinished elements, and to ensure every kept image carries proper alt text. Curated the 16 down to a hero plus 11 section images. Skipped 4 on substantive grounds (one labcoat-name-tag mismatch that contradicts the brief's named-physician argument, two redundant continuation screenshots of treatments + per-area menu surfaces, and one Curology-branded product photo presented as the "Reverie Starter Regimen" that contradicts the recommended brand list).
+
+### Files changed (1 markdown + 1 hero replacement + 11 new section images)
+
+- **`docs/design-briefs/med-spa.md`**: full content rewrite. Headline `"What Medical Spas Need Online"` -> `"The Architecture of a Physician-Led Medical Spa"`. Summary refreshed to eleven-surfaces framing. Slug field corrected from `medical-spa` to `med-spa` to match `BRIEF_INDEX`. Replaced the prior 3-section analytical essay with 11 image-anchored sections: Treatments Sold By Outcome, Not by Procedure Code / A Per-Area Menu, Published Where the Front Desk Quotes From / A Quiet Membership for the Long View / Three Things Each Quarter, Dated and Capped / Patients Speak for Themselves / A Physician, an RN, and a Licensed Esthetician, Each With a License / Professional Skincare, Curated From the Patient Chart / Safety Is the Quiet Part of the Work / Pay Over Time, On Your Terms / Complimentary, 30 Minutes, No Obligation / A Footer With Real License Numbers. Each section opens with one `![alt](path)` block followed by 3 paragraphs of editorial commentary. New `previewAlt` (1,374 chars) describes the Reverie page-top hero in detail (split-screen layout, Where Science Meets Subtlety headline, Dr. Whitfield credit, Schedule a Consultation CTA, editorial portrait of model in champagne silk robe in calm interior).
+- **`public/design-briefs/med-spa.webp`**: replaced with the new Reverie hero (1800px wide, q=82, 58 KB).
+- **`public/design-briefs/med-spa/`** (new directory, 11 files): `02-treatments.webp` through `12-footer.webp`. All 1600px wide, q=82, 31-66 KB each.
+
+### Editorial judgment on excluded screenshots
+
+- **Meet the Physician (11.13.11)**: skipped on labcoat-mismatch grounds. The portrait shows a woman wearing a labcoat with the name tag clearly reading "ELENA PARK, MD / RENEWAL MED SPA" while the page text introduces "Dr. Elaine Whitfield, MD" of Reverie Aesthetics. For a brief that argues for a named physician with verifiable credentials and a personal practice voice, anchoring on a misbranded-labcoat photo would contradict the structural argument. The doctor is still represented in the team-grid section (image 11.14.15) as Medical Director with credentials and license number.
+- **Treatments grid continuation (11.13.21)**: skipped on redundancy grounds. Same surface as the kept treatments image, just at a deeper scroll position with the bottom row of cards visible. The kept image already carries the section opener (eyebrow, headline, intro paragraph, Katherine L. pull-quote) plus the first row.
+- **Per-Area Menu continuation (11.13.31)**: skipped on redundancy grounds. Same pricing table as the kept image, just the second half (Energy + Resurfacing + Body, Peels, IV columns). The brief commentary references the full menu range in prose without needing a second image.
+- **Reverie Starter Regimen featured callout (11.14.26)**: skipped on brand-mismatch grounds. The featured product photograph shows a navy tube clearly labeled "Curology" being squeezed, presented as the "Reverie Starter Regimen." Curology is a direct-to-consumer consumer-grade brand that does not appear in the recommended brand list (ZO, SkinMedica, Obagi, Alastin, ISDIN, EltaMD), and the photo contradicts the brief's "the lines we carry are the ones we recommend because they appear repeatedly in our patient charts" argument. Skipping the image preserves the integrity of the Shelf section.
+
+### Voice and rules adherence
+
+- Zero em dashes across all changed files (audited via `grep -c $'\xe2\x80\x94'`).
+- DBJ first-person framing voice throughout the prose. Reverie brand-voice "we" appears only inside paraphrased site copy and pull-quotes (e.g., "we believe the best results are the ones nobody can pinpoint", "we publish them with real dates"), which is consistent with the precedent established in the prior three briefs.
+- Substantial copy per the luxury-means-substantial rule: 11 sections at 3 paragraphs each, ~3,500 words total.
+- Section image alts are descriptive multi-sentence paragraphs that name the visible content faithfully (per-unit prices stated, brand names listed, doctor credentials named, fineprint paraphrased).
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- Section count: `grep -c "^## " docs/design-briefs/med-spa.md` = 11. Image-block count: `grep -c "^!\[" docs/design-briefs/med-spa.md` = 11. One image per section.
+- Parser smoke test (node import of `getDesignBriefBySlug`): med-spa `previewAlt` length 1,374 chars; all 11 sections parsed with images attached and 3 paragraphs of editorial commentary each.
+- Em-dash audit on the changed file: 0.
+- Image dimensions verified: 12 source PNGs all 3024x1964; outputs are 1800w (hero) and 1600w (sections) at q=82, totaling 12 webp files (58 KB hero + 31-66 KB section files).
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/med-spa` and confirm: (1) the Reverie hero renders cleanly with the Where Science Meets Subtlety headline and the model portrait visible above the fold, (2) each of the 11 body sections shows its anchor screenshot in the framed accent-tinted container between heading and prose, (3) the visual rhythm reads cleanly through 11 sections (the longest brief yet, but justified by the med spa vertical's larger surface footprint: skincare retail + safety + financing all live as distinct surfaces here), (4) the page card preview on `/work` picks up the new hero. Once approved, hand me the screenshots for the next brief (upscale-restaurant, financial-advisor, pi-law, or hvac-contractor) and I will repeat the pattern. Four briefs remain.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Dental Practice design brief rebuilt as image-anchored deep dive (Ridgeview Dental template)
 
 ### What shipped
 
