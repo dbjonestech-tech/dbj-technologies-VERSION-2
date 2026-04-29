@@ -6,7 +6,52 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Luxury Home Builder design brief rebuilt as image-anchored deep dive (Ashworth & Foster template) + previewAlt support added across all briefs
+## Most Recent Session: April 29, 2026 -- Dental Practice design brief rebuilt as image-anchored deep dive (Ridgeview Dental template)
+
+### What shipped
+
+Third of the eight image-anchored design-brief rewrites. Joshua handed over 15 screenshots of the Ridgeview Dental template (Ridgeview Dental, West Plano family practice) and asked me to use editorial judgment about which to include and which to skip based on whether they read as unprofessional, redundant, or unfinished. Curated the 15 down to a hero plus 10 section images. Skipped 3 (the "What Makes the Difference" image with a half-empty left column that reads as unfinished in screenshot form even though the content is good; the all-text continuation of the Inside the Office surface that was a pure body-copy duplicate of the better photo-anchored shot; the hygiene team grid that uses MR/JT/EL monogram circles in place of headshots, which is exactly the kind of placeholder that contradicts the brief's named-doctor argument). Skipped 1 more (the closing CTA + footer-top stack) on redundancy grounds with the standalone compliance footer. Final structure: 10 image-anchored sections post-hero, which is the right scale for the dental vertical because the category genuinely carries more distinct surfaces (specials, smile plan, first-visit process, financing, insurance) than residential or builder did.
+
+### Files changed (1 markdown + 1 hero replacement + 10 new section images)
+
+- **`docs/design-briefs/dental-practice.md`**: full content rewrite. Headline `"What Modern Dental Practices Need Online"` -> `"The Architecture of a Modern Family Dental Practice"`. Summary refreshed to ten-surfaces framing. Replaced the prior 3-section analytical essay (How patients pick a dentist / What most dental sites get wrong / What your site needs) with 10 image-anchored sections: Services Sold By Outcome, Not by Procedure Code / Three Dated Offers, Run Year-Round / A Smile Plan, Not a "Quote on Request" / A First Visit Walked Through, Step By Step / A Named Doctor, Not "Our Team" / Stories From the Chair, Not Star Aggregates / Technology Paired With Comfort, In One Section / Financing Without the Sales Pitch / An Honest Insurance List, Not "We Accept Most Plans" / A Footer That Earns the License. Each section opens with one `![alt](path)` block followed by 3 paragraphs of editorial commentary. New `previewAlt` (1,256 chars) describes the Ridgeview Dental hero in full: top promo strip with $59 New Patient Welcome, the navigation, the coral emergency band, the Dr. Parker portrait, the bottom trust row.
+- **`public/design-briefs/dental-practice.webp`**: replaced with the new Ridgeview Dental hero (Dr. Sarah Parker portrait + Modern Care headline + same-day emergency band + new-patient promo strip). 1800px wide, q=82, 87 KB.
+- **`public/design-briefs/dental-practice/`** (new directory, 10 files): `02-services.webp` (Care for Every Stage of Life + trust band + 3-up service grid), `03-specials.webp` (three dated offers: $59 cleaning, $0 Invisalign consult, free whitening kit), `04-smile-plan.webp` (Ridgeview Smile Plan: $29/mo adult, $19 kids, family from $69, full benefits checklist), `05-process.webp` (Velasquez Family pull-quote on faded x-ray bg + 4-step first-visit process), `06-doctor.webp` (Meet Dr. Sarah Parker DDS: Baylor DDS, Spear Education, ADA Member, signed quote), `07-stories.webp` (three substantive testimonials: anxiety / family / Sunday emergency), `08-inside.webp` (Inside the Office editorial photo + Technology/Comfort dual columns intro), `09-financing.webp` (Big Treatment Plans navy section + $4,200 implant CareCredit example), `10-insurance.webp` (12 carriers as pills + honest out-of-network disclosure + Call/Text/Book contact cards), `11-footer.webp` (compliance footer with Texas Dental License No. DDS-12894, ADA, TDA, CDC/OSHA, Hablamos Español). All 1600px wide, q=82, 38-79 KB each.
+
+### Editorial judgment on excluded screenshots
+
+- **What Makes the Difference (11.11.55)**: skipped. The asymmetric layout puts the heading column flush left with empty space below and the three differentiators stacked on the right. In a full scroll context this reads as paced editorial; as a static screenshot it reads as half-finished. The three differentiators (We do not upsell / We treat anxiety seriously / We are family-built) are referenced in the prose of adjacent sections where they make more sense (no-upsell goes into the first-visit Treatment Conversation step; anxiety goes into the Inside the Office section's sedation pairing; family-built goes into the Stories From the Chair quotes).
+- **Tech/Comfort all-text continuation (11.12.33)**: skipped on redundancy grounds. Image 11.12.25 is the better visual anchor for the same surface because it includes the editorial photograph of the dentist examining the 3D x-ray panel plus the headline plus the first item in each column.
+- **Hygiene team monogram cards (11.12.39)**: skipped on completeness grounds. The three hygienist cards use circular monogram placeholders (MR / JT / EL) in place of actual headshots. A brief that argues for a named-doctor surface and substantive testimonials cannot reasonably anchor a section on a placeholder-headshot grid. The hygiene team's structural role is referenced lightly in adjacent prose without leaning on the screenshot.
+- **Closing CTA + footer-top stack (11.12.58)**: skipped to avoid a near-redundant pairing with the standalone compliance footer (11.13.01). The closing CTA's content (We Have a Chair Open for You This Week + studio address) is a logical doorway into the footer, and the brief's tenth section commentary on the footer references the hours and address in continuity.
+
+### Voice and rules adherence
+
+- Zero em dashes across all changed files (audited via `grep -c $'\xe2\x80\x94'`).
+- DBJ first-person framing voice throughout the prose (no studio "we"/"our"). Ridgeview brand-voice "we" appears only inside paraphrased site copy and pull-quotes, which is the precedent established in the prior two briefs.
+- "Hablamos Español" with the ñ diacritic for accuracy where the screenshot uses it (3 occurrences).
+- Substantial copy per the luxury-means-substantial rule: 10 sections at 3 paragraphs each, ~3,000 words.
+- Section image alts are descriptive multi-sentence paragraphs, alt sentences match the visible content faithfully (carriers named, prices stated, fine-print copy paraphrased).
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- Section count check on rewritten brief: `grep -c "^## " docs/design-briefs/dental-practice.md` = 10. Image-block count: `grep -c "^!\[" docs/design-briefs/dental-practice.md` = 10. One image per section.
+- Parser smoke test (node import of `getDesignBriefBySlug`): dental-practice `previewAlt` length 1,256 chars; all 10 sections parsed with images attached and 3 paragraphs of editorial commentary each.
+- Em-dash audit on the changed file: 0.
+- Image dimensions verified: 11 source PNGs all 3024x1964; outputs are 1800w (hero) and 1600w (sections) at q=82, totaling 11 webp files (87 KB hero + 38-79 KB section files).
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/dental-practice` and confirm: (1) the Ridgeview Dental hero renders cleanly with the $59 New Patient promo strip and the coral emergency band visible above the fold, (2) each of the 10 body sections shows its anchor screenshot in the framed accent-tinted container between heading and prose, (3) the visual rhythm reads cleanly through 10 sections, which is the longest brief yet, without feeling drone-paced, (4) the page card preview on `/work` picks up the new hero. Once approved, hand me the screenshots for the next brief (med-spa, upscale-restaurant, financial-advisor, pi-law, or hvac-contractor) and I will repeat the pattern. Five briefs remain.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Luxury Home Builder design brief rebuilt as image-anchored deep dive (Ashworth & Foster template) + previewAlt support added across all briefs
 
 ### What shipped
 
