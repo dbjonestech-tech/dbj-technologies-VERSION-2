@@ -6,7 +6,33 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Star Auto work-card hero swapped to current "Expert auto repair, done right" screenshot
+## Most Recent Session: April 29, 2026 -- Star Auto work-card hero refreshed to include "4.8 · 136 REVIEWS" pill in nav
+
+### What shipped
+
+Second image swap of the same day. The earlier 12:38 PM screenshot didn't include the "4.8 · 136 REVIEWS" social-proof pill that Star Auto's nav now shows next to "BOOK SERVICE". Joshua provided a current 1:05 PM screenshot capturing the pill. Replaced the webp asset in place again.
+
+### Files changed (1)
+
+- **`public/images/case-studies/star-auto-desktop.webp`**: replaced. Source PNG 3020x1896 (3.48 MB). Resized to 1600px wide (1600x1005, native aspect preserved) and re-encoded as webp at q=82 via `cwebp`. Final size 82 KB. Filename and path identical, so no code change.
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean (exit 0).
+- `magick identify` on the new file: `WEBP 1600x1005 8-bit sRGB 82006B`.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work` and confirm the Star Auto card preview now shows the "4.8 · 136 REVIEWS" gold star pill in the upper right of the nav strip. Hover scale should still play cleanly.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Star Auto work-card hero swapped to current "Expert auto repair, done right" screenshot
 
 ### What shipped
 
