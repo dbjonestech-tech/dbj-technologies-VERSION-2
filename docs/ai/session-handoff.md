@@ -32,7 +32,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work` and confirm: (1) 
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `b36a9fa` -- chore(work): swap Star Auto card preview to current hero screenshot. 2 files changed, 31 insertions, 1 deletion (the binary image swap shows as 0/0 in `--stat` and the +31/-1 reflects the handoff entry).
+- Pushed to `origin main` (`38307ef..b36a9fa main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
