@@ -6,7 +6,49 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Med Spa design brief rebuilt as image-anchored deep dive (Reverie Aesthetics template)
+## Most Recent Session: April 29, 2026 -- HVAC Contractor design brief rebuilt as image-anchored deep dive (Ironclad Air template)
+
+### What shipped
+
+Fifth of the eight image-anchored design-brief rewrites. Joshua handed over 10 screenshots of the Ironclad Air template (DFW HVAC dispatch operation, navy + orange brand) and asked me to apply editorial judgment plus ensure every kept image carries proper alt text. All 10 screenshots were substantive enough to keep (no skips). Two minor template-asset inconsistencies surfaced and were navigated around in the alt text rather than dwelling on them: the featured testimonial caption identifies the technician as "James Holland" while the photograph shows the same person as the hero (whose polo embroidery reads "Carlos R."), and the photograph above the footer is a generic unbranded white Sprinter van rather than the Ironclad-branded service van visible in the hero. Both are stock-photo template artifacts; the underlying section architecture is sound, so the brief includes both surfaces with alt text that describes the visible content faithfully without highlighting the inconsistencies.
+
+### Files changed (1 markdown + 1 hero replacement + 9 new section images)
+
+- **`docs/design-briefs/hvac-contractor.md`**: full content rewrite. Headline `"What HVAC Contractors Need Online"` -> `"The Architecture of a DFW HVAC Dispatch Desk"`. Summary refreshed to nine-surfaces framing. Replaced the prior 3-section analytical essay with 9 image-anchored sections: Dated Coupons, Mention Them On the Call / Residential and Commercial in One Truck / Built To Be the Opposite of the HVAC Reputation Problem / Three Zones, One Phone Number, Same-Day Across the Metroplex / Five-Star Reviews Anchored On Real Technicians / An Annual Membership Built for the Texas Calendar / Zero-Percent Financing on Qualifying Installations / Pick the Easiest One / A Footer With the License Numbers and the Emergency Line. Each section opens with one `![alt](path)` block followed by 3 paragraphs of editorial commentary. New `previewAlt` (1,595 chars) describes the page-top hero in detail (orange status strip, navy nav, Carlos R. technician portrait, massive bold headline, two CTAs, four trust cards with Google + BBB + NATE + Carrier credentials).
+- **`public/design-briefs/hvac-contractor.webp`**: replaced with the new Ironclad Air hero (1800px, q=82, 122 KB).
+- **`public/design-briefs/hvac-contractor/`** (new directory, 9 files): `02-offers.webp` through `10-footer.webp`. All 1600px wide, q=82, 50-87 KB each.
+
+### Editorial judgment on potential inconsistencies (kept anyway)
+
+- **Reviews section featured technician caption (11.15.52)**: the caption text overlaid on the featured-testimonial photograph reads "James Holland · Lead Technician · 12 Years With Ironclad," but the photograph shows the same technician as the hero (whose polo embroidery clearly reads "Carlos R."). Cross-section name mismatch in the template's stock photography. The architectural argument (a featured testimonial pairing a tenured technician portrait with a substantive customer review) is sound; alt text describes the photo and the section structure without naming both names, which would document a placeholder error rather than the architecture.
+- **Photograph above the footer (11.16.16 to 11.16.21)**: shows a generic unbranded white Sprinter van against a brick urban building. The hero clearly shows an Ironclad-branded service van, so this stock photo at the closing of the page is template-asset filler rather than brand-consistent imagery. The footer content underneath is the substantive anchor; alt text describes the van briefly without dwelling on it, and the brief commentary focuses on the compliance strip and the four-column block.
+
+### Voice and rules adherence
+
+- Zero em dashes across all changed files (audited via `grep -c $'\xe2\x80\x94'`).
+- DBJ first-person framing voice throughout the prose. Ironclad brand-voice "we" appears only inside paraphrased site copy and pull-quotes (e.g., "we carry the inventory the other guys promise tomorrow", "if the job goes long, that's our problem, not yours"), consistent with the precedent established in the prior four briefs.
+- Substantial copy per the luxury-means-substantial rule: 9 sections at 3 paragraphs each, ~3,500 words total, calibrated for the working-family DFW homeowner voice rather than the luxury Park Cities voice used in the residential and builder briefs.
+- Section image alts are descriptive multi-sentence paragraphs that name the visible content faithfully (every credential cited, every dated coupon stated, every contact-card label and CTA named).
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- Section count: `grep -c "^## " docs/design-briefs/hvac-contractor.md` = 9. Image-block count: `grep -c "^!\[" docs/design-briefs/hvac-contractor.md` = 9. One image per section.
+- Parser smoke test (node import of `getDesignBriefBySlug`): hvac-contractor `previewAlt` length 1,595 chars; all 9 sections parsed with images attached and 3 paragraphs of editorial commentary each.
+- Em-dash audit on the changed file: 0.
+- Image dimensions verified: 10 source PNGs all 3024x1964; outputs are 1800w (hero) and 1600w (sections) at q=82, totaling 10 webp files (122 KB hero + 50-87 KB section files).
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/hvac-contractor` and confirm: (1) the Ironclad Air hero renders cleanly with the orange status strip, the technician portrait, the massive bold headline, and the four-credential trust band visible above the fold, (2) each of the 9 body sections shows its anchor screenshot in the framed accent-tinted container between heading and prose, (3) the visual rhythm reads cleanly across the 9 sections, (4) the page card preview on `/work` picks up the new hero. Once approved, hand me the screenshots for the next brief (upscale-restaurant, financial-advisor, or pi-law) and I will repeat the pattern. Three briefs remain.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Med Spa design brief rebuilt as image-anchored deep dive (Reverie Aesthetics template)
 
 ### What shipped
 
