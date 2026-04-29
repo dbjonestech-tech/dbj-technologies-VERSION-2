@@ -46,7 +46,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/luxu
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `bd848bb` -- feat(design-briefs): Luxury Home Builder image-anchored rewrite + previewAlt. 13 files changed, 112 insertions, 17 deletions (5 modified files + hero replacement + 7 new section images + this snapshot).
+- Pushed to `origin main` (`0095e8d..bd848bb main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
