@@ -66,7 +66,12 @@ Take the Canopy dashboard screenshot for the case study image, push it, and the 
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- DBJ feature commit: `758333a` -- feat(work): ship Canopy as the 4th case study under new "Productized Engagement" category. 4 files changed, 195 insertions, 4 deletions.
+- Pushed to `origin main` (`92bdda3..758333a main -> main`).
+- Working tree clean apart from this snapshot amendment.
+- Canopy starter repo (`github.com/dbjonestech-tech/canopy`) commit `6a8ee09` -- feat(admin): substantial dashboard expansion -- 9 sections, sparklines, trend deltas. 19 files changed (8 new, 11 modified). Pushed to `origin main`.
+- Star Auto Service repo (`github.com/dbjonestech-tech/star-auto-service`) commit `e3c879f` (earlier in session) -- feat(analytics): integrate CanopyBeacon for first-party RUM + visitor tracking. 2 files changed, 158 insertions.
+- Star Auto Canopy install: `https://ops.thestarautoservice.com/admin` is live behind Google sign-in, both test users configured, Neon Postgres migrated to schema version 7.
 
 ---
 
