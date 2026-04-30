@@ -64,7 +64,10 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/fina
 
 ### Final state (post-commit)
 
-- Will populate after this commit lands.
+- Feature commit: `fcb89af` -- feat(design-briefs): Financial Advisor image-anchored rewrite (Beckett Wealth Partners) - SERIES COMPLETE. 15 files changed, 167 insertions, 20 deletions (markdown rewrite + brief-index update + hero replacement + 11 new section images + this snapshot).
+- Pushed to `origin main` (`ff9a711..fcb89af main -> main`).
+- Working tree clean apart from this snapshot amendment.
+- Eight-of-eight image-anchored design-brief series is now complete in production.
 
 ---
 
