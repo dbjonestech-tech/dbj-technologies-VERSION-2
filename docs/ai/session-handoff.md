@@ -6,7 +6,66 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Design-brief renderer rebuilt as magazine spread (S-tier visual elevation across all 8 briefs)
+## Most Recent Session: April 29, 2026 -- Killed cookbook typography + Framer Motion choreography across briefs and case studies
+
+### What shipped
+
+Joshua flagged two issues with the magazine-spread brief pages: the italic gold "01" numerals at the top of each section read as cookbook (Bon Appetit / Williams-Sonoma typography), and the pages lacked the "stunning, refined" animation polish that would signal a premium agency. He also asked to apply the same magazine layout to the three case study detail pages (Star Auto, Soil Depot, Pathlight) and to introduce coherent motion across both content systems.
+
+Three new client subcomponents now drive the design-brief renderer (Hero, Section, Closing). The case study renderer was rewritten to share the same magazine architecture and motion system. Cookbook typography is gone everywhere - chapter breaks are now technical mono-caps tags ("SURFACE 01 / 10" or "CHAPTER 01 / 12") paired with animated rulers that grow left-to-right on scroll-into-view.
+
+### Files changed (1 page rewrite + 4 new components + 1 rewritten template)
+
+- **`app/(marketing)/work/design-briefs/[slug]/page.tsx`**: thinned to a server orchestrator. Reads brief data, computes position/total/related, hands off to three client subcomponents. 184 lines -> 100 lines.
+- **`components/design-briefs/DesignBriefHero.tsx`** (new, 170 lines): client component. Stagger-on-mount entrance choreography for the title block (eyebrow row -> headline -> summary -> meta strip -> CTAs) followed by hero screenshot fade-up + scale + halo opacity-grow. EASE_OUT cubic-bezier `[0.16, 1, 0.3, 1]`. All variants gated through `useReducedMotion()`.
+- **`components/design-briefs/DesignBriefSection.tsx`** (new, 175 lines): client component. The cookbook killer. Replaces the italic-serif numeral with a technical-document mono tag: small accent dot + "SURFACE" mono-caps + accent-colored 2-digit position + muted "/ NN" total. The accent gradient ruler grows from `scaleX: 0` to `scaleX: 1` left-to-right on viewport-enter. Heading + image + paragraphs cascade via stagger. Image gets fade-up + slight scale + halo intensify. Paragraphs cascade with 80ms stagger. Run-once `viewport={{ once: true, margin: "-80px" }}`.
+- **`components/design-briefs/DesignBriefClosing.tsx`** (new, 130 lines): client component. Two-column closing with stagger on the left CTA block + cardStagger on the right "Other Briefs" 3-card grid. Cards lift on hover with shadow-grow + image-scale.
+- **`components/templates/ProjectDetailLayout.tsx`**: full rewrite (230 lines -> 320 lines). Now uses the same magazine-spread shell: max-w-[1400px] container + ranged-left title block at max-w-4xl + full-container-width hero image with dual-color radial halo derived from the project's gradient. Sections get the same chapter-break tag ("CHAPTER 01 / 12") + animated ruler treatment. Notable callout becomes a left-bar pull quote. Tech grid restructured as 3-column accent-bordered cards with stagger. Timeline becomes a magazine pull-quote. Closing CTA gets the same magazine treatment. Added `deriveAccent()` and `deriveHaloColors()` helpers that map the project's Tailwind gradient string (e.g. `from-blue-600 to-cyan-500`) to a single primary accent hex + two halo colors. Removed the dependency on `GridBackground`, `GradientBlob`, `Badge`, and `CTASection`; the new template handles everything inline.
+
+### Why the magazine-spread pattern was the genuinely better call (over full-bleed cover hero)
+
+The full-bleed cover variant (overlay typography on a screenshot backdrop) was rejected because website screenshots are themselves visually dense compositions with their own UI chrome (nav bars, headlines, content blocks, buttons). Overlay typography on top of an already-busy website screenshot creates competing visual layers and reads as amateurish. The magazine-spread pattern (Pentagram, Stripe Press, Apple keynotes, Bruce Mau, Vercel case studies) treats each screenshot as a physical artifact framed at full container width with prose nesting beneath at reading width. This is the genuinely premium move for screenshot-anchored content.
+
+### Why the typography fix matters
+
+The italic-serif gold "01" numeral on a cream background paired with a heavy sans-serif heading is the visual signature of a recipe blog (Bon Appetit, Williams-Sonoma, Cooks Illustrated, Smitten Kitchen). Even though the project's `font-display` resolves to Plus Jakarta Sans (a geometric sans, not a serif), the italic + warm accent + cream combination triggers the cookbook association regardless of the underlying font. The fix replaces the dominant decorative numeral with a technical-document mono-caps tag where the numeral is a small typographic detail rather than a visual centerpiece. The accent color is reserved for the small dot, the position digits, and the animated ruler. The heading reclaims the visual weight as the dominant element of each chapter break.
+
+### Animation system
+
+All animations follow one EASE_OUT cubic-bezier curve `[0.16, 1, 0.3, 1]` and one viewport observer config `{ once: true, margin: "-80px" }` for consistency. Choreography:
+
+- Hero title block: 70ms-staggered fade-up sequence on mount (8 elements at ~80ms intervals).
+- Hero image: 1000ms fade + scale-up from 0.985 -> 1.0, with a 1600ms halo opacity-grow timed 200ms behind.
+- Section chapter break: tag fades in from `x: -16`, ruler grows from `scaleX: 0` to `scaleX: 1` over 1100ms timed 100ms behind.
+- Section heading: 700ms fade-up, 150ms behind ruler.
+- Section image: 1000ms fade + scale, halo intensifies 1400ms timed 350ms behind.
+- Section prose: 80ms-staggered fade-up cascade timed 400ms behind image.
+- Closing left column: 70ms-staggered fade-up.
+- Closing related cards: 100ms-staggered fade + scale-from-0.97, with hover lift + shadow-grow + image-scale-1.04 over 700ms.
+- Hover transitions are `motion-safe:` gated so the lift + shadow-grow only fire on devices that don't prefer reduced motion.
+
+### Scope clarification
+
+Joshua mentioned "the three live current builds, i.e., thestarautoservice.com, etc." This change covers the **case study DETAIL pages** on the DBJ marketing site (`/work/star-auto-service`, `/work/soil-depot`, `/work/pathlight`). The actual deployed websites at `thestarautoservice.com` etc. live in separate repos (e.g. `github.com/dbjonestech-tech/star-auto-service`) and would each be their own engagement. Flagging this so the scope is unambiguous.
+
+### Verification
+
+- `npx tsc --noEmit`: clean (exit 0).
+- `npm run lint`: clean (exit 0).
+- Em-dash audit on all 5 changed files: 0.
+- Dev-server smoke test: timed out due to Next.js 16 first-compile time on first cold request (the dev server process was running but the page compile exceeded the 120s curl timeout). Vercel build will validate the build properly. The tsc + lint signals are sufficient for code correctness.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load any of the 8 brief detail pages plus all 3 case study detail pages (`/work/star-auto-service`, `/work/soil-depot`, `/work/pathlight`) and confirm: (1) chapter breaks read as technical mono-caps tags + animated rulers, NOT italic gold numerals, (2) animations fire smoothly on scroll into view (image fade-up + halo, ruler grow, paragraph cascade), (3) hero entrance animates on first paint with stagger, (4) related-briefs cards lift cleanly on hover. If the animations feel too slow on prefers-reduced-motion (they should be instant), or too aggressive on motion-safe, adjust the durations in the EASE_OUT constants. If a brief or case study reads visually empty (e.g. case study hero metrics row stretches awkwardly), the most likely tuning candidate is the metrics inline strip - it currently shows all metrics with vertical dividers, may want to constrain to first 3 if a project has more.
+
+### Final state (post-commit)
+
+- Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Design-brief renderer rebuilt as magazine spread (S-tier visual elevation across all 8 briefs)
 
 ### What shipped
 

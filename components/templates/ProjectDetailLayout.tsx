@@ -1,28 +1,58 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { GridBackground } from "@/components/effects/GridBackground";
-import { GradientBlob } from "@/components/effects/GradientBlob";
-import { CTASection } from "@/components/sections/CTA";
-import { Badge } from "@/components/ui/Badge";
 import type { ProjectDetail } from "@/lib/work-data";
 
 interface ProjectDetailLayoutProps {
   project: ProjectDetail;
 }
 
-function splitCtaText(text: string): { heading: string; highlight: string } {
-  const words = text.trim().split(/\s+/);
-  if (words.length <= 1) {
-    return { heading: "", highlight: text };
-  }
-  return {
-    heading: words.slice(0, -1).join(" "),
-    highlight: words[words.length - 1]!,
+const EASE_OUT = [0.16, 1, 0.3, 1] as const;
+const VIEWPORT = { once: true, margin: "-80px" } as const;
+
+/**
+ * Map the project's Tailwind gradient class to a single primary accent
+ * hex used for tags, dividers, halos, and CTAs.
+ */
+function deriveAccent(gradient: string): string {
+  const match = gradient.match(/from-([a-z]+)-(\d{3})/);
+  if (!match) return "#3b82f6";
+  const palette: Record<string, string> = {
+    "violet-600": "#7c3aed",
+    "violet-500": "#8b5cf6",
+    "blue-600": "#2563eb",
+    "blue-500": "#3b82f6",
+    "cyan-500": "#06b6d4",
+    "amber-600": "#d97706",
+    "amber-500": "#f59e0b",
+    "yellow-500": "#eab308",
+    "pink-500": "#ec4899",
+    "emerald-600": "#059669",
+    "emerald-500": "#10b981",
   };
+  return palette[`${match[1]}-${match[2]}`] ?? "#3b82f6";
+}
+
+/**
+ * Map gradient to two halo colors used for the hero radial backdrop.
+ */
+function deriveHaloColors(gradient: string): [string, string] {
+  const fromMatch = gradient.match(/from-([a-z]+-\d{3})/);
+  const toMatch = gradient.match(/to-([a-z]+-\d{3})/);
+  const palette: Record<string, string> = {
+    "violet-600": "#7c3aed",
+    "blue-600": "#2563eb",
+    "cyan-500": "#06b6d4",
+    "amber-600": "#d97706",
+    "yellow-500": "#eab308",
+    "pink-500": "#ec4899",
+  };
+  const a = palette[fromMatch?.[1] ?? ""] ?? "#3b82f6";
+  const b = palette[toMatch?.[1] ?? ""] ?? "#06b6d4";
+  return [a, b];
 }
 
 function resolveCtaButtonText(ctaHref: string): string {
@@ -31,200 +61,461 @@ function resolveCtaButtonText(ctaHref: string): string {
 }
 
 export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
-  const { heading: ctaHeading, highlight: ctaHighlight } = splitCtaText(
-    project.ctaText
-  );
+  const reduced = useReducedMotion();
+  const accent = deriveAccent(project.gradient);
+  const [haloA, haloB] = deriveHaloColors(project.gradient);
   const ctaButtonText = resolveCtaButtonText(project.ctaHref);
+  const sectionTotal = project.sections.length;
+
+  // Variants
+  const stagger: Variants = {
+    hidden: {},
+    visible: {
+      transition: reduced
+        ? { staggerChildren: 0, delayChildren: 0 }
+        : { staggerChildren: 0.08, delayChildren: 0.05 },
+    },
+  };
+  const item: Variants = {
+    hidden: reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: reduced ? 0 : 0.7, ease: EASE_OUT },
+    },
+  };
+  const heroImage: Variants = {
+    hidden: reduced
+      ? { opacity: 1, y: 0, scale: 1 }
+      : { opacity: 0, y: 36, scale: 0.985 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: reduced ? 0 : 1.0, ease: EASE_OUT },
+    },
+  };
+  const halo: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 0.32,
+      transition: { duration: reduced ? 0 : 1.6, ease: EASE_OUT, delay: 0.2 },
+    },
+  };
+  const tag: Variants = {
+    hidden: reduced ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: reduced ? 0 : 0.6, ease: EASE_OUT },
+    },
+  };
+  const ruler: Variants = {
+    hidden: reduced ? { scaleX: 1 } : { scaleX: 0 },
+    visible: {
+      scaleX: 1,
+      transition: { duration: reduced ? 0 : 1.1, ease: EASE_OUT, delay: 0.1 },
+    },
+  };
 
   return (
-    <>
-      {/* Hero */}
-      <section className="relative pt-40 pb-20 overflow-hidden">
-        <GridBackground />
-        <GradientBlob className="-top-40 -right-40" />
-        <div className="relative mx-auto max-w-4xl px-6 lg:px-8">
+    <article className="relative">
+      {/* Hero - magazine cover spread */}
+      <section className="relative pt-28 pb-20 lg:pt-32 lg:pb-28 overflow-hidden bg-gradient-to-b from-bg-secondary via-bg-primary to-bg-primary">
+        <div
+          className="absolute inset-0 -z-10 opacity-[0.05] pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse 70% 50% at 80% 20%, ${haloA} 0%, transparent 65%)`,
+          }}
+          aria-hidden="true"
+        />
+
+        <div className="relative mx-auto max-w-[1400px] px-6 lg:px-12">
           <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="mb-8"
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
           >
-            <Link
-              href="/work"
-              className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-gray-900 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              Back to All Work
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-4"
-          >
-            <Badge variant="blue">{project.category}</Badge>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-section font-bold leading-tight"
-          >
-            {project.name}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-6 text-xl text-text-secondary leading-relaxed"
-          >
-            {project.heroDescription}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-8"
-          >
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-accent-blue px-6 py-3 text-sm font-semibold text-white shadow-glow-blue transition-colors hover:bg-accent-cyan"
-            >
-              View Live Site
-              <ExternalLink className="h-4 w-4" aria-hidden="true" />
-            </a>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="relative mt-12 aspect-video w-full overflow-hidden rounded-2xl shadow-xl"
-          >
-            <Image
-              src={project.image}
-              alt={`${project.name} screenshot`}
-              fill
-              className="object-cover object-top"
-              sizes="(max-width: 768px) 100vw, 800px"
-              priority
-            />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Metrics */}
-      <section className="py-16">
-        <div className="mx-auto max-w-5xl px-6 lg:px-8">
-          <div className="grid gap-6 sm:grid-cols-3">
-            {project.metrics.map((metric, i) => (
-              <motion.div
-                key={metric.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass-card p-8 text-center"
+            <motion.div variants={item}>
+              <Link
+                href="/work"
+                className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-text-muted hover:text-text-primary transition-colors"
               >
-                <p className="text-xs font-mono uppercase tracking-widest text-text-muted mb-3">
-                  {metric.label}
-                </p>
-                <p className="font-display text-5xl font-bold text-gradient leading-none">
-                  {metric.value}
-                </p>
+                <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                Back to All Work
+              </Link>
+            </motion.div>
+
+            <div className="mt-12 lg:mt-16 max-w-4xl">
+              <motion.div
+                variants={item}
+                className="flex items-center gap-3 mb-7 flex-wrap"
+              >
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ backgroundColor: accent }}
+                  aria-hidden="true"
+                />
+                <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
+                  Case Study
+                </span>
+                <span className="text-text-muted/50" aria-hidden="true">
+                  /
+                </span>
+                <span
+                  className="font-mono text-[11px] uppercase tracking-[0.22em]"
+                  style={{ color: accent }}
+                >
+                  {project.category}
+                </span>
               </motion.div>
-            ))}
-          </div>
+
+              <motion.h1
+                variants={item}
+                className="font-display text-[clamp(2.6rem,5.6vw,4.6rem)] font-bold leading-[1.04] tracking-tight mb-8"
+              >
+                {project.name}
+              </motion.h1>
+
+              <motion.p
+                variants={item}
+                className="text-lg lg:text-xl text-text-secondary leading-[1.6] max-w-2xl mb-10"
+              >
+                {project.heroDescription}
+              </motion.p>
+
+              {/* Metrics inline strip */}
+              <motion.div
+                variants={item}
+                className="flex flex-wrap items-center gap-x-6 gap-y-4 lg:gap-x-10 mb-10"
+              >
+                {project.metrics.map((metric, i) => (
+                  <div
+                    key={metric.label}
+                    className="flex items-baseline gap-2.5"
+                  >
+                    {i > 0 ? (
+                      <div
+                        className="hidden sm:block h-8 w-px bg-text-primary/15 -ml-3 mr-3"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    <span
+                      className="font-display text-2xl lg:text-3xl font-bold leading-none"
+                      style={{ color: accent }}
+                    >
+                      {metric.value}
+                    </span>
+                    <span className="font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.18em] text-text-muted">
+                      {metric.label}
+                    </span>
+                  </div>
+                ))}
+              </motion.div>
+
+              <motion.div
+                variants={item}
+                className="flex flex-wrap items-center gap-x-6 gap-y-4"
+              >
+                <a
+                  href={project.liveUrl}
+                  target={project.liveUrl.startsWith("http") ? "_blank" : undefined}
+                  rel={
+                    project.liveUrl.startsWith("http")
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
+                  className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
+                  style={{ backgroundColor: accent }}
+                >
+                  View Live Site
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                </a>
+                <Link
+                  href="#case-study"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-text-primary border-b border-text-primary/30 hover:border-text-primary transition-colors pb-1"
+                >
+                  Read the Case Study
+                </Link>
+              </motion.div>
+            </div>
+
+            <motion.div variants={heroImage} className="relative mt-16 lg:mt-20">
+              <motion.div
+                variants={halo}
+                className="absolute -inset-6 lg:-inset-10 -z-10 blur-3xl pointer-events-none"
+                style={{
+                  background: `radial-gradient(ellipse at 30% 50%, ${haloA} 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, ${haloB} 0%, transparent 60%)`,
+                }}
+                aria-hidden="true"
+              />
+              <div
+                className="relative overflow-hidden rounded-2xl lg:rounded-3xl border-2 transform-gpu aspect-video bg-bg-secondary"
+                style={{
+                  borderColor: `${accent}55`,
+                  boxShadow: `0 50px 120px -30px ${accent}55, 0 25px 60px -20px rgba(0,0,0,0.22)`,
+                }}
+              >
+                <Image
+                  src={project.image}
+                  alt={`${project.name} screenshot`}
+                  fill
+                  priority
+                  className="object-cover object-top"
+                  sizes="(max-width: 1024px) 100vw, 1400px"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Narrative sections */}
-      {project.sections.map((section, i) => (
-        <section
-          key={section.heading}
-          className={`py-20 ${i % 2 === 1 ? "bg-bg-secondary/50" : ""}`}
-        >
-          <div className="mx-auto max-w-3xl px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
+      {/* Section divider */}
+      <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+        <div
+          className="h-px w-full"
+          style={{
+            background: `linear-gradient(90deg, transparent 0%, ${accent}33 50%, transparent 100%)`,
+          }}
+          aria-hidden="true"
+        />
+      </div>
+
+      {/* Notable callout - pull-quote feel */}
+      {project.notable ? (
+        <section className="relative pt-20 lg:pt-28">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <motion.figure
+              initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={VIEWPORT}
+              transition={{ duration: reduced ? 0 : 0.8, ease: EASE_OUT }}
+              className="relative max-w-4xl mx-auto"
             >
-              <h2 className="font-display text-3xl font-bold mb-6">
-                {section.heading}
-              </h2>
-              <p className="text-lg text-text-secondary leading-relaxed">
-                {section.body}
-              </p>
-            </motion.div>
+              <div
+                className="absolute left-0 top-0 bottom-0 w-1 rounded-full"
+                style={{ backgroundColor: accent }}
+                aria-hidden="true"
+              />
+              <blockquote className="pl-8 lg:pl-10 font-display text-[clamp(1.4rem,2.4vw,2rem)] font-medium leading-[1.35] tracking-tight text-text-primary">
+                {project.notable}
+              </blockquote>
+            </motion.figure>
           </div>
         </section>
-      ))}
+      ) : null}
+
+      {/* Narrative sections */}
+      <section
+        id="case-study"
+        className="relative py-24 lg:py-32 scroll-mt-24"
+      >
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+          {project.sections.map((section, i) => (
+            <motion.article
+              key={section.heading}
+              initial="hidden"
+              whileInView="visible"
+              viewport={VIEWPORT}
+              className="mb-20 lg:mb-28 last:mb-0"
+            >
+              <div className="flex items-center gap-4 lg:gap-6 mb-6 lg:mb-8">
+                <motion.div
+                  variants={tag}
+                  className="flex items-center gap-2.5 shrink-0"
+                >
+                  <span
+                    className="inline-block h-2 w-2 rounded-full"
+                    style={{ backgroundColor: accent }}
+                    aria-hidden="true"
+                  />
+                  <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
+                    Chapter
+                  </span>
+                  <span
+                    className="font-mono text-[11px] uppercase tracking-[0.22em]"
+                    style={{ color: accent }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted/60">
+                    / {String(sectionTotal).padStart(2, "0")}
+                  </span>
+                </motion.div>
+                <motion.span
+                  variants={ruler}
+                  className="h-[2px] flex-1 origin-left"
+                  style={{
+                    background: `linear-gradient(90deg, ${accent} 0%, ${accent}11 100%)`,
+                  }}
+                  aria-hidden="true"
+                />
+              </div>
+
+              <motion.h2
+                variants={item}
+                className="font-display text-[clamp(1.8rem,3.4vw,2.8rem)] font-bold leading-[1.1] tracking-tight mb-8 lg:mb-10 max-w-4xl"
+              >
+                {section.heading}
+              </motion.h2>
+
+              <motion.div variants={item} className="mx-auto max-w-3xl">
+                <p className="text-[1.0625rem] lg:text-[1.125rem] leading-[1.85] text-text-secondary whitespace-pre-line">
+                  {section.body}
+                </p>
+              </motion.div>
+            </motion.article>
+          ))}
+        </div>
+      </section>
 
       {/* Tech deep dive */}
-      <section className="py-20 bg-bg-secondary/50">
-        <div className="mx-auto max-w-5xl px-6 lg:px-8">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-display text-3xl font-bold mb-12 text-center"
+      <section className="relative py-20 lg:py-28 bg-bg-secondary/50 border-t border-text-primary/8">
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT}
+            variants={stagger}
+            className="max-w-4xl mb-12 lg:mb-16"
           >
-            Built With <span className="text-gradient">— And Why</span>
-          </motion.h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {project.techDetails.map((tech, i) => (
+            <motion.div
+              variants={item}
+              className="flex items-center gap-3 mb-5"
+            >
+              <span
+                className="inline-block h-2 w-2 rounded-full"
+                style={{ backgroundColor: accent }}
+                aria-hidden="true"
+              />
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
+                Built With
+              </span>
+              <span
+                className="font-mono text-[11px] uppercase tracking-[0.22em]"
+                style={{ color: accent }}
+              >
+                And Why
+              </span>
+            </motion.div>
+            <motion.h2
+              variants={item}
+              className="font-display text-[clamp(1.8rem,3.2vw,2.6rem)] font-bold leading-[1.12] tracking-tight"
+            >
+              The technical decisions behind this build.
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT}
+            variants={{
+              hidden: {},
+              visible: {
+                transition: reduced
+                  ? { staggerChildren: 0 }
+                  : { staggerChildren: 0.08 },
+              },
+            }}
+            className="grid gap-4 lg:gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {project.techDetails.map((tech) => (
               <motion.div
                 key={tech.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="glass-card p-6"
+                variants={{
+                  hidden: reduced
+                    ? { opacity: 1, y: 0 }
+                    : { opacity: 0, y: 20 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: reduced ? 0 : 0.6, ease: EASE_OUT },
+                  },
+                }}
+                className="rounded-xl border bg-bg-primary p-6 lg:p-7 transition-all motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-lg"
+                style={{ borderColor: `${accent}22` }}
               >
-                <h3 className="font-display text-lg font-bold text-accent-blue mb-2">
+                <h3
+                  className="font-display text-lg font-bold mb-2.5"
+                  style={{ color: accent }}
+                >
                   {tech.name}
                 </h3>
-                <p className="text-sm text-text-secondary leading-relaxed">
+                <p className="text-sm text-text-secondary leading-[1.7]">
                   {tech.reason}
                 </p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Timeline callout */}
-      {project.timeline && (
-        <section className="py-20">
-          <div className="mx-auto max-w-2xl px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
+      {/* Timeline pull-quote */}
+      {project.timeline ? (
+        <section className="relative py-20 lg:py-28">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <motion.figure
+              initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="rounded-2xl border border-gray-200 bg-gray-50 px-10 py-10 text-center"
+              viewport={VIEWPORT}
+              transition={{ duration: reduced ? 0 : 0.8, ease: EASE_OUT }}
+              className="relative max-w-4xl mx-auto"
             >
-              <p className="text-xs font-mono uppercase tracking-widest text-accent-blue mb-4">
-                Timeline
-              </p>
-              <p className="text-lg text-text-secondary leading-relaxed">
+              <div className="flex items-center gap-3 mb-6">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ backgroundColor: accent }}
+                  aria-hidden="true"
+                />
+                <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
+                  Timeline
+                </span>
+              </div>
+              <p className="font-display text-[clamp(1.3rem,2.2vw,1.85rem)] font-medium leading-[1.4] tracking-tight text-text-primary">
                 {project.timeline}
               </p>
-            </motion.div>
+            </motion.figure>
           </div>
         </section>
-      )}
+      ) : null}
 
-      <CTASection
-        heading={ctaHeading}
-        highlight={ctaHighlight}
-        buttonText={ctaButtonText}
-        buttonHref={project.ctaHref}
-      />
-    </>
+      {/* Closing CTA */}
+      <section className="relative py-20 lg:py-28 border-t border-text-primary/10 bg-bg-secondary/40">
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT}
+            variants={stagger}
+            className="max-w-4xl"
+          >
+            <motion.p
+              variants={item}
+              className="font-mono text-[11px] uppercase tracking-[0.22em] mb-5"
+              style={{ color: accent }}
+            >
+              Build It For Real
+            </motion.p>
+            <motion.h3
+              variants={item}
+              className="font-display text-[clamp(1.9rem,3.4vw,2.8rem)] font-bold leading-[1.1] tracking-tight mb-8"
+            >
+              {project.ctaText}
+            </motion.h3>
+            <motion.div variants={item}>
+              <Link
+                href={project.ctaHref}
+                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
+                style={{ backgroundColor: accent }}
+              >
+                {ctaButtonText}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+    </article>
   );
 }
