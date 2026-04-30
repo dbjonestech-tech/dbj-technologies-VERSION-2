@@ -6,7 +6,49 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- HVAC Contractor design brief rebuilt as image-anchored deep dive (Ironclad Air template)
+## Most Recent Session: April 29, 2026 -- Upscale Restaurant design brief rebuilt as image-anchored deep dive (Ember & Vine template)
+
+### What shipped
+
+Sixth of the eight image-anchored design-brief rewrites. Joshua handed over 13 screenshots of the Ember & Vine template (Bishop Arts chef-driven restaurant, deep oxblood + cream + gold palette) along with a question about whether to add framing copy that would dispel AI-suspicion concerns about the brief screenshots. Reasoned the framing question through three angles (link-to-deployed-templates was rejected on time/energy grounds, "in-house research artifact" framing was rejected as diminishing, and "polished obvious reference" framing requires the references to actually be polished). Final call from a true multi-lane perspective: skip the framing entirely, ship Ember & Vine clean. The substantive prose carries the work, the existing case studies (Star Auto, Soil Depot) ship without meta-framing, and Joshua is planning a meticulous pre-launch audit pass that will close the visible tells. Adding meta-framing draws attention to the very thing it tries to deflect.
+
+### Files changed (1 markdown + 1 hero replacement + 10 new section images)
+
+- **`docs/design-briefs/upscale-restaurant.md`**: full content rewrite. Headline `"What Upscale Restaurants Need Online"` -> `"The Architecture of a Bishop Arts Chef-Driven Restaurant"`. Summary refreshed to ten-surfaces framing. Replaced the prior 3-section analytical essay with 10 image-anchored sections: We Cook What the Season Gives Us / A Named Chef Who Still Works the Pass / A Menu on the Page, Dated and Honest / A Bar With Its Own Door, Its Own Menu, Its Own Director / Sixty Bottles, Half By the Glass, Chosen Not Collected / Two Rooms for the Nights That Matter / A Named GM, A Direct Line, A Pantry Shelf Behind Her / Press, Dated and Recent / Reservations Recommended, Walk-Ins at the Bar / A Preferred Guest List That Earns the Open Rate. Each section opens with one `![alt](path)` block followed by 3 paragraphs of editorial commentary. New `previewAlt` (1,651 chars) describes the Ember & Vine page-top hero in detail (oxblood promo strip with reservation widget, three-diamond ornament, split nav, top-down pasta photograph, Seasonal Honest Worth the Drive headline, Make a Reservation CTA, Tuesday-through-Saturday hours line).
+- **`public/design-briefs/upscale-restaurant.webp`**: replaced with the new Ember & Vine hero (1800px, q=82, 97 KB).
+- **`public/design-briefs/upscale-restaurant/`** (new directory, 10 files): `02-approach.webp` through `11-newsletter.webp`. All 1600px wide, q=82, 38-87 KB each.
+
+### Editorial judgment on excluded screenshots
+
+- **Pantry product cards (11.17.26)**: skipped on stock-photo mismatch grounds. The four product cards in this section have photographs that do not match the products described. The Garnet Negroni Kit card shows the hero pasta dish; the House Granola card shows a young woman eating in a casual restaurant setting; the Chef Cole's Harissa card shows what appears to be a sports bar interior; the Holiday Box card shows an empty modern dining room. Classic stock-image mismatch tells. The Pantry surface is referenced in the commentary of the adjacent Catherine Dao section since that section's bottom edge already carries the Pantry section opener (eyebrow + headline + subhead).
+- **Reviews band + interior photo (11.17.41)**: skipped on redundancy grounds. This screenshot carried the "4.8 on Google, based on 380+ guest reviews" band and a wide interior photograph above the start of the reservation CTA. The substantive reservation content (button, address, full hours table) is in the kept screenshot (11.17.49), so this near-duplicate is referenced in prose without anchoring on it.
+
+### Voice and rules adherence
+
+- Zero em dashes across all changed files (audited via `grep -c $'\xe2\x80\x94'`).
+- DBJ first-person framing voice throughout the prose. Ember & Vine brand-voice "we" appears only inside paraphrased site copy and pull-quotes (e.g., "We cook what tastes best on the day you sit down," "We do not chase trends," "Cooking for strangers is the most generous thing I can think of"), consistent with the precedent established in the prior five briefs.
+- Substantial copy per the luxury-means-substantial rule: 10 sections at 3 paragraphs each, ~3,500 words total.
+- Section image alts are descriptive multi-sentence paragraphs that name the visible content faithfully (every menu item priced, every cocktail named, every recognition row dated, every hours row annotated with both dinner and bar windows).
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- Section count: `grep -c "^## " docs/design-briefs/upscale-restaurant.md` = 10. Image-block count: `grep -c "^!\[" docs/design-briefs/upscale-restaurant.md` = 10. One image per section.
+- Parser smoke test (node import of `getDesignBriefBySlug`): upscale-restaurant `previewAlt` length 1,651 chars; all 10 sections parsed with images attached and 3 paragraphs of editorial commentary each.
+- Em-dash audit on the changed file: 0.
+- Image dimensions verified: 11 source PNGs all 3024x1964; outputs are 1800w (hero) and 1600w (sections) at q=82, totaling 11 webp files (97 KB hero + 38-87 KB section files).
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/upscale-restaurant` and confirm: (1) the Ember & Vine hero renders cleanly with the reservation widget, the wordmark, the pasta photograph, and the Make a Reservation CTA visible, (2) each of the 10 body sections shows its anchor screenshot in the framed accent-tinted container between heading and prose, (3) the visual rhythm reads cleanly across 10 sections, (4) the page card preview on `/work` picks up the new hero. Once approved, hand me the screenshots for the remaining two briefs (financial-advisor and pi-law) and I will repeat the pattern. Two briefs remain.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- HVAC Contractor design brief rebuilt as image-anchored deep dive (Ironclad Air template)
 
 ### What shipped
 
