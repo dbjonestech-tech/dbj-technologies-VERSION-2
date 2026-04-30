@@ -10,7 +10,8 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) feat(positioning): remove AI self-claims sitewide; reposition Pathlight as a "diagnostic" instead of "AI-powered analysis"
+- (this commit) docs: update session-handoff with fe3cb59 commit hash
+- `fe3cb59` feat(positioning): remove AI self-claims sitewide; reposition Pathlight as a "diagnostic" instead of "AI-powered analysis"
 - `bdd76bf` docs: update session-handoff with 247bda1 commit hash
 - `247bda1` feat(pricing): add Fix Sprint as the post-Pathlight-scan engagement tier
 - `63b7d29` docs: capture post-deploy verification + Google NAP escalation in session-handoff
