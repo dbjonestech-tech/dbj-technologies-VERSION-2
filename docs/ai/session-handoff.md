@@ -61,7 +61,10 @@ After Vercel rebuild settles (1-3 min), incognito-load any of the 8 brief detail
 
 ### Final state (post-commit)
 
-- Will populate after this commit lands.
+- Feature commit: `71e5819` -- feat(design-briefs, work): kill cookbook typography + add motion choreography across briefs and case studies. 6 files changed, 1,125 insertions, 456 deletions (3 new client components + brief page thinned to server orchestrator + case study layout rewrite + this snapshot).
+- Pushed to `origin main` (`c2d7906..71e5819 main -> main`).
+- Working tree clean apart from this snapshot amendment.
+- Cookbook typography is gone across all 8 briefs and all 3 case studies. Animation system is unified across both content types.
 
 ---
 
