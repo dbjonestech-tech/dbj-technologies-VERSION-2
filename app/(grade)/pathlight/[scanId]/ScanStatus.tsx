@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AskPathlightLoader from "./AskPathlightLoader";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
+import { PathlightLogo } from "@/components/brand/PathlightLogo";
+import { PathlightWordmark } from "@/components/brand/PathlightWordmark";
 import type {
   DesignScores,
   LighthouseCategoryScores,
@@ -173,25 +175,11 @@ function TopBar() {
     >
       <Link
         href="/pathlight"
-        className="flex items-center gap-2"
+        className="flex items-center"
+        style={{ color: "#e7ebf2" }}
+        aria-label="Pathlight home"
       >
-        <svg
-          viewBox="0 0 174 214"
-          aria-hidden="true"
-          style={{ height: 22, width: "auto", color: "#1AD4EA" }}
-        >
-          <path
-            fill="currentColor"
-            fillRule="evenodd"
-            d="M 173 98 L 153 87 L 153 149 L 88 189 L 21 150 L 21 88 L 0 99 L 0 160 L 8 166 L 87 213 L 90 213 L 93 210 L 103 205 L 173 160 Z M 57 67 L 37 79 L 37 143 L 57 155 L 59 155 L 59 67 Z M 116 66 L 116 154 L 122 153 L 123 151 L 135 145 L 138 142 L 138 77 L 122 68 Z M 116 24 L 115 26 L 115 46 L 116 48 L 172 83 L 173 82 L 173 58 L 125 29 L 122 26 Z M 96 0 L 92 1 L 89 4 L 0 58 L 0 82 L 2 82 L 42 58 L 74 37 L 76 38 L 76 165 L 87 171 L 96 167 Z"
-          />
-        </svg>
-        <span
-          className="font-display text-sm font-semibold tracking-wide"
-          style={{ color: "#e7ebf2" }}
-        >
-          Pathlight
-        </span>
+        <PathlightWordmark height={20} ariaLabel="Pathlight" />
       </Link>
       <Link
         href="/pathlight"
@@ -573,6 +561,15 @@ function Report({
 
   return (
     <section className="pathlight-report flex flex-col gap-16 py-12">
+      <div className="flex justify-center">
+        <PathlightLogo
+          size={160}
+          priority
+          className="h-[120px] w-[120px] sm:h-[160px] sm:w-[160px]"
+          alt="Pathlight"
+        />
+      </div>
+
       {isPartial ? <PartialNotice /> : null}
       {report.screenshotNotice ? (
         <ScreenshotHealthNotice message={report.screenshotNotice} />

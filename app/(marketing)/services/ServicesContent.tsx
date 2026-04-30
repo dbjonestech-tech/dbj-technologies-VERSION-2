@@ -348,11 +348,11 @@ export default function ServicesContent() {
 
               <motion.div
                 variants={heroItem}
-                className="flex items-center gap-6 lg:gap-8 mb-10"
+                className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-3 mb-10"
               >
-                <div className="flex items-baseline gap-2.5">
+                <div className="flex items-baseline gap-2 sm:gap-2.5">
                   <span
-                    className="font-display text-3xl lg:text-4xl font-bold leading-none"
+                    className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-none"
                     style={{ color: PAGE_ACCENT }}
                   >
                     6
@@ -361,10 +361,10 @@ export default function ServicesContent() {
                     Disciplines
                   </span>
                 </div>
-                <div className="h-8 w-px bg-text-primary/15" aria-hidden="true" />
-                <div className="flex items-baseline gap-2.5">
+                <div className="hidden sm:block h-8 w-px bg-text-primary/15" aria-hidden="true" />
+                <div className="flex items-baseline gap-2 sm:gap-2.5">
                   <span
-                    className="font-display text-3xl lg:text-4xl font-bold leading-none"
+                    className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-none"
                     style={{ color: PAGE_ACCENT }}
                   >
                     1
@@ -373,10 +373,10 @@ export default function ServicesContent() {
                     Standard
                   </span>
                 </div>
-                <div className="h-8 w-px bg-text-primary/15" aria-hidden="true" />
-                <div className="flex items-baseline gap-2.5">
+                <div className="hidden sm:block h-8 w-px bg-text-primary/15" aria-hidden="true" />
+                <div className="flex items-baseline gap-2 sm:gap-2.5">
                   <span
-                    className="font-display text-3xl lg:text-4xl font-bold leading-none"
+                    className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-none"
                     style={{ color: PAGE_ACCENT }}
                   >
                     0

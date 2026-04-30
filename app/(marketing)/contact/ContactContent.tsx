@@ -151,11 +151,14 @@ const PORTAL_ACCESS_DEFAULTS: Partial<FormData> = {
     "I'd like to request access to the DBJ client portal. A bit of context on what I'm working on:\n\n",
 };
 
+/* Kept for inbound from legacy /pricing/canopy and /pricing/operations
+ * URLs (now redirected to /work/canopy) so any saved bookmarks still land
+ * in a sensible prefill. Canopy is not currently sold as a productized
+ * engagement; the prefill nudges toward a custom-build conversation. */
 const CANOPY_DEFAULTS: Partial<FormData> = {
-  budget: "$25,000+",
   projectType: "Other",
   message:
-    "I'd like to scope a Canopy engagement. A bit of context on what we're currently using and what I want to consolidate:\n\n",
+    "I saw the Canopy build on the Work page and want to talk about a custom version for my business. Some context on what I am currently using and what I want to consolidate:\n\n",
 };
 
 export default function ContactContent() {

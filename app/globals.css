@@ -537,26 +537,26 @@ select:focus-visible {
   }
 }
 
-/* ─── PATHLIGHT NAV ACCENT ─────────────────────────── */
+/* ─── PATHLIGHT NAV ACCENT ───────────────────────────
+ * The Pathlight nav link renders the official wordmark via
+ * <PathlightWordmark> (CSS mask-image, white PATH + cyan LIGHT
+ * matching the logo). The "resonance glow" is now a drop-shadow
+ * filter, which (unlike text-shadow) applies to the masked spans.
+ * Two stacked drop-shadows give a subtle bloom: tight blue + wider
+ * cyan halo. PATH inherits currentColor from the link, so it reads
+ * white on dark surfaces and dark on the scrolled white nav. */
 .nav-pathlight {
-  background: linear-gradient(
-    110deg,
-    #3b82f6 0%,
-    #60a5fa 40%,
-    #22d3ee 55%,
-    #60a5fa 70%,
-    #3b82f6 100%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  transition: filter 300ms ease, text-shadow 300ms ease;
+  display: inline-flex;
+  align-items: center;
+  transition: filter 300ms ease;
+  filter: drop-shadow(0 0 8px rgba(91, 169, 213, 0.18));
 }
 .nav-pathlight:hover,
 .nav-pathlight:focus-visible {
-  filter: brightness(1.18);
-  text-shadow: 0 0 18px rgba(34, 211, 238, 0.35);
+  filter:
+    drop-shadow(0 0 6px rgba(34, 211, 238, 0.45))
+    drop-shadow(0 0 18px rgba(34, 211, 238, 0.25))
+    brightness(1.08);
 }
 
 /* ─── PATHLIGHT DISTANT LIGHTNING (desktop only) ───

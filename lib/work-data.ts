@@ -333,14 +333,14 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "canopy",
     name: "Canopy",
     description:
-      "A productized operations dashboard that replaces the five to seven SaaS subscriptions every business stitches together to answer 'how is my stack actually doing.' Visitor analytics, real-user performance, deployment lifecycle, infrastructure watchers, error tracking, email deliverability, and an audit log, all in one dashboard you own, on your own domain, with one auth wall and one source of truth.",
-    category: "Productized Engagement",
+      "An operations dashboard I built first for myself to run DBJ Technologies, then deployed for a client as the first install. Visitor analytics, real-user performance, deployment lifecycle, infrastructure watchers, error tracking, email deliverability, and an admin audit log. One dashboard, on the client's own domain, with one auth wall and one source of truth.",
+    category: "Internal Tooling",
     gradient: "from-cyan-500 to-blue-600",
-    liveUrl: "https://dbjtechnologies.com/pricing/canopy",
+    liveUrl: "https://dbjtechnologies.com/work/canopy",
     metrics: [
       { label: "Sections", value: "9" },
-      { label: "Delivery", value: "4 to 8 weeks" },
-      { label: "Starting at", value: "$25,000" },
+      { label: "Live Install", value: "Star Auto" },
+      { label: "Built In", value: "Two days" },
     ],
     techStack: [
       "Next.js 16",
@@ -349,10 +349,10 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "Auth.js",
     ],
     notable:
-      "Built first for myself to run DBJ Technologies. Productized so every client engagement gets the same operations stack, on their domain, in their database, under their auth, with no SaaS to renew.",
+      "Built first for myself to run DBJ Technologies. Star Auto Service is install zero, the proving ground for the architecture before any wider productized rollout.",
     image: "/images/case-studies/canopy-dashboard.webp",
     heroDescription:
-      "Most businesses run on a stack of five to seven SaaS tools that do not talk to each other. Analytics in one place, performance in another, error tracking in a third, deliverability and infrastructure scattered across more. Canopy consolidates all of it into a single dashboard the buyer owns, on their domain, with one auth wall and one source of truth. Built first for the studio that ships it. Productized for every engagement that follows. The first install lives at ops.thestarautoservice.com, behind a Google sign-in, surfacing visitor analytics, real-user Web Vitals, Vercel deployment lifecycle, infrastructure watchers, error tracking, email deliverability, and an admin audit log for the family-owned auto repair shop in Richardson, TX.",
+      "An operations dashboard built first for the studio that ships it, then deployed as install zero for a real client. Star Auto Service in Richardson, TX is the first external Canopy: visitor analytics, real-user Web Vitals, Vercel deployment lifecycle, infrastructure watchers, error tracking, email deliverability, and an admin audit log, all on the client's own domain at ops.thestarautoservice.com behind a Google sign-in. Not yet a productized offering for sale. Live as a working install, on the way to becoming one once the playbook proves out across more verticals.",
     sections: [
       {
         heading: "The Problem",
@@ -371,8 +371,8 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
         body: "Datadog, PostHog, Sentry, and the rest are excellent products. The reason to build in-house is when the buyer needs data joined to their specific business outcomes (visitor-to-customer attribution across marketing, product, and sales) or when SaaS sprawl is costing them more annually than the build pays back in. Canopy is for the cases where a single SaaS does not work. Owned by the buyer, not rented. On the buyer's domain, not a third-party subdomain. In the buyer's database, not someone else's data center. Behind the buyer's auth, not a vendor login. Walking away cleanly is the productized promise: every install is structured so the buyer keeps deploying it themselves long after the engagement ends.",
       },
       {
-        heading: "The Engagement",
-        body: "Four to eight weeks from kickoff to live install. I handle the architecture, the integrations across whichever observability sources the buyer already pays for, and the cross-site instrumentation. The buyer ends up with a dashboard on their own domain, in their own accounts, with documentation written for whoever will operate it long after I am out of the picture. Starting at twenty-five thousand dollars. The price scales with the number of integrations and the depth of the funnel modeling, not with the number of dashboards or seats.",
+        heading: "What Comes Next",
+        body: "Star Auto is install zero, the first proof that the architecture transfers cleanly off DBJ's stack and onto somebody else's. Before this becomes a productized engagement on the pricing page, the playbook needs to prove out across more verticals (a tech-forward business with five to seven SaaS subscriptions, an operations team that wants funnel attribution, at least one install with a year of data behind it). Until then it lives here as proof of craft. If you have an operations problem that this kind of stack might solve, get in touch and we can scope a custom build.",
       },
     ],
     techDetails: [
@@ -404,9 +404,8 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     timeline:
       "Built first for DBJ Technologies as my own internal operations cockpit. Productized into a per-client engagement after the patterns proved durable across a year of running my own studio on it. The first external install lives at ops.thestarautoservice.com for Star Auto Service in Richardson, TX. Each engagement is delivered as the buyer's own infrastructure, in their own accounts, transferred cleanly so the buyer keeps deploying it themselves long after the work is done.",
-    ctaText: "Scope Your Canopy Engagement",
-    ctaHref: "/contact?topic=canopy",
-    logoImage: "/images/case-studies/canopy-logo.png",
+    ctaText: "Get in Touch",
+    ctaHref: "/contact",
     showcaseVideo: {
       mp4: "/images/case-studies/canopy-showcase.mp4",
       webm: "/images/case-studies/canopy-showcase.webm",

@@ -67,13 +67,19 @@ const nextConfig = {
         destination: "/work#design-briefs",
         permanent: true,
       },
-      /* /pricing/operations was the slug under which the Operations
-       * Cockpit engagement was originally published. Renamed to
-       * /pricing/canopy on 2026-04-28 when the offering was rebranded
-       * to Canopy. Same engagement, same scope, different name. */
+      /* Legacy: /pricing/operations -> /pricing/canopy was the rename
+       * redirect from 2026-04-28. Canopy was then pulled from the public
+       * pricing page on 2026-04-30 (premature to sell with one install).
+       * Both old URLs now route to the work-page case study so existing
+       * inbound links land somewhere useful instead of 404. */
       {
         source: "/pricing/operations",
-        destination: "/pricing/canopy",
+        destination: "/work/canopy",
+        permanent: true,
+      },
+      {
+        source: "/pricing/canopy",
+        destination: "/work/canopy",
         permanent: true,
       },
     ];

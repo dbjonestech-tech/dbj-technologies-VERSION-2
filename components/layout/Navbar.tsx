@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
+import { PathlightWordmark } from "@/components/brand/PathlightWordmark";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -101,9 +102,9 @@ export function Navbar() {
                     : "text-gray-500 hover:text-gray-900"
                 }`;
             return (
-              <Link key={link.href} href={link.href} className={className}>
+              <Link key={link.href} href={link.href} className={className} aria-label={isPathlight ? link.label : undefined}>
                 {isPathlight ? (
-                  link.label
+                  <PathlightWordmark height={18} ariaLabel={link.label} />
                 ) : (
                   <span className="relative z-10">{link.label}</span>
                 )}
@@ -204,8 +205,13 @@ export function Navbar() {
                       href={link.href}
                       onClick={() => setIsOpen(false)}
                       className={className}
+                      aria-label={isPathlight ? link.label : undefined}
                     >
-                      {link.label}
+                      {isPathlight ? (
+                        <PathlightWordmark height={26} ariaLabel={link.label} />
+                      ) : (
+                        link.label
+                      )}
                     </Link>
                   </motion.div>
                 );

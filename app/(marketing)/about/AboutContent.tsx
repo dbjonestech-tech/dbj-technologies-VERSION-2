@@ -999,24 +999,25 @@ export default function AboutContent() {
               className="text-base leading-[1.75] sm:text-lg"
               style={{ color: "#c5ccd8" }}
             >
-              I built it because I needed it. If you want the same stack on your
-              domain, I will build it for you. Same architecture. Your data.
-              Your auth wall.
+              I built it because I needed it. The first install is live for a
+              client; once the playbook proves out across more verticals, it
+              becomes a productized engagement. For now: see what was built,
+              or get in touch about a custom version.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
-                href="/pricing/canopy"
+                href="/work/canopy"
                 className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_18px_40px_-15px_rgba(59,130,246,0.6)]"
                 style={{ backgroundColor: ACCENT }}
               >
-                See Pricing
+                See What Was Built
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <Link
-                href="/contact?topic=canopy"
+                href="/contact"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-white border-b border-white/30 hover:border-white transition-colors pb-1"
               >
-                Request a Private Walkthrough
+                Get in Touch
               </Link>
             </div>
           </motion.div>

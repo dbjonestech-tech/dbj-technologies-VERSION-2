@@ -10,9 +10,7 @@ import {
   Check,
   X,
   Sparkles,
-  Gauge,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { Accordion } from "@/components/ui/Accordion";
 import {
@@ -273,11 +271,11 @@ export default function PricingContent() {
 
             <motion.div
               variants={heroItem}
-              className="flex items-center justify-center gap-6 lg:gap-8 mb-10"
+              className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-3 mb-10"
             >
-              <div className="flex items-baseline gap-2.5">
+              <div className="flex items-baseline gap-2 sm:gap-2.5">
                 <span
-                  className="font-display text-3xl lg:text-4xl font-bold leading-none"
+                  className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-none"
                   style={{ color: PAGE_ACCENT }}
                 >
                   3
@@ -286,10 +284,10 @@ export default function PricingContent() {
                   Tiers
                 </span>
               </div>
-              <div className="h-8 w-px bg-text-primary/15" aria-hidden="true" />
-              <div className="flex items-baseline gap-2.5">
+              <div className="hidden sm:block h-8 w-px bg-text-primary/15" aria-hidden="true" />
+              <div className="flex items-baseline gap-2 sm:gap-2.5">
                 <span
-                  className="font-display text-3xl lg:text-4xl font-bold leading-none"
+                  className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-none"
                   style={{ color: PAGE_ACCENT }}
                 >
                   0
@@ -298,10 +296,10 @@ export default function PricingContent() {
                   Hourly
                 </span>
               </div>
-              <div className="h-8 w-px bg-text-primary/15" aria-hidden="true" />
-              <div className="flex items-baseline gap-2.5">
+              <div className="hidden sm:block h-8 w-px bg-text-primary/15" aria-hidden="true" />
+              <div className="flex items-baseline gap-2 sm:gap-2.5">
                 <span
-                  className="font-display text-3xl lg:text-4xl font-bold leading-none"
+                  className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-none"
                   style={{ color: PAGE_ACCENT }}
                 >
                   1
@@ -569,153 +567,12 @@ export default function PricingContent() {
         </div>
       </section>
 
-      {/* ─── CANOPY SPECIALTY ─────────────────────────── */}
-      <section className="relative py-24 lg:py-32 border-t border-text-primary/8 bg-bg-secondary/40">
-        <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
-          <div className="mb-16 lg:mb-20 max-w-3xl">
-            <ChapterHeader
-              label="Specialty Engagement"
-              heading="Canopy."
-              reduce={reduce}
-            />
-          </div>
-
-          <motion.div
-            initial={
-              reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }
-            }
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={VIEWPORT}
-            transition={{
-              duration: reduce ? 0 : 0.8,
-              ease: EASE_OUT,
-            }}
-            whileHover={
-              reduce
-                ? undefined
-                : { y: -8, transition: { duration: 0.35, ease: EASE_OUT } }
-            }
-            className="group relative rounded-2xl border p-8 lg:p-12 overflow-hidden cursor-default"
-            style={{
-              borderColor: `${PAGE_ACCENT}40`,
-              background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}08 100%)`,
-              boxShadow: [
-                "inset 0 1px 0 rgba(255,255,255,0.95)",
-                "0 1px 2px rgba(0,0,0,0.04)",
-                `0 18px 48px -16px ${PAGE_ACCENT}38`,
-                `0 48px 100px -32px ${PAGE_ACCENT}22`,
-              ].join(", "),
-            }}
-          >
-            <span
-              className="absolute -inset-px rounded-2xl pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100 -z-10"
-              style={{
-                boxShadow: [
-                  `0 30px 70px -16px ${PAGE_ACCENT}50`,
-                  `0 70px 140px -32px ${PAGE_ACCENT}28`,
-                  `0 0 0 1px ${PAGE_ACCENT}40`,
-                ].join(", "),
-              }}
-              aria-hidden="true"
-            />
-            <div
-              className="absolute top-0 left-8 right-8 h-px pointer-events-none"
-              style={{
-                background: `linear-gradient(90deg, transparent 0%, ${PAGE_HIGHLIGHT}cc 50%, transparent 100%)`,
-              }}
-              aria-hidden="true"
-            />
-            <div className="grid gap-10 lg:grid-cols-5 lg:gap-12 items-center">
-              <div className="lg:col-span-3">
-                {/* Canopy logo plaque: framed dark backdrop showcases
-                    the cyan tree wordmark as a brand element. The image
-                    itself ships with a black background so we mount it
-                    on a black-tinted card with rounded corners and a
-                    subtle amber-edged glow. */}
-                <div className="mb-6 inline-flex items-center gap-4">
-                  <div
-                    className="relative overflow-hidden rounded-xl shrink-0"
-                    style={{
-                      width: 88,
-                      height: 88,
-                      background:
-                        "radial-gradient(ellipse at center, #050a0c 0%, #000 100%)",
-                      boxShadow: [
-                        "inset 0 1px 0 rgba(255,255,255,0.10)",
-                        `0 0 0 1px ${PAGE_ACCENT}55`,
-                        `0 8px 24px -8px ${PAGE_ACCENT}55`,
-                      ].join(", "),
-                    }}
-                  >
-                    <Image
-                      src="/canopy-logo.webp"
-                      alt="Canopy"
-                      width={800}
-                      height={600}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      sizes="88px"
-                    />
-                  </div>
-                  <div>
-                    <div
-                      className="font-display text-2xl font-bold tracking-tight leading-none"
-                      style={{ color: PAGE_DARK }}
-                    >
-                      Canopy
-                    </div>
-                    <div className="mt-1.5 inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em]"
-                      style={{
-                        border: `1px solid ${PAGE_ACCENT}33`,
-                        backgroundColor: `${PAGE_ACCENT}0d`,
-                        color: PAGE_ACCENT,
-                      }}
-                    >
-                      <Gauge className="h-3 w-3" aria-hidden="true" />
-                      Operations Stack on Your Domain
-                    </div>
-                  </div>
-                </div>
-                <h3 className="mt-5 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-                  Replace 5 to 7 SaaS subscriptions with code you own.
-                </h3>
-                <p className="mt-5 text-base text-text-secondary leading-relaxed">
-                  First-party analytics, real-user performance, deliverability
-                  monitoring, infrastructure watchers, error tracking, pipeline
-                  health, and cost telemetry. One operations stack on your own
-                  infrastructure with one auth wall and one source of truth.
-                  The same stack I built for DBJ, productized for your business.
-                </p>
-              </div>
-              <div
-                className="lg:col-span-2 lg:border-l lg:pl-12"
-                style={{ borderColor: `${PAGE_ACCENT}1a` }}
-              >
-                <div
-                  className="font-display text-5xl font-bold tabular-nums"
-                  style={{ color: PAGE_DARK }}
-                >
-                  $25,000
-                </div>
-                <div className="mt-1 text-sm text-text-muted">Starting at</div>
-                <div className="mt-3 text-sm text-text-secondary">
-                  Delivered in 4 to 8 weeks
-                </div>
-                <Link
-                  href="/pricing/canopy"
-                  className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5"
-                  style={{
-                    backgroundColor: BRAND_BLUE,
-                    boxShadow: `0 8px 20px -8px ${BRAND_BLUE}aa`,
-                  }}
-                >
-                  See What's Included
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      {/* Canopy Specialty Engagement section pulled 2026-04-30. The first
+       * install (Star Auto Service) shipped April 29 but Canopy is not yet
+       * ready to be sold publicly: 1 install, no proven case studies across
+       * verticals, no testimonials, ICP still being validated. Lives on
+       * /work/canopy as proof-of-craft until the playbook proves out. The
+       * full markup is preserved in git history for restoration. */}
 
       {/* ─── ADD-ONS ──────────────────────────────────── */}
       <section className="relative py-24 lg:py-32 border-t border-text-primary/8">
