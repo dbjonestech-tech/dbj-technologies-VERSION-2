@@ -46,7 +46,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/pi-l
 
 ### Final state (post-commit)
 
-- Will populate after this commit lands.
+- Feature commit: `fce222b` -- feat(design-briefs): Personal Injury Law image-anchored rewrite (Bauder & Associates). 14 files changed, 137 insertions, 22 deletions (markdown rewrite + brief-index update + hero replacement + 10 new section images + this snapshot).
+- Pushed to `origin main` (`553d702..fce222b main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
