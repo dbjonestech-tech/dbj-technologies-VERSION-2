@@ -66,7 +66,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/process` and watch: (1)
 
 ### Final state (post-commit)
 
-- Will populate after this commit lands.
+- Feature commit: `885accd` -- feat(process, cards): cyan palette + premium card recipe site-wide. 5 files changed, 204 insertions, 27 deletions.
+- Pushed to `origin main` (`1928d93..885accd main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
