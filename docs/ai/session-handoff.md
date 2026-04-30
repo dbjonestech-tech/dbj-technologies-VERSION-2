@@ -53,17 +53,22 @@ Joshua received a third-party "triple-checked live audit" of the site on April 3
 
 ### Open questions Joshua needs to resolve
 
-1. **NAP consistency (Dallas vs Royse City).** Site brands as "Dallas, TX" (`SITE.address`, contact Location card, CLAUDE.md identity). GBP shows physical address `5073 Co Rd 2656, Royse City, TX 75189`, service area `Hunt County, Texas`, phone `(682) 325-8324`, 5.0 / 2 reviews, profile strength "Looks good!". Google's local algorithm treats the two as different NAP strings, which dilutes local-pack signal. Two clean fixes: (a) hide GBP physical address and broaden service area to "Dallas-Fort Worth Metroplex" (lower-effort, keeps home address private), or (b) widen `SITE.address` on the site to "Greater Dallas / DFW Metroplex". Resolve before pursuing local SEO work.
+1. **NAP consistency (Dallas vs Royse City)** — escalated to Google directly on 2026-04-30, Joshua awaiting reply. Site brands as "Dallas, TX" (`SITE.address`, contact Location card, CLAUDE.md identity). GBP shows physical address `5073 Co Rd 2656, Royse City, TX 75189`, service area `Hunt County, Texas`, phone `(682) 325-8324`, 5.0 / 2 reviews, profile strength "Looks good!". Google's local algorithm treats the two as different NAP strings, which dilutes local-pack signal. Two clean fixes are still on the table while we wait: (a) hide GBP physical address and broaden service area to "Dallas-Fort Worth Metroplex" (lower-effort, keeps home address private), or (b) widen `SITE.address` on the site to "Greater Dallas / DFW Metroplex". Hold all local-SEO work until Google's response lands.
 2. **Pathlight intermittent banner.** "Some analysis steps could not be completed" still triggers occasionally. Traced April 27 to s6 finalize on non-transient Anthropic responses (schema validation failures after one retry, or benchmark research timeouts on cold cache). No mitigation shipped yet.
+
+### Post-deploy verification status (2026-04-30 evening)
+
+- **Footer Email + Phone**: Joshua confirmed working in production. Mailto and tel: handlers fire correctly.
+- **Sitemap resubmission**: Joshua resubmitting `https://dbjtechnologies.com/sitemap.xml` in Google Search Console at the close of this session.
+- **GBP / NAP issue**: Joshua has opened the Dallas vs Royse City question with Google directly, awaiting Google's reply. No further site-side action until they respond.
 
 ### Next recommended task
 
-After Vercel propagation, verify the slug rename and footer contact in production:
-1. Hit `https://dbjtechnologies.com/services/frontend-architecture` (or any of the 5 other old slugs) and confirm a clean 301 to the new slug.
-2. Confirm `/services/website-design`, `/services/business-systems`, `/services/hosting`, `/services/user-experience`, `/services/ecommerce`, `/services/speed-and-search` all render the existing detail-page content.
-3. On any page (homepage, pricing, contact), scroll to the footer "Get In Touch" column. Confirm Email + Phone rows render above the location row and that tapping each fires the `mailto:` / `tel:` handlers on a phone.
-4. In Google Search Console (after Vercel deploy), submit the updated sitemap at `https://dbjtechnologies.com/sitemap.xml`. The sitemap now lists the new slugs only; old slugs are 301-redirected.
-5. Resolve the Dallas-vs-Royse-City NAP question (see "Open questions" below) before any local-SEO work.
+In ~2 weeks (around 2026-05-14), verify the SEO + slug-rename soak in Google Search Console:
+1. Confirm the 6 new service URLs (`/services/website-design`, `/services/business-systems`, `/services/hosting`, `/services/user-experience`, `/services/ecommerce`, `/services/speed-and-search`) are indexed.
+2. Confirm the 6 old slugs (`/services/frontend-architecture`, `/services/backend-systems`, `/services/cloud-infrastructure`, `/services/interface-engineering`, `/services/ecommerce-platforms`, `/services/web-performance`) show as redirected (not crawl errors) in the Coverage / Pages report.
+3. Confirm `/pathlight` (marketing page) is indexed and `/pathlight/<scanId>` (per-user reports) are not.
+4. If Google has replied on the GBP/NAP question by then, execute whichever resolution they recommend.
 
 ### Durable lessons from this sprint (worth keeping)
 
