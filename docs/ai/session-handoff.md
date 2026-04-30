@@ -10,7 +10,8 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- `23c8495` feat(strategy): make Pathlight diagnoses, DBJ fixes the homepage's organizing principle
+- (this commit) docs: update session-handoff with afa4958 commit hash
+- `afa4958` feat(strategy): make Pathlight diagnoses, DBJ fixes the homepage's organizing principle
 - `25a71bd` docs: update session-handoff with f68c756 commit hash
 - `f68c756` feat(contact + services): surface email/phone on contact, fix services capability stack on mobile
 - `6b1e0a3` fix(pricing): align CTAs and feature dividers across the three tier cards
