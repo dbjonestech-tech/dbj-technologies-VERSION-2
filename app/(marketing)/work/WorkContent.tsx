@@ -278,18 +278,20 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       <span className="sr-only">: {project.name}</span>
                     </Link>
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors min-h-[44px]"
-                    >
-                      Live Site
-                      <ExternalLink
-                        className="h-3.5 w-3.5"
-                        aria-hidden="true"
-                      />
-                    </a>
+                    {project.liveUrl ? (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors min-h-[44px]"
+                      >
+                        Live Site
+                        <ExternalLink
+                          className="h-3.5 w-3.5"
+                          aria-hidden="true"
+                        />
+                      </a>
+                    ) : null}
                   </div>
                 </div>
               </motion.article>

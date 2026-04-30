@@ -95,7 +95,7 @@ export function Navbar() {
             const isActive = pathname === link.href;
             const isPathlight = link.label === "Pathlight";
             const className = isPathlight
-              ? "relative rounded-lg px-4 py-2 text-sm font-semibold nav-pathlight"
+              ? `relative rounded-lg px-3 py-2 nav-pathlight transition-colors duration-300 ${wordmarkColorClass}`
               : `relative rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 ${
                   isActive
                     ? "text-gray-900 font-semibold"
@@ -104,7 +104,7 @@ export function Navbar() {
             return (
               <Link key={link.href} href={link.href} className={className} aria-label={isPathlight ? link.label : undefined}>
                 {isPathlight ? (
-                  <PathlightWordmark height={18} ariaLabel={link.label} />
+                  <PathlightWordmark height={11} ariaLabel={link.label} />
                 ) : (
                   <span className="relative z-10">{link.label}</span>
                 )}
@@ -188,7 +188,7 @@ export function Navbar() {
               {NAV_LINKS.map((link, i) => {
                 const isPathlight = link.label === "Pathlight";
                 const className = isPathlight
-                  ? "block rounded-lg px-4 py-3 text-lg font-semibold nav-pathlight"
+                  ? "block rounded-lg px-4 py-3 nav-pathlight text-[#0F172A]"
                   : `block rounded-lg px-4 py-3 text-lg font-medium transition-colors ${
                       pathname === link.href
                         ? "text-accent-blue bg-accent-blue/5"
@@ -208,7 +208,7 @@ export function Navbar() {
                       aria-label={isPathlight ? link.label : undefined}
                     >
                       {isPathlight ? (
-                        <PathlightWordmark height={26} ariaLabel={link.label} />
+                        <PathlightWordmark height={16} ariaLabel={link.label} />
                       ) : (
                         link.label
                       )}

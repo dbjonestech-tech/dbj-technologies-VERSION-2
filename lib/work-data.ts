@@ -32,7 +32,10 @@ export interface ProjectDetail {
   description: string;
   category: string;
   gradient: string;
-  liveUrl: string;
+  /** Optional. When provided, the deep-dive renders a "View Live Site"
+   * button in the hero. Omit for projects that have no public-facing live
+   * URL the visitor could meaningfully click through to. */
+  liveUrl?: string;
   metrics: ProjectMetric[];
   techStack: string[];
   notable: string;
@@ -336,7 +339,8 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "An operations dashboard I built first for myself to run DBJ Technologies, then deployed for a client as the first install. Visitor analytics, real-user performance, deployment lifecycle, infrastructure watchers, error tracking, email deliverability, and an admin audit log. One dashboard, on the client's own domain, with one auth wall and one source of truth.",
     category: "Internal Tooling",
     gradient: "from-cyan-500 to-blue-600",
-    liveUrl: "https://dbjtechnologies.com/work/canopy",
+    /* No public liveUrl: the dashboard itself is auth-walled per-client,
+     * so a "View Live Site" button would dead-end at a Google sign-in. */
     metrics: [
       { label: "Sections", value: "9" },
       { label: "Live Install", value: "Star Auto" },
@@ -352,7 +356,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "Built first for myself to run DBJ Technologies. Star Auto Service is install zero, the proving ground for the architecture before any wider productized rollout.",
     image: "/images/case-studies/canopy-dashboard.webp",
     heroDescription:
-      "An operations dashboard built first for the studio that ships it, then deployed as install zero for a real client. Star Auto Service in Richardson, TX is the first external Canopy: visitor analytics, real-user Web Vitals, Vercel deployment lifecycle, infrastructure watchers, error tracking, email deliverability, and an admin audit log, all on the client's own domain at ops.thestarautoservice.com behind a Google sign-in. Not yet a productized offering for sale. Live as a working install, on the way to becoming one once the playbook proves out across more verticals.",
+      "An operations dashboard built first for the studio that ships it, then deployed as install zero for a real client. Star Auto Service in Richardson, TX is the first external Canopy, surfacing visitor analytics, real-user performance, deployment health, infrastructure posture, error tracking, email deliverability, and an admin access log, all on the client's own domain behind a Google sign-in. Not yet a productized offering for sale. Live as a working install, on the way to becoming one once the playbook proves out across more verticals.",
     sections: [
       {
         heading: "The Problem",
@@ -360,15 +364,15 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
       {
         heading: "The Solution",
-        body: "Canopy is a single operations dashboard that replaces the SaaS sprawl. One login, one domain, one Postgres, one place to look. Visitor analytics that join the same session across page-views, performance, and conversion events. Real-user Web Vitals captured from every visitor with thresholds tied to the actual Core Web Vitals spec. Vercel deployment lifecycle posted in real time from the platform's webhook. Infrastructure watchers running daily TLS, WHOIS, MX, SPF, DKIM, and DMARC checks per domain. Error tracking grouped by fingerprint with affected-user counts. Email deliverability ingested directly from the sending platform's webhook. An admin audit log so every sign-in is accountable. Nine sections of operations intelligence, all on the buyer's domain, in the buyer's database, under the buyer's auth.",
+        body: "Canopy is a single operations dashboard that replaces the SaaS sprawl. One login, one domain, one place to look. Visitor analytics, real-user performance, deployment health, infrastructure posture, error tracking, email deliverability, and an admin access log, all joined to the same session and the same business outcomes. The whole stack lives on the client's own domain, in the client's own database, under the client's own auth wall.",
       },
       {
-        heading: "What the Star Auto Install Includes",
-        body: "Miguel runs the auto repair shop. He signs into ops.thestarautoservice.com with his Google account and sees the worst-of-status banner first: any failing deploys, any spiking errors, any infrastructure that needs attention. Below that, eight headline stat cards with sparkline trends and signed deltas against the prior period, then real-time feeds for recent deploys, recent errors, infrastructure status, and live visitor sessions. Each section drills into its own page: Visitors with top pages, top referrers, UTM source breakdown, devices, and a recent-sessions table; Real-User Performance with p75 LCP, INP, CLS, TTFB, and FCP plus per-page and per-device breakdowns; Platform with deploy outcomes, build cadence, function p95, and a hot-functions table; Infrastructure with a per-domain check grid and TLS expiry countdowns; Errors grouped by fingerprint with affected users; Email with delivery and bounce rates plus the 30-day trend; an admin Audit log of every sign-in. Same architecture I run for the studio, productized so the install path is repeatable.",
+        heading: "What the Star Auto Install Looks Like",
+        body: "The shop owner signs into the dashboard with his Google account and sees a worst-of-status banner first: anything failing, anything spiking, anything that needs attention surfaced before he has to go look. Below that, headline metrics with trend deltas against yesterday and the prior week. Each operational domain (visitors, performance, deploys, infrastructure, errors, email, admin access) drills into a focused page. Same architecture I run for the studio, transferred onto Star Auto's own infrastructure with one auth wall and one source of truth.",
       },
       {
         heading: "How It Is Different",
-        body: "Datadog, PostHog, Sentry, and the rest are excellent products. The reason to build in-house is when the buyer needs data joined to their specific business outcomes (visitor-to-customer attribution across marketing, product, and sales) or when SaaS sprawl is costing them more annually than the build pays back in. Canopy is for the cases where a single SaaS does not work. Owned by the buyer, not rented. On the buyer's domain, not a third-party subdomain. In the buyer's database, not someone else's data center. Behind the buyer's auth, not a vendor login. Walking away cleanly is the productized promise: every install is structured so the buyer keeps deploying it themselves long after the engagement ends.",
+        body: "Datadog, PostHog, Sentry, and the rest are excellent products. The reason to build in-house is when the buyer needs data joined to their specific business outcomes (visitor-to-customer attribution across marketing, product, and sales) or when SaaS sprawl is costing them more annually than a custom build pays back in. Canopy is for the cases where a single SaaS does not work. Owned by the buyer, not rented. On the buyer's domain, not a third-party subdomain. In the buyer's database, not someone else's data center. Behind the buyer's auth, not a vendor login.",
       },
       {
         heading: "What Comes Next",
@@ -397,20 +401,19 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
           "Raw visitor IPs are never persisted. Identifiers are first-party only, not third-party tracking cookies. The whole capture pipeline assumes the question 'can you defend this against a privacy challenge' will get asked, and the answer is yes. That stance also future-proofs the install against the next round of cookie deprecations.",
       },
       {
-        name: "Daily Watchers, Surfaced Before They Bite",
+        name: "Surfaced Before It Bites",
         reason:
-          "TLS expiry, WHOIS, MX, SPF, DKIM, DMARC checked daily per tracked domain. Email deliverability rolled up from the sending platform. Deploy lifecycle ingested in real time. The dashboard reads from already-aggregated tables, so opening it is instant even when the underlying data is large. Issues surface before they become outages.",
+          "Certificate, domain, and email-auth posture checked daily per tracked domain. Deployment health and email deliverability ingested in real time. The dashboard is fast even when the underlying data is large because it reads from already-aggregated views. Issues surface as warnings before they become outages.",
       },
     ],
     timeline:
-      "Built first for DBJ Technologies as my own internal operations cockpit. Productized into a per-client engagement after the patterns proved durable across a year of running my own studio on it. The first external install lives at ops.thestarautoservice.com for Star Auto Service in Richardson, TX. Each engagement is delivered as the buyer's own infrastructure, in their own accounts, transferred cleanly so the buyer keeps deploying it themselves long after the work is done.",
+      "Built first for DBJ Technologies as my own internal operations cockpit. Star Auto Service in Richardson, TX is install zero, the first external proof that the architecture transfers cleanly off the studio's stack and onto somebody else's. Each install is delivered as the client's own infrastructure, in their own accounts, structured so they keep deploying it themselves long after the work is done.",
     ctaText: "Get in Touch",
     ctaHref: "/contact",
     showcaseVideo: {
       mp4: "/images/case-studies/canopy-showcase.mp4",
       webm: "/images/case-studies/canopy-showcase.webm",
       poster: "/images/case-studies/canopy-showcase-poster.jpg",
-      caption: "Live from ops.thestarautoservice.com",
     },
   },
 ];

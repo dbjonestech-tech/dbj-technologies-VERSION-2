@@ -231,20 +231,22 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                 variants={item}
                 className="flex flex-wrap items-center gap-x-6 gap-y-4"
               >
-                <a
-                  href={project.liveUrl}
-                  target={project.liveUrl.startsWith("http") ? "_blank" : undefined}
-                  rel={
-                    project.liveUrl.startsWith("http")
-                      ? "noopener noreferrer"
-                      : undefined
-                  }
-                  className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
-                  style={{ backgroundColor: accent }}
-                >
-                  View Live Site
-                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                </a>
+                {project.liveUrl ? (
+                  <a
+                    href={project.liveUrl}
+                    target={project.liveUrl.startsWith("http") ? "_blank" : undefined}
+                    rel={
+                      project.liveUrl.startsWith("http")
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
+                    className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
+                    style={{ backgroundColor: accent }}
+                  >
+                    View Live Site
+                    <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                  </a>
+                ) : null}
                 <Link
                   href="#case-study"
                   className="inline-flex items-center gap-2 text-sm font-semibold text-text-primary border-b border-text-primary/30 hover:border-text-primary transition-colors pb-1"
@@ -270,84 +272,43 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                   boxShadow: `0 50px 120px -30px ${accent}55, 0 25px 60px -20px rgba(0,0,0,0.22)`,
                 }}
               >
-                <Image
-                  src={project.image}
-                  alt={`${project.name} screenshot`}
-                  fill
-                  priority
-                  className="object-cover object-top"
-                  sizes="(max-width: 1024px) 100vw, 1400px"
-                />
+                {project.showcaseVideo ? (
+                  /* When the project provides a showcase video, the video
+                   * occupies the hero slot directly instead of stacking
+                   * static image + video. The static `image` field is still
+                   * used for /work grid cards, opengraph, and the poster. */
+                  <video
+                    className="h-full w-full object-cover"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    poster={project.showcaseVideo.poster}
+                    preload="metadata"
+                  >
+                    {project.showcaseVideo.webm ? (
+                      <source src={project.showcaseVideo.webm} type="video/webm" />
+                    ) : null}
+                    <source src={project.showcaseVideo.mp4} type="video/mp4" />
+                  </video>
+                ) : (
+                  <Image
+                    src={project.image}
+                    alt={`${project.name} screenshot`}
+                    fill
+                    priority
+                    className="object-cover object-top"
+                    sizes="(max-width: 1024px) 100vw, 1400px"
+                  />
+                )}
               </div>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Showcase video (autoplay loop, muted, plays inline). Rendered when
-       * the project entry provides showcaseVideo. Sits between the hero
-       * still image and the case-study sections so visitors see the product
-       * in motion before reading. */}
-      {project.showcaseVideo ? (
-        <section className="relative pt-12 lg:pt-20">
-          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
-            {project.showcaseVideo.caption ? (
-              <motion.p
-                initial={reduced ? { opacity: 1 } : { opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={VIEWPORT}
-                transition={{ duration: 0.45, ease: EASE_OUT }}
-                className="mb-4 text-center font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted"
-              >
-                <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: accent }} aria-hidden="true" />
-                {project.showcaseVideo.caption}
-              </motion.p>
-            ) : null}
-            <motion.div
-              initial={reduced ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.985 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={VIEWPORT}
-              transition={{ duration: 0.7, ease: EASE_OUT }}
-              className="relative"
-            >
-              <div
-                className="absolute -inset-6 lg:-inset-10 -z-10 blur-3xl pointer-events-none"
-                style={{
-                  background: `radial-gradient(ellipse at 30% 50%, ${haloA} 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, ${haloB} 0%, transparent 60%)`,
-                  opacity: 0.55,
-                }}
-                aria-hidden="true"
-              />
-              <div
-                className="relative overflow-hidden rounded-2xl lg:rounded-3xl border-2 transform-gpu aspect-video bg-bg-secondary"
-                style={{
-                  borderColor: `${accent}55`,
-                  boxShadow: `0 50px 120px -30px ${accent}55, 0 25px 60px -20px rgba(0,0,0,0.22)`,
-                }}
-              >
-                <video
-                  className="h-full w-full object-cover"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  poster={project.showcaseVideo.poster}
-                  preload="metadata"
-                >
-                  {project.showcaseVideo.webm ? (
-                    <source src={project.showcaseVideo.webm} type="video/webm" />
-                  ) : null}
-                  <source src={project.showcaseVideo.mp4} type="video/mp4" />
-                </video>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-      ) : null}
-
-      {/* Section divider. Pads from the video section above when present;
-       * otherwise sits flush against the hero like other case studies. */}
-      <div className={`mx-auto max-w-[1400px] px-6 lg:px-12 ${project.showcaseVideo ? "pt-16 lg:pt-24" : ""}`}>
+      {/* Section divider sits flush against the hero. */}
+      <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
         <div
           className="h-px w-full"
           style={{
