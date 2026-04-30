@@ -38,9 +38,9 @@ Saved as a project memory under `~/.claude/projects/.../memory/project_business_
 
 ### Final state (post-commit)
 
-- Feature commit hash: pending amend.
+- Feature commit: `f68c756` -- feat(contact + services): surface email/phone on contact, fix services capability stack on mobile. 6 files changed, 132 insertions, 10 deletions.
+- Pushed to `origin main` (`6b1e0a3..f68c756 main -> main`). Note: push log warns "Bypassed rule violations for refs/heads/main: 4 of 4 required status checks are expected" -- branch protection has required checks configured but the push still went through; worth confirming the check policy matches Joshua's intent.
 - Working tree clean apart from this snapshot amendment.
-- Pushed to `origin main`.
 
 ### Next recommended task
 
