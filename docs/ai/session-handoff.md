@@ -10,7 +10,9 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with afa4958 commit hash
+- (this commit) feat(pricing): add Fix Sprint as the post-Pathlight-scan engagement tier
+- `63b7d29` docs: capture post-deploy verification + Google NAP escalation in session-handoff
+- `f1bfa23` docs: update session-handoff with afa4958 commit hash
 - `afa4958` feat(strategy): make Pathlight diagnoses, DBJ fixes the homepage's organizing principle
 - `25a71bd` docs: update session-handoff with f68c756 commit hash
 - `f68c756` feat(contact + services): surface email/phone on contact, fix services capability stack on mobile
@@ -20,7 +22,18 @@ header before the April 30 reset.
 
 Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys from main.
 
-### What landed in the last code sprint (April 30 evening, post-audit response)
+### What landed in the latest code sprint (April 30 late evening, Fix Sprint tier)
+
+- **Fix Sprint pricing tier added at $2,995, 2-week timeline.** Closes the audit's "no Pathlight-to-engagement bridge" gap. Pathlight stays free; Fix Sprint is the paid post-scan engagement that takes the top 3 issues from a Pathlight report and ships the fixes in two weeks, fixed price.
+  - **Price reasoning:** $175/hr Joshua-rate × ~14h scope = ~$2,450 hourly equivalent. $2,995 charm-prices just under the $3K SMB self-approve threshold, gives healthy fixed-price margin, premium-position-coherent for a principal-architect studio, and clearly differentiated from $4,500 Starter (which is a full new-build, not a fix engagement).
+  - **Detail page:** New `fix-sprint` entry as the first item in `PRICING_DETAILS` (`lib/pricing-data.ts`), giving a full `/pricing/fix-sprint` page with its own hero, 3 sections (What Gets Fixed / How It Works / What You Get at the End), 3 FAQ entries. Auto-generates `Offer` JSON-LD + `BreadcrumbList` schema via `/pricing/[slug]/page.tsx`. Auto-listed in sitemap via `getPricingSlugs()`. CTA goes to `/contact`.
+  - **/pricing callout:** New `FIX_SPRINT` export in `lib/siteContent.ts` (re-exported via `lib/constants.ts`) drives a distinct callout section in `app/(marketing)/pricing/PricingContent.tsx` between the hero and the existing "Three Tiers" deep-dive section. ChapterHeader pattern matching the rest of the page, amber accent color (PAGE_ACCENT), "What's Included" feature list with 8 bullets, $2,995 price block, "Start a Fix Sprint" CTA to `/contact`. `id="fix-sprint"` so deep-links work. Visually distinct treatment intentional: Fix Sprint is a different engagement category (fix-what's-broken) from the 3 full-build tiers (Starter / Professional / Enterprise) below it.
+  - **Pathlight page closing CTA:** PathlightContent.tsx Section 6 now has a secondary "See the Fix Sprint" link pointing to `/pricing#fix-sprint` alongside the primary "Run Free Scan" CTA. Closes the Pathlight-to-engagement loop.
+  - **Project type select:** "Pathlight Fix Sprint" added as the first option in `PROJECT_TYPE_OPTIONS` so contact-form submissions originating from a Fix Sprint inquiry can be tagged.
+  - **Build configurator (`/pricing/build`):** Intentionally NOT updated. Fix Sprint is a fix engagement, not a build, and BuildContent.tsx hardcodes only starter/professional/enterprise.
+  - **Coherence audit done before commit:** Fixed two cross-file inconsistencies. Price aligned at $2,995 in both PRICING_DETAILS and FIX_SPRINT.price (initially split $2,500/$2,995). Post-launch support aligned at "30 days" everywhere (initially split "14 days" in FIX_SPRINT.features and "30 days" in detail page; harmonized to 30 to match Joshua's "I don't disappear" brand voice and every other tier's support window).
+
+### What landed in the prior code sprint (April 30 evening, post-audit response)
 
 - **Homepage strategy refactor**: The diagnose-fix-grow model is now the homepage's organizing principle (the audit's central recommendation, accepted).
   - `HERO_CONTENT.subheading` rewritten to state the model explicitly: *"Pathlight scans your website and shows you exactly where it's losing trust, leads, and revenue. I fix the highest-impact issues first. Fixed price. Full ownership. No retainer."* Headline ("Architect The Impossible") unchanged - master-brand identity stays separate from the product-tagline pitch underneath.
@@ -53,7 +66,7 @@ Joshua received a third-party "triple-checked live audit" of the site on April 3
 
 ### Open questions Joshua needs to resolve
 
-1. **NAP consistency (Dallas vs Royse City)** — escalated to Google directly on 2026-04-30, Joshua awaiting reply. Site brands as "Dallas, TX" (`SITE.address`, contact Location card, CLAUDE.md identity). GBP shows physical address `5073 Co Rd 2656, Royse City, TX 75189`, service area `Hunt County, Texas`, phone `(682) 325-8324`, 5.0 / 2 reviews, profile strength "Looks good!". Google's local algorithm treats the two as different NAP strings, which dilutes local-pack signal. Two clean fixes are still on the table while we wait: (a) hide GBP physical address and broaden service area to "Dallas-Fort Worth Metroplex" (lower-effort, keeps home address private), or (b) widen `SITE.address` on the site to "Greater Dallas / DFW Metroplex". Hold all local-SEO work until Google's response lands.
+1. **NAP consistency (Dallas vs Royse City)**, escalated to Google directly on 2026-04-30, Joshua awaiting reply. Site brands as "Dallas, TX" (`SITE.address`, contact Location card, CLAUDE.md identity). GBP shows physical address `5073 Co Rd 2656, Royse City, TX 75189`, service area `Hunt County, Texas`, phone `(682) 325-8324`, 5.0 / 2 reviews, profile strength "Looks good!". Google's local algorithm treats the two as different NAP strings, which dilutes local-pack signal. Two clean fixes are still on the table while we wait: (a) hide GBP physical address and broaden service area to "Dallas-Fort Worth Metroplex" (lower-effort, keeps home address private), or (b) widen `SITE.address` on the site to "Greater Dallas / DFW Metroplex". Hold all local-SEO work until Google's response lands.
 2. **Pathlight intermittent banner.** "Some analysis steps could not be completed" still triggers occasionally. Traced April 27 to s6 finalize on non-transient Anthropic responses (schema validation failures after one retry, or benchmark research timeouts on cold cache). No mitigation shipped yet.
 
 ### Post-deploy verification status (2026-04-30 evening)

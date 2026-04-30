@@ -146,8 +146,8 @@ export function PathlightContent() {
             style={{ color: "#9ca3af" }}
           >
             When your scan is done, you'll know exactly where your website is
-            losing leads. The studio behind Pathlight is the same team that
-            ships the fixes. Fixed price. Full ownership. No retainer.
+            losing leads. The Fix Sprint takes the top three and ships them in
+            two weeks, fixed price. Same architect, same standard.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <a
@@ -162,14 +162,14 @@ export function PathlightContent() {
               Run Free Scan
             </a>
             <Link
-              href="/contact"
+              href="/pricing#fix-sprint"
               className="inline-flex w-full items-center justify-center rounded-full border px-7 py-3.5 font-display text-sm font-semibold text-white transition-colors hover:border-white/20 sm:w-auto sm:text-base"
               style={{
                 borderColor: "rgba(255,255,255,0.12)",
                 backgroundColor: "rgba(10,12,18,0.45)",
               }}
             >
-              Book a Strategy Call
+              See the Fix Sprint
             </Link>
           </div>
         </div>

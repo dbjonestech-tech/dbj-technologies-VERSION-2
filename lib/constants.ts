@@ -41,6 +41,7 @@ export {
   PROJECT_TYPE_OPTIONS,
   PATHLIGHT_CTA_CONTENT,
   DIAGNOSE_FIX_GROW,
+  FIX_SPRINT,
 } from "./siteContent";
 
 /* ─── SITE META ─────────────────────────────────────── */

@@ -36,6 +36,49 @@ export interface AddOn {
 
 export const PRICING_DETAILS: PricingDetail[] = [
   {
+    slug: "fix-sprint",
+    name: "Fix Sprint",
+    price: "$2,995",
+    timeline: "2 weeks",
+    heroDescription:
+      "The fastest path from a Pathlight report to fewer revenue leaks. I take the three highest-impact issues from your scan and ship the fixes in two weeks. Fixed price, full source code ownership, and a re-scan after launch so you can verify the difference.",
+    idealFor:
+      "Businesses who just ran a Pathlight scan, saw the revenue-impact estimate, and want the highest-leverage fixes shipped now without committing to a full rebuild. Ideal when your site mostly works but specific issues are quietly costing you leads.",
+    sections: [
+      {
+        heading: "What Gets Fixed",
+        body: "The three top-priority issues from your Pathlight report, ranked by revenue impact. That typically means a mix of trust signals, conversion paths, mobile rendering, page speed, or messaging clarity. I scope the exact list with you in a 30-minute kickoff so the two weeks are spent on the highest-leverage work, not guesswork.",
+      },
+      {
+        heading: "How It Works",
+        body: "You send your Pathlight report. I review it, propose the three fixes I would prioritize, and confirm the scope with you. Build happens in a focused two-week sprint with one mid-sprint check-in. At launch you get the deployed fixes, a before-and-after Lighthouse comparison, and a fresh Pathlight re-scan so you can see the score change.",
+      },
+      {
+        heading: "What You Get at the End",
+        body: "The three fixes deployed to production, full source code committed to your repository, a before-and-after report covering Lighthouse scores plus the relevant Pathlight pillar movement, and 30 days of post-launch support for any follow-up issues. If you want to keep going, the $2,995 is credited toward a Starter, Professional, or Enterprise engagement.",
+      },
+    ],
+    faq: [
+      {
+        question: "What if my scan flagged more than three issues?",
+        answer:
+          "I prioritize the three with the highest revenue impact and clearest scope. If you want to ship more in one engagement, the Starter or Professional tier is usually the better fit, and the Fix Sprint fee is credited toward it.",
+      },
+      {
+        question: "Do I have to use Pathlight to qualify?",
+        answer:
+          "Pathlight is the easiest path because it produces the exact diagnosis I work from. If you have an audit from another tool or a list of known issues, send them over and I will tell you whether the scope fits a Fix Sprint.",
+      },
+      {
+        question: "What is not included?",
+        answer:
+          "New pages, brand redesigns, copywriting beyond the targeted fixes, and feature additions are out of scope. Fix Sprint is for repairing what is quietly broken on your existing site, not rebuilding it. If you need a rebuild, the Starter or Professional tier is the right fit.",
+      },
+    ],
+    ctaText: "Start a Fix Sprint",
+    ctaHref: "/contact",
+  },
+  {
     slug: "starter",
     name: "Starter",
     price: "$4,500",

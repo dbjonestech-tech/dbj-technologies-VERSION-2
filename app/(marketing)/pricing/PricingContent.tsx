@@ -17,6 +17,7 @@ import {
   PRICING_TIERS,
   PRICING_ADDONS,
   FAQ_ITEMS,
+  FIX_SPRINT,
 } from "@/lib/constants";
 
 /* ─── PAGE IDENTITY ───────────────────────────────────
@@ -329,6 +330,147 @@ export default function PricingContent() {
                 See Each Tier
               </Link>
             </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── FIX SPRINT (DIAGNOSTIC-LED ENGAGEMENT) ──── */}
+      <section
+        id="fix-sprint"
+        className="relative py-24 lg:py-32 scroll-mt-24"
+      >
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+          <div className="mb-14 lg:mb-20 max-w-3xl">
+            <ChapterHeader
+              label={FIX_SPRINT.eyebrow}
+              heading={FIX_SPRINT.heading}
+              reduce={reduce}
+            />
+            <motion.p
+              initial={reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT}
+              transition={{
+                duration: reduce ? 0 : 0.7,
+                ease: EASE_OUT,
+                delay: 0.25,
+              }}
+              className="mt-8 text-lg leading-[1.7] text-text-secondary"
+            >
+              {FIX_SPRINT.subheading}
+            </motion.p>
+          </div>
+
+          <motion.div
+            initial={
+              reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }
+            }
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT}
+            transition={{
+              duration: reduce ? 0 : 0.7,
+              ease: EASE_OUT,
+              delay: 0.3,
+            }}
+            whileHover={
+              reduce
+                ? undefined
+                : { y: -6, transition: { duration: 0.35, ease: EASE_OUT } }
+            }
+            className="group relative max-w-5xl rounded-2xl border p-8 lg:p-10 cursor-default"
+            style={{
+              borderColor: `${PAGE_ACCENT}55`,
+              background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}10 100%)`,
+              boxShadow: [
+                "inset 0 1px 0 rgba(255,255,255,0.95)",
+                "0 1px 2px rgba(0,0,0,0.04)",
+                `0 22px 56px -16px ${PAGE_ACCENT}40`,
+                `0 56px 112px -32px ${PAGE_ACCENT}30`,
+              ].join(", "),
+            }}
+          >
+            <span
+              className="absolute -inset-px rounded-2xl pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100 -z-10"
+              style={{
+                boxShadow: [
+                  `0 30px 70px -16px ${PAGE_ACCENT}55`,
+                  `0 70px 140px -32px ${PAGE_ACCENT}30`,
+                  `0 0 0 1px ${PAGE_ACCENT}40`,
+                ].join(", "),
+              }}
+              aria-hidden="true"
+            />
+            <div
+              className="absolute top-0 left-6 right-6 h-px pointer-events-none"
+              style={{
+                background: `linear-gradient(90deg, transparent 0%, ${PAGE_LIGHT}99 50%, transparent 100%)`,
+              }}
+              aria-hidden="true"
+            />
+
+            <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-start lg:gap-12">
+              <div>
+                <h3 className="font-display text-3xl font-bold tracking-tight lg:text-4xl">
+                  {FIX_SPRINT.heading}
+                </h3>
+                <p className="mt-4 text-base leading-relaxed text-text-secondary lg:text-[1.0625rem]">
+                  {FIX_SPRINT.description}
+                </p>
+                <div className="mt-8 flex items-baseline gap-2">
+                  <span
+                    className="font-display text-5xl font-bold tabular-nums lg:text-6xl"
+                    style={{ color: PAGE_DARK }}
+                  >
+                    ${FIX_SPRINT.price.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-text-muted">
+                    fixed price
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-text-secondary">
+                  Delivered in {FIX_SPRINT.timeline}
+                </p>
+                <Link
+                  href={FIX_SPRINT.ctaHref}
+                  className="mt-7 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
+                  style={{ backgroundColor: BRAND_BLUE }}
+                >
+                  {FIX_SPRINT.cta}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+
+              <div
+                className="rounded-xl border p-6 lg:p-7"
+                style={{
+                  borderColor: `${PAGE_ACCENT}1f`,
+                  background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}06 100%)`,
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95)",
+                }}
+              >
+                <p
+                  className="text-[10px] font-mono uppercase tracking-widest mb-4"
+                  style={{ color: PAGE_DARK }}
+                >
+                  What&apos;s Included
+                </p>
+                <ul className="space-y-3">
+                  {FIX_SPRINT.features.map((feature) => (
+                    <li
+                      key={feature}
+                      className="flex items-start gap-3 text-sm text-text-secondary leading-relaxed"
+                    >
+                      <Check
+                        className="mt-0.5 h-4 w-4 shrink-0"
+                        style={{ color: PAGE_ACCENT }}
+                        aria-hidden="true"
+                      />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>

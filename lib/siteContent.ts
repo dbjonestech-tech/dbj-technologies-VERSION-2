@@ -591,6 +591,7 @@ export const CTA_DEFAULTS: CTADefaults = {
 /* ─── BUDGET OPTIONS (CONTACT FORM) ────────────────── */
 
 export const BUDGET_OPTIONS = [
+  "Under $4,500",
   "$4,500 to $10,000",
   "$10,000 to $25,000",
   "$25,000+",
@@ -598,6 +599,7 @@ export const BUDGET_OPTIONS = [
 ];
 
 export const PROJECT_TYPE_OPTIONS = [
+  "Pathlight Fix Sprint",
   "New Website",
   "Website Redesign",
   "Web Application",
@@ -606,3 +608,28 @@ export const PROJECT_TYPE_OPTIONS = [
   "Infrastructure & DevOps",
   "Other",
 ];
+
+/* ─── FIX SPRINT (DIAGNOSTIC-LED ENGAGEMENT) ───────── */
+
+export const FIX_SPRINT = {
+  eyebrow: "After Your Pathlight Scan",
+  heading: "The Fix Sprint",
+  subheading:
+    "Top 3 fixes from your Pathlight report, shipped in two weeks. Fixed price, no discovery phase, no scoping cycle. The report is the spec.",
+  price: 2995,
+  timeline: "2 weeks",
+  description:
+    "When your scan is done, the report identifies your top three issues ranked by impact. The Fix Sprint takes those exact issues, in that exact order, and ships them. No re-discovery, no agency overhead. I built Pathlight. I ship the fixes.",
+  features: [
+    "Top 3 Pathlight fixes implemented, in priority order",
+    "Real-user performance verified before and after",
+    "Mobile and desktop both addressed",
+    "Fixed price, no scope creep",
+    "Full source code delivered",
+    "Lighthouse audit at delivery",
+    "30 days of post-launch support",
+    "Direct line to me, no project manager layer",
+  ],
+  cta: "Start a Fix Sprint",
+  ctaHref: "/contact",
+};
