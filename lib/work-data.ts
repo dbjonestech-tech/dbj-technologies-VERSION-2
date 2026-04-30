@@ -340,7 +340,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     metrics: [
       { label: "Sections", value: "9" },
       { label: "Live Install", value: "Star Auto" },
-      { label: "Built In", value: "Two days" },
+      { label: "SaaS Replaced", value: "5-7" },
     ],
     techStack: [
       "Next.js 16",
