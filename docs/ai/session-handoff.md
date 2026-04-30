@@ -10,7 +10,8 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) feat(pricing): add Fix Sprint as the post-Pathlight-scan engagement tier
+- (this commit) docs: update session-handoff with 247bda1 commit hash
+- `247bda1` feat(pricing): add Fix Sprint as the post-Pathlight-scan engagement tier
 - `63b7d29` docs: capture post-deploy verification + Google NAP escalation in session-handoff
 - `f1bfa23` docs: update session-handoff with afa4958 commit hash
 - `afa4958` feat(strategy): make Pathlight diagnoses, DBJ fixes the homepage's organizing principle
