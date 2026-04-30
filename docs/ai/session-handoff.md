@@ -61,7 +61,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/process` and watch: (1)
 
 ### Final state (post-commit)
 
-- Will populate after this commit lands.
+- Feature commit: `d231066` -- feat(process): silvery charcoal palette + glow/pulse motion (kills indigo). 2 files changed, 247 insertions, 63 deletions (process repaint + this snapshot).
+- Pushed to `origin main` (`f23d4d7..d231066 main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
