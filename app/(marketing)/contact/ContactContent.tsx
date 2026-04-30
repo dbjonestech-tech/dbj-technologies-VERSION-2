@@ -18,8 +18,10 @@ import {
   Gauge,
   KeyRound,
   Loader2,
+  Mail,
   MapPin,
   Pencil,
+  Phone,
   Send,
 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
@@ -706,6 +708,80 @@ export default function ContactContent() {
               }}
               className="lg:col-span-2 space-y-6"
             >
+              <a
+                href={`mailto:${SITE.email}`}
+                className="group relative block rounded-2xl border p-7 transition-all motion-safe:hover:-translate-y-0.5"
+                style={{
+                  borderColor: `${PAGE_ACCENT}26`,
+                  background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}04 100%)`,
+                  boxShadow: [
+                    "inset 0 1px 0 rgba(255,255,255,0.95)",
+                    "0 1px 2px rgba(0,0,0,0.03)",
+                    `0 8px 22px -10px ${PAGE_ACCENT}1f`,
+                  ].join(", "),
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                    style={{
+                      backgroundColor: `${PAGE_ACCENT}15`,
+                      color: PAGE_DARK,
+                    }}
+                  >
+                    <Mail className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-text-muted mb-1 font-mono">
+                      Email
+                    </p>
+                    <p className="text-sm font-medium text-text-primary break-all group-hover:underline underline-offset-4 decoration-text-primary/30">
+                      {SITE.email}
+                    </p>
+                    <p className="mt-1 text-xs text-text-secondary leading-snug">
+                      Replies typically same day.
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <a
+                href={`tel:${SITE.phoneTel}`}
+                className="group relative block rounded-2xl border p-7 transition-all motion-safe:hover:-translate-y-0.5"
+                style={{
+                  borderColor: `${PAGE_ACCENT}26`,
+                  background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}04 100%)`,
+                  boxShadow: [
+                    "inset 0 1px 0 rgba(255,255,255,0.95)",
+                    "0 1px 2px rgba(0,0,0,0.03)",
+                    `0 8px 22px -10px ${PAGE_ACCENT}1f`,
+                  ].join(", "),
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                    style={{
+                      backgroundColor: `${PAGE_ACCENT}15`,
+                      color: PAGE_DARK,
+                    }}
+                  >
+                    <Phone className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-text-muted mb-1 font-mono">
+                      Phone
+                    </p>
+                    <p className="text-sm font-medium text-text-primary tracking-wider group-hover:underline underline-offset-4 decoration-text-primary/30">
+                      {SITE.phoneDisplay}
+                    </p>
+                    <p className="mt-1 text-xs text-text-secondary leading-snug">
+                      Mon to Fri, 9 to 6 Central. Tap to call.
+                    </p>
+                  </div>
+                </div>
+              </a>
+
               <div
                 className="relative rounded-2xl border p-7"
                 style={{

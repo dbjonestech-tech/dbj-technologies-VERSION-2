@@ -201,7 +201,7 @@ function CapabilityStack({ reduce }: { reduce: boolean | null }) {
               ease: EASE_OUT,
               delay: reduce ? 0 : 0.4 + i * 0.12,
             }}
-            className="group relative flex items-center gap-4 rounded-xl border p-4 transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:translate-x-1"
+            className="group relative flex items-start lg:items-center gap-3 sm:gap-4 rounded-xl border p-3.5 sm:p-4 transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:translate-x-1"
             style={{
               borderColor: `${PAGE_ACCENT}30`,
               background: `linear-gradient(135deg, #ffffff 0%, ${PAGE_LIGHT}08 100%)`,
@@ -223,7 +223,7 @@ function CapabilityStack({ reduce }: { reduce: boolean | null }) {
             />
             {/* Brushed-metal icon chip */}
             <div
-              className="ml-2 inline-flex h-10 w-10 items-center justify-center rounded-lg shrink-0 transition-transform duration-300 motion-safe:group-hover:scale-110"
+              className="ml-1.5 sm:ml-2 inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg shrink-0 transition-transform duration-300 motion-safe:group-hover:scale-110"
               style={{
                 background: `linear-gradient(145deg, ${PAGE_LIGHT}25 0%, ${PAGE_ACCENT}12 100%)`,
                 color: PAGE_ACCENT,
@@ -236,12 +236,12 @@ function CapabilityStack({ reduce }: { reduce: boolean | null }) {
               <h3 className="font-display text-sm lg:text-base font-bold text-text-primary leading-tight tracking-tight">
                 {service.title}
               </h3>
-              <p className="mt-0.5 text-xs lg:text-[0.8rem] text-text-secondary leading-snug truncate">
+              <p className="mt-0.5 text-xs lg:text-[0.8rem] text-text-secondary leading-snug line-clamp-2 lg:truncate">
                 {service.tagline}
               </p>
             </div>
             <span
-              className="font-mono text-[10px] uppercase tracking-[0.2em] shrink-0"
+              className="hidden sm:inline-flex font-mono text-[10px] uppercase tracking-[0.2em] shrink-0"
               style={{ color: PAGE_ACCENT }}
             >
               {String(i + 1).padStart(2, "0")}
@@ -454,7 +454,7 @@ export default function ServicesContent() {
                 />
               )}
               <div
-                className="relative rounded-2xl lg:rounded-3xl border p-6 lg:p-8 transform-gpu overflow-hidden"
+                className="relative rounded-2xl lg:rounded-3xl border p-4 sm:p-6 lg:p-8 transform-gpu overflow-hidden"
                 style={{
                   borderColor: `${PAGE_ACCENT}40`,
                   background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}0d 60%, ${PAGE_ACCENT}0a 100%)`,

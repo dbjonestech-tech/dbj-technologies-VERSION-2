@@ -6,7 +6,49 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 30, 2026 -- Pricing badge fix + Canopy logo + Contact silver scale-back + Work forest brown
+## Most Recent Session: April 30, 2026 (afternoon) -- Contact email + phone surfaced, Services mobile capability stack fix, GBP NAP context
+
+### What shipped
+
+Joshua asked two things in one ask: surface his email and a phone number on `/contact` for legitimacy + accessibility, and fix the Services page rendering poorly on mobile (other pages were fine). He chose to display the phone as `214-DBJ-TECH` (lettered) for scrape-resistance against `\d{3}-\d{3}-\d{4}` regexes; the underlying number is the same E.164 (`+12143258324` = 214-325-8324).
+
+Mobile diagnosis on Services: the unique-to-Services right-column CapabilityStack has 6 rows where service titles like "Business Systems & Integrations" (31 chars) and "E-Commerce & Custom Applications" (32 chars) wrap to 2 lines on a 375px viewport. The original `flex items-center` layout left the icon and trailing `01`-`06` number badge floating against the wrapped title, and `truncate` killed the tagline entirely. Process / Pricing render fine at the same h1 clamp because their right columns are different shapes (PhaseLadder uses items-start with shorter copy and no trailing badge).
+
+### Files changed (3)
+
+- **`lib/constants.ts`**: added `SITE.phoneDisplay` = `"214-DBJ-TECH"` (lettered, scrape-resistant) and `SITE.phoneTel` = `"+12143258324"` (decoded E.164 used in `tel:` links so click-to-call works on mobile).
+- **`app/(marketing)/contact/ContactContent.tsx`**: added two cards above Location and Response Time in the sidebar. Email card wraps `<a href="mailto:joshua@dbjtechnologies.com">` with the `Mail` icon, subtitle "Replies typically same day." Phone card wraps `<a href="tel:+12143258324">` showing "214-DBJ-TECH" with the `Phone` icon, subtitle "Mon to Fri, 9 to 6 Central. Tap to call." Both inherit the existing silver-card styling and add `motion-safe:hover:-translate-y-0.5` to signal they're tappable. NOTE: this re-introduces a publicly-displayed email on the Contact page, which earlier in the day had been removed in the silver scale-back. Joshua's reason: legitimacy + accessibility for warm-lead conversion outweighed the spam-curb logic.
+- **`app/(marketing)/services/ServicesContent.tsx`**: CapabilityStack mobile pass. Row alignment `items-center` -> `items-start lg:items-center`. Tagline `truncate` -> `line-clamp-2 lg:truncate` (mobile gets up to 2 lines instead of an ellipsis). Trailing `01`-`06` number badge hidden below `sm:` (frees ~30px for the wrapping title; numbering still implied by stack order). Outer card padding `p-6 lg:p-8` -> `p-4 sm:p-6 lg:p-8`, per-row padding `p-4` -> `p-3.5 sm:p-4`, gap `gap-4` -> `gap-3 sm:gap-4`, icon `h-10 w-10 ml-2` -> `h-9 w-9 sm:h-10 sm:w-10 ml-1.5 sm:ml-2`. Desktop appearance preserved.
+
+### GBP / NAP context (no code change)
+
+Joshua confirmed his Google Business Profile is verified and active. Public GBP shows physical address `5073 Co Rd 2656, Royse City, TX 75189`, service area "Hunt County, Texas", phone `(214) 325-8324` (numeric, same E.164 as the lettered site display), 5.0 stars / 2 reviews, profile strength "Looks good!". The site brands as "Dallas, TX" (CLAUDE.md identity, `SITE.address`, contact Location card). Royse City is ~30 miles east and inside the DFW metroplex, but Google's local algorithm treats "Dallas, TX" and "Royse City, TX 75189" as different NAP strings, which can dilute local-pack signal. Two clean fixes proposed, Joshua did not commit to either yet:
+
+- (a) Hide physical address on GBP, set service area to "Dallas-Fort Worth Metroplex" so the public face matches brand positioning. Lower-effort, keeps home address private.
+- (b) Update `SITE.address` to "Greater Dallas / DFW Metroplex" so site spans both.
+
+Saved as a project memory under `~/.claude/projects/.../memory/project_business_address.md` so future sessions don't trip on the Dallas-vs-Royse-City split.
+
+### Pre-commit
+
+- `npx tsc --noEmit`: clean (exit 0).
+- `npm run lint`: clean (exit 0).
+- Em-dash audit on all 3 changed files: 0 introduced (lib/constants.ts has 1 pre-existing in a header comment, untouched).
+- Dev server confirmed: `mailto:joshua@dbjtechnologies.com` and `tel:+12143258324` both rendered in `/contact` HTML; `items-start lg:items-center` and `line-clamp-2 lg:truncate` both rendered in `/services` HTML.
+
+### Final state (post-commit)
+
+- Feature commit hash: pending amend.
+- Working tree clean apart from this snapshot amendment.
+- Pushed to `origin main`.
+
+### Next recommended task
+
+Joshua to incognito-load `/contact` on his phone and confirm Email + Phone cards render above Location, then tap each to verify `mailto:` and `tel:` handlers fire. Then incognito-load `/services` on his phone and confirm the right-column "The Stack" capability card now reads cleanly with titles wrapping to 2 lines (no longer feels cramped). Then decide on the Dallas-vs-Royse-City NAP question above so the site and GBP align before pursuing local SEO work.
+
+---
+
+## Previous Session: April 30, 2026 (morning) -- Pricing badge fix + Canopy logo + Contact silver scale-back + Work forest brown
 
 ### What shipped (commit `24b3ffc`)
 
