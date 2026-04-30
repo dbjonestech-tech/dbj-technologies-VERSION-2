@@ -6,7 +6,75 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Financial Advisor design brief rebuilt as image-anchored deep dive (Beckett Wealth Partners template). EIGHT-OF-EIGHT SERIES COMPLETE.
+## Most Recent Session: April 29, 2026 -- Design-brief renderer rebuilt as magazine spread (S-tier visual elevation across all 8 briefs)
+
+### What shipped
+
+Joshua flagged that the design-brief detail pages were reading "too much like a blog" rather than a "legitimate premium website" - too much empty space on the sides, hero image too small, the centered max-w-3xl reading column made screenshots look squeezed inside an article. Single-renderer overhaul of `app/(marketing)/work/design-briefs/[slug]/page.tsx` to a magazine-spread layout that elevates all 8 briefs simultaneously.
+
+### Files changed (1)
+
+- **`app/(marketing)/work/design-briefs/[slug]/page.tsx`**: full rewrite of the detail-page renderer. 382 lines changed (273 insertions, 109 deletions).
+
+### Layout overhaul
+
+**Hero (was: stacked title above small framed preview at max-w-6xl):**
+- Container widened to `max-w-[1400px]` with `px-6 lg:px-12` outer padding
+- Title block stays ranged-left at `max-w-4xl` reading width
+- New 3-element eyebrow row: small accent dot + DESIGN BRIEF mono caps + vertical name in accent color + position counter "0X of 08" (computed from BRIEF_INDEX position)
+- Headline scaled up from `clamp(2.4rem,4.6vw,3.6rem)` to `clamp(2.6rem,5.6vw,4.6rem)` with tighter `leading-[1.04]`
+- Summary scaled up to `text-lg lg:text-xl`
+- New meta strip with two large numerals + small caps labels: surface count + load-bearing count, both colored in the brief's palette accent
+- New CTA row: solid accent-colored "Start a Project" with right-arrow + ghost "Read the Brief" anchor link to `#brief`
+- Hero screenshot now lives BELOW the title block at FULL container width (1400px breakout), with a 2px accent border, deeper shadow, and a soft accent-colored radial halo backdrop at `-inset-6 lg:-inset-10 blur-3xl opacity-30`
+
+**Body sections (was: max-w-3xl prose column with images at the same width):**
+- Body container also `max-w-[1400px]` with the same outer padding
+- New chapter-break treatment per section: large italic-serif numeral (`clamp(3.5rem,7.5vw,6.5rem)`) in the brief's accent color, paired with a horizontal accent gradient ruler that flexes to fill the rest of the container width
+- Section headings scaled up from `clamp(1.6rem,2.8vw,2.2rem)` to `clamp(1.9rem,3.6vw,3rem)` with `leading-[1.1]`
+- Section images BREAK OUT to full container width (was constrained to max-w-3xl prose column), with a 2px accent border, deep accent-tinted shadow, and a smaller accent halo at `-inset-4 lg:-inset-8 blur-3xl opacity-25`
+- Prose nests at `max-w-3xl` BELOW each image so reading line-length stays at ~65-75ch
+- Vertical rhythm: section spacing increased from `mb-16` to `mb-28 lg:mb-40` for editorial pacing
+- Prose font size bumped from `text-[1.0625rem]` to `text-[1.0625rem] lg:text-[1.125rem]` and spacing from `space-y-5` to `space-y-6 lg:space-y-7`
+
+**Closing CTA (was: small centered text-only block with two buttons):**
+- Container widened to `max-w-[1400px]`, left-aligned
+- New 5fr/7fr split: left column carries the eyebrow + headline + body + Start a Project CTA; right column carries a 3-card "Other Briefs" grid showing the next three briefs from BRIEF_INDEX with 4:3 thumb + accent-colored Design Brief eyebrow + bold vertical name
+- Cards use `motion-safe:group-hover:scale-[1.03] transition-transform duration-700 ease-out` for subtle hover animation
+- "View All →" link in the right column header above the cards
+
+### S-tier polish details
+
+- Hover transforms gated behind `motion-safe:` to respect `prefers-reduced-motion`
+- All decorative elements have `aria-hidden="true"` (accent dot, dividers, halos, ruler lines)
+- `id="brief"` anchor + `scroll-mt-24` on the body section so the "Read the Brief" CTA scrolls to the right position without landing under the header
+- Section heading anchor: `id={\`section-${i+1}-heading\`}` paired with `aria-labelledby` on the wrapping `<article>` element for screen-reader navigation
+- Image alt text preserved verbatim from the brief markdown (the previewAlt and per-section alt strings authored across all 8 briefs)
+- Position counter is computed by indexing into `getAllDesignBriefSlugs()` rather than hardcoded
+- Related briefs grid filters out the current slug and slices to 3, so the closing always shows distinct other-brief options
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean.
+- Em-dash audit on the changed file: 0 (replaced 7 JSX-comment em-dashes with hyphens).
+- Dev server smoke test: `/work/design-briefs/financial-advisor`, `/work/design-briefs/pi-law`, and `/work/design-briefs/dental-practice` all returned `200 OK`. Grep on rendered HTML confirmed presence of new layout markers: `max-w-[1400px]`, `font-display italic` (the section numerals), `Load Bearing` (meta strip), `Other Briefs` (closing related grid), and `Read the Brief` (anchor link).
+
+### Why the magazine-spread direction was the better call
+
+The full-bleed cover hero variant (overlay typography on a screenshot backdrop) was rejected because the brief screenshots are themselves visually dense compositions with their own UI chrome (nav bars, headlines, content blocks, buttons). Overlay typography on top of an already-busy website screenshot produces competing visual layers and reads as amateurish. The magazine-spread pattern (Pentagram, Stripe Press, Apple keynotes, Bruce Mau) treats the screenshot as a physical artifact framed at full container width with prose nesting beneath at reading width. This is the genuinely premium move for screenshot-anchored content, and it is what every legitimate design-led case-study site uses.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load any of the 8 brief detail pages and confirm: (1) the hero title block is ranged left at reading width with the new eyebrow row + meta strip + dual CTAs, (2) the hero screenshot fills the full 1400px container width with a soft accent halo behind it, (3) each body section opens with a large italic-serif numeral in the brief's accent color, (4) section screenshots break out to full container width with a noticeable accent halo, (5) prose stays comfortably narrow underneath each image, (6) the closing CTA shows the dual-column layout with the related-briefs grid on the right, (7) hover the related-brief cards to verify the subtle scale animation, (8) mobile (resize to <1024px) - the layout should collapse cleanly: hero image stacks below the title, related briefs stack vertically. If anything reads off, the most likely tuning candidates are: hero image height feels too tall on 1080p (consider max-h constraint with object-position top), or section numerals feel too aggressive (consider scaling clamp down). Otherwise this elevates the entire 8-brief series visually in one renderer change.
+
+### Final state (post-commit)
+
+- Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Financial Advisor design brief rebuilt as image-anchored deep dive (Beckett Wealth Partners template). EIGHT-OF-EIGHT SERIES COMPLETE.
 
 ### What shipped
 
