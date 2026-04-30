@@ -10,7 +10,9 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with cdeeb13 commit hash
+- (this commit) docs: update session-handoff with a28cd80 commit hash
+- `a28cd80` fix(admin): pass icon name as string across RSC boundary (the Server -> Client function-prop crash that surfaced as "Application error: a client-side exception has occurred" on dbjtechnologies.com/admin in production)
+- `5d531cc` docs: update session-handoff with cdeeb13 commit hash
 - `cdeeb13` feat(admin): redesign dashboard with column color themes, hover KPIs, and Framer Motion animation; fix visitors recent feed sort and add cursor pagination
 - `4cad739` docs: update session-handoff with fe3cb59 commit hash
 - `fe3cb59` feat(positioning): remove AI self-claims sitewide; reposition Pathlight as a "diagnostic" instead of "AI-powered analysis"
