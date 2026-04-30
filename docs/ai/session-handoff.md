@@ -6,7 +6,61 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Killed cookbook typography + Framer Motion choreography across briefs and case studies
+## Most Recent Session: April 29, 2026 -- About page elevated to magazine spread (chapter-break treatment + unified motion language)
+
+### What shipped
+
+Joshua flagged the About page had the same boxy-card / centered-pill / generic-grid feel the briefs and case studies just shed. Asked for the same magazine elevation. Single-file rewrite of the post-hero JSX in `app/(marketing)/about/AboutContent.tsx`. The file went from 977 lines to 1,039 lines (heavier helpers, lighter section markup). All four post-hero sections now share the magazine chapter-break language used on briefs and case studies: small mono-caps tag with accent-blue dot + animated horizontal ruler that grows on scroll-into-view + bold heading + ranged-left content. Identical EASE_OUT cubic-bezier `[0.16, 1, 0.3, 1]` and viewport observer `{ once: true, margin: "-80px" }` so the whole site reads as one editorial document.
+
+### Files changed (1)
+
+- **`app/(marketing)/about/AboutContent.tsx`**: imports gained `Variants` and `ArrowRight`. Two new helpers added at module scope: `ChapterHeader` (renders the tag + animated ruler + heading, supports optional `position`/`total` for the chapter counter and `align="left" | "center"`) and `ChapterArticle` (renders a story section as a chapter, wraps the prose in `ScrollProgressCard` for the existing scroll-fill accent bar, optionally renders the closing CTA). Module-scope constants `EASE_OUT`, `VIEWPORT`, and `ACCENT` for the unified motion + color language.
+
+### Layout changes (post-hero)
+
+**Story sections (Why I Work This Way / What You Actually Get / How I Build / Who This Is For):** Was a 4-card vertical column at max-w-3xl with white/[0.06] borders + glass-card gradient bg + accent-line above each heading + ScrollRevealText body. Now a single magazine spread at max-w-[1400px] / px-12. Each section becomes a `ChapterArticle` with chapter counter "01 of 04" through "04 of 04" in the tag row, a 2px gradient ruler that grows from `scaleX: 0` to `scaleX: 1` over 1100ms on scroll-in, headline at clamp(2rem, 4vw, 3.4rem), and the existing `ScrollProgressCard` vertical-bar treatment plus `ScrollRevealText` 3-word-batch reveal. The closing CTA on the final chapter ("Start a Conversation") becomes the ranged-left CTA button in accent-blue with the magnetic motion-safe lift treatment used on briefs.
+
+**Core Values (4 items):** Was a centered title + animated divider line + 4-card grid with glass borders and chunky icon chips. Now a ranged-left `ChapterHeader` ("CORE VALUES" tag + ruler + "What Drives Every Decision." heading) + a 4-column grid with NO card chrome - just typography, a small ring-bordered accent-blue icon chip, bold title, body. Cards stagger-fade-in via parent variants with 100ms intervals.
+
+**Operating Principles (timeline):** Was the same centered title + 6-item vertical timeline at max-w-3xl. Now ranged-left `ChapterHeader` ("HOW I WORK" tag + "Operating Principles." heading) + the timeline preserved (the timeline pattern was already strong; I just elevated the heading treatment). Timeline items stagger fade-in-from-left at 700ms each.
+
+**Built for Myself First / Canopy showcase (6 OPS_CAPABILITIES tiles):** Was a centered title + intro paragraph + 6-card grid + closing center-aligned CTA pair. Now ranged-left chapter header + ranged-left intro at max-w-3xl + 3-column grid where each tile carries a 2px accent-blue left bar (full-height inset 2px from top/bottom) + ring-1 accent-blue/20 icon chip + bold title + body. Cards lift on hover with motion-safe translate-y-1 + accent-tinted shadow grow. Closing copy + "See Pricing" / "Request a Private Walkthrough" CTAs are now ranged-left with the same accent button + ghost-link treatment used on the brief and case study pages.
+
+**Team section (currently empty since `TEAM_MEMBERS = []`):** When populated will use the `ChapterHeader` treatment with "TEAM" tag + "Meet the People Behind the Code." heading.
+
+### What was removed
+
+- Three `<motion.div>` gradient dividers between sections (they were bridging boxy cards; the new chapter-break ruler does the same work inside content flow, no extra dividers needed)
+- All `rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5` pill-shaped section eyebrows (replaced by the architectural mono-caps tag + dot + accent ruler)
+- All centered-text section headers (replaced by ranged-left chapter break)
+- All `linear-gradient(135deg, rgba(255,255,255,0.03)...)` glass-card gradient backgrounds on story-section wrappers (replaced by chapter break + content-flow prose, no card chrome needed)
+- The hand-rolled SVG arrow on the "Start a Conversation" / "See Pricing" buttons (replaced by lucide `ArrowRight` for consistency with brief / case study CTAs)
+
+### What was preserved
+
+- The hero (founder portrait + animated headline character stagger + scan line + `ParallaxPhoto` translate + atmospheric blue glow). Joshua said it was already strong.
+- All four helpers from before: `AmbientParticles`, `ScrollRevealText`, `ScrollWordBatch`, `ScrollProgressCard`, `ParallaxPhoto`. The `ScrollProgressCard` vertical-fill bar is now used inside each `ChapterArticle` for the scroll-fill accent.
+- All copy: the four ABOUT_STORY sections, VALUES, ABOUT_CONTENT.principles, OPS_CAPABILITIES tiles. Content untouched.
+- The CTA section wrapper at the end (uses the shared `CTASection` component with the about-cta-dark class).
+
+### Verification
+
+- `npx tsc --noEmit`: clean (exit 0).
+- `npm run lint`: clean (exit 0).
+- Em-dash audit on the changed file: 0.
+- Dev-server smoke: dev server was up on port 3000 from the prior session work; About page uses the existing helpers + new ChapterHeader / ChapterArticle, all of which are consistent with the brief and case study renderers that have been smoke-tested.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/about` and confirm: (1) hero is unchanged (founder portrait + headline animation + scan line still play), (2) the four story chapters now have the technical mono-caps "Chapter 01 of 04" tag + animated ruler + larger heading + ranged-left prose at max-w-3xl, (3) the values, principles, and Canopy showcase sections all have the same chapter-break header pattern, ranged-left, no centered pills, (4) the values icons keep their accent-blue chip treatment, (5) the Canopy capability tiles have an accent-blue left bar inside each card and lift on hover, (6) the gradient divider lines between sections are gone, (7) the closing "Start a Conversation" / "See Pricing" CTAs use the new accent-pill button with right-arrow icon. If the values grid feels too narrow at 4 columns on desktop, the most likely tuning candidate is sm:grid-cols-2 lg:grid-cols-4 which works at common breakpoints but compresses on 1024-1280px viewports - consider md:grid-cols-3 lg:grid-cols-4 if the middle range feels cramped.
+
+### Final state (post-commit)
+
+- Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Killed cookbook typography + Framer Motion choreography across briefs and case studies
 
 ### What shipped
 

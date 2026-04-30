@@ -9,6 +9,7 @@ import {
   useScroll,
   useTransform,
   type MotionValue,
+  type Variants,
 } from "framer-motion";
 import {
   Zap,
@@ -21,6 +22,7 @@ import {
   ShieldCheck,
   Workflow,
   Receipt,
+  ArrowRight,
 } from "lucide-react";
 import { GradientBlob } from "@/components/effects/GradientBlob";
 import { CTASection } from "@/components/sections/CTA";
@@ -255,6 +257,182 @@ function ParallaxPhoto({
     <div ref={ref} className="relative flex-shrink-0">
       <motion.div style={reduce ? undefined : { y }}>{children}</motion.div>
     </div>
+  );
+}
+
+/* ─── MAGAZINE CHAPTER HELPERS ─────────────────────
+   Shared motion language across the post-hero sections.
+   EASE_OUT and VIEWPORT match the design-brief and
+   case-study renderers so the entire site reads as one
+   editorial document. */
+const EASE_OUT = [0.16, 1, 0.3, 1] as const;
+const VIEWPORT = { once: true, margin: "-80px" } as const;
+const ACCENT = "#3b82f6";
+
+function ChapterHeader({
+  label,
+  heading,
+  accent,
+  reduce,
+  position,
+  total,
+  align = "left",
+}: {
+  label: string;
+  heading: string;
+  accent: string;
+  reduce: boolean | null;
+  position?: number;
+  total?: number;
+  align?: "left" | "center";
+}) {
+  const tagV: Variants = {
+    hidden: reduce ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: reduce ? 0 : 0.6, ease: EASE_OUT },
+    },
+  };
+  const rulerV: Variants = {
+    hidden: reduce ? { scaleX: 1 } : { scaleX: 0 },
+    visible: {
+      scaleX: 1,
+      transition: {
+        duration: reduce ? 0 : 1.1,
+        ease: EASE_OUT,
+        delay: 0.1,
+      },
+    },
+  };
+  const headingV: Variants = {
+    hidden: reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: reduce ? 0 : 0.7,
+        ease: EASE_OUT,
+        delay: 0.15,
+      },
+    },
+  };
+
+  return (
+    <motion.div initial="hidden" whileInView="visible" viewport={VIEWPORT}>
+      <div
+        className={`flex items-center gap-4 lg:gap-6 mb-8 lg:mb-10 ${
+          align === "center" ? "justify-center" : ""
+        }`}
+      >
+        <motion.div
+          variants={tagV}
+          className="flex items-center gap-2.5 shrink-0"
+        >
+          <span
+            className="inline-block h-2 w-2 rounded-full"
+            style={{ backgroundColor: accent }}
+            aria-hidden="true"
+          />
+          <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/55">
+            {label}
+          </span>
+          {position !== undefined && total !== undefined ? (
+            <>
+              <span
+                className="font-mono text-[11px] uppercase tracking-[0.22em]"
+                style={{ color: accent }}
+              >
+                {String(position).padStart(2, "0")}
+              </span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/30">
+                / {String(total).padStart(2, "0")}
+              </span>
+            </>
+          ) : null}
+        </motion.div>
+        <motion.span
+          variants={rulerV}
+          className="h-[2px] flex-1 origin-left"
+          style={{
+            background: `linear-gradient(90deg, ${accent} 0%, ${accent}11 100%)`,
+          }}
+          aria-hidden="true"
+        />
+      </div>
+      <motion.h2
+        variants={headingV}
+        className={`font-display text-[clamp(2rem,4vw,3.4rem)] font-bold leading-[1.05] tracking-tight text-white max-w-4xl ${
+          align === "center" ? "mx-auto text-center" : ""
+        }`}
+      >
+        {heading}
+      </motion.h2>
+    </motion.div>
+  );
+}
+
+function ChapterArticle({
+  index,
+  total,
+  accent,
+  heading,
+  body,
+  reduce,
+  showCTA,
+}: {
+  index: number;
+  total: number;
+  accent: string;
+  heading: string;
+  body: string;
+  reduce: boolean | null;
+  showCTA: boolean;
+}) {
+  return (
+    <article className="mb-24 lg:mb-32 last:mb-0">
+      <ChapterHeader
+        label="Chapter"
+        heading={heading}
+        accent={accent}
+        reduce={reduce}
+        position={index + 1}
+        total={total}
+      />
+      <ScrollProgressCard reduce={reduce}>
+        <motion.div
+          initial={reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{
+            duration: reduce ? 0 : 0.7,
+            ease: EASE_OUT,
+            delay: 0.3,
+          }}
+          className="mt-10 lg:mt-12 max-w-3xl"
+        >
+          {reduce ? (
+            <p className="text-lg leading-[1.85]" style={{ color: "#c5ccd8" }}>
+              {body}
+            </p>
+          ) : (
+            <ScrollRevealText text={body} />
+          )}
+          {showCTA ? (
+            <div className="mt-10">
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
+                style={{ backgroundColor: accent }}
+              >
+                Start a Conversation
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          ) : null}
+        </motion.div>
+      </ScrollProgressCard>
+    </article>
   );
 }
 
@@ -496,26 +674,13 @@ export default function AboutContent() {
         </div>
       </section>
 
-      {/* Gradient divider between hero and story */}
-      <motion.div
-        initial={{ opacity: 0.3, scaleX: 0.6 }}
-        whileInView={{ opacity: 1, scaleX: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        aria-hidden="true"
-        className="relative z-[2] h-px w-full"
-        style={{
-          background:
-            "linear-gradient(to right, transparent, #3b82f6, transparent)",
-        }}
-      />
-
-      {/* Story sections (dark) */}
+      {/* Story sections - magazine chapter breaks */}
       <section
-        className="relative overflow-hidden"
+        id="story"
+        className="relative overflow-hidden py-24 lg:py-32 scroll-mt-24"
         style={{ backgroundColor: "#06060a" }}
       >
-        {/* Dark-friendly dot grid, same as hero */}
+        {/* Dark dot grid backdrop */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-50"
@@ -525,157 +690,78 @@ export default function AboutContent() {
             backgroundSize: "32px 32px",
           }}
         />
-        <div className="relative z-[2] mx-auto max-w-3xl px-6 py-20 lg:py-32">
+        <div className="relative z-[2] mx-auto max-w-[1400px] px-6 lg:px-12">
           {storySections.map((section, i) => (
-            <motion.div
+            <ChapterArticle
               key={section.heading}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="mb-12 last:mb-0 rounded-xl border border-white/[0.06] p-8 lg:p-10"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
-              }}
-            >
-              <ScrollProgressCard reduce={prefersReducedMotion}>
-                {/* Accent line before heading */}
-                <div
-                  className="mb-4 h-px w-16"
-                  style={{
-                    background:
-                      "linear-gradient(to right, #3b82f6, transparent)",
-                  }}
-                />
-                <motion.h3
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="mb-6 text-2xl font-semibold tracking-tight lg:text-3xl"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #ffffff 30%, #93c5fd 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  {section.heading}
-                </motion.h3>
-                {prefersReducedMotion ? (
-                  <p
-                    className="text-lg leading-relaxed"
-                    style={{ color: "#9ca3af" }}
-                  >
-                    {section.body}
-                  </p>
-                ) : (
-                  <ScrollRevealText text={section.body} />
-                )}
-                {i === storySections.length - 1 && (
-                  <div className="mt-8">
-                    <Link
-                      href="/contact"
-                      className="inline-flex transform items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:scale-[1.02] hover:gap-3 hover:shadow-[0_0_20px_-2px_rgba(59,130,246,0.4)] hover:brightness-110"
-                      style={{ backgroundColor: "#3b82f6" }}
-                    >
-                      Start a Conversation
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M5 12h14" />
-                        <path d="m12 5 7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
-                )}
-              </ScrollProgressCard>
-            </motion.div>
+              index={i}
+              total={storySections.length}
+              accent={ACCENT}
+              heading={section.heading}
+              body={section.body}
+              reduce={prefersReducedMotion}
+              showCTA={i === storySections.length - 1}
+            />
           ))}
         </div>
       </section>
 
-      {/* Gradient divider between story and values */}
-      <motion.div
-        initial={{ opacity: 0.3, scaleX: 0.6 }}
-        whileInView={{ opacity: 1, scaleX: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        aria-hidden="true"
-        className="relative z-[2] h-px w-full"
-        style={{
-          background:
-            "linear-gradient(to right, transparent, #3b82f6, transparent)",
-        }}
-      />
-
-      {/* Values (dark glass cards) */}
+      {/* Core Values - chapter break + minimal grid */}
       <section
-        className="relative overflow-hidden py-20"
+        className="relative overflow-hidden py-24 lg:py-32 border-t border-white/5"
         style={{ backgroundColor: "#06060a" }}
       >
-        <div className="relative z-[2] mb-16 mx-auto max-w-3xl text-center px-6">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs font-medium uppercase tracking-widest text-accent-blue"
-          >
-            Core Values
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-4 font-display text-section font-bold leading-tight text-white"
-          >
-            What Drives Every Decision
-          </motion.h2>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-6 h-[1px] w-24 mx-auto bg-gradient-to-r from-accent-blue to-accent-cyan"
+        <div className="relative z-[2] mx-auto max-w-[1400px] px-6 lg:px-12">
+          <ChapterHeader
+            label="Core Values"
+            heading="What Drives Every Decision."
+            accent={ACCENT}
+            reduce={prefersReducedMotion}
           />
-        </div>
-        <div className="relative z-[2] mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT}
+            variants={{
+              hidden: {},
+              visible: {
+                transition: prefersReducedMotion
+                  ? { staggerChildren: 0 }
+                  : { staggerChildren: 0.1, delayChildren: 0.2 },
+              },
+            }}
+            className="mt-16 lg:mt-20 grid gap-10 sm:gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10 lg:gap-y-14"
+          >
             {VALUES.map((v, i) => {
               const Icon = valueIcons[i];
               return (
                 <motion.div
                   key={v.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="rounded-2xl border border-white/[0.06] p-6 transition-shadow duration-300 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.25)] md:p-8"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
+                  variants={{
+                    hidden: prefersReducedMotion
+                      ? { opacity: 1, y: 0 }
+                      : { opacity: 0, y: 20 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: {
+                        duration: prefersReducedMotion ? 0 : 0.7,
+                        ease: EASE_OUT,
+                      },
+                    },
                   }}
+                  className="relative"
                 >
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue">
-                    {Icon && <Icon className="h-6 w-6" aria-hidden="true" />}
+                  <div
+                    className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue ring-1 ring-accent-blue/20"
+                  >
+                    {Icon ? <Icon className="h-5 w-5" aria-hidden="true" /> : null}
                   </div>
-                  <h3 className="font-display text-lg font-bold text-white mb-2">
+                  <h3 className="font-display text-lg lg:text-xl font-bold text-white mb-3">
                     {v.title}
                   </h3>
                   <p
-                    className="text-sm leading-relaxed"
+                    className="text-[0.95rem] leading-[1.7]"
                     style={{ color: "#9ca3af" }}
                   >
                     {v.description}
@@ -683,126 +769,90 @@ export default function AboutContent() {
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* How I Work (dark) */}
+      {/* Operating Principles - chapter break + timeline */}
       <section
-        className="relative overflow-hidden py-20"
+        className="relative overflow-hidden py-24 lg:py-32 border-t border-white/5"
         style={{ backgroundColor: "#06060a" }}
       >
-        <div className="relative z-[2] mb-16 mx-auto max-w-3xl text-center px-6">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs font-medium uppercase tracking-widest text-accent-blue"
-          >
-            How I Work
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-4 font-display text-section font-bold leading-tight text-white"
-          >
-            Operating Principles
-          </motion.h2>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-6 h-[1px] w-24 mx-auto bg-gradient-to-r from-accent-blue to-accent-cyan"
+        <div className="relative z-[2] mx-auto max-w-[1400px] px-6 lg:px-12">
+          <ChapterHeader
+            label="How I Work"
+            heading="Operating Principles."
+            accent={ACCENT}
+            reduce={prefersReducedMotion}
           />
-        </div>
-        <div className="relative z-[2] mx-auto max-w-3xl px-6 lg:px-8">
-          <div className="relative ml-4 space-y-12 border-l border-white/10 pl-8">
-            {ABOUT_CONTENT.principles.map((item, i) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative"
-              >
-                <div
-                  className="absolute -left-[41px] top-1 flex h-6 w-6 items-center justify-center rounded-[9999px] border-2 border-accent-blue/40"
-                  style={{ backgroundColor: "#06060a" }}
+          <div className="mt-16 lg:mt-20 mx-auto max-w-3xl">
+            <div className="relative ml-4 space-y-12 border-l border-white/10 pl-8 lg:pl-10">
+              {ABOUT_CONTENT.principles.map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  initial={
+                    prefersReducedMotion
+                      ? { opacity: 1, x: 0 }
+                      : { opacity: 0, x: -20 }
+                  }
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={VIEWPORT}
+                  transition={{
+                    duration: prefersReducedMotion ? 0 : 0.7,
+                    delay: prefersReducedMotion ? 0 : i * 0.1,
+                    ease: EASE_OUT,
+                  }}
+                  className="relative"
                 >
-                  <div className="h-2 w-2 rounded-[9999px] bg-accent-blue" />
-                </div>
-                <h3 className="font-display text-xl font-bold text-white">
-                  {item.title}
-                </h3>
-                <p
-                  className="mt-2 text-sm leading-relaxed"
-                  style={{ color: "#9ca3af" }}
-                >
-                  {item.text}
-                </p>
-              </motion.div>
-            ))}
+                  <div
+                    className="absolute -left-[45px] lg:-left-[51px] top-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-accent-blue/40"
+                    style={{ backgroundColor: "#06060a" }}
+                  >
+                    <div className="h-2 w-2 rounded-full bg-accent-blue" />
+                  </div>
+                  <h3 className="font-display text-xl lg:text-2xl font-bold text-white tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p
+                    className="mt-3 text-[0.95rem] lg:text-base leading-[1.75]"
+                    style={{ color: "#c5ccd8" }}
+                  >
+                    {item.text}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
-
-      {/* Gradient divider before Canopy showcase */}
-      <motion.div
-        initial={{ opacity: 0.3, scaleX: 0.6 }}
-        whileInView={{ opacity: 1, scaleX: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        aria-hidden="true"
-        className="relative z-[2] h-px w-full"
-        style={{
-          background:
-            "linear-gradient(to right, transparent, #3b82f6, transparent)",
-        }}
-      />
 
       {/* Built for Myself First (Canopy showcase) */}
       <section
-        className="relative overflow-hidden py-20"
+        className="relative overflow-hidden py-24 lg:py-32 border-t border-white/5"
         style={{ backgroundColor: "#06060a" }}
       >
-        <div className="relative z-[2] mb-16 mx-auto max-w-3xl text-center px-6">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs font-medium uppercase tracking-widest text-accent-blue"
-          >
-            The Stack Behind the Studio
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-4 font-display text-section font-bold leading-tight text-white"
-          >
-            Built for Myself First.
-          </motion.h2>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-6 h-[1px] w-24 mx-auto bg-gradient-to-r from-accent-blue to-accent-cyan"
+        <div className="relative z-[2] mx-auto max-w-[1400px] px-6 lg:px-12">
+          <ChapterHeader
+            label="The Stack Behind the Studio"
+            heading="Built for Myself First."
+            accent={ACCENT}
+            reduce={prefersReducedMotion}
           />
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={
+              prefersReducedMotion
+                ? { opacity: 1, y: 0 }
+                : { opacity: 0, y: 20 }
+            }
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-6 text-base leading-relaxed sm:text-lg"
-            style={{ color: "#9ca3af" }}
+            viewport={VIEWPORT}
+            transition={{
+              duration: prefersReducedMotion ? 0 : 0.7,
+              ease: EASE_OUT,
+              delay: 0.25,
+            }}
+            className="mt-10 max-w-3xl text-base leading-[1.75] sm:text-lg"
+            style={{ color: "#c5ccd8" }}
           >
             Most agencies hand you a website and tell you to outsource the rest
             to five different SaaS vendors. I built an operations stack for the
@@ -810,90 +860,103 @@ export default function AboutContent() {
             deliverability, infrastructure watchers, error tracking, and
             pipeline health. One auth wall. One database. One source of truth.
           </motion.p>
-        </div>
 
-        <div className="relative z-[2] mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {OPS_CAPABILITIES.map((cap, i) => {
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT}
+            variants={{
+              hidden: {},
+              visible: {
+                transition: prefersReducedMotion
+                  ? { staggerChildren: 0 }
+                  : { staggerChildren: 0.08, delayChildren: 0.35 },
+              },
+            }}
+            className="mt-16 lg:mt-20 grid gap-6 lg:gap-8 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {OPS_CAPABILITIES.map((cap) => {
               const Icon = cap.icon;
               return (
                 <motion.div
                   key={cap.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, delay: i * 0.08 }}
-                  className="rounded-2xl border border-white/[0.06] p-6 transition-shadow duration-300 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.25)] md:p-8"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
+                  variants={{
+                    hidden: prefersReducedMotion
+                      ? { opacity: 1, y: 0 }
+                      : { opacity: 0, y: 20 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: {
+                        duration: prefersReducedMotion ? 0 : 0.7,
+                        ease: EASE_OUT,
+                      },
+                    },
                   }}
+                  className="relative rounded-2xl border border-white/[0.08] bg-white/[0.015] p-7 lg:p-8 transition-all duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:border-accent-blue/30 motion-safe:hover:shadow-[0_24px_60px_-30px_rgba(59,130,246,0.4)]"
                 >
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue">
-                    <Icon className="h-6 w-6" aria-hidden="true" />
+                  <div
+                    className="absolute left-0 top-7 lg:top-8 bottom-7 lg:bottom-8 w-[2px] rounded-full bg-accent-blue/40"
+                    aria-hidden="true"
+                  />
+                  <div className="pl-2">
+                    <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue ring-1 ring-accent-blue/20">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <h3 className="font-display text-lg lg:text-xl font-bold text-white mb-3">
+                      {cap.title}
+                    </h3>
+                    <p
+                      className="text-[0.95rem] leading-[1.7]"
+                      style={{ color: "#9ca3af" }}
+                    >
+                      {cap.body}
+                    </p>
                   </div>
-                  <h3 className="font-display text-lg font-bold text-white mb-2">
-                    {cap.title}
-                  </h3>
-                  <p
-                    className="text-sm leading-relaxed"
-                    style={{ color: "#9ca3af" }}
-                  >
-                    {cap.body}
-                  </p>
                 </motion.div>
               );
             })}
-          </div>
-        </div>
+          </motion.div>
 
-        <div className="relative z-[2] mx-auto mt-16 max-w-3xl px-6 text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-base leading-relaxed sm:text-lg"
-            style={{ color: "#c5ccd8" }}
-          >
-            I built it because I needed it. If you want the same stack on your
-            domain, I will build it for you. Same architecture. Your data. Your
-            auth wall.
-          </motion.p>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={
+              prefersReducedMotion
+                ? { opacity: 1, y: 0 }
+                : { opacity: 0, y: 20 }
+            }
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-8 flex flex-wrap items-center justify-center gap-4"
+            viewport={VIEWPORT}
+            transition={{
+              duration: prefersReducedMotion ? 0 : 0.7,
+              ease: EASE_OUT,
+              delay: 0.2,
+            }}
+            className="mt-16 lg:mt-20 max-w-3xl"
           >
-            <Link
-              href="/pricing/canopy"
-              className="inline-flex transform items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:scale-[1.02] hover:gap-3 hover:shadow-[0_0_20px_-2px_rgba(59,130,246,0.4)] hover:brightness-110"
-              style={{ backgroundColor: "#3b82f6" }}
+            <p
+              className="text-base leading-[1.75] sm:text-lg"
+              style={{ color: "#c5ccd8" }}
             >
-              See Pricing
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              I built it because I needed it. If you want the same stack on your
+              domain, I will build it for you. Same architecture. Your data.
+              Your auth wall.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Link
+                href="/pricing/canopy"
+                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_18px_40px_-15px_rgba(59,130,246,0.6)]"
+                style={{ backgroundColor: ACCENT }}
               >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </Link>
-            <Link
-              href="/contact?topic=canopy"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:border-accent-blue/40 hover:bg-white/[0.04]"
-            >
-              Request a Private Walkthrough
-            </Link>
+                See Pricing
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/contact?topic=canopy"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-white border-b border-white/30 hover:border-white transition-colors pb-1"
+              >
+                Request a Private Walkthrough
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -901,41 +964,40 @@ export default function AboutContent() {
       {/* Team: shown only when real team members are added */}
       {TEAM_MEMBERS.length > 0 && (
         <section
-          className="relative overflow-hidden py-32"
+          className="relative overflow-hidden py-24 lg:py-32 border-t border-white/5"
           style={{ backgroundColor: "#06060a" }}
         >
-          <div className="relative z-[2] mb-16 mx-auto max-w-3xl text-center px-6">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="font-display text-section font-bold leading-tight text-white"
-            >
-              Meet the People Behind the Code
-            </motion.h2>
-          </div>
-          <div className="relative z-[2] mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="relative z-[2] mx-auto max-w-[1400px] px-6 lg:px-12">
+            <ChapterHeader
+              label="Team"
+              heading="Meet the People Behind the Code."
+              accent={ACCENT}
+              reduce={prefersReducedMotion}
+            />
+            <div className="mt-16 lg:mt-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {TEAM_MEMBERS.map((m, i) => (
                 <motion.div
                   key={m.name}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={
+                    prefersReducedMotion
+                      ? { opacity: 1, y: 0 }
+                      : { opacity: 0, y: 20 }
+                  }
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="rounded-2xl border border-white/[0.06] p-6 text-center"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
+                  viewport={VIEWPORT}
+                  transition={{
+                    duration: prefersReducedMotion ? 0 : 0.7,
+                    delay: prefersReducedMotion ? 0 : i * 0.1,
+                    ease: EASE_OUT,
                   }}
                 >
                   <div
-                    className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-2xl border border-white/10"
+                    className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02]"
                     role="img"
                     aria-label={`Avatar for ${m.name}`}
                   >
                     <span
-                      className="font-display text-3xl font-bold text-gradient"
+                      className="font-display text-2xl font-bold text-gradient"
                       aria-hidden="true"
                     >
                       {m.name
@@ -951,7 +1013,7 @@ export default function AboutContent() {
                     {m.role}
                   </p>
                   <p
-                    className="mt-3 text-xs leading-relaxed"
+                    className="mt-3 text-[0.9rem] leading-[1.7]"
                     style={{ color: "#9ca3af" }}
                   >
                     {m.bio}
