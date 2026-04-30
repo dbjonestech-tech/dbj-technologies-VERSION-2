@@ -10,7 +10,8 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) feat(admin): redesign /admin dashboard with per-column color themes, Framer Motion hover, live KPIs on hover; fix /admin/visitors recent feed sort and add cursor pagination + per-row session links
+- (this commit) docs: update session-handoff with cdeeb13 commit hash
+- `cdeeb13` feat(admin): redesign dashboard with column color themes, hover KPIs, and Framer Motion animation; fix visitors recent feed sort and add cursor pagination
 - `4cad739` docs: update session-handoff with fe3cb59 commit hash
 - `fe3cb59` feat(positioning): remove AI self-claims sitewide; reposition Pathlight as a "diagnostic" instead of "AI-powered analysis"
 - `bdd76bf` docs: update session-handoff with 247bda1 commit hash
