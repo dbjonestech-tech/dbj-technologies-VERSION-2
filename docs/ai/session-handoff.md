@@ -56,7 +56,10 @@ After Vercel rebuild settles (1-3 min), incognito-load `/about` and confirm: (1)
 
 ### Final state (post-commit)
 
-- Will populate after this commit lands.
+- Feature commit: `cc767ee` -- feat(about): magazine-spread elevation with unified chapter-break treatment. 2 files changed, 455 insertions, 339 deletions (about page rewrite + this snapshot).
+- Pushed to `origin main` (`e1f3252..cc767ee main -> main`).
+- Working tree clean apart from this snapshot amendment.
+- About page now matches the magazine-spread / chapter-break / motion language already shipped on briefs and case studies. The marketing site reads as one editorial document end-to-end.
 
 ---
 
