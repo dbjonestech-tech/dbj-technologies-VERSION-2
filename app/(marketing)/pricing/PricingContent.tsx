@@ -479,11 +479,18 @@ export default function PricingContent() {
                 <h3 className="font-display text-2xl font-bold tracking-tight">
                   {tier.name}
                 </h3>
-                <p className="mt-2 text-sm text-text-secondary leading-relaxed">
+                {/* Row-normalizing min-heights at lg+ keep description and
+                    price blocks the same height across the three tiers, so
+                    the CTAs and feature dividers align horizontally. The
+                    Enterprise tier carries an extra "Starts at" line and a
+                    longer description; without these floors, downstream
+                    rows drift by ~70px. Mobile (stacked) layout keeps the
+                    natural content height. */}
+                <p className="mt-2 text-sm text-text-secondary leading-relaxed lg:min-h-[5rem]">
                   {tier.description}
                 </p>
 
-                <div className="mt-6 mb-8">
+                <div className="mt-6 mb-8 lg:min-h-[7rem]">
                   {tier.price !== null ? (
                     <div className="flex items-baseline gap-1">
                       <span
