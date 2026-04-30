@@ -181,106 +181,6 @@ function ChapterHeader({
   );
 }
 
-/* ─── FEE LEDGER (HERO SIGNATURE) ─────────────────────
-   A stylized invoice/ledger panel showing the 3 tiers
-   stacked vertically with clean typography and a
-   ledger-style horizontal rule between rows. Each row
-   shows the tier name, a 1-line description, and the
-   price, like a beautifully typeset fee schedule. The
-   middle (Professional) has an amber-tinted background
-   strip to mark it as the recommended tier. */
-function FeeLedger({ reduce }: { reduce: boolean | null }) {
-  return (
-    <div className="space-y-0">
-      {PRICING_TIERS.map((tier, i) => {
-        const isLast = i === PRICING_TIERS.length - 1;
-        return (
-          <motion.div
-            key={tier.name}
-            initial={
-              reduce ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }
-            }
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
-              duration: reduce ? 0 : 0.7,
-              ease: EASE_OUT,
-              delay: reduce ? 0 : 0.4 + i * 0.18,
-            }}
-            className={`group relative grid grid-cols-[1fr_auto] items-center gap-6 py-5 lg:py-6 transition-all motion-safe:hover:bg-amber-50/30 ${
-              !isLast ? "border-b" : ""
-            }`}
-            style={
-              !isLast
-                ? { borderColor: `${PAGE_ACCENT}1a` }
-                : undefined
-            }
-          >
-            {/* Pop-out highlight strip for the popular tier */}
-            {tier.popular ? (
-              <span
-                className="absolute -inset-x-4 inset-y-0 -z-10 rounded-md pointer-events-none"
-                style={{
-                  background: `linear-gradient(90deg, ${PAGE_LIGHT}10 0%, ${PAGE_ACCENT}06 100%)`,
-                }}
-                aria-hidden="true"
-              />
-            ) : null}
-
-            <div className="min-w-0">
-              <div className="flex items-center gap-2.5 mb-1.5">
-                <span
-                  className="font-mono text-[10px] uppercase tracking-[0.22em]"
-                  style={{ color: PAGE_ACCENT }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="font-display text-base lg:text-lg font-bold text-text-primary tracking-tight">
-                  {tier.name}
-                </h3>
-                {tier.popular ? (
-                  <span
-                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em]"
-                    style={{
-                      backgroundColor: `${PAGE_ACCENT}18`,
-                      color: PAGE_ACCENT,
-                    }}
-                  >
-                    <Sparkles className="h-2.5 w-2.5" aria-hidden="true" />
-                    Popular
-                  </span>
-                ) : null}
-              </div>
-              <p className="text-xs lg:text-[0.8rem] text-text-secondary leading-snug truncate">
-                {tier.description.split(".")[0]}.
-              </p>
-            </div>
-            <div className="text-right">
-              {tier.price !== null ? (
-                <div
-                  className="font-display text-2xl lg:text-3xl font-bold leading-none tabular-nums"
-                  style={{ color: PAGE_DARK }}
-                >
-                  ${tier.price.toLocaleString()}
-                </div>
-              ) : (
-                <div
-                  className="font-display text-xl lg:text-2xl font-bold leading-none"
-                  style={{ color: PAGE_DARK }}
-                >
-                  Custom
-                </div>
-              )}
-              <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
-                {tier.timeline}
-              </div>
-            </div>
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-}
-
 export default function PricingContent() {
   const reduce = useReducedMotion();
   const billingFaqs = FAQ_ITEMS.filter((f) => f.category === "Billing");
@@ -328,196 +228,110 @@ export default function PricingContent() {
           aria-hidden="true"
         />
 
-        <div className="relative mx-auto max-w-[1400px] px-6 lg:px-12">
-          <div className="grid lg:grid-cols-[5fr_7fr] gap-12 lg:gap-16 xl:gap-20 items-start">
-            {/* LEFT: title block */}
+        <div className="relative mx-auto max-w-3xl px-6 text-center lg:px-8">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={heroStagger}
+          >
             <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={heroStagger}
-              className="lg:pt-4"
+              variants={heroItem}
+              className="inline-flex items-center gap-3 mb-7 flex-wrap justify-center"
             >
-              <motion.div
-                variants={heroItem}
-                className="flex items-center gap-3 mb-7 flex-wrap"
+              <PulsingDot reduce={reduce} />
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
+                Engagement Tiers
+              </span>
+              <span className="text-text-muted/50" aria-hidden="true">
+                /
+              </span>
+              <span
+                className="font-mono text-[11px] uppercase tracking-[0.22em]"
+                style={{ color: PAGE_ACCENT }}
               >
-                <PulsingDot reduce={reduce} />
-                <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
-                  Engagement Tiers
-                </span>
-                <span className="text-text-muted/50" aria-hidden="true">
-                  /
-                </span>
-                <span
-                  className="font-mono text-[11px] uppercase tracking-[0.22em]"
-                  style={{ color: PAGE_ACCENT }}
-                >
-                  Fixed Price
-                </span>
-              </motion.div>
-
-              <motion.h1
-                variants={heroItem}
-                className="font-display text-[clamp(2.6rem,5.6vw,4.6rem)] font-bold leading-[1.04] tracking-tight mb-8"
-              >
-                Fixed Pricing.
-                <br />
-                <span style={{ color: PAGE_ACCENT }}>Clear Scope.</span>
-              </motion.h1>
-
-              <motion.p
-                variants={heroItem}
-                className="text-lg lg:text-xl text-text-secondary leading-[1.6] max-w-xl mb-10"
-              >
-                Every project starts with a clear scope and a fixed price. Know
-                exactly what you are getting, and what it costs, before I write
-                a single line of code.
-              </motion.p>
-
-              <motion.div
-                variants={heroItem}
-                className="flex items-center gap-6 lg:gap-8 mb-10"
-              >
-                <div className="flex items-baseline gap-2.5">
-                  <span
-                    className="font-display text-3xl lg:text-4xl font-bold leading-none"
-                    style={{ color: PAGE_ACCENT }}
-                  >
-                    3
-                  </span>
-                  <span className="font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.18em] text-text-muted">
-                    Tiers
-                  </span>
-                </div>
-                <div className="h-8 w-px bg-text-primary/15" aria-hidden="true" />
-                <div className="flex items-baseline gap-2.5">
-                  <span
-                    className="font-display text-3xl lg:text-4xl font-bold leading-none"
-                    style={{ color: PAGE_ACCENT }}
-                  >
-                    0
-                  </span>
-                  <span className="font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.18em] text-text-muted">
-                    Hourly
-                  </span>
-                </div>
-                <div className="h-8 w-px bg-text-primary/15" aria-hidden="true" />
-                <div className="flex items-baseline gap-2.5">
-                  <span
-                    className="font-display text-3xl lg:text-4xl font-bold leading-none"
-                    style={{ color: PAGE_ACCENT }}
-                  >
-                    1
-                  </span>
-                  <span className="font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.18em] text-text-muted">
-                    Invoice
-                  </span>
-                </div>
-              </motion.div>
-
-              <motion.div
-                variants={heroItem}
-                className="flex flex-wrap items-center gap-x-6 gap-y-4"
-              >
-                <Link
-                  href="/pricing/build"
-                  className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
-                  style={{ backgroundColor: BRAND_BLUE }}
-                >
-                  Build a Custom Package
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-                <Link
-                  href="#tiers"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-text-primary border-b border-text-primary/30 hover:border-text-primary transition-colors pb-1"
-                >
-                  See Each Tier
-                </Link>
-              </motion.div>
+                Fixed Price
+              </span>
             </motion.div>
 
-            {/* RIGHT: Fee Ledger signature */}
-            <div className="relative">
-              {!reduce ? (
-                <>
-                  <motion.div
-                    className="absolute -inset-8 lg:-inset-12 -z-10 blur-3xl pointer-events-none"
-                    style={{
-                      background: `radial-gradient(ellipse at center, ${PAGE_LIGHT} 0%, transparent 70%)`,
-                    }}
-                    animate={{ opacity: [0.16, 0.32, 0.16] }}
-                    transition={{
-                      duration: 5.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 0.4,
-                    }}
-                    aria-hidden="true"
-                  />
-                  <motion.div
-                    className="absolute -inset-6 lg:-inset-10 -z-10 blur-2xl pointer-events-none"
-                    style={{
-                      background: `radial-gradient(ellipse at 60% 40%, ${PAGE_ACCENT} 0%, transparent 60%)`,
-                    }}
-                    animate={{ opacity: [0.10, 0.22, 0.10] }}
-                    transition={{
-                      duration: 6.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 1.6,
-                    }}
-                    aria-hidden="true"
-                  />
-                </>
-              ) : (
-                <div
-                  className="absolute -inset-8 lg:-inset-12 -z-10 blur-3xl pointer-events-none opacity-25"
-                  style={{
-                    background: `radial-gradient(ellipse at center, ${PAGE_LIGHT} 0%, transparent 70%)`,
-                  }}
-                  aria-hidden="true"
-                />
-              )}
-              <div
-                className="relative rounded-2xl lg:rounded-3xl border p-8 lg:p-10 transform-gpu overflow-hidden"
-                style={{
-                  borderColor: `${PAGE_ACCENT}40`,
-                  background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}0d 60%, ${PAGE_ACCENT}0a 100%)`,
-                  boxShadow: [
-                    "inset 0 1px 0 rgba(255,255,255,0.95)",
-                    "inset 0 0 0 1px rgba(255,255,255,0.4)",
-                    "0 1px 2px rgba(0,0,0,0.04)",
-                    `0 18px 48px -16px ${PAGE_ACCENT}40`,
-                    `0 48px 100px -32px ${PAGE_ACCENT}30`,
-                    `0 80px 140px -40px ${PAGE_DARK}25`,
-                  ].join(", "),
-                }}
-              >
-                <div
-                  className="absolute top-0 left-6 right-6 h-px pointer-events-none"
-                  style={{
-                    background: `linear-gradient(90deg, transparent 0%, ${PAGE_LIGHT}aa 35%, ${PAGE_HIGHLIGHT}cc 50%, ${PAGE_LIGHT}aa 65%, transparent 100%)`,
-                  }}
-                  aria-hidden="true"
-                />
-                <div className="flex items-center justify-between mb-6 lg:mb-7 pb-5 border-b" style={{ borderColor: `${PAGE_ACCENT}1f` }}>
-                  <div className="flex items-center gap-2.5">
-                    <PulsingDot reduce={reduce} />
-                    <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
-                      Fee Schedule
-                    </span>
-                  </div>
-                  <span
-                    className="font-mono text-[10px] uppercase tracking-[0.22em]"
-                    style={{ color: PAGE_ACCENT }}
-                  >
-                    USD · Fixed
-                  </span>
-                </div>
-                <FeeLedger reduce={reduce} />
+            <motion.h1
+              variants={heroItem}
+              className="font-display text-[clamp(2.6rem,5.6vw,4.6rem)] font-bold leading-[1.04] tracking-tight mb-8"
+            >
+              Fixed Pricing.
+              <br />
+              <span style={{ color: PAGE_ACCENT }}>Clear Scope.</span>
+            </motion.h1>
+
+            <motion.p
+              variants={heroItem}
+              className="text-lg lg:text-xl text-text-secondary leading-[1.6] max-w-xl mx-auto mb-10"
+            >
+              Every project starts with a clear scope and a fixed price. Know
+              exactly what you are getting, and what it costs, before I write
+              a single line of code.
+            </motion.p>
+
+            <motion.div
+              variants={heroItem}
+              className="flex items-center justify-center gap-6 lg:gap-8 mb-10"
+            >
+              <div className="flex items-baseline gap-2.5">
+                <span
+                  className="font-display text-3xl lg:text-4xl font-bold leading-none"
+                  style={{ color: PAGE_ACCENT }}
+                >
+                  3
+                </span>
+                <span className="font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.18em] text-text-muted">
+                  Tiers
+                </span>
               </div>
-            </div>
-          </div>
+              <div className="h-8 w-px bg-text-primary/15" aria-hidden="true" />
+              <div className="flex items-baseline gap-2.5">
+                <span
+                  className="font-display text-3xl lg:text-4xl font-bold leading-none"
+                  style={{ color: PAGE_ACCENT }}
+                >
+                  0
+                </span>
+                <span className="font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.18em] text-text-muted">
+                  Hourly
+                </span>
+              </div>
+              <div className="h-8 w-px bg-text-primary/15" aria-hidden="true" />
+              <div className="flex items-baseline gap-2.5">
+                <span
+                  className="font-display text-3xl lg:text-4xl font-bold leading-none"
+                  style={{ color: PAGE_ACCENT }}
+                >
+                  1
+                </span>
+                <span className="font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.18em] text-text-muted">
+                  Invoice
+                </span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              variants={heroItem}
+              className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4"
+            >
+              <Link
+                href="/pricing/build"
+                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
+                style={{ backgroundColor: BRAND_BLUE }}
+              >
+                Build a Custom Package
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="#tiers"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-text-primary border-b border-text-primary/30 hover:border-text-primary transition-colors pb-1"
+              >
+                See Each Tier
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
