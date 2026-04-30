@@ -6,7 +6,83 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 (late) -- Process v3: cyan palette + premium card recipe applied site-wide
+## Most Recent Session: April 29, 2026 (late) -- Card hover interaction + Services / Pricing / Contact rebuilds (4-commit sprint)
+
+### What shipped
+
+Joshua: "The cards need interaction from the user." plus "do everything else perfectly and masterfully ensuring perfection in every way for the other pages." Four commits in sequence:
+
+1. **`6e8d2f3` feat(cards):** Hover interaction added to every elevated card site-wide. Lift, halo grow, top-edge brighten, brushed-metal icon scale + tilt.
+2. **`0fa2ec0` feat(services):** Capability stack hero + emerald (#059669) page identity.
+3. **`4ad28a3` feat(pricing):** Fee ledger hero + amber-700 (#b45309) page identity.
+4. **`0066bc2` feat(contact):** Channel grid hero + rose-600 (#e11d48) page identity.
+
+The lookalike-cluster pages (Services / Pricing / Contact) all had the same centered-pill + 2-line-headline + centered-paragraph hero template. Now each one has a distinct hero composition, a distinct page-identity color, and the same magazine-spread architecture below the fold so the editorial language stays unified. The full per-page identity matrix is now:
+
+- About: brand-blue #3b82f6 (anchor)
+- Process: cyan #0891b2 (ocean cyan, brushed steel)
+- Services: emerald #059669 (build / grow / engineering)
+- Pricing: amber-700 #b45309 (premium / value / brass fittings)
+- Contact: rose-600 #e11d48 (personal / warm / approachable)
+
+Brand-blue (#3b82f6) stays as the primary CTA color across all five pages so brand cohesion holds.
+
+### Stage 1 details: Card hover interaction
+
+Every elevated card now gets:
+1. Framer Motion `whileHover` lift `y: -8` over 350ms with EASE_OUT.
+2. A hover-halo span behind the card at -z-10 with opacity 0 to 100 over 500ms on group-hover. Carries an accent-tinted shadow and an inset 1px accent ring for atmospheric glow.
+3. Top-edge highlight base + brighter overlay that opacity-fades to 100 on group-hover. Brighter color (cyan-300 / emerald-300 / amber-400 / rose-300 peak depending on the page).
+4. Brushed-metal icon chip scales 1.10 and tilts -3deg on group-hover, like hardware tipping toward the user.
+5. Clickable cards (related-briefs) get a hover-underline on the title with offset-4 decoration-1.
+
+Cards upgraded with hover treatment: Process expectation cards, brief related-briefs cards, case study tech-detail cards, About OPS_CAPABILITIES cards. All gated behind `useReducedMotion()`.
+
+### Stage 2 details: Services rebuild
+
+Hero is the Capability Stack signature: 5fr/7fr split where the right column shows all 6 SERVICES disciplines as horizontal layer cards stacked vertically with brushed-metal icon chips, a leading emerald gradient bar, position numerals (01-06), and a stagger-from-right entrance. The whole stack reads as "the system being assembled."
+
+Background: diagonal cross-hatch grid in emerald at 4% opacity (distinct from Process's orthogonal blueprint and Pricing's ledger rules).
+
+Body: each of the 6 disciplines becomes a chapter-break section with the 2-column phase-content treatment shared with Process. Brushed icon chip, prose on left, "What's Included" features list on right with cascading 60ms stagger and emerald CheckCircle2 icons.
+
+### Stage 3 details: Pricing rebuild
+
+Hero is the Fee Ledger signature: 5fr/7fr split where the right column is a beautifully typeset invoice-style panel with the 3 PRICING_TIERS stacked vertically as ledger rows. Each row has the position numeral, tier name, summary, fixed price (tabular nums, deep amber), and timeline. Professional gets a "Popular" pill and a faint amber strip behind it. Header row labels the panel "Fee Schedule" with "USD Fixed" on the right.
+
+Background: repeating horizontal amber rules at 4% opacity (like a ledger sheet).
+
+Body: tier deep-dive cards (Professional pops up via lg:-mt-4) all use the elevated card recipe with hover halos. Canopy specialty engagement section gets its own chapter with the elevated card treatment. Add-ons grid uses the elevated card recipe. Billing FAQ section opens with the chapter break + Accordion preserved.
+
+### Stage 4 details: Contact rebuild
+
+Hero is the Channel Grid signature: 5fr/7fr split where the right column is a card with 4 ChannelTile components in a 2x2 grid: Email (mailto), Form (anchor to form below), Location (Dallas TX), Response Time (within 1 business day). Each tile is a premium card with rose-tinted recipe and full hover interaction (lift 6, halo grow, top edge brighten, icon scale + tilt). Clickable tiles show an arrow that translates +1 on hover.
+
+Background: rose dot grid at 4% opacity (warmer/softer than the orthogonal grids elsewhere).
+
+Form section preserved verbatim with all the existing form logic (useForm, zod, package selection from query params, portal-access topic, canopy topic). Visual layer fully rebuilt: form container is now a premium rose-tinted card. Package selection / portal / canopy callouts all use the elevated card recipe with rose identity. Focus states on selects switched from accent-blue to rose. Submit button is brand-blue (consistent across the site). Sidebar info cards match.
+
+### Verification (cumulative across all 4 commits)
+
+- `npx tsc --noEmit`: clean every commit.
+- `npm run lint`: clean every commit.
+- Em-dash audit: 0 across all changed files.
+
+### Lookalike-cluster problem fully closed
+
+Five marketing pages now each have their own distinct hero composition AND identity color while sharing the same brand language (typography, motion, primary CTA color, chapter-break pattern). The "didn't I just see this?" feeling Joshua flagged is structurally resolved. Navigation between any two pages now produces a visible visual shift while staying unmistakably DBJ.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/`, `/about`, `/process`, `/services`, `/pricing`, `/contact` in sequence and verify each page reads as visually distinct from the previous. Hover every card on every page and confirm: lift, halo grow, top-edge brighten, icon scale + tilt all fire smoothly. The 5-color page-identity matrix should now feel deliberate (cool-cool-cool-warm-warm progression: blue → cyan → emerald → amber → rose). If any page feels off relative to the others, the most likely tuning candidates are Pricing (amber can read warm/dated if not paired well with the cool surrounding pages) and Contact (rose can read pink/feminine if you want a more neutral warm). Otherwise the elevation pass is structurally complete.
+
+### Final state (post-commit)
+
+- Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 (late) -- Process v3: cyan palette + premium card recipe applied site-wide
 
 ### What shipped
 
