@@ -6,7 +6,55 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 (late) -- Card hover interaction + Services / Pricing / Contact rebuilds (4-commit sprint)
+## Most Recent Session: April 30, 2026 -- Pricing badge fix + Canopy logo + Contact silver scale-back + Work forest brown
+
+### What shipped (commit `24b3ffc`)
+
+Joshua's review of the 4-commit elevation sprint flagged four targeted issues:
+
+1. The "Most Popular" badge on the Professional pricing tier was getting clipped at the top because the card had `overflow-hidden`.
+2. The Canopy section needed the Canopy logo (cyan tree wordmark) added beautifully.
+3. The Contact page was too dramatic, was using rose ("red"), and was publicly displaying his email. Asked to scale back DRAMATICALLY and switch to silver.
+4. The Work page needed a forest brown identity. Card layout / design / texture / feel enhanced (NOT dimensions).
+
+### Files changed (4)
+
+- **`app/(marketing)/pricing/PricingContent.tsx`**: removed `overflow-hidden` from tier cards so the `-top-3` "Most Popular" badge renders unclipped. Added a Canopy logo plaque to the Canopy section: 88x88 rounded panel with a dark radial-gradient backdrop and an amber-edged glow ring, hosting the cyan tree wordmark. Sits next to a "Canopy" wordmark and the Operations Stack pill.
+- **`app/(marketing)/contact/ContactContent.tsx`**: dramatically scaled back. Reverted the elaborate 4-tile channel grid hero. Hero is now a calm centered structure: small slate-tinted pill eyebrow, 2-line headline with the second line in slate-dark, calm supporting paragraph. Rose-600 palette swapped for slate-500 (silver). No 4-tile channel grid, no email displayed publicly anywhere on the page. Form preserved verbatim with all the existing logic (useForm, zod, package selection from query params, portal-access topic, canopy topic). Sidebar info reduced to 2 cards: Location + Response Time. The page is now the quietest in the marketing surface by intent so the form is the focus.
+- **`app/(marketing)/work/WorkContent.tsx`**: switched from default cream / accent-blue palette to forest brown tones. PAGE_ACCENT #5d4037 (walnut), PAGE_LIGHT #8d6e63 (warm tan), PAGE_DARK #3e2723 (espresso), PAGE_HIGHLIGHT #bcaaa4 (pale beige). Card dimensions preserved (3:2 image, same vertical content stack). What changed: layout, design, texture, feel. Project + design-brief cards now carry the premium card recipe (inner top highlight strip, brown-tinted gradient bg, 4-layer brown-tinted shadow reaching 36-72px deep, hover halo with opacity 0 to 100 that grows the shadow on group-hover, top-edge highlight that brightens on group-hover via a second strip overlay, image scales 1.05 on hover with 700ms ease-out). Inner metric tiles + tech-stack pills restyled with the same forest palette. Notable callout band uses a warm brown gradient instead of accent-blue tint. The design-briefs section preserves per-brief paletteAccent for variety, layered into the same premium card recipe.
+- **`public/canopy-logo.webp`** (new, 147 KB): converted from `/Users/doulosjones/Desktop/operations-cockpit/public/CANOPY LOGO TRANSPARENT.png` (5786x4330 source) at 800px wide, q=90, alpha-q=100.
+
+### Updated page-identity matrix
+
+- About: brand-blue #3b82f6 (anchor)
+- Process: cyan #0891b2 (ocean cyan, brushed steel)
+- Services: emerald #059669 (build / grow)
+- Pricing: amber-700 #b45309 (premium / value / brass fittings)
+- Contact: slate-500 #64748b (silver / calm / direct) - REVISED from rose
+- Work: walnut #5d4037 (forest brown / craft / finished wood) - NEW
+- About: brand-blue still anchor
+
+The five marketing pages now read as a deliberate cool-warm progression from brand-blue (About) through cyan (Process) and emerald (Services) into amber (Pricing), with silver (Contact) acting as a calm interlude and walnut (Work) anchoring the portfolio surface.
+
+### Verification
+
+- `npx tsc --noEmit`: clean (exit 0).
+- `npm run lint`: clean (exit 0).
+- Em-dash audit on all 3 changed files: 0.
+
+### Final state (post-commit)
+
+- Feature commit: `24b3ffc` -- fix(marketing): pricing badge clip + canopy logo, contact silver scale-back, work forest brown. 4 files changed, 532 insertions, 850 deletions (net negative because the Contact rebuild reverted to a much smaller file).
+- Pushed to `origin main` (`1d6e9d9..24b3ffc main -> main`).
+- Working tree clean apart from this snapshot amendment.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/pricing` and confirm the "Most Popular" badge on the Professional tier is no longer clipped, scroll down to the Canopy section and confirm the cyan tree logo plaque renders cleanly next to the wordmark + Operations Stack pill. Load `/contact` and confirm the page reads silver / calm / focused on the form, with no email displayed anywhere. Load `/work` and confirm the cards have the warm walnut tint with the inner-highlight + multi-layer shadow recipe; hover any card and watch the halo glow + image scale fire smoothly.
+
+---
+
+## Previous Session: April 29, 2026 (late) -- Card hover interaction + Services / Pricing / Contact rebuilds (4-commit sprint)
 
 ### What shipped
 
