@@ -6,7 +6,69 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Personal Injury Law design brief rebuilt as image-anchored deep dive (Bauder & Associates template)
+## Most Recent Session: April 29, 2026 -- Financial Advisor design brief rebuilt as image-anchored deep dive (Beckett Wealth Partners template). EIGHT-OF-EIGHT SERIES COMPLETE.
+
+### What shipped
+
+Eighth and final image-anchored design-brief rewrite. The image-anchored deep-dive series across all eight verticals is now complete. Joshua handed over 19 screenshots of the Beckett Wealth Partners Dallas fee-only fiduciary registered investment advisor template (deep charcoal-brown + cream + forest-green palette, As Featured In media strip, $540M AUA stats band) with explicit permission to skip any image that read as not-ideal. Curated 19 down to a hero plus 11 section images. Skipped 7 screenshots on substantive grounds: one credential-inconsistency mismatch, one redundant hero continuation, one redundant transition shot, one redundant philosophy bridge, one redundant recognition surface, and two redundant footer continuations.
+
+### Files changed (1 markdown + 1 hero replacement + 11 new section images + 1 brief-index description update)
+
+- **`docs/design-briefs/financial-advisor.md`**: full content rewrite. Headline `"What Independent Wealth Advisors Need Online"` -> `"The Architecture of a Dallas Fee-Only Fiduciary Practice"`. Summary refreshed to eleven-surfaces framing. Slug field corrected from `independent-wealth-advisor` to `financial-advisor` to match `BRIEF_INDEX`. Replaced the prior 3-section analytical essay with 11 image-anchored sections: I Am a Fiduciary I Do Not Take Commissions / Comprehensive Wealth Management / Where the Work Gets Technical / My Fees in Plain Numbers / Your Money Stays in Your Name at a Major Custodian / We Sit on Your Side of the Table / Experience You Can Verify / Relationships Measured in Decades / Considered Perspective Written Quarterly / How I Protect Client Data / Thirty Minutes No Fee No Follow-Up If It Is Not a Fit. Each section opens with one `![alt](path)` block followed by 3 paragraphs of editorial commentary. New `previewAlt` (2,365 chars, the longest yet) describes the Beckett page-top hero in detail (cream As Featured In strip with five publication wordmarks Barron's/Forbes/Bloomberg/WSJ/D CEO, charcoal-brown field with pinstripe overlay, green pipe wordmark, italic Registered Investment Advisor Dallas TX tagline, seven-link nav with green Schedule A Discovery Call button, hero split with eyebrow Wealth Management Dallas Texas, three-line headline Wealth Is Personal Your Strategy Should Be Too, body paragraph naming families business owners and executives across DFW, two CTAs, stats row 2003 / $540M / Fee-Only, founding-partner portrait credited James Beckett CFP CFA Founding Partner).
+- **`lib/design-briefs.ts`**: refreshed the `financial-advisor` index entry's `description` and `keySurfaces`. New description names the signed pledge in the partner's voice, the parent-child service architecture (relationship grid + technical workstreams grid), the published tiered AUM fee schedule with notes, the named institutional custodians with SIPC annotations, the Fee-Only / Fiduciary / Independent three-pillar diagram, the three credentialed principals, the two SEC-marketing-rule-compliant testimonials, the dated quarterly letters under the partner's name, the three structural cybersecurity defenses, the thirty-minute discovery call run by the partner personally with no follow-up if not a fit, and the four-column compliance footer. New keySurfaces: Signed Fiduciary Pledge, Published Tiered Fee Schedule, Custody With SIPC.
+- **`public/design-briefs/financial-advisor.webp`**: replaced with the new Beckett hero (1800px wide, q=82, 65 KB). The prior placeholder is overwritten.
+- **`public/design-briefs/financial-advisor/`** (new directory, 11 files): `02-pledge.webp` (My Fiduciary Pledge editorial column with green left rule and James Beckett signature) / `03-services.webp` (Comprehensive Wealth Management 4-card service grid) / `04-technical.webp` (Where the Work Gets Technical 6 specialized practice areas) / `05-fees.webp` (My Fees in Plain Numbers tiered AUM table 1.00% to 0.45%) / `06-custody.webp` (Your Money Stays in Your Name 4 custodian cards: Schwab Primary, Fidelity Secondary, Pershing Specialty, eMoney Client Portal) / `07-philosophy.webp` (We Sit on Your Side of the Table with Fee-Only/Fiduciary/Independent three-pillar cards) / `08-team.webp` (Experience You Can Verify 3 principal cards: James Beckett CFP CFA 28YRS / Catherine Okafor CFP MSFP 17YRS / Daniel Reeves CFA CAIA 22YRS) / `09-testimonials.webp` (Relationships Measured in Decades two italic quotes from The Hargrove Family Highland Park 2014 + Dr. Linh Nguyen Plano 2019) / `10-letters.webp` (Considered Perspective Written Quarterly three letters: Q1 2026 Concentrated Stock / Q4 2025 Roth Conversions Sunset Year / Q3 2025 Discovery Meeting) / `11-security.webp` (How I Protect Client Data 3 cards: Custodial Separation, Encrypted Document Vault, Annual Penetration Testing) / `12-discovery.webp` (Thirty Minutes No Fee discovery call with three commitments + Choose A Time widget). All 1600px wide, q=82, 39-70 KB each.
+
+### Editorial judgment on excluded screenshots
+
+- **Catherine Okafor individual profile (11.22.07)**: skipped on credential-inconsistency grounds. The leadership-card grid (kept image 11.22.01) lists Catherine as `CFP, MSFP, 17 YRS / PARTNER, FINANCIAL PLANNING / Master of Science in Financial Planning from Texas Tech`. The individual profile screenshot lists the same person as `Senior Advisor / CFP / 18 YRS / SMU COX / 8 years at Goldman Sachs Private Wealth Management`. Same person, four contradictions: role title (Partner vs Senior Advisor), tenure (17 vs 18 years), education credential (MSFP from Texas Tech vs SMU Cox), and prior firm (none stated vs Goldman Sachs). For a brief that explicitly argues for "Experience You Can Verify" with "Every credential we cite is independently verifiable through the issuing body," anchoring on a section that contradicts itself across two surfaces would undercut the architectural argument. The leadership grid alone carries the team-representation work.
+- **Hero continuation with stats band + pledge start (11.21.04)**: skipped on redundancy grounds. The stats band (2003 Founded / $540M AUA / Fee-Only Fiduciary), the founding-partner credit (James Beckett CFP CFA), and the start of the pledge headline are all captured in the `previewAlt` text on the hero, and the pledge surface (kept 11.21.16) is the cleaner anchor for the My Fiduciary Pledge architecture. This screenshot is a transitional crop with no distinct content.
+- **Specific Clients Specific Problems (11.21.26)**: skipped on consolidation grounds. The three niche descriptors ($2M+ Established Families, Liquidity Business Owners Preparing for Sale 18-36 months out, RSUs Tech and Healthcare Executives) are valuable content but they read as a sub-element of the services architecture rather than a distinct surface deserving its own section. The Comprehensive Wealth Management commentary (section 02) references these niches in its closing paragraph, which preserves the structural argument without requiring a 12th section.
+- **$540,000,000 AUA big-number bridge (11.21.49)**: skipped on redundancy grounds. The $540M figure already appears in the hero stats band (captured in `previewAlt`) and the surface itself is a transitional bridge between the custodians section and the philosophy section. The accompanying body paragraph ("Across 90+ client relationships, we manage portfolios that have weathered three market cycles, two recessions, and one pandemic") is poetic but architecturally redundant.
+- **Independent Media and Industry Honors (11.22.28)**: skipped on redundancy grounds with the As Featured In strip in the hero. The hero strip already cites Barron's, Forbes, Bloomberg, WSJ, and D CEO, which is the brand-credibility credential. The honors block adds three additional honors (Five Star Wealth Manager 11 consecutive years, CFP Board Service to Profession, Financial Advisor Magazine RIA Top 250) but the marginal credential lift over the hero strip is small relative to the cost of an 11th-going-on-12th section. The leadership grid (section 07) plus the As Featured In strip in the hero plus the testimonials surface together carry the credential work.
+- **Footer top with disclosures and address (11.22.46)** and **Footer bottom with full disclosure paragraph (11.22.50)**: skipped on prose-consolidation grounds. The discovery-call section's closing paragraph describes the full footer architecture in prose: BECKETT WEALTH PARTNERS wordmark, SEC File No. 801-72904 and CRD #189204, principal Turtle Creek Boulevard address, FORM ADV PART 2A and 2B and FORM CRS and Privacy Policy and Fiduciary Statement disclosure links, WEBSITE BY DBJ TECHNOLOGIES credit, and the four-column compliance band naming Registration / Standard of Care / Custody / Reference Documents. This consolidation matches the precedent established in the restaurant brief (footer described in the closing newsletter section).
+
+### Voice and rules adherence
+
+- Zero em dashes across all changed files (audited via `grep -c $'\xe2\x80\x94'`).
+- DBJ first-person framing voice throughout the prose. Beckett firm-voice "we" appears only inside paraphrased site copy and the partner's first-person pledge / commitments (e.g., "I am a fiduciary. I do not take commissions. My only revenue is from clients.", "We construct portfolios from individual securities and institutional vehicles, not packaged products with embedded fees.", "We are paid by you, and only by you.", "I run discovery calls personally. No analyst, no associate, no relationship-management script."), consistent with the precedent established in the prior seven briefs.
+- Substantial copy per the luxury-means-substantial rule: 11 sections at 3 paragraphs each, ~4,000 words total. Calibrated for the high-net-worth Highland Park / Preston Hollow / Park Cities prospect voice rather than the working-family or panicked-injury-victim voices used in HVAC and PI law.
+- Section image alts are descriptive multi-sentence paragraphs that name the visible content faithfully (every fee tier rate stated, every custodian SIPC status named, every credential cited, every quarterly letter title transcribed, every security-card commitment paraphrased, full disclosure block transcribed in the closing alt blocks).
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean.
+- Section count: `grep -c "^## " docs/design-briefs/financial-advisor.md` = 11. Image-block count: `grep -c "^!\[" docs/design-briefs/financial-advisor.md` = 11. One image per section.
+- Parser smoke test (tsx import of `getDesignBriefBySlug`): financial-advisor `previewAlt` length 2,365 chars (the longest yet); all 11 sections parsed with images attached and 3 paragraphs of editorial commentary each.
+- Em-dash audit on the changed files: 0.
+- Image dimensions verified: 12 source PNGs all 3024x1964; outputs are 1800w (hero) and 1600w (sections) at q=82, totaling 12 webp files (65 KB hero + 39-70 KB section files).
+
+### Series complete: eight image-anchored briefs
+
+The image-anchored design-brief deep-dive series is now complete across all eight verticals. Each brief carries a real-template hero, 7 to 11 image-anchored body sections, and ~2,000 to ~4,000 words of analytical commentary. Sites covered:
+1. Lauren Prescott Real Estate (Luxury Residential, 8 sections), Park Cities boutique agent
+2. Ashworth & Foster (Custom Residential / Luxury Home Builder, 7 sections), Park Cities builder
+3. Ridgeview Dental (Family Dental Practice, 10 sections), West Plano family practice
+4. Reverie Aesthetics (Med Spa, 11 sections), Highland Park physician-led practice
+5. Ironclad Air (HVAC Contractor, 9 sections), DFW dispatch operation
+6. Ember & Vine (Upscale Restaurant, 10 sections), Bishop Arts chef-driven restaurant
+7. Bauder & Associates (Personal Injury Law, 10 sections), DFW trial firm with three-office DFW footprint
+8. Beckett Wealth Partners (Independent Wealth Advisor, 11 sections), Dallas fee-only fiduciary RIA
+
+The pattern is portable: the schema, parser, and renderer are generic, so future briefs (additional verticals or refreshes of existing ones) follow the exact same flow with no code changes required.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/financial-advisor` and confirm: (1) the Beckett hero renders cleanly with the As Featured In strip, the green Schedule A Discovery Call button, the three-line Wealth Is Personal headline, the founding-partner portrait, and the stats band visible above the fold, (2) each of the 11 body sections shows its anchor screenshot in the framed accent-tinted container between heading and prose, (3) the visual rhythm reads cleanly across the 11 sections (the longest brief tied with med spa, but justified by the wealth-advisor vertical's structural-trust surface count: pledge + services + technical + fees + custody + philosophy + team + testimonials + letters + security + discovery is the actual conversion architecture for the eight-figure prospect), (4) the page card preview on `/work` picks up the new hero and the refreshed description. Once approved, the eight-brief series is complete and the Work surface is fully populated with image-anchored deep dives. Joshua may want to consider a `/work` index refresh that surfaces the new asset density (each brief now has 7-11 anchor screenshots inside, not just a hero).
+
+### Final state (post-commit)
+
+- Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Personal Injury Law design brief rebuilt as image-anchored deep dive (Bauder & Associates template)
 
 ### What shipped
 

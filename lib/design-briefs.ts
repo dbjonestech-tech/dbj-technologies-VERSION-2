@@ -84,11 +84,11 @@ const BRIEF_INDEX: Array<
     preview: "/design-briefs/financial-advisor.webp",
     paletteAccent: "#2D5F4A",
     description:
-      "How a Dallas family with eight figures of equity comp and a private business actually evaluates a fee-only fiduciary across a six-to-eighteen-month decision window. A signed first-person fiduciary pledge, a published tiered fee schedule, named custodian relationships, dated quarterly commentary, and a four-column compliance footer. Trust written as a structural disclosure document, not a brochure.",
+      "How a Dallas family with eight figures of equity comp and a private business actually evaluates a fee-only fiduciary across a six-to-eighteen-month decision window. A signed first-person fiduciary pledge in the partner's voice, a parent-child service architecture pairing a four-card relationship grid with a six-card technical workstreams grid (RSU/ISO/10b5-1, business sale, multi-generational transfer, tax coordination, estate coordination, charitable funds), a published tiered AUM fee schedule with notes, named institutional custodians with SIPC annotations, a Fee-Only Fiduciary Independent three-pillar diagram, three credentialed principals with verifiable credentials, two SEC-marketing-rule-compliant testimonials, dated quarterly letters under the partner's name, three structural cybersecurity defenses, a thirty-minute discovery call run by the partner personally with no follow-up if it is not a fit, and a four-column compliance footer. Trust written as a structural disclosure document, not a brochure.",
     keySurfaces: [
       "Signed Fiduciary Pledge",
-      "Published Fee Schedule",
-      "Named Custodians",
+      "Published Tiered Fee Schedule",
+      "Custody With SIPC",
     ],
   },
   {
