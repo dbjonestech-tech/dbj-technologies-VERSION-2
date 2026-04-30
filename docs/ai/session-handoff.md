@@ -44,7 +44,9 @@ After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/upsc
 
 ### Final state (post-commit)
 
-Will populate after this commit lands.
+- Feature commit: `c04dd94` -- feat(design-briefs): Upscale Restaurant image-anchored rewrite (Ember & Vine). 13 files changed, 132 insertions, 17 deletions (markdown rewrite + hero replacement + 10 new section images + this snapshot).
+- Pushed to `origin main` (`af59dc7..c04dd94 main -> main`).
+- Working tree clean apart from this snapshot amendment.
 
 ---
 
