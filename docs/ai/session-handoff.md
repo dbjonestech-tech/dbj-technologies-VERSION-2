@@ -6,7 +6,66 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 (late) -- Canopy expanded from 6 stub pages to 9 substantial sections + 4th DBJ case study shipped
+## Most Recent Session: April 29, 2026 (late) -- Process page v2: silvery charcoal palette + glow/pulse motion (replaces indigo)
+
+### What shipped
+
+Joshua saw the indigo Process page and said "looks good but not 'wow' enough" plus "don't use purple, use a silvery grey charcoal blue, and have the colors glow and pulsate." Single-file iteration of `app/(marketing)/process/ProcessContent.tsx` to swap the indigo identity for slate, and to wire continuous breathing glow/pulse animations across every accent in the page.
+
+### Files changed (1)
+
+- **`app/(marketing)/process/ProcessContent.tsx`**: 187 insertions, 62 deletions. Indigo killed entirely. New palette + new `PulsingDot` helper + breathing halos on the hero ladder card + traveling shimmer along the connector line + brushed-metal phase node circles + glow shadow on chapter-break rulers.
+
+### New palette
+
+- `PAGE_ACCENT = "#64748b"` (slate-500): structural elements (chapter ruler base, phase node deeper tone, dot fills, eyebrow position numerals, expectation card left-bar, toolkit chip border)
+- `PAGE_LIGHT = "#94a3b8"` (slate-400): luminous halos, ruler highlight, glow shadows, breathing pulse fills, traveling spark color
+- `PAGE_DARK = "#475569"` (slate-600): phase node deep tone, drop shadow tint
+- `BRAND_BLUE = "#3b82f6"`: preserved for primary CTA buttons (cross-site brand anchor)
+
+The combined effect: the page reads as brushed titanium with soft pulsing light, where the static structure is silvery-charcoal and the luminous accents breathe in slate-blue.
+
+### New `PulsingDot` helper
+
+A reusable accent-dot component that breathes on a 3.6s loop. Cycles `opacity: 0.6 → 1 → 0.6`, `scale: 1 → 1.18 → 1`, and `boxShadow: 0 → 12px 3px → 0` so the dot expands a soft glow halo at peak. Accepts `delay`, `size`, and `color` props. Used in the hero eyebrow row, the ladder card "Engagement Ladder" tag, every chapter-break tag dot (with stagger derived from chapter position so the page does not pulse in unison), every "What Happens" eyebrow above each phase activities list (per-phase delay offset), and the closing CTA eyebrow. Gated through `useReducedMotion()` so the dot is static when the user prefers reduced motion.
+
+### Hero card glow
+
+The right-column ladder card now sits inside two stacked breathing halos with offset timings: an outer slate-light radial halo at `inset -8 lg:-inset-12` blur-3xl that breathes 0.18 → 0.36 → 0.18 over 5.5s, and an inner slate-accent radial halo at `inset -6 lg:-inset-10` blur-2xl that breathes 0.12 → 0.24 → 0.12 over 6.5s with a 1.6s offset. The two together produce a subtle shifting shimmer rather than a static glow. The card itself gained an inner top highlight `inset 0 1px 0 rgba(255,255,255,0.9)` and a slate-tinted vertical gradient, so the card reads as a polished metal slab catching light.
+
+### Phase node circles: brushed-metal treatment
+
+Each phase number circle is now filled with a 145deg linear gradient from `${PAGE_LIGHT}` to `${PAGE_DARK}` plus an inner top highlight via `inset 0 1px 0 ${PAGE_LIGHT}aa` and a soft drop shadow `0 6px 18px -6px ${PAGE_DARK}99`. Reads as polished steel coins. The bg-primary ring around each circle isolates them from the connector line.
+
+### Phase node breathing
+
+All four phase nodes now breathe (was: only Phase 01). Phase 01 keeps the prominent breath (2.8s loop, scale 1 → 1.6 → 1, opacity 0.45 → 0 → 0.45) signaling "start here." Phases 02 to 04 get a more subtle breath (4.2s loop, scale 1 → 1.32 → 1, opacity 0.28 → 0.05 → 0.28) with staggered 550ms delays so they breathe out of sync with each other. The visual feeling: four pieces of hardware idling on standby, each with its own slow heartbeat.
+
+### Traveling spark along the connector line
+
+A new luminous segment drifts top-to-bottom along the vertical connector line on a 5s loop with 1.8s repeat delay. The segment is a 20-unit-tall vertical gradient `transparent → PAGE_LIGHT → transparent` with `boxShadow 0 0 16px 2px ${PAGE_LIGHT}aa`. Opacity envelope 0 → 0.85 → 0.85 → 0 across 0/15/85/100% of the duration so it fades in at the top, holds, and fades out at the bottom. The visual is a charge running through the wire. Mounts after the connector line finishes drawing (2.5s initial delay so it does not compete with the on-mount animation).
+
+### Chapter ruler glow
+
+Every chapter break ruler picked up `boxShadow: 0 0 14px ${PAGE_LIGHT}33` and a richer 3-stop gradient `${PAGE_LIGHT} 0% → ${PAGE_ACCENT} 35% → ${PAGE_ACCENT}11 100%`. The ruler now reads as a luminous edge rather than a flat line, with the brightest point at the chapter-tag end and falling off into the page.
+
+### Verification
+
+- `npx tsc --noEmit`: clean (exit 0).
+- `npm run lint`: clean (exit 0).
+- Em-dash audit: 0.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/process` and watch: (1) the hero eyebrow dot breathes, (2) the ladder card glows with a slow shifting halo (two stacked breathes at offset timings), (3) the four phase number circles look like brushed steel coins and each breathes on its own clock, (4) a luminous spark travels down the connector line every ~7 seconds, (5) the chapter ruler under "From Diagnosis to Deployment" has a luminous edge, (6) every accent dot down the page (chapter tags, "What Happens" eyebrows, closing eyebrow) breathes in unison-but-staggered. If the breathing feels too active, the most likely tuning candidate is dialing the PulsingDot opacity range from 0.6→1 to 0.7→1 (subtler) and the scale from 1.18 to 1.1. If Joshua wants more "wow," the next candidates are: (a) a slow rotating border-gradient around the ladder card (Stripe-style border-glow), (b) a subtle parallax tilt on the ladder card responding to mouse position, (c) a faint ambient particle field floating around the hero.
+
+### Final state (post-commit)
+
+- Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 (late) -- Canopy expanded from 6 stub pages to 9 substantial sections + 4th DBJ case study shipped
 
 ### What shipped (overview)
 

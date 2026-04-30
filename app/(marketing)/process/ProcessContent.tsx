@@ -15,13 +15,75 @@ import {
 } from "lucide-react";
 
 /* ─── PAGE IDENTITY ───────────────────────────────────
-   Process gets its own indigo accent for chapter rulers,
-   halos, and the phase ladder. Accent-blue remains the
-   site-wide primary CTA color so brand cohesion holds. */
-const PAGE_ACCENT = "#6366f1";
+   Process is the silvery charcoal page. Slate-500 carries
+   structural elements (chapter rulers, dots, tags, phase
+   nodes, borders). Slate-400 carries luminous halos and
+   pulsing glow halos. Slate-600 carries deeper accents.
+   Accent-blue remains the site-wide primary CTA color so
+   brand cohesion holds. The visual feeling is brushed
+   titanium with soft pulsing light, like the case of a
+   premium piece of hardware. */
+const PAGE_ACCENT = "#64748b"; // slate-500
+const PAGE_LIGHT = "#94a3b8"; // slate-400
+const PAGE_DARK = "#475569"; // slate-600
 const BRAND_BLUE = "#3b82f6";
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 const VIEWPORT = { once: true, margin: "-80px" } as const;
+
+/* ─── PULSING DOT ──────────────────────────────────────
+   The small accent dots that sit before every mono-caps
+   eyebrow tag now breathe. Opacity cycles 0.6 → 1.0 → 0.6
+   over 3.6 seconds, with a subtle scale pulse. Phase node
+   numbers and chapter break dots use this pattern with
+   staggered delays so the page reads as alive without
+   feeling busy. */
+function PulsingDot({
+  delay = 0,
+  size = 8,
+  color = PAGE_ACCENT,
+  reduce,
+}: {
+  delay?: number;
+  size?: number;
+  color?: string;
+  reduce: boolean | null;
+}) {
+  return (
+    <motion.span
+      className="inline-block rounded-full shrink-0"
+      style={{
+        backgroundColor: color,
+        width: size,
+        height: size,
+        boxShadow: `0 0 0 0 ${color}66`,
+      }}
+      animate={
+        reduce
+          ? undefined
+          : {
+              opacity: [0.6, 1, 0.6],
+              scale: [1, 1.18, 1],
+              boxShadow: [
+                `0 0 0 0 ${color}66`,
+                `0 0 12px 3px ${color}66`,
+                `0 0 0 0 ${color}66`,
+              ],
+            }
+      }
+      transition={
+        reduce
+          ? undefined
+          : {
+              duration: 3.6,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay,
+            }
+      }
+      aria-hidden="true"
+    />
+  );
+}
 
 interface Phase {
   step: string;
@@ -162,15 +224,19 @@ function ChapterHeader({
     },
   };
 
+  // Stagger the breathing dot a bit per chapter so the page does not
+  // pulse in unison. Delay derives from the chapter position when
+  // available; otherwise a stable hash from the label string.
+  const dotDelay =
+    position !== undefined
+      ? (position - 1) * 0.6
+      : (label.charCodeAt(0) % 5) * 0.4;
+
   return (
     <motion.div initial="hidden" whileInView="visible" viewport={VIEWPORT}>
       <div className="flex items-center gap-4 lg:gap-6 mb-8 lg:mb-10">
         <motion.div variants={tagV} className="flex items-center gap-2.5 shrink-0">
-          <span
-            className="inline-block h-2 w-2 rounded-full"
-            style={{ backgroundColor: PAGE_ACCENT }}
-            aria-hidden="true"
-          />
+          <PulsingDot delay={dotDelay} reduce={reduce} />
           <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
             {label}
           </span>
@@ -192,7 +258,8 @@ function ChapterHeader({
           variants={rulerV}
           className="h-[2px] flex-1 origin-left"
           style={{
-            background: `linear-gradient(90deg, ${PAGE_ACCENT} 0%, ${PAGE_ACCENT}11 100%)`,
+            background: `linear-gradient(90deg, ${PAGE_LIGHT} 0%, ${PAGE_ACCENT} 35%, ${PAGE_ACCENT}11 100%)`,
+            boxShadow: `0 0 14px ${PAGE_LIGHT}33`,
           }}
           aria-hidden="true"
         />
@@ -221,6 +288,7 @@ function PhaseLadder({ reduce }: { reduce: boolean | null }) {
         className="absolute left-6 top-12 bottom-12 w-[2px]"
         style={{
           background: `linear-gradient(180deg, ${PAGE_ACCENT} 0%, ${PAGE_ACCENT}33 100%)`,
+          boxShadow: `0 0 12px ${PAGE_LIGHT}55`,
           transformOrigin: "top",
         }}
         initial={reduce ? { scaleY: 1 } : { scaleY: 0 }}
@@ -232,6 +300,33 @@ function PhaseLadder({ reduce }: { reduce: boolean | null }) {
         }}
         aria-hidden="true"
       />
+
+      {/* Traveling spark: a luminous segment drifts top-to-bottom along
+          the connector on a slow loop, like a charge running through
+          the line. Subtle but signals "process in motion." */}
+      {!reduce ? (
+        <motion.div
+          className="absolute left-6 w-[2px] h-20 -translate-x-[0px] pointer-events-none"
+          style={{
+            background: `linear-gradient(180deg, transparent 0%, ${PAGE_LIGHT} 50%, transparent 100%)`,
+            boxShadow: `0 0 16px 2px ${PAGE_LIGHT}aa`,
+            top: "3rem",
+          }}
+          animate={{
+            top: ["3rem", "calc(100% - 5rem)"],
+            opacity: [0, 0.85, 0.85, 0],
+          }}
+          transition={{
+            duration: 5,
+            times: [0, 0.15, 0.85, 1],
+            repeat: Infinity,
+            ease: "easeInOut",
+            repeatDelay: 1.8,
+            delay: 2.5,
+          }}
+          aria-hidden="true"
+        />
+      ) : null}
 
       <div className="space-y-7 lg:space-y-8 relative">
         {phases.map((phase, i) => (
@@ -248,29 +343,35 @@ function PhaseLadder({ reduce }: { reduce: boolean | null }) {
             }}
             className="relative flex items-start gap-5 lg:gap-6 group"
           >
-            {/* Number node with pulsing halo on first phase */}
+            {/* Number node with continuous breathing halo. Phase 01
+                breathes prominently to signal "start here", phases 02
+                to 04 breathe more subtly with staggered delays. */}
             <div className="relative z-10 shrink-0">
-              {i === 0 && !reduce ? (
+              {!reduce ? (
                 <motion.div
                   className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{ backgroundColor: PAGE_ACCENT }}
-                  initial={{ scale: 1, opacity: 0.5 }}
+                  style={{ backgroundColor: PAGE_LIGHT }}
+                  initial={{ scale: 1, opacity: i === 0 ? 0.5 : 0.28 }}
                   animate={{
-                    scale: [1, 1.55, 1],
-                    opacity: [0.45, 0, 0.45],
+                    scale: i === 0 ? [1, 1.6, 1] : [1, 1.32, 1],
+                    opacity:
+                      i === 0 ? [0.45, 0, 0.45] : [0.28, 0.05, 0.28],
                   }}
                   transition={{
-                    duration: 2.8,
+                    duration: i === 0 ? 2.8 : 4.2,
                     repeat: Infinity,
-                    ease: "easeOut",
-                    delay: 1.2,
+                    ease: "easeInOut",
+                    delay: 1.2 + i * 0.55,
                   }}
                   aria-hidden="true"
                 />
               ) : null}
               <div
                 className="relative h-12 w-12 rounded-full flex items-center justify-center font-display text-sm font-bold text-white ring-4 ring-bg-primary"
-                style={{ backgroundColor: PAGE_ACCENT }}
+                style={{
+                  background: `linear-gradient(145deg, ${PAGE_LIGHT} 0%, ${PAGE_DARK} 100%)`,
+                  boxShadow: `inset 0 1px 0 ${PAGE_LIGHT}aa, 0 6px 18px -6px ${PAGE_DARK}99`,
+                }}
               >
                 {phase.step}
               </div>
@@ -316,22 +417,23 @@ export default function ProcessContent() {
     <>
       {/* ─── HERO: TIMELINE-AS-HERO ───────────────────── */}
       <section className="relative pt-28 pb-20 lg:pt-32 lg:pb-28 overflow-hidden bg-gradient-to-b from-bg-secondary via-bg-primary to-bg-primary">
-        {/* Page-identity wash: indigo radial top-right + blue radial top-left */}
+        {/* Page-identity wash: silvery slate radials at top corners,
+            soft enough to read as light against the cream backdrop. */}
         <div
           className="absolute inset-0 -z-10 pointer-events-none"
           aria-hidden="true"
         >
           <div
-            className="absolute inset-0 opacity-[0.07]"
+            className="absolute inset-0 opacity-[0.10]"
             style={{
-              background: `radial-gradient(ellipse 60% 45% at 85% 20%, ${PAGE_ACCENT} 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 30%, ${BRAND_BLUE} 0%, transparent 55%)`,
+              background: `radial-gradient(ellipse 60% 45% at 85% 20%, ${PAGE_LIGHT} 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 30%, ${PAGE_ACCENT} 0%, transparent 55%)`,
             }}
           />
         </div>
 
         {/* Architectural blueprint grid backdrop */}
         <div
-          className="absolute inset-0 -z-10 opacity-[0.025] pointer-events-none"
+          className="absolute inset-0 -z-10 opacity-[0.04] pointer-events-none"
           style={{
             backgroundImage: `linear-gradient(${PAGE_ACCENT} 1px, transparent 1px), linear-gradient(90deg, ${PAGE_ACCENT} 1px, transparent 1px)`,
             backgroundSize: "64px 64px",
@@ -352,11 +454,7 @@ export default function ProcessContent() {
                 variants={heroItem}
                 className="flex items-center gap-3 mb-7 flex-wrap"
               >
-                <span
-                  className="inline-block h-2 w-2 rounded-full"
-                  style={{ backgroundColor: PAGE_ACCENT }}
-                  aria-hidden="true"
-                />
+                <PulsingDot reduce={reduce} />
                 <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
                   My Process
                 </span>
@@ -459,34 +557,60 @@ export default function ProcessContent() {
 
             {/* RIGHT: Phase Ladder signature element */}
             <div className="relative">
-              {/* Soft halo behind the ladder */}
-              <motion.div
-                className="absolute -inset-8 lg:-inset-12 -z-10 blur-3xl pointer-events-none"
-                style={{
-                  background: `radial-gradient(ellipse at center, ${PAGE_ACCENT} 0%, transparent 70%)`,
-                }}
-                initial={reduce ? { opacity: 0.18 } : { opacity: 0 }}
-                animate={{ opacity: 0.22 }}
-                transition={{
-                  duration: reduce ? 0 : 1.6,
-                  ease: EASE_OUT,
-                  delay: 0.3,
-                }}
-                aria-hidden="true"
-              />
+              {/* Outer breathing halo. The card glows softly and pulses
+                  on a slow loop, reading as a piece of brushed-metal
+                  hardware lit from underneath. Two stacked halos with
+                  offset timings produce a subtle shimmering shift. */}
+              {!reduce ? (
+                <>
+                  <motion.div
+                    className="absolute -inset-8 lg:-inset-12 -z-10 blur-3xl pointer-events-none"
+                    style={{
+                      background: `radial-gradient(ellipse at center, ${PAGE_LIGHT} 0%, transparent 70%)`,
+                    }}
+                    animate={{ opacity: [0.18, 0.36, 0.18] }}
+                    transition={{
+                      duration: 5.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.4,
+                    }}
+                    aria-hidden="true"
+                  />
+                  <motion.div
+                    className="absolute -inset-6 lg:-inset-10 -z-10 blur-2xl pointer-events-none"
+                    style={{
+                      background: `radial-gradient(ellipse at 40% 30%, ${PAGE_ACCENT} 0%, transparent 60%)`,
+                    }}
+                    animate={{ opacity: [0.12, 0.24, 0.12] }}
+                    transition={{
+                      duration: 6.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 1.6,
+                    }}
+                    aria-hidden="true"
+                  />
+                </>
+              ) : (
+                <div
+                  className="absolute -inset-8 lg:-inset-12 -z-10 blur-3xl pointer-events-none opacity-25"
+                  style={{
+                    background: `radial-gradient(ellipse at center, ${PAGE_LIGHT} 0%, transparent 70%)`,
+                  }}
+                  aria-hidden="true"
+                />
+              )}
               <div
-                className="relative rounded-2xl lg:rounded-3xl border-2 bg-bg-primary p-8 lg:p-10 transform-gpu"
+                className="relative rounded-2xl lg:rounded-3xl border-2 p-8 lg:p-10 transform-gpu"
                 style={{
-                  borderColor: `${PAGE_ACCENT}33`,
-                  boxShadow: `0 40px 100px -30px ${PAGE_ACCENT}55, 0 20px 40px -15px rgba(0,0,0,0.12)`,
+                  borderColor: `${PAGE_ACCENT}40`,
+                  background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}10 100%)`,
+                  boxShadow: `0 40px 100px -30px ${PAGE_ACCENT}55, 0 20px 40px -15px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)`,
                 }}
               >
                 <div className="flex items-center gap-2.5 mb-7">
-                  <span
-                    className="inline-block h-2 w-2 rounded-full"
-                    style={{ backgroundColor: PAGE_ACCENT }}
-                    aria-hidden="true"
-                  />
+                  <PulsingDot reduce={reduce} />
                   <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
                     Engagement Ladder
                   </span>
@@ -587,11 +711,7 @@ export default function ProcessContent() {
                   }}
                 >
                   <div className="flex items-center gap-2.5 mb-5">
-                    <span
-                      className="inline-block h-2 w-2 rounded-full"
-                      style={{ backgroundColor: PAGE_ACCENT }}
-                      aria-hidden="true"
-                    />
+                    <PulsingDot reduce={reduce} delay={i * 0.5 + 0.3} />
                     <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
                       What Happens
                     </span>
@@ -803,13 +923,18 @@ export default function ProcessContent() {
             }}
             className="max-w-4xl"
           >
-            <motion.p
+            <motion.div
               variants={heroItem}
-              className="font-mono text-[11px] uppercase tracking-[0.22em] mb-5"
-              style={{ color: PAGE_ACCENT }}
+              className="flex items-center gap-2.5 mb-5"
             >
-              Phase Zero Begins With a Conversation
-            </motion.p>
+              <PulsingDot reduce={reduce} delay={1.4} />
+              <span
+                className="font-mono text-[11px] uppercase tracking-[0.22em]"
+                style={{ color: PAGE_ACCENT }}
+              >
+                Phase Zero Begins With a Conversation
+              </span>
+            </motion.div>
             <motion.h3
               variants={heroItem}
               className="font-display text-[clamp(1.9rem,3.4vw,2.8rem)] font-bold leading-[1.1] tracking-tight mb-6"
