@@ -312,6 +312,84 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ctaText: "Ready for Results Like These?",
     ctaHref: "/contact",
   },
+  {
+    slug: "canopy",
+    name: "Canopy",
+    description:
+      "A productized operations dashboard that replaces the five to seven SaaS subscriptions every business stitches together to answer 'how is my stack actually doing.' Visitor analytics, real-user performance, deployment lifecycle, infrastructure watchers, error tracking, email deliverability, and an audit log, all in one dashboard you own, on your own domain, with one auth wall and one source of truth.",
+    category: "Productized Engagement",
+    gradient: "from-cyan-500 to-blue-600",
+    liveUrl: "https://dbjtechnologies.com/pricing/canopy",
+    metrics: [
+      { label: "Sections", value: "9" },
+      { label: "Delivery", value: "4 to 8 weeks" },
+      { label: "Starting at", value: "$25,000" },
+    ],
+    techStack: [
+      "Next.js 16",
+      "TypeScript",
+      "PostgreSQL",
+      "Auth.js",
+    ],
+    notable:
+      "Built first for myself to run DBJ Technologies. Productized so every client engagement gets the same operations stack, on their domain, in their database, under their auth, with no SaaS to renew.",
+    image: "/images/case-studies/canopy-dashboard.webp",
+    heroDescription:
+      "Most businesses run on a stack of five to seven SaaS tools that do not talk to each other. Analytics in one place, performance in another, error tracking in a third, deliverability and infrastructure scattered across more. Canopy consolidates all of it into a single dashboard the buyer owns, on their domain, with one auth wall and one source of truth. Built first for the studio that ships it. Productized for every engagement that follows. The first install lives at ops.thestarautoservice.com, behind a Google sign-in, surfacing visitor analytics, real-user Web Vitals, Vercel deployment lifecycle, infrastructure watchers, error tracking, email deliverability, and an admin audit log for the family-owned auto repair shop in Richardson, TX.",
+    sections: [
+      {
+        heading: "The Problem",
+        body: "Walk into most operating businesses and ask 'how many of last week's visitors actually became customers' and the answer is a shrug, plus a guess from somebody who watches one dashboard and somebody else who watches a different one. Analytics, performance monitoring, error tracking, deliverability, and infrastructure all live in separate SaaS products with separate logins, separate billing, separate data shapes, and zero ability to join across them. Each one charges a recurring fee, each one owns a slice of the truth, and none of them speak to the business outcomes the operator actually cares about. That is what fifteen thousand dollars or more per year on observability subscriptions buys most businesses: noise across five to seven tabs, no single source of truth, no answers when it matters.",
+      },
+      {
+        heading: "The Solution",
+        body: "Canopy is a single operations dashboard that replaces the SaaS sprawl. One login, one domain, one Postgres, one place to look. Visitor analytics that join the same session across page-views, performance, and conversion events. Real-user Web Vitals captured from every visitor with thresholds tied to the actual Core Web Vitals spec. Vercel deployment lifecycle posted in real time from the platform's webhook. Infrastructure watchers running daily TLS, WHOIS, MX, SPF, DKIM, and DMARC checks per domain. Error tracking grouped by fingerprint with affected-user counts. Email deliverability ingested directly from the sending platform's webhook. An admin audit log so every sign-in is accountable. Nine sections of operations intelligence, all on the buyer's domain, in the buyer's database, under the buyer's auth.",
+      },
+      {
+        heading: "What the Star Auto Install Includes",
+        body: "Miguel runs the auto repair shop. He signs into ops.thestarautoservice.com with his Google account and sees the worst-of-status banner first: any failing deploys, any spiking errors, any infrastructure that needs attention. Below that, eight headline stat cards with sparkline trends and signed deltas against the prior period, then real-time feeds for recent deploys, recent errors, infrastructure status, and live visitor sessions. Each section drills into its own page: Visitors with top pages, top referrers, UTM source breakdown, devices, and a recent-sessions table; Real-User Performance with p75 LCP, INP, CLS, TTFB, and FCP plus per-page and per-device breakdowns; Platform with deploy outcomes, build cadence, function p95, and a hot-functions table; Infrastructure with a per-domain check grid and TLS expiry countdowns; Errors grouped by fingerprint with affected users; Email with delivery and bounce rates plus the 30-day trend; an admin Audit log of every sign-in. Same architecture I run for the studio, productized so the install path is repeatable.",
+      },
+      {
+        heading: "How It Is Different",
+        body: "Datadog, PostHog, Sentry, and the rest are excellent products. The reason to build in-house is when the buyer needs data joined to their specific business outcomes (visitor-to-customer attribution across marketing, product, and sales) or when SaaS sprawl is costing them more annually than the build pays back in. Canopy is for the cases where a single SaaS does not work. Owned by the buyer, not rented. On the buyer's domain, not a third-party subdomain. In the buyer's database, not someone else's data center. Behind the buyer's auth, not a vendor login. Walking away cleanly is the productized promise: every install is structured so the buyer keeps deploying it themselves long after the engagement ends.",
+      },
+      {
+        heading: "The Engagement",
+        body: "Four to eight weeks from kickoff to live install. The buyer provides a domain or subdomain, Google OAuth credentials from their workspace, an admin email allow-list, and access to whichever observability sources they already use (Vercel webhook, Resend webhook, Sentry, Search Console, others). I provision the Vercel project, the Neon Postgres, the auth wall, the cron schedule, and the per-source ingestion. I install the cross-origin beacon into the buyer's main site for visitor analytics. I deliver the install with documentation written for an engagement owner who will operate it long after I am out of the picture. Starting at twenty-five thousand dollars. The price scales with the number of integrations and the depth of the funnel modeling, not with the number of dashboards or seats.",
+      },
+    ],
+    techDetails: [
+      {
+        name: "Next.js 16 + Auth.js + Neon Postgres",
+        reason:
+          "Server components with the App Router for fast first-render dashboards, Auth.js for the Google sign-in wall and admin allow-list enforcement, Neon Postgres for the per-client data store. Every install is its own database; no multi-tenant shared infrastructure that mixes one buyer's data with another's.",
+      },
+      {
+        name: "First-Party Beacon",
+        reason:
+          "A drop-in CanopyBeacon React component mounts in the client site's root layout and posts page-views, Core Web Vitals, scroll depth, and dwell time directly to the buyer's own dashboard endpoint. Cross-origin via a CORS allow-list. Cookies set with Secure and SameSite=None so the cross-origin handshake works in production. No third-party SDK, no external script, no data leaving the buyer's stack.",
+      },
+      {
+        name: "Layered Bot Filtering",
+        reason:
+          "Every incoming beacon hit runs through a three-layer bot classifier: known-bot user-agent regex, length floor for suspiciously short user agents, and Accept-Language fallback for crawlers that omit it. Bot traffic still lands in the database (so audits are honest about bot pressure) but is filtered out of every dashboard query so headline numbers reflect humans.",
+      },
+      {
+        name: "Privacy-First Analytics",
+        reason:
+          "Raw IPs are never persisted. Only sha256 of the IP joined with a daily-rotating salt, so historical sessions cannot be re-linked to the same visitor across days. Visitor IDs and session IDs are first-party random UUIDs, not third-party tracking cookies. The engagement owner can defend the analytics setup against any privacy challenge because the design assumes that question.",
+      },
+      {
+        name: "Cron-Driven Watchers",
+        reason:
+          "Daily Vercel crons run the infrastructure watchers (TLS not_after, WHOIS expiry, MX/SPF/DKIM/DMARC reachability), refresh the email KPI rollup, snapshot Vercel deployment lifecycle, and prune old visitor data per the retention policy. The dashboard is always reading from already-aggregated tables, not running expensive queries on every page load.",
+      },
+    ],
+    timeline:
+      "Built first for DBJ Technologies as my own internal admin dashboard, ported into a productized starter template under github.com/dbjonestech-tech/canopy, and deployed for the first time as a standalone install for Star Auto Service in Richardson, TX. The engagement model is repeatable per client: separate Vercel project, separate Postgres database, separate Google OAuth client (in the client's workspace, not mine). Every future install starts from the same starter, on the same architecture, with the same install runbook.",
+    ctaText: "Scope Your Canopy Engagement",
+    ctaHref: "/contact?topic=canopy",
+  },
 ];
 
 export function getProjectBySlug(slug: string): ProjectDetail | undefined {

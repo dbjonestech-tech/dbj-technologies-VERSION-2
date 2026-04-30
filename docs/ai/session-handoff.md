@@ -6,7 +6,71 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Process page rebuilt with timeline-as-hero + indigo page identity
+## Most Recent Session: April 29, 2026 (late) -- Canopy expanded from 6 stub pages to 9 substantial sections + 4th DBJ case study shipped
+
+### What shipped (overview)
+
+After the initial Canopy install for Star Auto Service landed (custom domain live, Google OAuth working, Neon Postgres connected, beacon mounted in the Star Auto repo), Joshua flagged that the existing Canopy was a thin slice. 5 stub pages saying `[Stubbed: ...]` plus one functional zero-stat dashboard. For a $25K productized engagement that becomes the 4th DBJ Work case study, that wasn't impressive enough. Direction: "GO ALL OUT IN EVERYWAY FOR WHATEVER WE CAN DO TONIGHT TO MAKE IT TRULY STUNNING VISUALLY BUT MOST IMPORTANTLY IN ITS CAPABILITIES, SCOPE, BREADTH, ETC."
+
+This session ported Canopy from 6 stub pages to 9 substantial sections, added two new database migrations, built a chart-primitives library (sparklines, trend deltas, health pills, stat cards, section cards), wired Auth.js to write an audit log on every signin/signout/denial, and shipped the 4th case study on the DBJ Work page.
+
+### Canopy starter (separate repo `github.com/dbjonestech-tech/canopy`)
+
+**Chart primitives** (new `lib/ui/`):
+- `sparkline.tsx`: pure SVG sparkline + MiniBars component (no chart library, server-renderable)
+- `trend.tsx`: TrendArrow with signed % delta and inverse-color flag (for error-style stats where up = bad)
+- `health-pill.tsx`: red/amber/green/idle pill with status dot
+- `stat-card.tsx`: reusable stat card with label, value, sparkline, trend, empty hint
+- `section-card.tsx`: reusable card frame with title/subtitle/icon/status/action + EmptyHint helper
+
+**New service** (`lib/services/time-buckets.ts`): `bucketize` for evenly-spaced time series, `percentile` for p75 etc., Web Vitals threshold helpers (`lcpStatus`, `inpStatus`, `clsStatus`, `ttfbStatus`, `fcpStatus`), `relativeTime`, `fmtMs`, `fmtBytes`.
+
+**New migrations**:
+- `006_audit_log.sql`: one row per admin signin/signout/denied with actor, IP hash, UA, outcome
+- `007_error_events.sql`: one row per uncaught client/server error with fingerprint grouping
+
+**Auth callback updated** (`lib/auth/auth.ts`): Auth.js now writes signin / signout / denied events to the `audit_log` table via the `events` callback (errors are swallowed after console.error so a Postgres outage cannot lock everyone out).
+
+**9 admin pages, all 5 stubs replaced + 3 new sections + dashboard rebuilt**:
+
+1. **Dashboard (`/admin`, rewritten)**: 8 headline stat cards each with trend delta + sparkline (Sessions / Page Views / Contacts / p75 LCP / Errors / Deploys / Email sent / Bounces). Worst-of-status banner at top (`fail`/`warn`/`ok`) listing every issue requiring attention. Three info cards (Recent deploys / Recent errors / Infrastructure summary). Recent visitors feed at bottom. Force-dynamic, parallel-loads three concurrent query batches via `Promise.all`.
+2. **Visitors (`/admin/visitors`, rewritten)**: 4 headline cards (Visitors / Sessions / Page Views / Avg Dwell), top-pages MiniBars, top-referrers MiniBars (with prefix-stripping for cleanliness), UTM sources, devices, average engagement (dwell + scroll %), live-presence card (sessions in last 30 min), 25-row recent-sessions table.
+3. **Real-User Performance (`/admin/performance/rum`, rewritten)**: 5 vital cards (LCP / INP / CLS / TTFB / FCP) each with thresholded color, sparkline of 14d trend, and goal annotation. By-page table (top 12 paths with samples + p75 LCP/INP/CLS each thresholded). By-device card.
+4. **Platform (`/admin/platform`, rewritten)**: 4 headline (Deploys / Failed / Avg Build / Function Invocations), build outcomes pie-as-bars, 14d cadence sparkline, function p95 card, recent deploys list (12), hot functions table (top 10).
+5. **Infrastructure (`/admin/infrastructure`, rewritten)**: 3 cards (Domains tracked / TLS expiring soonest with day-count / Email auth posture as SPF+DKIM+DMARC bars), full per-domain check grid with one HealthPill per (domain, check_type) cell.
+6. **Email (`/admin/email`, rewritten)**: 4 headline (Sent / Delivered / Bounced / Complaints) with deltas, delivery-rate big-number with goal, bounce-rate big-number with goal, top bouncing recipients, send/delivery/bounce 30d trend (3 stacked sparklines), 25-row recent events table.
+7. **Monitor (`/admin/monitor`, NEW)**: 4 headline (Hosts / Uptime% / Median latency / Failing checks). Per-host status list (latest TLS check + 24h ratio). Recent incidents feed (warning/fail rows from last 7 days).
+8. **Errors (`/admin/errors`, NEW)**: 4 headline (Events 24h / Unique groups / Affected visitors / Events 7d) with inverse-trend coloring. By-source MiniBars. 24h hourly volume sparkline. Top-12 error groups table with fingerprint, source pill, event count, affected user count, first-seen + last-seen.
+9. **Audit (`/admin/audit`, NEW)**: 4 headline (Signins 24h / Signins 7d / Unique actors / Denied attempts). Top actors MiniBars (30d). Recent activity feed (30 rows) with action icons (LogIn/LogOut/ShieldOff/KeyRound) and outcome health pill.
+
+**Sidebar redesigned** (`app/admin/layout.tsx`): Canopy wordmark gets a small gradient blue->cyan logo chip with a Zap icon. Nav grouped into Today / Acquisition / Health / Engagement / Security with section icons (LayoutDashboard / Users / Activity / Signal / ServerCog / Globe / AlertOctagon / Mail / Eye). Signed-in chip below the nav showing the current admin email above the Sign out button.
+
+### Star Auto Canopy as 4th DBJ case study
+
+`lib/work-data.ts`: new `slug: "canopy"` entry with `category: "Productized Engagement"` (a third category alongside "Internal Product" and "Client Project"). Hero description, 5 sections (The Problem / The Solution / What the Star Auto Install Includes / How It Is Different / The Engagement), 5 tech detail cards (Next.js + Auth.js + Neon / First-Party Beacon / Layered Bot Filtering / Privacy-First Analytics / Cron-Driven Watchers), `liveUrl` -> `/pricing/canopy` (since the actual install is auth-walled), `ctaHref` -> `/contact?topic=canopy`. Image path placeholder: `/images/case-studies/canopy-dashboard.webp`. Auto-picked up by `getProjectSlugs` so it appears on `/work` (now a 2x2 grid), `/work/canopy` detail page, and the sitemap.
+
+### Verification
+
+- Canopy: `npx tsc --noEmit` clean. 11 files changed, 18 created. New migrations 006 + 007 applied to the Star Auto production Neon DB. Deploy `starauto-5t1h6vpb9...` is **Ready** at `https://ops.thestarautoservice.com/admin`.
+- DBJ: `npx tsc --noEmit` clean. `npm run lint` clean. Em-dash audit clean.
+
+### What still needs to happen
+
+1. **Capture the Canopy dashboard screenshot** for the case study image. After the Star Auto Canopy gets some real traffic (or if you want it sooner, a one-time seed), screenshot the `/admin` dashboard and drop into `public/images/case-studies/canopy-dashboard.webp`. Until then the case study card on `/work` will render a broken image.
+2. **Beacon engagement payload still needs verification.** Earlier in the session I fixed the `id`-as-string bug in `/api/track/view` so the engagement flush will now actually post. After someone visits the Star Auto site (or after a seed), confirm `page_view_engagement` rows land alongside `page_views` rows.
+3. **Optional: seed demo data.** The dashboard looks much better with data. A `scripts/seed-demo-data.ts` script that generates plausible 30-day Richardson TX auto repair shop traffic would let the case-study screenshots show the dashboard in its populated state.
+
+### Next recommended task
+
+Take the Canopy dashboard screenshot for the case study image, push it, and the `/work/canopy` detail page becomes complete. After that, the next Canopy session should focus on either (a) the brand identity exercise (logomark + color refinement) the user flagged earlier, or (b) building the seed/demo data script so any future client install can be presented populated for case-study purposes.
+
+### Final state (post-commit)
+
+Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Process page rebuilt with timeline-as-hero + indigo page identity
 
 ### What shipped
 

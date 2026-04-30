@@ -1,10 +1,31 @@
 # Current State
 
-Last updated: April 28, 2026 (post-archive cleanup)
+Last updated: April 29, 2026 (late, post-Canopy expansion)
 
-## Canopy (productized engagement, April 28; renamed from Operations Cockpit later same day)
+## Canopy (productized engagement, April 28; renamed from Operations Cockpit later same day; expanded to 9-section product April 29)
 
 The internal admin dashboard is now positioned publicly as a productized engagement called **Canopy**, "Starting at $25,000," 4-8 week delivery. Pitched as a consolidation of 5-7 SaaS subscriptions into one stack the buyer owns: first-party analytics, real-user performance, deliverability monitoring, infrastructure watchers, error tracking, pipeline observability, cost telemetry. Same architecture I run for DBJ.
+
+### First install LIVE: Star Auto Service
+
+`https://ops.thestarautoservice.com/admin` is live behind Google sign-in. Test users: `joshua@dbjtechnologies.com` and `thestarautoservice1@gmail.com`. Neon Postgres provisioned and migrated (7 migrations). Cloudflare DNS resolves; SSL valid; auto-redirect to `/signin?callbackUrl=/admin` works. Vercel project `starauto-ops` on the `dbjonestech-9249s-projects` team. CanopyBeacon component mounted in Star Auto's main repo (`github.com/dbjonestech-tech/star-auto-service`, `src/app/layout.tsx` line ~12 with Suspense wrap), endpoint `https://ops.thestarautoservice.com`. CORS allow-list `CANOPY_ALLOWED_ORIGINS` covers both apex and www. Cookies `cnp_vid`/`cnp_sid` set with `Secure; SameSite=None` for cross-origin handshake.
+
+### Canopy product surface (9 admin sections, April 29 expansion)
+
+All routes under `/admin/*`, gated by Auth.js Google sign-in + `ADMIN_EMAILS` allow-list:
+- `/admin` (Dashboard): 8 headline stat cards with sparklines + trend deltas, worst-of-status banner, recent deploys/errors/sessions feeds, infrastructure summary
+- `/admin/visitors`: top pages, top referrers, UTM sources, devices, average engagement, live-presence card, 25-row recent sessions table
+- `/admin/performance/rum`: 5 Web Vital cards with thresholded color (LCP/INP/CLS/TTFB/FCP), 14d trend sparklines, by-page table, by-device card
+- `/admin/platform`: deploy outcomes, 14d cadence, function p95, recent 12 deploys, hot 10 functions table
+- `/admin/infrastructure`: per-domain check grid (TLS/WHOIS/MX/SPF/DKIM/DMARC), TLS expiry countdown, auth posture bars
+- `/admin/email`: delivery rate, bounce rate, top bouncing recipients, 30d send/delivery/bounce trend, recent webhook events
+- `/admin/monitor`: per-host uptime + latency + recent incidents (last 7 days)
+- `/admin/errors`: grouped-by-fingerprint with affected user counts, by-source breakdown, 24h hourly volume
+- `/admin/audit`: signin/signout/denied log with top actors and recent activity feed
+
+Sidebar grouped Today / Acquisition / Health / Engagement / Security with section icons + Canopy logomark chip + signed-in chip.
+
+### Canopy DBJ marketing surfaces (unchanged from earlier session)
 
 Surfaces (all on the marketing site, no admin internals exposed):
 - **About page**: section "Built for Myself First" (eyebrow "The Stack Behind the Studio") between Operating Principles and the CTA. 6-tile glass-card capability grid; dual CTAs to `/pricing/canopy` (primary) and `/contact?topic=canopy` (private walkthrough).
@@ -17,7 +38,11 @@ Sitemap auto-includes via `getPricingSlugs()`. No new env vars on the DBJ market
 
 ### Canopy starter repo (separate codebase)
 
-Productized template lives at `github.com/dbjonestech-tech/canopy` (private). Local working directory is `/Users/doulosjones/Desktop/operations-cockpit/`, slated to rename to `/canopy/` post-session (pre-session disk-name drift is a known artifact). Vercel project `starauto-ops` is the Star Auto deployment instance, linked to that repo, currently env-configured but not yet deployed (waiting on Google OAuth credentials, Neon Postgres, and Cloudflare DNS for `ops.thestarautoservice.com`).
+Productized template lives at `github.com/dbjonestech-tech/canopy` (private). Local working directory is `/Users/doulosjones/Desktop/operations-cockpit/`. Vercel project `starauto-ops` is the Star Auto deployment instance, linked to that repo, **deployed and serving traffic at `ops.thestarautoservice.com`**. Latest deploy (April 29, late) ships 9 admin sections + chart primitives (`lib/ui/`) + time-bucket helpers (`lib/services/time-buckets.ts`) + 2 new migrations (006_audit_log, 007_error_events) + Auth.js audit log writer.
+
+### 4th DBJ case study live: Canopy
+
+`lib/work-data.ts` now has 4 entries (Pathlight, Star Auto Service, Soil Depot, Canopy). Canopy uses a new `category: "Productized Engagement"` (third category alongside "Internal Product" and "Client Project"). 5 sections, 5 tech detail cards. `liveUrl` -> `/pricing/canopy` since the Star Auto install is auth-walled. `ctaHref` -> `/contact?topic=canopy`. Image path `/images/case-studies/canopy-dashboard.webp` is a placeholder; needs Joshua to capture the live dashboard screenshot and drop into `public/images/case-studies/`. `/work` page now renders 4 cards (2x2 on desktop). `/work/canopy` detail page auto-generated from PROJECT_DETAILS via existing slug routing.
 
 ## Client portal v1 (white-glove engagement portal at `/portal`)
 
