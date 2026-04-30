@@ -6,7 +6,83 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- About page elevated to magazine spread (chapter-break treatment + unified motion language)
+## Most Recent Session: April 29, 2026 -- Process page rebuilt with timeline-as-hero + indigo page identity
+
+### What shipped
+
+Joshua flagged that Process / Services / Pricing / Contact share the same hero template (centered accent-blue rounded pill + two-line bold headline with the second line in accent-blue gradient + centered supporting paragraph + lots of negative space above), which creates a "didn't I just see this?" feeling when navigating between them. Asked me to start with Process alone and consider per-page color identity. Single-file rewrite of `app/(marketing)/process/ProcessContent.tsx` from a generic centered-hero recipe to a timeline-as-hero with a distinct page identity.
+
+### Files changed (1)
+
+- **`app/(marketing)/process/ProcessContent.tsx`**: full rewrite. 256 lines -> 588 lines. Removed the dependency on `SectionHeading`, `GridBackground`, `GradientBlob`, `Badge`, and `CTASection` components; the new page handles everything inline so the visual language is tightly controlled.
+
+### Page identity
+
+Process gets **indigo (#6366f1)** as its page-level accent. Chapter rulers, halos, phase-ladder nodes, ruler dots, focus accents all carry indigo. Accent-blue (#3b82f6) is preserved for the primary CTA buttons so the brand still anchors. The hero backdrop carries a dual radial gradient (indigo top-right + blue top-left) at 7% opacity plus a barely-visible architectural-blueprint grid (indigo 64px squares at 2.5% opacity). The combined effect: Process feels like a blueprint sheet, distinct from any other page on the site, while still unmistakably DBJ.
+
+### Hero: timeline-as-hero (the page's signature element)
+
+Two-column 5fr/7fr split at max-w-[1400px]. The signature is the **right column**, which is a vertical 4-phase ladder:
+
+- White card with indigo border + indigo shadow + soft indigo halo backdrop
+- "ENGAGEMENT LADDER" mono-caps label at top
+- 4 phase rows, each with: a 12x12 indigo-filled circle holding the step number ("01"-"04"), phase title, one-line tagline ("Audit, alignment, scope. Before any code." etc.)
+- Vertical 2px connector line behind the nodes that **draws top-to-bottom on mount** via `scaleY: 0 -> 1` over 1500ms (350ms after mount). Phase nodes themselves stagger in from the right with 150ms intervals.
+- Phase 01 has a slow pulsing halo (2.8s loop, 1.2s mount delay) to suggest "this is where we start"
+
+No other page on the site has a numbered-ladder hero. The instant a returning visitor lands on /process, the visual is unambiguously different from Services, About, Pricing, or Contact.
+
+The **left column** is the title block with a new meta strip showing big indigo numerals: 4 PHASES / 0 SURPRISES / 1 ARCHITECT (a rhythmic three-row counter that puts memorable numbers next to memorable promises). Headline "Four Phases. Zero Ambiguity." gets the accent treatment (no gradient text, just a clean indigo span on the second line). Dual CTAs: "Start a Project" (filled accent-blue) + "See Phase Details" (anchor link to #phases).
+
+### Phase deep-dives (sections below hero)
+
+Each of the 4 phases becomes a chapter-break section using the same `ChapterHeader` pattern shipped on briefs/case studies/about: indigo dot + "PHASE 01 / 04" mono caps + animated indigo gradient ruler + phase title at clamp(1.9rem, 3.6vw, 3rem). Below each chapter break, a 5fr/7fr split:
+- Left: phase description in body text at max-w-md (calm, ranged-left)
+- Right: "WHAT HAPPENS" mono-caps eyebrow + activities list with cascading 60ms stagger reveal, indigo CheckCircle2 icons
+
+This 2-column phase-content treatment is also unique to Process. No other page on the site has paired phase-prose-with-deliverables-list.
+
+### Below-the-fold sections
+
+**What to Expect (3 cards):** chapter break "WHAT TO EXPECT / The Client Experience" + 3-column grid where each card has a 2px indigo inset left bar, indigo-tinted icon chip, motion-safe lift-on-hover with shadow grow.
+
+**My Toolkit (6 pill chips):** chapter break + indigo-tinted pills (background `${PAGE_ACCENT}10`, border `${PAGE_ACCENT}33`) with stagger entrance + motion-safe lift on hover. Replaced the Badge component pattern with custom pill styling that matches the Process indigo identity.
+
+**Closing CTA:** ranged-left magazine close matching brief/case study/about closings, with the indigo eyebrow ("Phase Zero Begins With a Conversation") + bold heading + accent-blue Start Discovery CTA.
+
+### Per-page color theme strategy (broader pattern)
+
+This shipping is the first step toward a per-page identity system Joshua suggested. Process owns indigo (architectural blueprint feel). The other lookalike-cluster pages would each get their own page accent in a future sprint:
+
+- About: blue (already shipped, brand anchor color)
+- Services: cyan/teal (capabilities, flow)
+- Process: indigo (architectural, sequence) - SHIPPED THIS SESSION
+- Pricing: violet (premium engagement)
+- Contact: emerald (channels, reach)
+
+The brand cohesion holds because (1) primary CTA buttons stay accent-blue across all pages, (2) typography + motion language are identical, (3) chapter-break structure is identical. The page accent only tints rulers, halos, dots, page-identity backdrop washes, and tertiary accents - never the primary CTA.
+
+### Animations
+
+All on the unified EASE_OUT cubic-bezier `[0.16, 1, 0.3, 1]` and viewport observer `{ once: true, margin: "-80px" }`. Hero stagger-on-mount, phase-ladder connector draw, phase node x-stagger, Phase 01 pulse halo, scroll-triggered chapter-break tag/ruler/heading sequences, activities list cascade, expectation card stagger, toolkit pill stagger, closing CTA stagger. All gated behind `useReducedMotion()` per CLAUDE.md.
+
+### Verification
+
+- `npx tsc --noEmit`: clean (exit 0).
+- `npm run lint`: clean (exit 0).
+- Em-dash audit: 0.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/process` and confirm: (1) hero immediately reads as a different page from Services/Pricing because of the right-column phase ladder + indigo color identity, (2) the connector line draws top-to-bottom on mount and the four phase nodes stagger in, (3) Phase 01 has a subtle pulsing halo that loops slowly without being distracting, (4) the meta strip shows 4 / 0 / 1 in big indigo numerals, (5) below the fold each phase deep-dive has the chapter break + 2-column description-plus-activities layout, (6) the toolkit pills have the indigo-tinted chip styling, (7) closing CTA reads consistently with brief/case-study closings. If the per-page color shift on Process feels right, the next sprint should give Services / Pricing / Contact their own hero compositions + page accents (cyan, violet, emerald respectively) so the entire navigation surface has distinct visual personality. The four hero rebuilds together would close the loop on the "didn't I just see this?" feeling Joshua flagged.
+
+### Final state (post-commit)
+
+- Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- About page elevated to magazine spread (chapter-break treatment + unified motion language)
 
 ### What shipped
 
