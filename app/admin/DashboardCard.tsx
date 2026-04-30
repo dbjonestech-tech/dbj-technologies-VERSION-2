@@ -2,9 +2,54 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, type LucideIcon } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  Briefcase,
+  Database,
+  DollarSign,
+  FileText,
+  Filter,
+  Globe,
+  Mail,
+  Search,
+  Server,
+  ShieldCheck,
+  Users,
+  Wifi,
+  Workflow,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { CardKpi, KpiTone } from "@/lib/services/dashboard-kpis";
+
+/* The dashboard page is a Server Component but this card is a Client
+ * Component (motion + useState). Functions cannot cross the
+ * Server -> Client RSC boundary, so we cannot accept a Lucide icon
+ * component as a prop. Instead, the parent passes the icon's *name*
+ * (a string) and we look it up here. */
+const ICONS = {
+  Activity,
+  AlertTriangle,
+  Briefcase,
+  Database,
+  DollarSign,
+  FileText,
+  Filter,
+  Globe,
+  Mail,
+  Search,
+  Server,
+  ShieldCheck,
+  Users,
+  Wifi,
+  Workflow,
+  Zap,
+} satisfies Record<string, LucideIcon>;
+
+export type IconName = keyof typeof ICONS;
 
 export type CardTheme = "cyan" | "violet" | "amber" | "emerald" | "zinc";
 
@@ -91,7 +136,7 @@ export type DashboardCardProps = {
   label: string;
   description: string;
   href: string;
-  icon: LucideIcon;
+  iconName: IconName;
   theme: CardTheme;
   kpi?: CardKpi;
 };
@@ -100,10 +145,11 @@ export default function DashboardCard({
   label,
   description,
   href,
-  icon: Icon,
+  iconName,
   theme,
   kpi,
 }: DashboardCardProps) {
+  const Icon = ICONS[iconName];
   const reduced = useReducedMotion();
   const [hovered, setHovered] = useState(false);
   const tokens = THEMES[theme];

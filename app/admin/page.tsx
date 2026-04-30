@@ -1,26 +1,10 @@
 import { auth } from "@/auth";
-import {
-  Activity,
-  AlertTriangle,
-  Briefcase,
-  Database,
-  DollarSign,
-  FileText,
-  Filter,
-  Globe,
-  Mail,
-  Search,
-  Server,
-  ShieldCheck,
-  Users,
-  Wifi,
-  Workflow,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
 import { getDashboardStatus, type StatusLevel } from "@/lib/services/health-status";
 import { getDashboardKpis } from "@/lib/services/dashboard-kpis";
-import DashboardCard, { type CardTheme } from "./DashboardCard";
+import DashboardCard, {
+  type CardTheme,
+  type IconName,
+} from "./DashboardCard";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -29,7 +13,11 @@ type Card = {
   label: string;
   description: string;
   href: string;
-  icon: LucideIcon;
+  /* Lucide icon component name. The icon itself is imported and
+   * resolved inside DashboardCard (a Client Component) because
+   * functions cannot cross the Server -> Client RSC boundary as
+   * props. */
+  iconName: IconName;
 };
 
 type Column = {
@@ -47,25 +35,25 @@ const COLUMNS: Column[] = [
         label: "Visitors",
         description: "Who is on the site right now, what they read, and where they came from.",
         href: "/admin/visitors",
-        icon: Globe,
+        iconName: "Globe",
       },
       {
         label: "Monitor",
         description: "Live event tail with funnel counts, severity, and Lighthouse trend.",
         href: "/admin/monitor",
-        icon: Activity,
+        iconName: "Activity",
       },
       {
         label: "Scans",
         description: "Every Pathlight scan with status, score, and revenue range. Filterable.",
         href: "/admin/scans",
-        icon: FileText,
+        iconName: "FileText",
       },
       {
         label: "Leads",
         description: "Pathlight scan signups and contact-form submissions, side by side.",
         href: "/admin/leads",
-        icon: Mail,
+        iconName: "Mail",
       },
     ],
   },
@@ -77,25 +65,25 @@ const COLUMNS: Column[] = [
         label: "Funnel",
         description: "How visitors flow from session to scan to contact, and where they drop off.",
         href: "/admin/funnel",
-        icon: Filter,
+        iconName: "Filter",
       },
       {
         label: "Search",
         description: "Top Google queries and pages, plus pages worth optimizing for CTR.",
         href: "/admin/search",
-        icon: Search,
+        iconName: "Search",
       },
       {
         label: "RUM",
         description: "How fast pages actually load for real visitors, by page and device.",
         href: "/admin/performance/rum",
-        icon: Zap,
+        iconName: "Zap",
       },
       {
         label: "Email",
         description: "Deliverability KPIs by email type, with bounce and complaint alerts.",
         href: "/admin/email",
-        icon: Mail,
+        iconName: "Mail",
       },
     ],
   },
@@ -107,25 +95,25 @@ const COLUMNS: Column[] = [
         label: "Costs",
         description: "Provider spend, per-operation totals, and the most expensive scans.",
         href: "/admin/costs",
-        icon: DollarSign,
+        iconName: "DollarSign",
       },
       {
         label: "Database",
         description: "Row counts and recent activity for every Pathlight and admin table.",
         href: "/admin/database",
-        icon: Database,
+        iconName: "Database",
       },
       {
         label: "Clients",
         description: "Engagement clients, projects, and deliverables. Drives the client portal.",
         href: "/admin/clients",
-        icon: Briefcase,
+        iconName: "Briefcase",
       },
       {
         label: "Audit log",
         description: "Sign-in attempts, allowlist denials, and protected-route access events.",
         href: "/admin/audit",
-        icon: ShieldCheck,
+        iconName: "ShieldCheck",
       },
     ],
   },
@@ -137,25 +125,25 @@ const COLUMNS: Column[] = [
         label: "Pipeline",
         description: "Pathlight scan engine. Recent runs, slow runs, and any failures.",
         href: "/admin/pipeline",
-        icon: Workflow,
+        iconName: "Workflow",
       },
       {
         label: "Platform",
         description: "Vercel deployments, build durations, and serverless function metrics.",
         href: "/admin/platform",
-        icon: Server,
+        iconName: "Server",
       },
       {
         label: "Errors",
         description: "Top unresolved Sentry issues from the trailing 24 hours.",
         href: "/admin/errors",
-        icon: AlertTriangle,
+        iconName: "AlertTriangle",
       },
       {
         label: "Infrastructure",
         description: "TLS, WHOIS, MX, SPF, DKIM, and DMARC checks per managed domain.",
         href: "/admin/infrastructure",
-        icon: Wifi,
+        iconName: "Wifi",
       },
     ],
   },
@@ -169,7 +157,7 @@ const ACCOUNT_COLUMN: Column = {
       label: "Users",
       description: "Invite admins. Bootstrap allowlist plus database-backed members.",
       href: "/admin/users",
-      icon: Users,
+      iconName: "Users",
     },
   ],
 };
@@ -285,7 +273,7 @@ export default async function AdminLanding() {
                   label={card.label}
                   description={card.description}
                   href={card.href}
-                  icon={card.icon}
+                  iconName={card.iconName}
                   theme={col.theme}
                   kpi={kpis[card.href]}
                 />
@@ -309,7 +297,7 @@ export default async function AdminLanding() {
                 label={card.label}
                 description={card.description}
                 href={card.href}
-                icon={card.icon}
+                iconName={card.iconName}
                 theme={ACCOUNT_COLUMN.theme}
                 kpi={kpis[card.href]}
               />
