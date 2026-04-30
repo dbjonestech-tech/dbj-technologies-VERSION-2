@@ -98,11 +98,11 @@ const BRIEF_INDEX: Array<
     preview: "/design-briefs/pi-law.webp",
     paletteAccent: "#C9A961",
     description:
-      "How an injury victim finds a lawyer in the worst hour of their life, searching from the back of an Uber leaving a Central Expressway wreck. A 24/7 bilingual urgent strip, a same-day attorney callback promise, a verdicts ledger with case type and county, a 'what to do after an accident' lead magnet, and the State Bar of Texas advertising disclaimer where it belongs. The architecture that signs cases at midnight.",
+      "How an injury victim chooses a lawyer in the first hour after a Central Expressway wreck. A 24/7 bilingual urgent strip with a verdicts ticker, an above-the-fold intake with a same-day attorney callback in the partner's first-person voice, a verdicts ledger that names the dollar amount and the county and the operational arc of every case, eight practice-area cards that read like briefs, a settlement-mill positioning headline backed by board certification, year-stamped peer recognition, four contact channels with a bilingual human-not-bot commitment, three offices with three direct numbers, and a State Bar of Texas advertising notice naming the responsible attorney by name. The architecture that signs cases the same business day.",
     keySurfaces: [
       "24/7 Bilingual Strip",
-      "Same-Day Attorney Callback",
-      "Verdicts Ledger",
+      "Verdicts Ledger by County",
+      "Settlement Mill Positioning",
     ],
   },
   {

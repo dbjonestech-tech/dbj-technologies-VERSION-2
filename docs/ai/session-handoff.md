@@ -6,7 +6,51 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 -- Upscale Restaurant design brief rebuilt as image-anchored deep dive (Ember & Vine template)
+## Most Recent Session: April 29, 2026 -- Personal Injury Law design brief rebuilt as image-anchored deep dive (Bauder & Associates template)
+
+### What shipped
+
+Seventh of the eight image-anchored design-brief rewrites. Joshua handed over 13 screenshots of the Bauder & Associates DFW personal injury trial firm template (deep navy + cream + gold palette, 24/7 dispatch posture, three-office DFW footprint) with explicit permission to skip any image that read as unprofessional or negative. Curated 13 down to a hero plus 10 section images. Skipped the two screenshots (11.18.18 and 11.18.31) that included a small whiskey tumbler at the right edge of a banker's-lamp + leather-briefcase editorial detail shot: in a personal-injury trial-firm context where the firm is selling courtroom discipline, an amber-glass tumbler subtly undercuts the credential, even if the rest of the editorial detail (lamp, books, briefcase) reads as a senior trial lawyer's study. The dual-photograph credentials surface itself is referenced lightly in adjacent prose without anchoring on a screenshot.
+
+### Files changed (1 markdown + 1 hero replacement + 10 new section images + 1 brief-index description update)
+
+- **`docs/design-briefs/pi-law.md`**: full content rewrite. Headline `"What Personal Injury Firms Need Online"` -> `"The Architecture of a DFW Personal Injury Trial Firm"`. Summary refreshed to eleven-surfaces framing. Slug field corrected from `personal-injury-law` to `pi-law` to match `BRIEF_INDEX`. Replaced the prior 3-section analytical essay with 10 image-anchored sections: Tell Us What Happened. A Real Attorney Calls You Back Today / A Verdict Ledger That Names the County / Eight Practice-Area Cards That Read Like Briefs / What Sets a Trial Firm Apart from a Settlement Mill / Peer-Reviewed Standing, Year-Stamped / Four Ways to Talk to a Lawyer Today / Where to Meet Us in Person / What Injury Clients Ask First / If You Are Hurt, the Clock Is Already Running / A Footer That Earns the State Bar Notice. Each section opens with one `![alt](path)` block followed by 3 paragraphs of editorial commentary. New `previewAlt` (2,272 chars, the longest yet) describes the Bauder page-top hero in detail (deep oxblood 24/7 strip with green pulse dot, gold (214) 555-0184 tap-to-call, animated verdicts ticker showing Dallas/Tarrant/Collin county results, Hablamos Espanol callout, navy utility row, gold-pipe-and-serif wordmark, six nav links, navy hero with No Fee Unless We Win badge, mixed-weight headline When the Outcome Matters / Bring the Lawyers Who Try the Case, two CTAs, gold credentials line for Board-Certified Personal Injury Trial Law and Texas Bar Foundation Fellow and 25+ Years Trying Cases, founding-partner portrait of a silver-haired trial lawyer in a wood-paneled office).
+- **`lib/design-briefs.ts`**: refreshed the `pi-law` index entry's `description` and `keySurfaces`. New description names the verdicts ticker, the partner's first-person intake commitment, the verdicts ledger by county, the eight practice-area cards, the settlement-mill positioning headline, the year-stamped peer recognition, the four contact channels with bilingual human-not-bot commitment, the three offices with three direct numbers, and the State Bar of Texas advertising notice naming the responsible attorney by name. New keySurfaces: 24/7 Bilingual Strip, Verdicts Ledger by County, Settlement Mill Positioning.
+- **`public/design-briefs/pi-law.webp`**: replaced with the new Bauder hero (1800px wide, q=82, 99 KB). The prior generic placeholder was 3024x1964 at 301 KB.
+- **`public/design-briefs/pi-law/`** (new directory, 10 files): `02-intake.webp` (Tell Us What Happened intake form with first-person callout) / `03-results.webp` (six-card verdicts ledger with county and case-arc context) / `04-practice-areas.webp` (eight practice-area cards naming FMCSA logs, ECM data, non-subscriber jobsites, one-bite-rule) / `05-trial-firm.webp` (Why Bauder pillars + female attorney portrait) / `06-recognition.webp` (eight peer-review honors year-stamped) / `07-contact.webp` (four channels: Call, Text photo of the wreck, Online Form, Live Chat with Hablamos Espanol) / `08-offices.webp` (Dallas principal + Fort Worth + Plano with direct numbers) / `09-faq.webp` (eight literal-Google-query FAQ rows) / `10-clock.webp` (statute of limitations close + State Bar notice opening) / `11-footer.webp` (full disclosure block + Website by DBJ Technologies credit + copyright with principal-office address). All 1600px wide, q=82, 39-115 KB each.
+
+### Editorial judgment on excluded screenshots
+
+- **Hero continuation with dual-photo strip (11.18.18)**: skipped on whiskey-glass grounds. The bottom of the screenshot showed the credentials bar transitioning into a left-courthouse / right-banker's-lamp-and-briefcase editorial detail shot, with a small amber-liquid tumbler visible at the right edge of the desk arrangement. In the personal-injury trial-firm category where the firm is positioning against settlement mills and selling courtroom discipline, a desk-side tumbler is a borderline read that would distract from the credential rather than reinforce it. The hero portrait alone carries the establishing-shot work, and the credentials line below the hero (Board-Certified Personal Injury Trial Law / Texas Bar Foundation Fellow / 25+ Years Trying Cases) is captured in the `previewAlt` text.
+- **Courthouse + intake transition (11.18.31)**: same whiskey-glass concern at the top of the screenshot above the intake form. The kept intake screenshot (11.18.38) is the cleaner anchor for the same surface because it shows the full Tell Us What Happened headline plus the four-field form plus the disclaimer beneath the gold button without the editorial detail pair.
+
+### Voice and rules adherence
+
+- Zero em dashes across all changed files (audited via `grep -c $'\xe2\x80\x94'`).
+- DBJ first-person framing voice throughout the prose. Bauder firm-voice "we" appears only inside paraphrased site copy and the partner's first-person callout (e.g., "I represent people who have been seriously injured. Most of our cases settle. The ones that do not, we try.", "When you submit this form, I personally review every intake. You will hear from a licensed attorney, not a paralegal, the same business day.", "We try cases.", "We are board-certified.", "We do not pyramid."), consistent with the precedent established in the prior six briefs.
+- Substantial copy per the luxury-means-substantial rule: 10 sections at 3 paragraphs each, ~3,500 words total.
+- Section image alts are descriptive multi-sentence paragraphs that name the visible content faithfully (every dollar verdict and county and case-arc named, every practice-area regime cited, every recognition row dated or status-flagged, every office address and direct number listed, every FAQ question stated as a literal Google query, the full State Bar advertising notice transcribed in the closing alt blocks).
+
+### Verification
+
+- `npx tsc --noEmit`: clean.
+- `npm run lint`: clean.
+- Section count: `grep -c "^## " docs/design-briefs/pi-law.md` = 10. Image-block count: `grep -c "^!\[" docs/design-briefs/pi-law.md` = 10. One image per section.
+- Parser smoke test (tsx import of `getDesignBriefBySlug`): pi-law `previewAlt` length 2,272 chars; all 10 sections parsed with images attached and 3 paragraphs of editorial commentary each.
+- Em-dash audit on the changed files: 0.
+- Image dimensions verified: 11 source PNGs all 3024x1964; outputs are 1800w (hero) and 1600w (sections) at q=82, totaling 11 webp files (99 KB hero + 39-115 KB section files).
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/work/design-briefs/pi-law` and confirm: (1) the Bauder hero renders cleanly with the 24/7 strip, the verdicts ticker, the No Fee Unless We Win badge, the mixed-weight headline, and the founding-partner portrait visible above the fold, (2) each of the 10 body sections shows its anchor screenshot in the framed accent-tinted container between heading and prose, (3) the visual rhythm reads cleanly across the 10 sections, (4) the page card preview on `/work` picks up the new hero and the refreshed description. Once approved, hand me the screenshots for the final brief (financial-advisor) and I will repeat the pattern. One brief remains.
+
+### Final state (post-commit)
+
+- Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 -- Upscale Restaurant design brief rebuilt as image-anchored deep dive (Ember & Vine template)
 
 ### What shipped
 
