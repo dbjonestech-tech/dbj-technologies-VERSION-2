@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PATHLIGHT_CTA_CONTENT } from "@/lib/constants";
-import { PathlightLogo } from "@/components/brand/PathlightLogo";
 
 export function PathlightCTA() {
   return (
@@ -19,13 +18,6 @@ export function PathlightCTA() {
         }}
       />
       <div className="relative mx-auto max-w-3xl px-6 text-center lg:px-8">
-        <div className="mx-auto mb-6 flex justify-center">
-          <PathlightLogo
-            size={140}
-            className="h-[120px] w-[120px] sm:h-[140px] sm:w-[140px]"
-            alt="Pathlight"
-          />
-        </div>
         <p
           className="text-xs font-semibold uppercase tracking-[0.3em]"
           style={{ color: "#9aa3b2" }}

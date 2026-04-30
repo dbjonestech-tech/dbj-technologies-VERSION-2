@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
-import { PathlightLogo } from "@/components/brand/PathlightLogo";
 
 type FormState = {
   url: string;
@@ -87,15 +86,10 @@ export function PathlightForm() {
     >
       <div className="mx-auto w-full max-w-[600px]">
         <section className="mb-14 text-center">
-          <h1 className="sr-only">Pathlight</h1>
-          <div className="mx-auto flex justify-center">
-            <PathlightLogo
-              size={280}
-              priority
-              className="h-[200px] w-[200px] sm:h-[260px] sm:w-[260px]"
-            />
-          </div>
-          <p className="mt-6 text-lg sm:text-xl" style={{ color: "#c5ccd8" }}>
+          <h1 className="header-glow-premium font-display text-5xl font-bold tracking-tight sm:text-6xl">
+            PATHLIGHT
+          </h1>
+          <p className="mt-4 text-lg sm:text-xl" style={{ color: "#c5ccd8" }}>
             Find where your website is losing trust, leads, and revenue.
           </p>
           <Link

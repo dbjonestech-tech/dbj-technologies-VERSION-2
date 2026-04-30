@@ -30,13 +30,6 @@ const WRAPPER_BG = "#f4f4f5";
 const CARD_BG = "#ffffff";
 const BORDER_COLOR = "#e4e4e7";
 
-// Public absolute origin for image URLs in emails. Email clients fetch
-// these directly, so the URL must be reachable on the public internet.
-const SITE_ORIGIN = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://dbjtechnologies.com"
-).replace(/\/$/, "");
-const LOGO_URL = `${SITE_ORIGIN}/brand/pathlight/logo-480.png`;
-
 function formatMoney(n: number | null): string {
   if (n === null || !Number.isFinite(n)) return "a meaningful amount";
   return `$${Math.round(n).toLocaleString("en-US")}`;
@@ -88,9 +81,7 @@ function shell(preheader: string, body: string, unsubscribeUrl: string): string 
       <td align="center" style="padding: 32px 16px;">
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; background-color: ${CARD_BG}; border: 1px solid ${BORDER_COLOR}; border-radius: 8px;">
           <tr>
-            <td align="center" style="padding: 32px 32px 16px;">
-              <img src="${LOGO_URL}" alt="Pathlight" width="96" height="96" style="display: block; width: 96px; height: 96px; border: 0; outline: none; text-decoration: none;" />
-            </td>
+            <td style="padding: 32px 32px 8px; font-family: ${FONT_STACK}; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: ${ACCENT_COLOR};">Pathlight</td>
           </tr>
           ${body}
           ${footer(unsubscribeUrl)}
