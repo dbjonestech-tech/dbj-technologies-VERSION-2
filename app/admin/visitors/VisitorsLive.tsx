@@ -22,6 +22,7 @@ import type { LiveVisitorRow } from "@/lib/services/analytics";
 
 type StreamEvent = {
   id: string;
+  session_id: string;
   path: string;
   referrer_host: string | null;
   country: string | null;

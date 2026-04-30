@@ -536,6 +536,7 @@ export async function getLiveVisitors(): Promise<LiveVisitorRow[]> {
 
 export type RecentPageViewRow = {
   id: string;
+  sessionId: string;
   path: string;
   referrerHost: string | null;
   country: string | null;
@@ -546,29 +547,48 @@ export type RecentPageViewRow = {
   createdAt: string;
 };
 
+/**
+ * Most recent page views, sorted by created_at DESC (with id DESC as a
+ * stable tiebreaker for ties or backfilled rows whose BIGSERIAL id and
+ * timestamp can drift). Used by the /admin/visitors recent feed and by
+ * the cursor "Load older" pagination via the optional `beforeIso`
+ * argument.
+ */
 export async function getRecentPageViews(
   limit = 100,
-  includeBots = false
+  includeBots = false,
+  beforeIso?: string
 ): Promise<RecentPageViewRow[]> {
   try {
     const sql = getDb();
     const cap = Math.max(1, Math.min(500, limit));
+    /* Validate ISO cursor before passing to SQL. We accept anything the
+     * Date constructor can parse, then re-emit the canonical ISO form
+     * so we never interpolate raw user input into the cursor. */
+    let cursor: string | null = null;
+    if (beforeIso) {
+      const t = Date.parse(beforeIso);
+      if (Number.isFinite(t)) cursor = new Date(t).toISOString();
+    }
     const rows = includeBots
       ? ((await sql`
-          SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
+          SELECT id::text, session_id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
           FROM page_views
-          ORDER BY id DESC
+          WHERE (${cursor}::timestamptz IS NULL OR created_at < ${cursor}::timestamptz)
+          ORDER BY created_at DESC, id DESC
           LIMIT ${cap}
         `) as RecentPageViewRowDb[])
       : ((await sql`
-          SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
+          SELECT id::text, session_id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
           FROM page_views
           WHERE is_bot = false
-          ORDER BY id DESC
+            AND (${cursor}::timestamptz IS NULL OR created_at < ${cursor}::timestamptz)
+          ORDER BY created_at DESC, id DESC
           LIMIT ${cap}
         `) as RecentPageViewRowDb[]);
     return rows.map((r) => ({
       id: r.id,
+      sessionId: r.session_id,
       path: r.path,
       referrerHost: r.referrer_host,
       country: r.country,
@@ -588,6 +608,7 @@ export async function getRecentPageViews(
 
 type RecentPageViewRowDb = {
   id: string;
+  session_id: string;
   path: string;
   referrer_host: string | null;
   country: string | null;
@@ -623,14 +644,14 @@ export async function getPageViewsAfterId(
     const cap = Math.max(1, Math.min(500, limit));
     const rows = includeBots
       ? ((await sql`
-          SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
+          SELECT id::text, session_id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
           FROM page_views
           WHERE id > ${safe}::bigint
           ORDER BY id ASC
           LIMIT ${cap}
         `) as RecentPageViewRowDb[])
       : ((await sql`
-          SELECT id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
+          SELECT id::text, session_id::text, path, referrer_host, country, city, device_type, browser, is_bot, created_at
           FROM page_views
           WHERE id > ${safe}::bigint
             AND is_bot = false
@@ -639,6 +660,7 @@ export async function getPageViewsAfterId(
         `) as RecentPageViewRowDb[]);
     return rows.map((r) => ({
       id: r.id,
+      sessionId: r.session_id,
       path: r.path,
       referrerHost: r.referrer_host,
       country: r.country,

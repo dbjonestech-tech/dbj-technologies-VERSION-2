@@ -10,7 +10,8 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with fe3cb59 commit hash
+- (this commit) feat(admin): redesign /admin dashboard with per-column color themes, Framer Motion hover, live KPIs on hover; fix /admin/visitors recent feed sort and add cursor pagination + per-row session links
+- `4cad739` docs: update session-handoff with fe3cb59 commit hash
 - `fe3cb59` feat(positioning): remove AI self-claims sitewide; reposition Pathlight as a "diagnostic" instead of "AI-powered analysis"
 - `bdd76bf` docs: update session-handoff with 247bda1 commit hash
 - `247bda1` feat(pricing): add Fix Sprint as the post-Pathlight-scan engagement tier
@@ -24,6 +25,51 @@ header before the April 30 reset.
 - `72be7f0` fix(work/canopy): video occupies hero, no misleading 'live' caption, more copy sanitization
 
 Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys from main.
+
+### What landed in the latest code sprint (April 30 late evening, /admin cockpit redesign)
+
+The /admin landing page is now a real cockpit instead of a uniform card grid. This is the structural foundation for what becomes the Canopy product UI later. **Files touched: 5 modified, 2 added.**
+
+- **Per-column color theme.** Each card now inherits a color from its column: cyan (Today), violet (Acquisition), amber (Operations), emerald (Health), zinc (Account). The theme drives the card's top accent stripe, icon tile gradient, hover halo, hover border, hover overlay wash, and KPI value color. Column headers carry a small dot in their theme so the mapping is visible without relying on the cards alone.
+- **Larger icon block.** Bumped from `h-9 w-9` / `h-4 w-4` to `h-12 w-12` / `h-6 w-6`, with a soft gradient tile (`from-{color}-50 to-{color}-100`), inset ring, and inset shadow. Icon scales `1.08` and rotates `-3deg` on hover.
+- **Framer Motion hover.** Card lifts `y: -3` (spring), icon scales + rotates, an arrow indicator slides in from the left of the right edge with `x` + opacity transitions, top stripe brightens from 60% → 100%, and a subtle diagonal gradient overlay (`from-{color}-50/0 via-{color}-50/50 to-{color}-50/0`) fades in across the card. All motion respects `useReducedMotion()`. Keyboard focus mirrors hover via shared `hovered` state (onFocus/onBlur on the wrapper).
+- **Live KPIs on hover.** A new `lib/services/dashboard-kpis.ts` aggregates 17 KPIs in parallel via `Promise.all`, each individually wrapped in a `safe()` helper so one failing service (Sentry, Vercel API, infra checks) cannot blank the whole dashboard. The dashboard fetches the KPI map server-side alongside `auth()` and `getDashboardStatus()`. Each card receives its KPI by `card.href` lookup. KPI line lives in a fixed-height slot at the bottom of every card (no layout shift across hover) and fades + slides up on hover, with a tone-driven accent dot (positive/warning/danger/neutral) and a `secondary` line for context.
+- **Plainer-English descriptions.** Funnel, Search, RUM, Pipeline rewritten to lead with what the page tells the user, not the underlying mechanism. Operational pages (Monitor, Costs, Database, Audit log, Infrastructure) keep precision-loaded copy because the technical terms ARE the value.
+
+**Visitors page recent-feed bug fix and pagination.**
+
+- **Sort fix.** `getRecentPageViews` was sorting by `id DESC` (BIGSERIAL). With backfilled or replayed rows, id and created_at can drift, which surfaced as "1d ago" rows interleaved with "2m ago" rows. Switched to `ORDER BY created_at DESC, id DESC` (id as a stable tiebreaker). The SSE live tail still uses `id ASC` cursor since that's the correct semantics for "tail new rows."
+- **Cursor pagination.** Added optional `beforeIso` parameter to `getRecentPageViews` plus a "Load older →" button that bumps a `?before=<iso>` query param. Server validates the cursor through `Date.parse` and re-emits canonical ISO before interpolating into SQL. "← Back to latest" link resets the cursor.
+- **Per-row session links.** Added `sessionId` to `RecentPageViewRow` and to the SSE wire format. Every row in the recent feed now has a "view →" link to `/admin/visitors/sessions/{sessionId}` so any visitor's full path is one click away.
+
+**New / changed files**
+
+- **NEW:** `lib/services/dashboard-kpis.ts` — 17-card KPI aggregator with per-card try/catch via `safe()`. Returns `Record<href, CardKpi>`. KPIs cover visitors, monitor, scans, leads, funnel, search, RUM, email, costs, database, clients, audit, pipeline, platform, errors, infrastructure, users.
+- **NEW:** `app/admin/DashboardCard.tsx` — client component, per-column theme tokens, Framer Motion animations, hover-revealed KPI footer with tone-driven accent.
+- **MODIFIED:** `app/admin/page.tsx` — wires `getDashboardKpis` into the existing parallel fetch, attaches a `CardTheme` to each column, replaces the old inline `CardLink` with `DashboardCard`. Adds colored dots to column headers.
+- **MODIFIED:** `lib/services/analytics.ts` — `getRecentPageViews` now sorts by `created_at DESC, id DESC` and accepts an optional `beforeIso` cursor; both query branches now select `session_id`. `RecentPageViewRow` extended with `sessionId`. `getPageViewsAfterId` updated to select session_id. `RecentPageViewRowDb` type extended.
+- **MODIFIED:** `app/admin/visitors/page.tsx` — accepts `searchParams: Promise<...>`, parses `?before=` cursor, passes it to `getRecentPageViews`, renders a `RecentPaginator` with "Back to latest" / "Load older" / "End of feed" states. RecentTable now has a "Session" column with a "view →" link per row.
+- **MODIFIED:** `app/admin/visitors/api/stream/route.ts` — wire format now includes `session_id`.
+- **MODIFIED:** `app/admin/visitors/VisitorsLive.tsx` — `StreamEvent` type extended with `session_id`.
+
+**Verification**
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- No em dashes in any changed file.
+- No leaked `dbjonestech@gmail.com` references.
+- Tailwind colored utility classes (`hover:shadow-cyan-500/20`, `from-violet-50/0`, etc.) appear as full string literals in the `THEMES` const so the JIT scanner picks them up.
+
+**What this unblocks**
+
+- Joshua now has a real cockpit on /admin: hover any card to see live state without navigating.
+- The visitors recent feed no longer interleaves old rows mid-list.
+- Per-row session drill-in from the recent feed and live tail.
+
+**Suggested next moves**
+
+- Sessions index page (group page_views by session_id, show entry → exit path, dwell, geo, conversion) was scoped during this session but not built. Would replace "view → session" being only available row-by-row with a sortable, filterable index.
+- The KPI aggregator queries Sentry, Vercel API, Anthropic budget, etc. on every dashboard render. If page load latency becomes noticeable, wrap `getDashboardKpis()` in `unstable_cache` with a 30-60s TTL.
 
 ### What landed in the latest code sprint (April 30 late late evening, AI language removal)
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   getDeviceBreakdown,
   getGeoBreakdown,
@@ -9,7 +10,6 @@ import {
   getVisitorOverview,
   type GeoRow,
   type DeviceRow,
-  type LiveVisitorRow,
   type RecentPageViewRow,
   type TopPageRow,
   type TopSourceRow,
@@ -24,6 +24,18 @@ export const metadata: Metadata = {
   title: "Visitors",
   robots: { index: false, follow: false, nocache: true },
 };
+
+const RECENT_PAGE_SIZE = 50;
+
+function parseBeforeCursor(
+  raw: Record<string, string | string[] | undefined>
+): string | undefined {
+  const v = raw["before"];
+  const value = Array.isArray(v) ? v[0] : v;
+  if (!value) return undefined;
+  const t = Date.parse(value);
+  return Number.isFinite(t) ? new Date(t).toISOString() : undefined;
+}
 
 function formatNumber(n: number): string {
   return new Intl.NumberFormat("en-US").format(n);
@@ -44,7 +56,13 @@ function formatDwell(ms: number | null): string {
   return `${Math.floor(ms / 60_000)}m ${Math.floor((ms % 60_000) / 1000)}s`;
 }
 
-export default async function VisitorsPage() {
+type VisitorsPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function VisitorsPage({ searchParams }: VisitorsPageProps) {
+  const params = await searchParams;
+  const before = parseBeforeCursor(params);
   const [overview24, overview7d, overview30d, topPages, topSources, geo, devices, live, recent] =
     await Promise.all([
       getVisitorOverview("1 day"),
@@ -55,8 +73,14 @@ export default async function VisitorsPage() {
       getGeoBreakdown("7 days", 25),
       getDeviceBreakdown("7 days"),
       getLiveVisitors(),
-      getRecentPageViews(50, false),
+      getRecentPageViews(RECENT_PAGE_SIZE, false, before),
     ]);
+  /* When the user has paged into the past, the live header still
+   * reflects the present, but the "Recent page views" table reflects
+   * the cursor window. Pagination state is driven entirely by the
+   * URL so refresh + back/forward behave correctly. */
+  const hasMore = recent.length === RECENT_PAGE_SIZE;
+  const olderCursor = recent.length > 0 ? recent[recent.length - 1]!.createdAt : null;
 
   return (
     <div className="px-6 py-10 sm:px-10">
@@ -98,10 +122,57 @@ export default async function VisitorsPage() {
           </Section>
         </div>
 
-        <Section title="Recent page views">
+        <Section
+          title={
+            before
+              ? `Recent page views (older than ${new Date(before).toLocaleString("en-US")})`
+              : "Recent page views"
+          }
+        >
           <RecentTable rows={recent} />
+          <RecentPaginator
+            isPaged={Boolean(before)}
+            hasMore={hasMore}
+            olderCursor={olderCursor}
+          />
         </Section>
       </div>
+    </div>
+  );
+}
+
+function RecentPaginator({
+  isPaged,
+  hasMore,
+  olderCursor,
+}: {
+  isPaged: boolean;
+  hasMore: boolean;
+  olderCursor: string | null;
+}) {
+  if (!isPaged && !hasMore) return null;
+  return (
+    <div className="mt-4 flex items-center justify-between gap-3 border-t border-zinc-100 pt-4">
+      {isPaged ? (
+        <Link
+          href="/admin/visitors"
+          className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+        >
+          ← Back to latest
+        </Link>
+      ) : (
+        <span />
+      )}
+      {hasMore && olderCursor ? (
+        <Link
+          href={`/admin/visitors?before=${encodeURIComponent(olderCursor)}`}
+          className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+        >
+          Load older →
+        </Link>
+      ) : (
+        <span className="text-xs text-zinc-400">End of feed</span>
+      )}
     </div>
   );
 }
@@ -299,7 +370,7 @@ function RecentTable({ rows }: { rows: RecentPageViewRow[] }) {
     return <p className="text-sm text-zinc-500">No data yet.</p>;
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[700px] text-sm">
+      <table className="w-full min-w-[760px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Path</th>
@@ -307,6 +378,7 @@ function RecentTable({ rows }: { rows: RecentPageViewRow[] }) {
             <th className="px-3 py-2 font-semibold">Geo</th>
             <th className="px-3 py-2 font-semibold">Device</th>
             <th className="px-3 py-2 text-right font-semibold">When</th>
+            <th className="px-3 py-2 text-right font-semibold">Session</th>
           </tr>
         </thead>
         <tbody>
@@ -326,6 +398,14 @@ function RecentTable({ rows }: { rows: RecentPageViewRow[] }) {
               </td>
               <td className="px-3 py-2 text-right font-mono text-xs text-zinc-500">
                 {formatRelative(r.createdAt)}
+              </td>
+              <td className="px-3 py-2 text-right">
+                <Link
+                  href={`/admin/visitors/sessions/${r.sessionId}`}
+                  className="font-mono text-[11px] text-cyan-700 hover:underline"
+                >
+                  view →
+                </Link>
               </td>
             </tr>
           ))}

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { auth } from "@/auth";
 import {
   Activity,
@@ -20,6 +19,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { getDashboardStatus, type StatusLevel } from "@/lib/services/health-status";
+import { getDashboardKpis } from "@/lib/services/dashboard-kpis";
+import DashboardCard, { type CardTheme } from "./DashboardCard";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -31,31 +32,38 @@ type Card = {
   icon: LucideIcon;
 };
 
-const COLUMNS: { label: string; cards: Card[] }[] = [
+type Column = {
+  label: string;
+  theme: CardTheme;
+  cards: Card[];
+};
+
+const COLUMNS: Column[] = [
   {
     label: "Today",
+    theme: "cyan",
     cards: [
       {
         label: "Visitors",
-        description: "Live presence, top pages, sources, geography, devices.",
+        description: "Who is on the site right now, what they read, and where they came from.",
         href: "/admin/visitors",
         icon: Globe,
       },
       {
         label: "Monitor",
-        description: "Funnel, severity counts, Lighthouse trend, live event tail.",
+        description: "Live event tail with funnel counts, severity, and Lighthouse trend.",
         href: "/admin/monitor",
         icon: Activity,
       },
       {
         label: "Scans",
-        description: "Filterable table of every Pathlight scan with status and revenue range.",
+        description: "Every Pathlight scan with status, score, and revenue range. Filterable.",
         href: "/admin/scans",
         icon: FileText,
       },
       {
         label: "Leads",
-        description: "Pathlight scan signups and contact-form submissions side by side.",
+        description: "Pathlight scan signups and contact-form submissions, side by side.",
         href: "/admin/leads",
         icon: Mail,
       },
@@ -63,28 +71,29 @@ const COLUMNS: { label: string; cards: Card[] }[] = [
   },
   {
     label: "Acquisition",
+    theme: "violet",
     cards: [
       {
         label: "Funnel",
-        description: "Sessions to scans to contacts. Sankey + cohort retention.",
+        description: "How visitors flow from session to scan to contact, and where they drop off.",
         href: "/admin/funnel",
         icon: Filter,
       },
       {
         label: "Search",
-        description: "Top queries, top pages, opportunities (high impressions, mid position).",
+        description: "Top Google queries and pages, plus pages worth optimizing for CTR.",
         href: "/admin/search",
         icon: Search,
       },
       {
         label: "RUM",
-        description: "Real-user Core Web Vitals. p75 / p95 LCP, INP, CLS by page and device.",
+        description: "How fast pages actually load for real visitors, by page and device.",
         href: "/admin/performance/rum",
         icon: Zap,
       },
       {
         label: "Email",
-        description: "Deliverability KPIs by type. Bounce + complaint rate alerts.",
+        description: "Deliverability KPIs by email type, with bounce and complaint alerts.",
         href: "/admin/email",
         icon: Mail,
       },
@@ -92,28 +101,29 @@ const COLUMNS: { label: string; cards: Card[] }[] = [
   },
   {
     label: "Operations",
+    theme: "amber",
     cards: [
       {
         label: "Costs",
-        description: "Provider spend, per-operation totals, top scans by cost.",
+        description: "Provider spend, per-operation totals, and the most expensive scans.",
         href: "/admin/costs",
         icon: DollarSign,
       },
       {
         label: "Database",
-        description: "Row counts and recent activity by table.",
+        description: "Row counts and recent activity for every Pathlight and admin table.",
         href: "/admin/database",
         icon: Database,
       },
       {
         label: "Clients",
-        description: "Engagement clients, projects, deliverables. Drives the /portal.",
+        description: "Engagement clients, projects, and deliverables. Drives the client portal.",
         href: "/admin/clients",
         icon: Briefcase,
       },
       {
         label: "Audit log",
-        description: "Sign-in attempts, allowlist denials, protected-route access.",
+        description: "Sign-in attempts, allowlist denials, and protected-route access events.",
         href: "/admin/audit",
         icon: ShieldCheck,
       },
@@ -121,16 +131,17 @@ const COLUMNS: { label: string; cards: Card[] }[] = [
   },
   {
     label: "Health",
+    theme: "emerald",
     cards: [
       {
         label: "Pipeline",
-        description: "Inngest run history, p50 / p95 / p99 by function, failure rate.",
+        description: "Pathlight scan engine. Recent runs, slow runs, and any failures.",
         href: "/admin/pipeline",
         icon: Workflow,
       },
       {
         label: "Platform",
-        description: "Vercel deployments, build durations, function metrics.",
+        description: "Vercel deployments, build durations, and serverless function metrics.",
         href: "/admin/platform",
         icon: Server,
       },
@@ -142,7 +153,7 @@ const COLUMNS: { label: string; cards: Card[] }[] = [
       },
       {
         label: "Infrastructure",
-        description: "TLS, WHOIS, MX, SPF, DKIM, DMARC checks per managed domain.",
+        description: "TLS, WHOIS, MX, SPF, DKIM, and DMARC checks per managed domain.",
         href: "/admin/infrastructure",
         icon: Wifi,
       },
@@ -150,14 +161,18 @@ const COLUMNS: { label: string; cards: Card[] }[] = [
   },
 ];
 
-const ACCOUNT_CARDS: Card[] = [
-  {
-    label: "Users",
-    description: "Invite admins. Bootstrap allowlist plus DB-backed members.",
-    href: "/admin/users",
-    icon: Users,
-  },
-];
+const ACCOUNT_COLUMN: Column = {
+  label: "Account",
+  theme: "zinc",
+  cards: [
+    {
+      label: "Users",
+      description: "Invite admins. Bootstrap allowlist plus database-backed members.",
+      href: "/admin/users",
+      icon: Users,
+    },
+  ],
+};
 
 function statusBadgeClass(level: StatusLevel): string {
   if (level === "red") return "bg-red-50 text-red-700 border-red-200";
@@ -165,8 +180,20 @@ function statusBadgeClass(level: StatusLevel): string {
   return "bg-emerald-50 text-emerald-700 border-emerald-200";
 }
 
+function columnDotClass(theme: CardTheme): string {
+  if (theme === "cyan") return "bg-cyan-500";
+  if (theme === "violet") return "bg-violet-500";
+  if (theme === "amber") return "bg-amber-500";
+  if (theme === "emerald") return "bg-emerald-500";
+  return "bg-zinc-400";
+}
+
 export default async function AdminLanding() {
-  const [session, status] = await Promise.all([auth(), getDashboardStatus()]);
+  const [session, status, kpis] = await Promise.all([
+    auth(),
+    getDashboardStatus(),
+    getDashboardKpis(),
+  ]);
   const firstName = session?.user?.email?.split("@")[0] ?? "there";
 
   return (
@@ -181,8 +208,9 @@ export default async function AdminLanding() {
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
             One cockpit for visitors, conversions, Pathlight, costs,
-            pipeline health, and infrastructure. The status bar below
-            reflects the worst-of every signal -- green is good.
+            pipeline health, and infrastructure. Hover any card to see
+            its current state. The status bar below reflects the
+            worst-of every signal, green is good.
           </p>
         </header>
 
@@ -224,13 +252,19 @@ export default async function AdminLanding() {
 
         {/* Column headers (lg only). Below lg the categorization
             collapses into a flat list because the 1- and 2-col
-            responsive grids do not align with the 4-column header. */}
+            responsive grids do not align with the 4-column header.
+            Each header carries a small dot in its column theme so
+            the color mapping is visible without relying on the cards. */}
         <div className="mb-3 hidden gap-6 lg:grid lg:grid-cols-4">
           {COLUMNS.map((col) => (
             <h2
               key={col.label}
-              className="font-display text-sm font-semibold uppercase tracking-wider text-zinc-500"
+              className="flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wider text-zinc-500"
             >
+              <span
+                aria-hidden="true"
+                className={`inline-block h-1.5 w-1.5 rounded-full ${columnDotClass(col.theme)}`}
+              />
               {col.label}
             </h2>
           ))}
@@ -245,18 +279,40 @@ export default async function AdminLanding() {
             COLUMNS.map((col) => {
               const card = col.cards[rowIdx];
               if (!card) return null;
-              return <CardLink key={card.href} card={card} />;
+              return (
+                <DashboardCard
+                  key={card.href}
+                  label={card.label}
+                  description={card.description}
+                  href={card.href}
+                  icon={card.icon}
+                  theme={col.theme}
+                  kpi={kpis[card.href]}
+                />
+              );
             })
           )}
         </div>
 
         <section className="mt-8">
-          <h2 className="mb-3 font-display text-sm font-semibold uppercase tracking-wider text-zinc-500">
-            Account
+          <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            <span
+              aria-hidden="true"
+              className={`inline-block h-1.5 w-1.5 rounded-full ${columnDotClass(ACCOUNT_COLUMN.theme)}`}
+            />
+            {ACCOUNT_COLUMN.label}
           </h2>
           <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {ACCOUNT_CARDS.map((card) => (
-              <CardLink key={card.href} card={card} />
+            {ACCOUNT_COLUMN.cards.map((card) => (
+              <DashboardCard
+                key={card.href}
+                label={card.label}
+                description={card.description}
+                href={card.href}
+                icon={card.icon}
+                theme={ACCOUNT_COLUMN.theme}
+                kpi={kpis[card.href]}
+              />
             ))}
           </div>
         </section>
@@ -267,29 +323,4 @@ export default async function AdminLanding() {
 
 function maxRowCount(): number {
   return COLUMNS.reduce((max, col) => Math.max(max, col.cards.length), 0);
-}
-
-function CardLink({ card }: { card: Card }) {
-  const Icon = card.icon;
-  return (
-    <Link
-      href={card.href}
-      className="group flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-5 transition-all hover:border-zinc-300 hover:shadow-sm"
-    >
-      <div className="mb-3 flex items-center justify-between">
-        <span
-          className="flex h-9 w-9 items-center justify-center rounded-lg"
-          style={{ backgroundColor: "rgba(8, 145, 178, 0.08)" }}
-        >
-          <Icon className="h-4 w-4" style={{ color: "#0891b2" }} aria-hidden="true" />
-        </span>
-      </div>
-      <h2 className="font-display text-base font-semibold text-zinc-900">
-        {card.label}
-      </h2>
-      <p className="mt-1 text-sm leading-relaxed text-zinc-600">
-        {card.description}
-      </p>
-    </Link>
-  );
 }

@@ -23,6 +23,7 @@ export const revalidate = 0;
 function toWireFormat(row: RecentPageViewRow) {
   return {
     id: row.id,
+    session_id: row.sessionId,
     path: row.path,
     referrer_host: row.referrerHost,
     country: row.country,
