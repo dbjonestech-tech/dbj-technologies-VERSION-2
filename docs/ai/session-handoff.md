@@ -70,7 +70,10 @@ After Vercel rebuild settles (1-3 min), incognito-load any of the 8 brief detail
 
 ### Final state (post-commit)
 
-- Will populate after this commit lands.
+- Feature commit: `4cac8b7` -- feat(design-briefs): magazine-spread renderer overhaul, S-tier visual elevation. 2 files changed, 342 insertions, 110 deletions (renderer rewrite + this snapshot).
+- Pushed to `origin main` (`77400db..4cac8b7 main -> main`).
+- Working tree clean apart from this snapshot amendment.
+- All 8 design-brief detail pages instantly elevated to magazine-spread visual rhythm: hero title block ranged-left + full 1400px container hero screenshot + large italic-serif section numerals + breakout section images + nested prose + closing related-briefs grid.
 
 ---
 
