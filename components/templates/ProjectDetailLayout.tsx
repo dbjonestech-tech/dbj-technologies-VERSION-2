@@ -170,12 +170,26 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                 </span>
               </motion.div>
 
-              <motion.h1
-                variants={item}
-                className="font-display text-[clamp(2.6rem,5.6vw,4.6rem)] font-bold leading-[1.04] tracking-tight mb-8"
-              >
-                {project.name}
-              </motion.h1>
+              {project.logoImage ? (
+                <motion.div variants={item} className="mb-8">
+                  <Image
+                    src={project.logoImage}
+                    alt={project.name}
+                    width={800}
+                    height={599}
+                    priority
+                    className="h-32 w-auto lg:h-40"
+                  />
+                  <span className="sr-only">{project.name}</span>
+                </motion.div>
+              ) : (
+                <motion.h1
+                  variants={item}
+                  className="font-display text-[clamp(2.6rem,5.6vw,4.6rem)] font-bold leading-[1.04] tracking-tight mb-8"
+                >
+                  {project.name}
+                </motion.h1>
+              )}
 
               <motion.p
                 variants={item}
@@ -270,8 +284,70 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
         </div>
       </section>
 
-      {/* Section divider */}
-      <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+      {/* Showcase video (autoplay loop, muted, plays inline). Rendered when
+       * the project entry provides showcaseVideo. Sits between the hero
+       * still image and the case-study sections so visitors see the product
+       * in motion before reading. */}
+      {project.showcaseVideo ? (
+        <section className="relative pt-12 lg:pt-20">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            {project.showcaseVideo.caption ? (
+              <motion.p
+                initial={reduced ? { opacity: 1 } : { opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={VIEWPORT}
+                transition={{ duration: 0.45, ease: EASE_OUT }}
+                className="mb-4 text-center font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted"
+              >
+                <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: accent }} aria-hidden="true" />
+                {project.showcaseVideo.caption}
+              </motion.p>
+            ) : null}
+            <motion.div
+              initial={reduced ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.985 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={VIEWPORT}
+              transition={{ duration: 0.7, ease: EASE_OUT }}
+              className="relative"
+            >
+              <div
+                className="absolute -inset-6 lg:-inset-10 -z-10 blur-3xl pointer-events-none"
+                style={{
+                  background: `radial-gradient(ellipse at 30% 50%, ${haloA} 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, ${haloB} 0%, transparent 60%)`,
+                  opacity: 0.55,
+                }}
+                aria-hidden="true"
+              />
+              <div
+                className="relative overflow-hidden rounded-2xl lg:rounded-3xl border-2 transform-gpu aspect-video bg-bg-secondary"
+                style={{
+                  borderColor: `${accent}55`,
+                  boxShadow: `0 50px 120px -30px ${accent}55, 0 25px 60px -20px rgba(0,0,0,0.22)`,
+                }}
+              >
+                <video
+                  className="h-full w-full object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  poster={project.showcaseVideo.poster}
+                  preload="metadata"
+                >
+                  {project.showcaseVideo.webm ? (
+                    <source src={project.showcaseVideo.webm} type="video/webm" />
+                  ) : null}
+                  <source src={project.showcaseVideo.mp4} type="video/mp4" />
+                </video>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Section divider. Pads from the video section above when present;
+       * otherwise sits flush against the hero like other case studies. */}
+      <div className={`mx-auto max-w-[1400px] px-6 lg:px-12 ${project.showcaseVideo ? "pt-16 lg:pt-24" : ""}`}>
         <div
           className="h-px w-full"
           style={{

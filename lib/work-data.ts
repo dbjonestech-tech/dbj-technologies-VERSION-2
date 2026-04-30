@@ -15,6 +15,17 @@ export interface ProjectTechDetail {
   reason: string;
 }
 
+export interface ProjectVideo {
+  /** Path to the MP4 (h.264) source. Required. */
+  mp4: string;
+  /** Optional WebM (VP9) source for browsers that prefer it. */
+  webm?: string;
+  /** Path to a still-image poster shown before play and as fallback. */
+  poster: string;
+  /** Optional descriptor rendered as a small caption above the video. */
+  caption?: string;
+}
+
 export interface ProjectDetail {
   slug: string;
   name: string;
@@ -32,6 +43,12 @@ export interface ProjectDetail {
   timeline: string;
   ctaText: string;
   ctaHref: string;
+  /** Optional brand mark to render in place of the text title in the
+   * deep-dive hero. Use for projects whose wordmark is part of the logo. */
+  logoImage?: string;
+  /** Optional autoplay-loop showcase video rendered between hero and case
+   * study sections on the deep-dive page. */
+  showcaseVideo?: ProjectVideo;
 }
 
 export const PROJECT_DETAILS: ProjectDetail[] = [
@@ -355,40 +372,47 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
       {
         heading: "The Engagement",
-        body: "Four to eight weeks from kickoff to live install. The buyer provides a domain or subdomain, Google OAuth credentials from their workspace, an admin email allow-list, and access to whichever observability sources they already use (Vercel webhook, Resend webhook, Sentry, Search Console, others). I provision the Vercel project, the Neon Postgres, the auth wall, the cron schedule, and the per-source ingestion. I install the cross-origin beacon into the buyer's main site for visitor analytics. I deliver the install with documentation written for an engagement owner who will operate it long after I am out of the picture. Starting at twenty-five thousand dollars. The price scales with the number of integrations and the depth of the funnel modeling, not with the number of dashboards or seats.",
+        body: "Four to eight weeks from kickoff to live install. I handle the architecture, the integrations across whichever observability sources the buyer already pays for, and the cross-site instrumentation. The buyer ends up with a dashboard on their own domain, in their own accounts, with documentation written for whoever will operate it long after I am out of the picture. Starting at twenty-five thousand dollars. The price scales with the number of integrations and the depth of the funnel modeling, not with the number of dashboards or seats.",
       },
     ],
     techDetails: [
       {
-        name: "Next.js 16 + Auth.js + Neon Postgres",
+        name: "You Own the Whole Stack",
         reason:
-          "Server components with the App Router for fast first-render dashboards, Auth.js for the Google sign-in wall and admin allow-list enforcement, Neon Postgres for the per-client data store. Every install is its own database; no multi-tenant shared infrastructure that mixes one buyer's data with another's.",
+          "Every install is its own database, its own auth wall, its own domain. No multi-tenant shared infrastructure that mixes one client's data with another's. No vendor login your team needs to remember. No SaaS contract to renew. The dashboard, the data, and the keys all live where the buyer keeps the rest of their business.",
       },
       {
-        name: "First-Party Beacon",
+        name: "First-Party Telemetry",
         reason:
-          "A drop-in CanopyBeacon React component mounts in the client site's root layout and posts page-views, Core Web Vitals, scroll depth, and dwell time directly to the buyer's own dashboard endpoint. Cross-origin via a CORS allow-list. Cookies set with Secure and SameSite=None so the cross-origin handshake works in production. No third-party SDK, no external script, no data leaving the buyer's stack.",
+          "Visitor analytics, Web Vitals, scroll depth, and dwell time captured from the buyer's own site and posted directly to the buyer's own dashboard. No third-party SDK loaded. No external script firing on every page. No data leaving the buyer's infrastructure to be aggregated elsewhere and resold. What is captured is what the buyer asked for, full stop.",
       },
       {
-        name: "Layered Bot Filtering",
+        name: "Real Visitors, Not Crawler Noise",
         reason:
-          "Every incoming beacon hit runs through a three-layer bot classifier: known-bot user-agent regex, length floor for suspiciously short user agents, and Accept-Language fallback for crawlers that omit it. Bot traffic still lands in the database (so audits are honest about bot pressure) but is filtered out of every dashboard query so headline numbers reflect humans.",
+          "Bot pressure is real and most dashboards either over-count it (inflating vanity numbers) or under-count it (hiding a problem). Canopy separates bot traffic from humans at the ingest layer so the headline numbers reflect actual potential customers, while bot pressure is still surfaced honestly when the buyer wants to see it.",
       },
       {
-        name: "Privacy-First Analytics",
+        name: "Privacy-First by Design",
         reason:
-          "Raw IPs are never persisted. Only sha256 of the IP joined with a daily-rotating salt, so historical sessions cannot be re-linked to the same visitor across days. Visitor IDs and session IDs are first-party random UUIDs, not third-party tracking cookies. The engagement owner can defend the analytics setup against any privacy challenge because the design assumes that question.",
+          "Raw visitor IPs are never persisted. Identifiers are first-party only, not third-party tracking cookies. The whole capture pipeline assumes the question 'can you defend this against a privacy challenge' will get asked, and the answer is yes. That stance also future-proofs the install against the next round of cookie deprecations.",
       },
       {
-        name: "Cron-Driven Watchers",
+        name: "Daily Watchers, Surfaced Before They Bite",
         reason:
-          "Daily Vercel crons run the infrastructure watchers (TLS not_after, WHOIS expiry, MX/SPF/DKIM/DMARC reachability), refresh the email KPI rollup, snapshot Vercel deployment lifecycle, and prune old visitor data per the retention policy. The dashboard is always reading from already-aggregated tables, not running expensive queries on every page load.",
+          "TLS expiry, WHOIS, MX, SPF, DKIM, DMARC checked daily per tracked domain. Email deliverability rolled up from the sending platform. Deploy lifecycle ingested in real time. The dashboard reads from already-aggregated tables, so opening it is instant even when the underlying data is large. Issues surface before they become outages.",
       },
     ],
     timeline:
-      "Built first for DBJ Technologies as my own internal admin dashboard, ported into a productized starter template under github.com/dbjonestech-tech/canopy, and deployed for the first time as a standalone install for Star Auto Service in Richardson, TX. The engagement model is repeatable per client: separate Vercel project, separate Postgres database, separate Google OAuth client (in the client's workspace, not mine). Every future install starts from the same starter, on the same architecture, with the same install runbook.",
+      "Built first for DBJ Technologies as my own internal operations cockpit. Productized into a per-client engagement after the patterns proved durable across a year of running my own studio on it. The first external install lives at ops.thestarautoservice.com for Star Auto Service in Richardson, TX. Each engagement is delivered as the buyer's own infrastructure, in their own accounts, transferred cleanly so the buyer keeps deploying it themselves long after the work is done.",
     ctaText: "Scope Your Canopy Engagement",
     ctaHref: "/contact?topic=canopy",
+    logoImage: "/images/case-studies/canopy-logo.png",
+    showcaseVideo: {
+      mp4: "/images/case-studies/canopy-showcase.mp4",
+      webm: "/images/case-studies/canopy-showcase.webm",
+      poster: "/images/case-studies/canopy-showcase-poster.jpg",
+      caption: "Live from ops.thestarautoservice.com",
+    },
   },
 ];
 
