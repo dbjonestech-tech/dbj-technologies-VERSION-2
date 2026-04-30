@@ -268,7 +268,7 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                   </div>
 
                   {/* Two links */}
-                  <div className="mt-auto flex items-center gap-6 pt-2">
+                  <div className="mt-auto flex flex-wrap items-center gap-x-6 gap-y-2 pt-2">
                     <Link
                       href={`/work/${project.slug}`}
                       className="inline-flex items-center gap-2 text-sm font-semibold transition-all hover:gap-3 min-h-[44px]"
