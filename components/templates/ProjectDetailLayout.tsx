@@ -433,7 +433,12 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                     transition: { duration: reduced ? 0 : 0.6, ease: EASE_OUT },
                   },
                 }}
-                className="relative rounded-xl border p-6 lg:p-7 transition-all motion-safe:hover:-translate-y-1 overflow-hidden"
+                whileHover={
+                  reduced
+                    ? undefined
+                    : { y: -8, transition: { duration: 0.35, ease: EASE_OUT } }
+                }
+                className="group relative rounded-xl border p-6 lg:p-7 overflow-hidden cursor-default"
                 style={{
                   borderColor: `${accent}30`,
                   background: `linear-gradient(180deg, #ffffff 0%, ${accent}07 100%)`,
@@ -445,6 +450,17 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                   ].join(", "),
                 }}
               >
+                <span
+                  className="absolute -inset-px rounded-xl pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100 -z-10"
+                  style={{
+                    boxShadow: [
+                      `0 28px 64px -16px ${accent}55`,
+                      `0 64px 128px -32px ${accent}30`,
+                      `0 0 0 1px ${accent}30`,
+                    ].join(", "),
+                  }}
+                  aria-hidden="true"
+                />
                 <div
                   className="absolute top-0 left-5 right-5 h-px pointer-events-none"
                   style={{
@@ -452,8 +468,15 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                   }}
                   aria-hidden="true"
                 />
+                <div
+                  className="absolute top-0 left-5 right-5 h-px pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100"
+                  style={{
+                    background: `linear-gradient(90deg, transparent 0%, #ffffff 50%, transparent 100%)`,
+                  }}
+                  aria-hidden="true"
+                />
                 <h3
-                  className="font-display text-lg font-bold mb-2.5"
+                  className="font-display text-lg font-bold mb-2.5 transition-transform duration-300"
                   style={{ color: accent }}
                 >
                   {tech.name}

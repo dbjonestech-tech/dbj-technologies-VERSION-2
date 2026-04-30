@@ -120,10 +120,21 @@ export function DesignBriefClosing({ accent, related }: DesignBriefClosingProps)
               className="grid sm:grid-cols-3 gap-4 lg:gap-5"
             >
               {related.map((m) => (
-                <motion.div key={m.slug} variants={card}>
+                <motion.div
+                  key={m.slug}
+                  variants={card}
+                  whileHover={
+                    reduced
+                      ? undefined
+                      : {
+                          y: -8,
+                          transition: { duration: 0.35, ease: EASE_OUT },
+                        }
+                  }
+                >
                   <Link
                     href={`/work/design-briefs/${m.slug}`}
-                    className="group relative block rounded-xl overflow-hidden border bg-bg-primary transition-all motion-safe:hover:-translate-y-1"
+                    className="group relative block rounded-xl overflow-hidden border bg-bg-primary"
                     style={{
                       borderColor: `${m.paletteAccent}26`,
                       boxShadow: [
@@ -134,6 +145,18 @@ export function DesignBriefClosing({ accent, related }: DesignBriefClosingProps)
                       ].join(", "),
                     }}
                   >
+                    {/* Hover halo behind card */}
+                    <span
+                      className="absolute -inset-px rounded-xl pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100 -z-10"
+                      style={{
+                        boxShadow: [
+                          `0 28px 64px -16px ${m.paletteAccent}55`,
+                          `0 64px 128px -32px ${m.paletteAccent}28`,
+                          `0 0 0 1px ${m.paletteAccent}40`,
+                        ].join(", "),
+                      }}
+                      aria-hidden="true"
+                    />
                     {/* Top edge highlight, tinted with the brief's accent */}
                     <div
                       className="absolute top-0 left-4 right-4 h-px pointer-events-none z-10"
@@ -142,12 +165,19 @@ export function DesignBriefClosing({ accent, related }: DesignBriefClosingProps)
                       }}
                       aria-hidden="true"
                     />
+                    <div
+                      className="absolute top-0 left-4 right-4 h-px pointer-events-none z-10 opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100"
+                      style={{
+                        background: `linear-gradient(90deg, transparent 0%, #ffffff 50%, transparent 100%)`,
+                      }}
+                      aria-hidden="true"
+                    />
                     <div className="relative aspect-[4/3] overflow-hidden bg-bg-secondary">
                       <Image
                         src={m.preview}
                         alt={`${m.vertical} brief preview`}
                         fill
-                        className="object-cover object-top motion-safe:group-hover:scale-[1.04] transition-transform duration-700 ease-out"
+                        className="object-cover object-top motion-safe:group-hover:scale-[1.06] transition-transform duration-700 ease-out"
                         sizes="(max-width: 640px) 100vw, 240px"
                       />
                     </div>
@@ -163,7 +193,7 @@ export function DesignBriefClosing({ accent, related }: DesignBriefClosingProps)
                         />
                         Design Brief
                       </div>
-                      <div className="font-display text-base font-bold leading-tight">
+                      <div className="font-display text-base font-bold leading-tight motion-safe:group-hover:underline underline-offset-4 decoration-1 decoration-text-primary/60">
                         {m.vertical}
                       </div>
                     </div>

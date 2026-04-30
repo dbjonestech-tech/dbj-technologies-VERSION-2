@@ -893,7 +893,15 @@ export default function AboutContent() {
                       },
                     },
                   }}
-                  className="relative rounded-2xl border p-7 lg:p-8 transition-all duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:border-accent-blue/40 overflow-hidden"
+                  whileHover={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          y: -8,
+                          transition: { duration: 0.35, ease: EASE_OUT },
+                        }
+                  }
+                  className="group relative rounded-2xl border p-7 lg:p-8 overflow-hidden cursor-default"
                   style={{
                     borderColor: "rgba(59,130,246,0.18)",
                     background:
@@ -907,12 +915,32 @@ export default function AboutContent() {
                     ].join(", "),
                   }}
                 >
-                  {/* Top edge highlight on dark surface */}
+                  {/* Hover halo behind card on dark surface */}
+                  <span
+                    className="absolute -inset-px rounded-2xl pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100 -z-10"
+                    style={{
+                      boxShadow: [
+                        "0 32px 80px -16px rgba(59,130,246,0.6)",
+                        "0 80px 160px -32px rgba(59,130,246,0.35)",
+                        "0 0 0 1px rgba(96,165,250,0.45)",
+                      ].join(", "),
+                    }}
+                    aria-hidden="true"
+                  />
+                  {/* Top edge highlight on dark surface (base + hover) */}
                   <div
                     className="absolute top-0 left-5 right-5 h-px pointer-events-none"
                     style={{
                       background:
                         "linear-gradient(90deg, transparent 0%, rgba(96,165,250,0.7) 50%, transparent 100%)",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <div
+                    className="absolute top-0 left-5 right-5 h-px pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, transparent 0%, rgba(191,219,254,1) 50%, transparent 100%)",
                     }}
                     aria-hidden="true"
                   />
@@ -927,7 +955,7 @@ export default function AboutContent() {
                   />
                   <div className="pl-2">
                     <div
-                      className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl text-accent-blue"
+                      className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl text-accent-blue transition-transform duration-300 motion-safe:group-hover:scale-110 motion-safe:group-hover:-rotate-3"
                       style={{
                         background:
                           "linear-gradient(145deg, rgba(147,197,253,0.18) 0%, rgba(59,130,246,0.10) 100%)",
