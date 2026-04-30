@@ -1,13 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  type Variants,
+} from "framer-motion";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { GridBackground } from "@/components/effects/GridBackground";
-import { GradientBlob } from "@/components/effects/GradientBlob";
 import { CTASection } from "@/components/sections/CTA";
-import { Badge } from "@/components/ui/Badge";
 import { PROJECT_DETAILS } from "@/lib/work-data";
 import type { DesignBriefMeta } from "@/lib/design-briefs";
 
@@ -15,94 +16,214 @@ interface WorkContentProps {
   designBriefs: DesignBriefMeta[];
 }
 
+/* ─── PAGE IDENTITY ───────────────────────────────────
+   Work is the forest brown page. Deep walnut/oak tones
+   carry structural elements. Brand-blue stays as the
+   primary CTA color. The feeling is craft - a deeply
+   built portfolio with the warmth of finished wood
+   rather than the cool of polished metal. */
+const PAGE_ACCENT = "#5d4037"; // deep walnut
+const PAGE_LIGHT = "#8d6e63"; // warm tan
+const PAGE_DARK = "#3e2723"; // espresso / deep oak
+const PAGE_HIGHLIGHT = "#bcaaa4"; // pale warm beige
+const EASE_OUT = [0.16, 1, 0.3, 1] as const;
+const VIEWPORT = { once: true, margin: "-80px" } as const;
+
 export default function WorkContent({ designBriefs }: WorkContentProps) {
+  const reduce = useReducedMotion();
+
+  const heroStagger: Variants = {
+    hidden: {},
+    visible: {
+      transition: reduce
+        ? { staggerChildren: 0 }
+        : { staggerChildren: 0.08, delayChildren: 0.05 },
+    },
+  };
+  const heroItem: Variants = {
+    hidden: reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: reduce ? 0 : 0.7, ease: EASE_OUT },
+    },
+  };
+
   return (
     <>
-      {/* Hero */}
-      <section className="relative pt-40 pb-20 overflow-hidden">
-        <GridBackground />
-        <GradientBlob className="-top-40 -right-40" />
-        <div className="relative mx-auto max-w-4xl px-6 text-center lg:px-8">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue mb-6"
+      {/* ─── HERO ─────────────────────────────────────── */}
+      <section className="relative pt-32 pb-12 lg:pt-40 lg:pb-16 overflow-hidden">
+        <div
+          className="absolute inset-0 -z-10 pointer-events-none"
+          aria-hidden="true"
+        >
+          <div
+            className="absolute inset-0 opacity-[0.07]"
+            style={{
+              background: `radial-gradient(ellipse 60% 45% at 50% 10%, ${PAGE_LIGHT} 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 85% 20%, ${PAGE_ACCENT} 0%, transparent 55%)`,
+            }}
+          />
+        </div>
+
+        <div className="relative mx-auto max-w-3xl px-6 text-center lg:px-8">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={heroStagger}
           >
-            Portfolio
-          </motion.span>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-section font-bold leading-tight"
-          >
-            Selected
-            <br />
-            <span className="text-gradient">Builds.</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto"
-          >
-            Each project below is running in production right now, with metrics
-            from real users.
-          </motion.p>
+            <motion.span
+              variants={heroItem}
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.22em]"
+              style={{
+                borderColor: `${PAGE_ACCENT}33`,
+                backgroundColor: `${PAGE_ACCENT}0a`,
+                color: PAGE_DARK,
+              }}
+            >
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: PAGE_ACCENT }}
+                aria-hidden="true"
+              />
+              Portfolio
+            </motion.span>
+            <motion.h1
+              variants={heroItem}
+              className="mt-6 font-display text-[clamp(2.4rem,5vw,4rem)] font-bold leading-[1.05] tracking-tight"
+            >
+              Selected
+              <br />
+              <span style={{ color: PAGE_DARK }}>Builds.</span>
+            </motion.h1>
+            <motion.p
+              variants={heroItem}
+              className="mt-6 text-lg text-text-secondary max-w-xl mx-auto leading-[1.6]"
+            >
+              Each project below is running in production right now, with
+              metrics from real users.
+            </motion.p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Projects */}
+      {/* ─── PROJECTS ─────────────────────────────────── */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-8 md:grid-cols-2">
             {PROJECT_DETAILS.map((project, i) => (
               <motion.article
                 key={project.slug}
-                initial={{ opacity: 0, y: 30 }}
+                initial={
+                  reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }
+                }
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="group glass-card-hover overflow-hidden flex flex-col"
+                viewport={VIEWPORT}
+                transition={{
+                  duration: reduce ? 0 : 0.7,
+                  ease: EASE_OUT,
+                  delay: reduce ? 0 : i * 0.08,
+                }}
+                whileHover={
+                  reduce
+                    ? undefined
+                    : { y: -6, transition: { duration: 0.35, ease: EASE_OUT } }
+                }
+                className="group relative flex flex-col rounded-2xl border bg-bg-primary"
+                style={{
+                  borderColor: `${PAGE_ACCENT}28`,
+                  background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}07 100%)`,
+                  boxShadow: [
+                    "inset 0 1px 0 rgba(255,255,255,0.95)",
+                    "0 1px 2px rgba(0,0,0,0.04)",
+                    `0 14px 36px -14px ${PAGE_ACCENT}28`,
+                    `0 36px 72px -32px ${PAGE_ACCENT}1a`,
+                  ].join(", "),
+                }}
               >
-                {/* Screenshot (3:2 aspect matches the native viewport
-                    screenshot ratio so the full hero is visible without
-                    bottom-cropping) */}
-                <div className="relative aspect-[3/2] overflow-hidden">
+                {/* Hover halo */}
+                <span
+                  className="absolute -inset-px rounded-2xl pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100 -z-10"
+                  style={{
+                    boxShadow: [
+                      `0 28px 64px -16px ${PAGE_ACCENT}50`,
+                      `0 64px 128px -32px ${PAGE_ACCENT}28`,
+                      `0 0 0 1px ${PAGE_ACCENT}38`,
+                    ].join(", "),
+                  }}
+                  aria-hidden="true"
+                />
+                {/* Top edge highlight */}
+                <div
+                  className="absolute top-0 left-6 right-6 h-px pointer-events-none"
+                  style={{
+                    background: `linear-gradient(90deg, transparent 0%, ${PAGE_LIGHT}99 50%, transparent 100%)`,
+                  }}
+                  aria-hidden="true"
+                />
+                <div
+                  className="absolute top-0 left-6 right-6 h-px pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100"
+                  style={{
+                    background: `linear-gradient(90deg, transparent 0%, ${PAGE_HIGHLIGHT} 50%, transparent 100%)`,
+                  }}
+                  aria-hidden="true"
+                />
+
+                {/* Screenshot */}
+                <div className="relative aspect-[3/2] overflow-hidden rounded-t-2xl">
                   <Image
                     src={project.image}
                     alt={`${project.name} screenshot`}
                     fill
-                    className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover object-top transition-transform duration-700 ease-out motion-safe:group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 600px"
                   />
                 </div>
 
                 <div className="flex flex-1 flex-col p-8">
-                  <Badge variant="blue" className="self-start mb-4">
+                  <span
+                    className="inline-flex items-center self-start gap-2 rounded-full border px-3 py-1 mb-4 font-mono text-[10px] uppercase tracking-[0.16em]"
+                    style={{
+                      borderColor: `${PAGE_ACCENT}40`,
+                      backgroundColor: `${PAGE_ACCENT}0a`,
+                      color: PAGE_DARK,
+                    }}
+                  >
+                    <span
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ backgroundColor: PAGE_ACCENT }}
+                      aria-hidden="true"
+                    />
                     {project.category}
-                  </Badge>
-                  <h2 className="font-display text-2xl font-bold mb-3">
+                  </span>
+                  <h2 className="font-display text-2xl font-bold mb-3 tracking-tight">
                     {project.name}
                   </h2>
                   <p className="text-sm text-text-secondary leading-relaxed mb-6">
                     {project.description}
                   </p>
 
-                  {/* Metrics (stacked on mobile so long values like
-                      "Instant + Email" have the full card width to
-                      breathe; 3-up only kicks in once each tile has
-                      meaningful room) */}
+                  {/* Metrics */}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 mb-6">
                     {project.metrics.map((m) => (
                       <div
                         key={m.label}
-                        className="min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
+                        className="min-w-0 rounded-xl border px-3 py-4 text-center"
+                        style={{
+                          borderColor: `${PAGE_ACCENT}1f`,
+                          background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}06 100%)`,
+                          boxShadow: `inset 0 1px 0 rgba(255,255,255,0.95)`,
+                        }}
                       >
-                        <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-1.5">
+                        <p
+                          className="text-[10px] font-mono uppercase tracking-widest mb-1.5"
+                          style={{ color: PAGE_DARK }}
+                        >
                           {m.label}
                         </p>
-                        <p className="font-display text-2xl font-bold text-gradient leading-tight break-words">
+                        <p
+                          className="font-display text-2xl font-bold leading-tight break-words tabular-nums"
+                          style={{ color: PAGE_DARK }}
+                        >
                           {m.value}
                         </p>
                       </div>
@@ -114,7 +235,12 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                     {project.techStack.map((tech) => (
                       <span
                         key={tech}
-                        className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-text-secondary"
+                        className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium"
+                        style={{
+                          borderColor: `${PAGE_ACCENT}22`,
+                          backgroundColor: "white",
+                          color: "#52443c",
+                        }}
                       >
                         {tech}
                       </span>
@@ -122,8 +248,18 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                   </div>
 
                   {/* Notable callout */}
-                  <div className="rounded-xl border border-accent-blue/15 bg-accent-blue/5 p-4 mb-8">
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-accent-blue mb-2">
+                  <div
+                    className="rounded-xl border p-4 mb-8"
+                    style={{
+                      borderColor: `${PAGE_ACCENT}22`,
+                      background: `linear-gradient(180deg, ${PAGE_LIGHT}08 0%, ${PAGE_ACCENT}05 100%)`,
+                      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.85)`,
+                    }}
+                  >
+                    <p
+                      className="text-[10px] font-mono uppercase tracking-widest mb-2"
+                      style={{ color: PAGE_DARK }}
+                    >
                       Notable
                     </p>
                     <p className="text-sm text-text-secondary leading-relaxed">
@@ -135,7 +271,8 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                   <div className="mt-auto flex items-center gap-6 pt-2">
                     <Link
                       href={`/work/${project.slug}`}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-accent-blue transition-colors hover:text-accent-cyan min-h-[44px]"
+                      className="inline-flex items-center gap-2 text-sm font-semibold transition-all hover:gap-3 min-h-[44px]"
+                      style={{ color: PAGE_DARK }}
                     >
                       View Case Study
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -148,7 +285,10 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                       className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors min-h-[44px]"
                     >
                       Live Site
-                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                      <ExternalLink
+                        className="h-3.5 w-3.5"
+                        aria-hidden="true"
+                      />
                     </a>
                   </div>
                 </div>
@@ -158,34 +298,76 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
         </div>
       </section>
 
-      {/* Design Briefs */}
-      <section className="relative py-24 border-t border-text-primary/10 overflow-hidden">
-        <GradientBlob className="-top-20 -left-40 opacity-50" />
+      {/* ─── DESIGN BRIEFS ────────────────────────────── */}
+      <section
+        className="relative py-24 border-t overflow-hidden"
+        style={{ borderColor: `${PAGE_ACCENT}1a` }}
+      >
+        <div
+          className="absolute inset-0 -z-10 pointer-events-none"
+          aria-hidden="true"
+        >
+          <div
+            className="absolute inset-0 opacity-[0.05]"
+            style={{
+              background: `radial-gradient(ellipse 50% 40% at 20% 20%, ${PAGE_LIGHT} 0%, transparent 60%)`,
+            }}
+          />
+        </div>
+
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="max-w-3xl mb-14">
             <motion.span
-              initial={{ opacity: 0, y: 10 }}
+              initial={
+                reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }
+              }
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-block rounded-full border border-accent-cyan/25 bg-accent-cyan/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-cyan mb-6"
+              viewport={VIEWPORT}
+              transition={{
+                duration: reduce ? 0 : 0.6,
+                ease: EASE_OUT,
+              }}
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.22em]"
+              style={{
+                borderColor: `${PAGE_ACCENT}33`,
+                backgroundColor: `${PAGE_ACCENT}0a`,
+                color: PAGE_DARK,
+              }}
             >
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: PAGE_ACCENT }}
+                aria-hidden="true"
+              />
               Design Briefs
             </motion.span>
             <motion.h2
-              initial={{ opacity: 0, y: 20 }}
+              initial={
+                reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }
+              }
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.05 }}
-              className="font-display text-[clamp(2rem,3.6vw,2.8rem)] font-bold leading-tight tracking-tight"
+              viewport={VIEWPORT}
+              transition={{
+                duration: reduce ? 0 : 0.7,
+                ease: EASE_OUT,
+                delay: 0.1,
+              }}
+              className="mt-6 font-display text-[clamp(2rem,3.6vw,2.8rem)] font-bold leading-tight tracking-tight"
             >
               Reference{" "}
-              <span className="text-gradient">architectures.</span>
+              <span style={{ color: PAGE_DARK }}>architectures.</span>
             </motion.h2>
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={
+                reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }
+              }
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
+              viewport={VIEWPORT}
+              transition={{
+                duration: reduce ? 0 : 0.7,
+                ease: EASE_OUT,
+                delay: 0.15,
+              }}
               className="mt-5 text-text-secondary leading-relaxed"
             >
               Design briefs covering a selection of verticals I work in. Each
@@ -199,23 +381,66 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
             {designBriefs.map((brief, i) => (
               <motion.article
                 key={brief.slug}
-                initial={{ opacity: 0, y: 30 }}
+                initial={
+                  reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }
+                }
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="group glass-card-hover overflow-hidden flex flex-col"
+                viewport={VIEWPORT}
+                transition={{
+                  duration: reduce ? 0 : 0.6,
+                  ease: EASE_OUT,
+                  delay: reduce ? 0 : i * 0.05,
+                }}
+                whileHover={
+                  reduce
+                    ? undefined
+                    : { y: -6, transition: { duration: 0.35, ease: EASE_OUT } }
+                }
+                className="group relative flex flex-col rounded-2xl border bg-bg-primary"
+                style={{
+                  borderColor: `${brief.paletteAccent}28`,
+                  background: `linear-gradient(180deg, #ffffff 0%, ${brief.paletteAccent}06 100%)`,
+                  boxShadow: [
+                    "inset 0 1px 0 rgba(255,255,255,0.95)",
+                    "0 1px 2px rgba(0,0,0,0.04)",
+                    `0 14px 36px -14px ${brief.paletteAccent}28`,
+                    `0 36px 72px -32px ${brief.paletteAccent}1a`,
+                  ].join(", "),
+                }}
               >
-                {/* Preview (intentionally not a tap target on mobile;
-                    only the explicit "Read the Design Brief" CTA below
-                    is the link, matching the project cards above. 3:2
-                    aspect matches the native 3024x1964 screenshot ratio
-                    so the full template hero is visible at any width.) */}
-                <div className="relative aspect-[3/2] overflow-hidden">
+                <span
+                  className="absolute -inset-px rounded-2xl pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100 -z-10"
+                  style={{
+                    boxShadow: [
+                      `0 28px 64px -16px ${brief.paletteAccent}55`,
+                      `0 64px 128px -32px ${brief.paletteAccent}28`,
+                      `0 0 0 1px ${brief.paletteAccent}40`,
+                    ].join(", "),
+                  }}
+                  aria-hidden="true"
+                />
+                <div
+                  className="absolute top-0 left-6 right-6 h-px pointer-events-none"
+                  style={{
+                    background: `linear-gradient(90deg, transparent 0%, ${brief.paletteAccent}99 50%, transparent 100%)`,
+                  }}
+                  aria-hidden="true"
+                />
+                <div
+                  className="absolute top-0 left-6 right-6 h-px pointer-events-none opacity-0 transition-opacity duration-500 motion-safe:group-hover:opacity-100"
+                  style={{
+                    background: `linear-gradient(90deg, transparent 0%, #ffffff 50%, transparent 100%)`,
+                  }}
+                  aria-hidden="true"
+                />
+
+                {/* Preview */}
+                <div className="relative aspect-[3/2] overflow-hidden rounded-t-2xl">
                   <Image
                     src={brief.preview}
                     alt={`${brief.vertical} reference architecture preview`}
                     fill
-                    className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover object-top transition-transform duration-700 ease-out motion-safe:group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 600px"
                   />
                 </div>
@@ -225,7 +450,7 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                     className="inline-flex items-center self-start gap-2 rounded-full border px-3 py-1 mb-4 font-mono text-[10px] uppercase tracking-[0.16em]"
                     style={{
                       borderColor: `${brief.paletteAccent}40`,
-                      backgroundColor: `${brief.paletteAccent}0F`,
+                      backgroundColor: `${brief.paletteAccent}0a`,
                       color: brief.paletteAccent,
                     }}
                   >
@@ -237,24 +462,29 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                     {brief.vertical}
                   </span>
 
-                  <h3 className="font-display text-2xl font-bold mb-3 leading-tight">
+                  <h3 className="font-display text-2xl font-bold mb-3 leading-tight tracking-tight">
                     {brief.headline}
                   </h3>
                   <p className="text-sm text-text-secondary leading-relaxed mb-6">
                     {brief.description}
                   </p>
 
-                  {/* Key surfaces (parallel to project metrics; same
-                      mobile-stack pattern so long surface labels like
-                      "Society Membership" or "Signed Fiduciary Pledge"
-                      have full card width on phones) */}
+                  {/* Key surfaces */}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 mb-6">
                     {brief.keySurfaces.map((surface) => (
                       <div
                         key={surface}
-                        className="min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
+                        className="min-w-0 rounded-xl border px-3 py-4 text-center"
+                        style={{
+                          borderColor: `${brief.paletteAccent}1f`,
+                          background: `linear-gradient(180deg, #ffffff 0%, ${brief.paletteAccent}06 100%)`,
+                          boxShadow: `inset 0 1px 0 rgba(255,255,255,0.95)`,
+                        }}
                       >
-                        <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-1.5">
+                        <p
+                          className="text-[10px] font-mono uppercase tracking-widest mb-1.5"
+                          style={{ color: brief.paletteAccent }}
+                        >
                           Surface
                         </p>
                         <p className="font-display text-[13px] font-bold text-text-primary leading-tight break-words">
@@ -268,8 +498,9 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                   <div
                     className="rounded-xl border p-4 mb-8"
                     style={{
-                      borderColor: `${brief.paletteAccent}26`,
-                      backgroundColor: `${brief.paletteAccent}0A`,
+                      borderColor: `${brief.paletteAccent}22`,
+                      background: `linear-gradient(180deg, ${brief.paletteAccent}08 0%, ${brief.paletteAccent}03 100%)`,
+                      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.85)`,
                     }}
                   >
                     <p
@@ -287,7 +518,8 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                   <div className="mt-auto flex items-center gap-6 pt-2">
                     <Link
                       href={`/work/design-briefs/${brief.slug}`}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-accent-blue transition-colors hover:text-accent-cyan min-h-[44px]"
+                      className="inline-flex items-center gap-2 text-sm font-semibold transition-all hover:gap-3 min-h-[44px]"
+                      style={{ color: brief.paletteAccent }}
                     >
                       Read the Design Brief
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />

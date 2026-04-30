@@ -12,6 +12,7 @@ import {
   Sparkles,
   Gauge,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Accordion } from "@/components/ui/Accordion";
 import {
@@ -595,7 +596,7 @@ export default function PricingContent() {
                     ? undefined
                     : { y: -8, transition: { duration: 0.35, ease: EASE_OUT } }
                 }
-                className={`group relative rounded-2xl border p-8 overflow-hidden cursor-default ${
+                className={`group relative rounded-2xl border p-8 cursor-default ${
                   tier.popular ? "lg:-mt-4 lg:mb-4" : ""
                 }`}
                 style={{
@@ -812,15 +813,53 @@ export default function PricingContent() {
             />
             <div className="grid gap-10 lg:grid-cols-5 lg:gap-12 items-center">
               <div className="lg:col-span-3">
-                <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em]"
-                  style={{
-                    border: `1px solid ${PAGE_ACCENT}33`,
-                    backgroundColor: `${PAGE_ACCENT}0d`,
-                    color: PAGE_ACCENT,
-                  }}
-                >
-                  <Gauge className="h-3 w-3" aria-hidden="true" />
-                  Operations Stack on Your Domain
+                {/* Canopy logo plaque: framed dark backdrop showcases
+                    the cyan tree wordmark as a brand element. The image
+                    itself ships with a black background so we mount it
+                    on a black-tinted card with rounded corners and a
+                    subtle amber-edged glow. */}
+                <div className="mb-6 inline-flex items-center gap-4">
+                  <div
+                    className="relative overflow-hidden rounded-xl shrink-0"
+                    style={{
+                      width: 88,
+                      height: 88,
+                      background:
+                        "radial-gradient(ellipse at center, #050a0c 0%, #000 100%)",
+                      boxShadow: [
+                        "inset 0 1px 0 rgba(255,255,255,0.10)",
+                        `0 0 0 1px ${PAGE_ACCENT}55`,
+                        `0 8px 24px -8px ${PAGE_ACCENT}55`,
+                      ].join(", "),
+                    }}
+                  >
+                    <Image
+                      src="/canopy-logo.webp"
+                      alt="Canopy"
+                      width={800}
+                      height={600}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      sizes="88px"
+                    />
+                  </div>
+                  <div>
+                    <div
+                      className="font-display text-2xl font-bold tracking-tight leading-none"
+                      style={{ color: PAGE_DARK }}
+                    >
+                      Canopy
+                    </div>
+                    <div className="mt-1.5 inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em]"
+                      style={{
+                        border: `1px solid ${PAGE_ACCENT}33`,
+                        backgroundColor: `${PAGE_ACCENT}0d`,
+                        color: PAGE_ACCENT,
+                      }}
+                    >
+                      <Gauge className="h-3 w-3" aria-hidden="true" />
+                      Operations Stack on Your Domain
+                    </div>
+                  </div>
                 </div>
                 <h3 className="mt-5 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
                   Replace 5 to 7 SaaS subscriptions with code you own.
