@@ -10,6 +10,7 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
+- `23c8495` feat(strategy): make Pathlight diagnoses, DBJ fixes the homepage's organizing principle
 - `25a71bd` docs: update session-handoff with f68c756 commit hash
 - `f68c756` feat(contact + services): surface email/phone on contact, fix services capability stack on mobile
 - `6b1e0a3` fix(pricing): align CTAs and feature dividers across the three tier cards
@@ -18,7 +19,30 @@ header before the April 30 reset.
 
 Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys from main.
 
-### What landed in the last code sprint (April 30)
+### What landed in the last code sprint (April 30 evening, post-audit response)
+
+- **Homepage strategy refactor**: The diagnose-fix-grow model is now the homepage's organizing principle (the audit's central recommendation, accepted).
+  - `HERO_CONTENT.subheading` rewritten to state the model explicitly: *"Pathlight scans your website and shows you exactly where it's losing trust, leads, and revenue. I fix the highest-impact issues first. Fixed price. Full ownership. No retainer."* Headline ("Architect The Impossible") unchanged - master-brand identity stays separate from the product-tagline pitch underneath.
+  - New `DIAGNOSE_FIX_GROW` data export in `lib/siteContent.ts` (re-exported via `lib/constants.ts`) feeding a new `components/sections/DiagnoseFixGrow.tsx` section: 3-card grid (Diagnose / Fix / Grow) + gradient primary CTA to `/pathlight#scan-form` and secondary "See How I Fix What Pathlight Finds" link to `/services`. Inset highlight + soft cyan/blue glow boxshadow stack for the substantial-not-minimalist look. Section rendered in `app/(marketing)/page.tsx` directly between `TestimonialBand` and `PathlightCTA`.
+  - `PATHLIGHT_CTA_CONTENT` rewritten: eyebrow `"Free tool"` -> `"Step 1 / The Diagnostic"`, tagline reframed around quiet lead-loss and fix valuation, button label `"Scan My Website"` -> `"Run Free Scan"`, button href `/pathlight` -> `/pathlight#scan-form` to match the hero primary CTA and skip the marketing fold.
+  - `TechStackSection` removed from the homepage render order (still exists as a component, just not surfaced on `/`). The home flow is now Hero -> TestimonialBand -> DiagnoseFixGrow -> PathlightCTA -> ClientLogos -> ServicesSection -> Stats -> Process -> CTASection. Goal: fewer technical stacks visible on the cold-traffic path, more strategy.
+  - Homepage metadata rewritten in `app/(marketing)/page.tsx`: title now `"Find Where Your Website Loses Leads. Fix It. | DBJ Technologies"`, description now leads with the Pathlight scan + DBJ fix promise.
+- **robots.txt**: Removed `Disallow: /pathlight/` from `app/robots.ts`. Per Google's docs, combining a robots disallow with a `noindex` meta tag prevents the meta from being read (the bot can't crawl the page to see the tag). The Pathlight scan report pages at `/pathlight/[scanId]` already carry `robots: { index: false, follow: false }` in their metadata, which is the correct deindexing signal once crawling is allowed. The marketing page at `/pathlight` was never blocked by the trailing-slash disallow per spec, but removing the line eliminates ambiguity for any crawler that interpreted it loosely.
+- **Service slug rename**: 6 developer-jargon slugs renamed to buyer-friendly equivalents in `lib/siteContent.ts` (SERVICES) and `lib/service-data.ts` (SERVICE_DETAILS + relatedSlugs):
+  - frontend-architecture -> website-design
+  - backend-systems -> business-systems
+  - cloud-infrastructure -> hosting
+  - interface-engineering -> user-experience
+  - ecommerce-platforms -> ecommerce
+  - web-performance -> speed-and-search
+  Six permanent 301 redirects added to `next.config.mjs` so prior inbound links and crawl equity are preserved. The Footer renders service links from `SERVICES.slice(0, 6).map(s => /services/${s.slug})` so it picks up the new slugs automatically. Sitemap pulls from `getServiceSlugs()`, also auto-updates. No hardcoded slug strings exist outside the two data files (verified via grep).
+- **Footer contact**: Added Email + Phone list items above the existing MapPin/address row in `components/layout/Footer.tsx`. Email is `mailto:joshua@dbjtechnologies.com`. Phone displays as `682-DBJ-TECH` (lettered for `\d{3}-\d{3}-\d{4}` scrape resistance), `tel:` link uses the decoded `+16823258324`. Both pull from the existing `SITE.email` / `SITE.phoneDisplay` / `SITE.phoneTel` constants. Now visible on every page (Footer is rendered globally), matching the existing Contact page sidebar pattern.
+
+### Triggering audit context (for the next session)
+
+Joshua received a third-party "triple-checked live audit" of the site on April 30. Reviewed against actual repo state, the audit's strongest claims with verified evidence were: (a) `/pathlight/` in robots.txt looked like an unforced error (partially correct - resolved as above), (b) old developer-jargon service slugs in URLs (correct - resolved as above), (c) phone/email missing from footer (correct - resolved as above). Several other audit claims were either overstated (Pathlight marketing page indexability, hero CTA framing) or out of scope per CLAUDE.md "do not rewrite working sections" (hero headline rewrite, pricing funnel restructure, Pathlight bridge copy across services/pricing, sample report PDF). Those broader strategic items are deferred to Joshua's explicit direction.
+
+### What landed in the prior code sprint (April 30 afternoon)
 
 - **Contact page**: Email + Phone cards added to the silver sidebar above Location and Response Time. Email is `mailto:joshua@dbjtechnologies.com`. Phone displayed as `682-DBJ-TECH` (lettered for `\d{3}-\d{3}-\d{4}` scrape resistance), `tel:` link uses decoded `+16823258324`. Constants live at `SITE.phoneDisplay` / `SITE.phoneTel` in `lib/constants.ts`. This re-introduces a publicly displayed email after the silver scale-back removed it earlier in the day; Joshua's reasoning was that legitimacy and accessibility for warm leads outweigh the spam-curb logic on a low-volume marketing site.
 - **Services page**: CapabilityStack mobile fix. Row alignment `items-center` -> `items-start lg:items-center`, tagline `truncate` -> `line-clamp-2 lg:truncate`, trailing `01`-`06` number badge hidden below `sm:`, outer card `p-6 lg:p-8` -> `p-4 sm:p-6 lg:p-8`, per-row padding tightened on mobile. Process / Pricing render fine at the same h1 clamp because their right-column shapes differ; the issue was specific to the CapabilityStack with 6 long service titles wrapping under `items-center`.
@@ -33,7 +57,12 @@ Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys fro
 
 ### Next recommended task
 
-After Vercel propagation, incognito-load `/contact` and `/services` on Joshua's phone. On `/contact`, confirm Email + Phone cards render above Location and that tapping each fires the `mailto:` and `tel:` handlers. On `/services`, confirm the right-column "The Stack" capability card now reads cleanly with titles wrapping to 2 lines. After visual confirmation, decide on the Dallas-vs-Royse-City NAP question above.
+After Vercel propagation, verify the slug rename and footer contact in production:
+1. Hit `https://dbjtechnologies.com/services/frontend-architecture` (or any of the 5 other old slugs) and confirm a clean 301 to the new slug.
+2. Confirm `/services/website-design`, `/services/business-systems`, `/services/hosting`, `/services/user-experience`, `/services/ecommerce`, `/services/speed-and-search` all render the existing detail-page content.
+3. On any page (homepage, pricing, contact), scroll to the footer "Get In Touch" column. Confirm Email + Phone rows render above the location row and that tapping each fires the `mailto:` / `tel:` handlers on a phone.
+4. In Google Search Console (after Vercel deploy), submit the updated sitemap at `https://dbjtechnologies.com/sitemap.xml`. The sitemap now lists the new slugs only; old slugs are 301-redirected.
+5. Resolve the Dallas-vs-Royse-City NAP question (see "Open questions" below) before any local-SEO work.
 
 ### Durable lessons from this sprint (worth keeping)
 

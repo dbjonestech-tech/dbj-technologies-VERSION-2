@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, MapPin, Linkedin, Github } from "lucide-react";
+import { ArrowUpRight, MapPin, Mail, Phone, Linkedin, Github } from "lucide-react";
 import { SITE, FOOTER_NAV_LINKS, SUPPORT_LINKS, SERVICES, SOCIAL_LINKS } from "@/lib/constants";
 
 export function Footer() {
@@ -125,6 +125,24 @@ export function Footer() {
               Get In Touch
             </h3>
             <ul className="mt-4 space-y-4">
+              <li className="flex items-start gap-3 text-sm">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent-blue" aria-hidden="true" />
+                <a
+                  href={`mailto:${SITE.email}`}
+                  className="text-gray-600 transition-colors hover:text-gray-900"
+                >
+                  {SITE.email}
+                </a>
+              </li>
+              <li className="flex items-start gap-3 text-sm">
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent-blue" aria-hidden="true" />
+                <a
+                  href={`tel:${SITE.phoneTel}`}
+                  className="text-gray-600 transition-colors hover:text-gray-900"
+                >
+                  {SITE.phoneDisplay}
+                </a>
+              </li>
               <li className="flex items-start gap-3 text-sm text-gray-600">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-blue" aria-hidden="true" />
                 <span>{SITE.address}</span>

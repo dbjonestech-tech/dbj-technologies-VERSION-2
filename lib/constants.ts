@@ -40,6 +40,7 @@ export {
   BUDGET_OPTIONS,
   PROJECT_TYPE_OPTIONS,
   PATHLIGHT_CTA_CONTENT,
+  DIAGNOSE_FIX_GROW,
 } from "./siteContent";
 
 /* ─── SITE META ─────────────────────────────────────── */

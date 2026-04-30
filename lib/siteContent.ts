@@ -119,7 +119,7 @@ export const HERO_CONTENT: HeroContent = {
   headlineWords: ["Architect", "The"] /* no-cache */,
   headlineAccent: "Impossible.",
   subheading:
-    "Websites and digital systems that generate trust, capture leads, and grow revenue. Built by a solo principal architect in Dallas, TX.",
+    "Pathlight scans your website and shows you exactly where it's losing trust, leads, and revenue. I fix the highest-impact issues first. Fixed price. Full ownership. No retainer.",
   primaryCta: { label: "Run Free Scan", href: "/pathlight#scan-form" },
   secondaryCta: { label: "Book a Strategy Call", href: "/contact" },
   techTicker: ["React", "Next.js", "TypeScript", "Node.js", "Vercel"],
@@ -139,7 +139,7 @@ export const STATS: StatItem[] = [
 export const SERVICES: ServiceItem[] = [
   {
     icon: Globe,
-    slug: "frontend-architecture",
+    slug: "website-design",
     title: "Website Design & Development",
     tagline: "Custom websites built for speed, trust, and conversion. Not templates.",
     description:
@@ -155,7 +155,7 @@ export const SERVICES: ServiceItem[] = [
   },
   {
     icon: Server,
-    slug: "backend-systems",
+    slug: "business-systems",
     title: "Business Systems & Integrations",
     tagline: "Connect your tools, automate workflows, and let the system handle the busywork.",
     description:
@@ -171,7 +171,7 @@ export const SERVICES: ServiceItem[] = [
   },
   {
     icon: Cloud,
-    slug: "cloud-infrastructure",
+    slug: "hosting",
     title: "Hosting & Reliability",
     tagline: "Your site stays online, loads fast everywhere, and handles traffic spikes without breaking.",
     description:
@@ -187,7 +187,7 @@ export const SERVICES: ServiceItem[] = [
   },
   {
     icon: Palette,
-    slug: "interface-engineering",
+    slug: "user-experience",
     title: "User Experience & Conversion",
     tagline: "Every page guides visitors toward calls, forms, quotes, or purchases.",
     description:
@@ -203,7 +203,7 @@ export const SERVICES: ServiceItem[] = [
   },
   {
     icon: ShoppingCart,
-    slug: "ecommerce-platforms",
+    slug: "ecommerce",
     title: "E-Commerce & Custom Applications",
     tagline: "Online stores, booking systems, client portals, and business tools that work.",
     description:
@@ -219,7 +219,7 @@ export const SERVICES: ServiceItem[] = [
   },
   {
     icon: Gauge,
-    slug: "web-performance",
+    slug: "speed-and-search",
     title: "Speed & Search Performance",
     tagline: "Fast sites rank higher, convert better, and cost less to run.",
     description:
@@ -267,12 +267,42 @@ export const PROCESS_STEPS: ProcessStep[] = [
 /* ─── PATHLIGHT CTA (HOMEPAGE SECTION) ─────────────── */
 
 export const PATHLIGHT_CTA_CONTENT = {
-  eyebrow: "Free tool",
+  eyebrow: "Step 1 / The Diagnostic",
   heading: "Pathlight",
   tagline:
-    "Not sure your website is working for you? Pathlight scans your site and shows you where you may be losing trust, leads, and revenue. Free. Results in minutes.",
-  buttonLabel: "Scan My Website",
-  buttonHref: "/pathlight",
+    "Most websites quietly lose leads every week. Pathlight scans yours and shows you exactly where, and what each fix is worth. Free. Results in minutes.",
+  buttonLabel: "Run Free Scan",
+  buttonHref: "/pathlight#scan-form",
+};
+
+/* ─── DIAGNOSE / FIX / GROW (HOMEPAGE MODEL) ───────── */
+
+export const DIAGNOSE_FIX_GROW = {
+  eyebrow: "How It Works",
+  headlineLead: "Pathlight finds it. I fix it.",
+  headlineAccent: "Your business grows.",
+  steps: [
+    {
+      number: "01",
+      label: "Diagnose",
+      title: "Pathlight scans your site",
+      body: "A 0-100 score, a revenue-impact estimate, the top three fixes ranked by impact, and full desktop and mobile screenshots. Free. Results in minutes.",
+    },
+    {
+      number: "02",
+      label: "Fix",
+      title: "I ship the fixes",
+      body: "Highest-impact issues first. Fixed price, no retainer trap, no junior developers. One principal architect, end to end. Full source code on delivery.",
+    },
+    {
+      number: "03",
+      label: "Grow",
+      title: "Your business compounds",
+      body: "Better trust signals. Faster pages. Sharper positioning. The outcome is more calls, more form submissions, more revenue. Verified against the same Pathlight pillars used to find the problem.",
+    },
+  ],
+  primaryCta: { label: "Run Free Scan", href: "/pathlight#scan-form" },
+  secondaryCta: { label: "See How I Fix What Pathlight Finds", href: "/services" },
 };
 
 /* ─── TECH STACK ───────────────────────────────────── */

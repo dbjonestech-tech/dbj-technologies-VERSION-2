@@ -129,7 +129,7 @@ export function PathlightContent() {
         </p>
       </section>
 
-      {/* SECTION 6 - Secondary CTA */}
+      {/* SECTION 6 - Loop close: Pathlight finds it. DBJ fixes it. */}
       <section className="mx-auto w-full max-w-3xl pt-24 sm:pt-32">
         <div
           className="rounded-2xl border p-8 text-center sm:p-12"
@@ -139,8 +139,16 @@ export function PathlightContent() {
           }}
         >
           <h2 className="font-display text-2xl font-bold leading-snug tracking-tight text-white sm:text-3xl">
-            Ready to see what your website is really costing you?
+            Pathlight finds it. DBJ Technologies fixes it.
           </h2>
+          <p
+            className="mx-auto mt-5 max-w-xl text-sm leading-relaxed sm:text-base"
+            style={{ color: "#9ca3af" }}
+          >
+            When your scan is done, you'll know exactly where your website is
+            losing leads. The studio behind Pathlight is the same team that
+            ships the fixes. Fixed price. Full ownership. No retainer.
+          </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <a
               href="#scan-form"
@@ -151,7 +159,7 @@ export function PathlightContent() {
                 boxShadow: "0 6px 20px rgba(59,130,246,0.25)",
               }}
             >
-              Scan My Website Free
+              Run Free Scan
             </a>
             <Link
               href="/contact"

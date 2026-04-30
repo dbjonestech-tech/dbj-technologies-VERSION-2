@@ -82,6 +82,41 @@ const nextConfig = {
         destination: "/work/canopy",
         permanent: true,
       },
+      /* Service slug rename (2026-04-30): old developer-jargon slugs
+       * (frontend-architecture, backend-systems, cloud-infrastructure,
+       * interface-engineering, ecommerce-platforms, web-performance)
+       * renamed to buyer-friendly equivalents. 301s preserve any
+       * inbound link equity from prior crawl. */
+      {
+        source: "/services/frontend-architecture",
+        destination: "/services/website-design",
+        permanent: true,
+      },
+      {
+        source: "/services/backend-systems",
+        destination: "/services/business-systems",
+        permanent: true,
+      },
+      {
+        source: "/services/cloud-infrastructure",
+        destination: "/services/hosting",
+        permanent: true,
+      },
+      {
+        source: "/services/interface-engineering",
+        destination: "/services/user-experience",
+        permanent: true,
+      },
+      {
+        source: "/services/ecommerce-platforms",
+        destination: "/services/ecommerce",
+        permanent: true,
+      },
+      {
+        source: "/services/web-performance",
+        destination: "/services/speed-and-search",
+        permanent: true,
+      },
     ];
   },
 };
