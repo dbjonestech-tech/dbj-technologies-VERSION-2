@@ -10,7 +10,8 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with 247bda1 commit hash
+- (this commit) feat(positioning): remove AI self-claims sitewide; reposition Pathlight as a "diagnostic" instead of "AI-powered analysis"
+- `bdd76bf` docs: update session-handoff with 247bda1 commit hash
 - `247bda1` feat(pricing): add Fix Sprint as the post-Pathlight-scan engagement tier
 - `63b7d29` docs: capture post-deploy verification + Google NAP escalation in session-handoff
 - `f1bfa23` docs: update session-handoff with afa4958 commit hash
@@ -23,7 +24,30 @@ header before the April 30 reset.
 
 Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys from main.
 
-### What landed in the latest code sprint (April 30 late evening, Fix Sprint tier)
+### What landed in the latest code sprint (April 30 late late evening, AI language removal)
+
+- **AI self-claims removed sitewide.** Strategic call by Joshua: cultural read of "AI" has flipped negative for the SMB ICP (auto repair, dental, contractors, law firms). The buzzword now reads as "low-effort generative slop" rather than "premium tech." Pathlight repositioned as a **"diagnostic"** rather than "AI-powered analysis" so it reads as principal-architect rigor instead of a ChatGPT wrapper.
+- **Categorized sweep across 6 files, 14 inserts / 14 deletes.**
+  - **Removed (customer-facing self-claims):**
+    - `app/(grade)/layout.tsx` — Pathlight section meta description
+    - `app/(grade)/pathlight/page.tsx` — page title, canonical description, OG title + description, Twitter title + description (6 metadata strings; "Free AI Website Analysis" → "Free Website Diagnostic", "AI powered website intelligence" → "website diagnostic", etc.)
+    - `app/(grade)/pathlight/[scanId]/page.tsx` — per-scan-result meta description
+    - `app/(grade)/pathlight/[scanId]/ScanStatus.tsx:427` — "with AI vision" replaced with "at the pixel level" (stronger concrete claim than the original)
+    - `lib/work-data.ts:62, 81` — Pathlight case study description and heroDescription ("AI platform" → "diagnostic platform"; "AI powered analysis, when properly engineered" → "proper engineering, not template scoring")
+  - **Softened (methodology disclosures):**
+    - `app/(grade)/pathlight/[scanId]/ScanStatus.tsx:1365` — methodology disclaimer "AI analysis" → "systematic analysis"
+    - `lib/siteContent.ts:383` (`ABOUT_STORY.howIBuild`) — "AI is part of my workflow, not a shortcut" line rewritten to "I use the best modern tools to go deeper, move faster, and catch what I'd otherwise miss" (preserves the spirit, drops the trigger word)
+- **Replacement vocabulary used (priority order):** "diagnostic" > "analysis" > "automated" / "systematic" / "computational." Avoided "intelligent" (almost as overused as AI).
+- **Strategic positioning preserved (kept by design, not oversights):**
+  - `app/(grade)/pathlight/[scanId]/ScanStatus.tsx:411` — "When you ask ChatGPT, Gemini, or any chatbot..." (just the word "AI" removed before "chatbot"). This line USES the negative AI association in your favor, positioning Pathlight as the not-generic alternative. Keeping it is strategically correct.
+  - `lib/work-data.ts:241, 257, 260, 295, 296, 300, 317` — Soil Depot case study "AI search" references (7 mentions). These are AI search engines as a discovery CHANNEL (ChatGPT, Perplexity), documenting a real lead that came in through them. Market-trend reference, not a self-claim. Keep.
+  - `lib/prompts/pathlight-chat.ts:85` — internal LLM system prompt, never user-facing.
+  - `lib/prompts/audio-summary.ts:63` — explicit internal instruction NOT to mention AI (already aligned with the new direction).
+  - `app/admin/database/page.tsx:31` — admin-only page, internal.
+- **SDK code untouched.** `lib/services/claude-analysis.ts`, `lib/services/voice.ts`, `app/(grade)/api/chat/route.ts`, `lib/services/health-status.ts` all import `@anthropic-ai/sdk` or use Anthropic SDK types. Functional code, not user-facing copy. Anthropic stays under the hood; the cards on top no longer mention it.
+- **Verification:** `npx tsc --noEmit` clean, `npm run lint` clean, em-dash sweep clean (only pre-existing comment headers), forbidden-email grep clean, post-edit re-grep confirms zero customer-facing AI self-claims remain.
+
+### What landed in the prior code sprint (April 30 late evening, Fix Sprint tier)
 
 - **Fix Sprint pricing tier added at $2,995, 2-week timeline.** Closes the audit's "no Pathlight-to-engagement bridge" gap. Pathlight stays free; Fix Sprint is the paid post-scan engagement that takes the top 3 issues from a Pathlight report and ships the fixes in two weeks, fixed price.
   - **Price reasoning:** $175/hr Joshua-rate × ~14h scope = ~$2,450 hourly equivalent. $2,995 charm-prices just under the $3K SMB self-approve threshold, gives healthy fixed-price margin, premium-position-coherent for a principal-architect studio, and clearly differentiated from $4,500 Starter (which is a full new-build, not a fix engagement).
@@ -34,7 +58,7 @@ Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys fro
   - **Build configurator (`/pricing/build`):** Intentionally NOT updated. Fix Sprint is a fix engagement, not a build, and BuildContent.tsx hardcodes only starter/professional/enterprise.
   - **Coherence audit done before commit:** Fixed two cross-file inconsistencies. Price aligned at $2,995 in both PRICING_DETAILS and FIX_SPRINT.price (initially split $2,500/$2,995). Post-launch support aligned at "30 days" everywhere (initially split "14 days" in FIX_SPRINT.features and "30 days" in detail page; harmonized to 30 to match Joshua's "I don't disappear" brand voice and every other tier's support window).
 
-### What landed in the prior code sprint (April 30 evening, post-audit response)
+### What landed in the earlier code sprint (April 30 evening, post-audit response)
 
 - **Homepage strategy refactor**: The diagnose-fix-grow model is now the homepage's organizing principle (the audit's central recommendation, accepted).
   - `HERO_CONTENT.subheading` rewritten to state the model explicitly: *"Pathlight scans your website and shows you exactly where it's losing trust, leads, and revenue. I fix the highest-impact issues first. Fixed price. Full ownership. No retainer."* Headline ("Architect The Impossible") unchanged - master-brand identity stays separate from the product-tagline pitch underneath.

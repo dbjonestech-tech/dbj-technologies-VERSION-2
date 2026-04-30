@@ -408,7 +408,7 @@ function LoadingState({ status, url }: { status: string; url: string }) {
             className="mx-auto mt-4 max-w-lg text-center text-sm leading-relaxed"
             style={{ color: "rgba(255,255,255,0.4)" }}
           >
-            When you ask ChatGPT, Gemini, or any AI chatbot to &ldquo;audit my
+            When you ask ChatGPT, Gemini, or any chatbot to &ldquo;audit my
             website,&rdquo; it never actually sees your site. It reads metadata
             and source code, if it can access them at all, and writes a generic
             essay based on assumptions. It cannot open a browser. It cannot
@@ -424,7 +424,7 @@ function LoadingState({ status, url }: { status: string; url: string }) {
             Pathlight doesn&apos;t guess. It opens a real browser, captures real
             screenshots at desktop and mobile sizes, runs a full Google
             PageSpeed audit against Core Web Vitals, analyzes your actual visual
-            design and brand positioning with AI vision, researches real
+            design and brand positioning at the pixel level, researches real
             industry benchmarks for your specific business type, and computes
             revenue impact from verified data. Every number and recommendation
             in your report is based on what your visitors actually see, not
@@ -1362,7 +1362,7 @@ function RevenueImpactBlock({
         </dl>
 
         <p className="mt-5 text-xs" style={{ color: "#6b7280" }}>
-          Pathlight uses AI analysis and conservative revenue modeling.
+          Pathlight uses systematic analysis and conservative revenue modeling.
           Estimates are directional only and not a substitute for professional
           consultation.
         </p>

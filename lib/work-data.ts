@@ -59,7 +59,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "pathlight",
     name: "Pathlight",
     description:
-      "Find the problems. Find the money drain. Find the fix. AI powered analysis with industry specific revenue modeling, not generic scores.",
+      "Find the problems. Find the money drain. Find the fix. Diagnostic analysis with industry specific revenue modeling, not generic scores.",
     category: "Internal Product",
     gradient: "from-violet-600 to-pink-500",
     liveUrl: "https://dbjtechnologies.com/pathlight",
@@ -78,7 +78,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "The only free tool that translates website problems into dollar signs, calibrated to your specific business type, with consistent results scan after scan.",
     image: "/images/pathlight-landing.webp",
     heroDescription:
-      "A full stack AI platform built from the ground up to scan any business website and produce a complete intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list. All in minutes, for free. Proof that AI powered analysis, when properly engineered, delivers genuine business insight instead of generic summaries.",
+      "A full stack diagnostic platform built from the ground up to scan any business website and produce a complete intelligence report: performance audit, design analysis, revenue impact estimate, and prioritized fix list. All in minutes, for free. Proof that proper engineering, not template scoring, delivers genuine business insight instead of generic summaries.",
     sections: [
       {
         heading: "The Problem",

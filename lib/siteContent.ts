@@ -380,7 +380,7 @@ export const ABOUT_STORY = {
   },
   howIBuild: {
     heading: "How I Build",
-    body: "I don’t ship until it’s right. That means painstaking hours, iteration after iteration, hammering at every detail until nothing slips through. I’ll rebuild a section five times if the first four aren’t good enough. Most developers ship \"good enough\" and move on. I stay until it’s done. AI is part of my workflow, not a shortcut. I use it to go deeper, move faster, and catch what I’d otherwise miss, but every decision, every line, every pixel still runs through a human standard: mine.",
+    body: "I don’t ship until it’s right. That means painstaking hours, iteration after iteration, hammering at every detail until nothing slips through. I’ll rebuild a section five times if the first four aren’t good enough. Most developers ship \"good enough\" and move on. I stay until it’s done. I use the best modern tools to go deeper, move faster, and catch what I’d otherwise miss, but every decision, every line, every pixel runs through a human standard: mine.",
   },
   whoThisIsFor: {
     heading: "Who This Is For",
