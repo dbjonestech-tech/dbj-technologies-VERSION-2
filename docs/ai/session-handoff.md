@@ -78,7 +78,10 @@ After Vercel rebuild settles (1-3 min), incognito-load `/process` and confirm: (
 
 ### Final state (post-commit)
 
-- Will populate after this commit lands.
+- Feature commit: `dd00dab` -- feat(process): timeline-as-hero with indigo page identity. 2 files changed, 793 insertions, 130 deletions (process page rewrite + this snapshot).
+- Pushed to `origin main` (`d973f3c..dd00dab main -> main`).
+- Working tree clean apart from this snapshot amendment.
+- Process page now reads as visually distinct from Services/Pricing/Contact while staying within the unified DBJ brand system. First page in the per-page identity rollout.
 
 ---
 
