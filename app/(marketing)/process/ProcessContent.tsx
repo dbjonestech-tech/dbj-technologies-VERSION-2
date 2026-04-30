@@ -15,17 +15,20 @@ import {
 } from "lucide-react";
 
 /* ─── PAGE IDENTITY ───────────────────────────────────
-   Process is the silvery charcoal page. Slate-500 carries
-   structural elements (chapter rulers, dots, tags, phase
-   nodes, borders). Slate-400 carries luminous halos and
-   pulsing glow halos. Slate-600 carries deeper accents.
-   Accent-blue remains the site-wide primary CTA color so
-   brand cohesion holds. The visual feeling is brushed
-   titanium with soft pulsing light, like the case of a
-   premium piece of hardware. */
-const PAGE_ACCENT = "#64748b"; // slate-500
-const PAGE_LIGHT = "#94a3b8"; // slate-400
-const PAGE_DARK = "#475569"; // slate-600
+   Process is the ocean-cyan page. Cyan-600 (which is also
+   the brand's --accent-cyan) carries structural elements
+   (chapter rulers, dots, tags, phase nodes, borders).
+   Cyan-300/400 carry luminous halos and pulsing glow.
+   Cyan-800 carries deeper depth in gradients and shadows.
+   Brand blue (#3b82f6) is still distinct enough from
+   cyan-600 to remain the site-wide primary CTA color so
+   navigation language stays anchored. The visual feeling
+   is brushed-steel-cyan catching pulsing aqua light, like
+   the panel of a premium piece of marine hardware. */
+const PAGE_ACCENT = "#0891b2"; // cyan-600 (brand --accent-cyan)
+const PAGE_LIGHT = "#22d3ee"; // cyan-400
+const PAGE_DARK = "#155e75"; // cyan-800
+const PAGE_HIGHLIGHT = "#67e8f9"; // cyan-300, peak glow color
 const BRAND_BLUE = "#3b82f6";
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 const VIEWPORT = { once: true, margin: "-80px" } as const;
@@ -602,13 +605,30 @@ export default function ProcessContent() {
                 />
               )}
               <div
-                className="relative rounded-2xl lg:rounded-3xl border-2 p-8 lg:p-10 transform-gpu"
+                className="relative rounded-2xl lg:rounded-3xl border p-8 lg:p-10 transform-gpu overflow-hidden"
                 style={{
                   borderColor: `${PAGE_ACCENT}40`,
-                  background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}10 100%)`,
-                  boxShadow: `0 40px 100px -30px ${PAGE_ACCENT}55, 0 20px 40px -15px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)`,
+                  background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}0d 60%, ${PAGE_ACCENT}0a 100%)`,
+                  boxShadow: [
+                    "inset 0 1px 0 rgba(255,255,255,0.95)",
+                    "inset 0 0 0 1px rgba(255,255,255,0.4)",
+                    "0 1px 2px rgba(0,0,0,0.04)",
+                    `0 18px 48px -16px ${PAGE_ACCENT}40`,
+                    `0 48px 100px -32px ${PAGE_ACCENT}30`,
+                    `0 80px 140px -40px ${PAGE_DARK}25`,
+                  ].join(", "),
                 }}
               >
+                {/* Top edge highlight: catches light like a polished
+                    panel. A horizontal gradient hairline that fades
+                    into the corners. */}
+                <div
+                  className="absolute top-0 left-6 right-6 h-px pointer-events-none"
+                  style={{
+                    background: `linear-gradient(90deg, transparent 0%, ${PAGE_LIGHT}aa 35%, ${PAGE_HIGHLIGHT}cc 50%, ${PAGE_LIGHT}aa 65%, transparent 100%)`,
+                  }}
+                  aria-hidden="true"
+                />
                 <div className="flex items-center gap-2.5 mb-7">
                   <PulsingDot reduce={reduce} />
                   <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
@@ -807,20 +827,41 @@ export default function ProcessContent() {
                       },
                     },
                   }}
-                  className="relative rounded-2xl border bg-bg-primary p-7 lg:p-8 transition-all motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-lg"
-                  style={{ borderColor: `${PAGE_ACCENT}22` }}
+                  className="relative rounded-2xl border p-7 lg:p-8 transition-all motion-safe:hover:-translate-y-1 overflow-hidden"
+                  style={{
+                    borderColor: `${PAGE_ACCENT}30`,
+                    background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}07 100%)`,
+                    boxShadow: [
+                      "inset 0 1px 0 rgba(255,255,255,0.95)",
+                      "0 1px 2px rgba(0,0,0,0.04)",
+                      `0 12px 32px -12px ${PAGE_ACCENT}25`,
+                      `0 32px 64px -32px ${PAGE_ACCENT}15`,
+                    ].join(", "),
+                  }}
                 >
+                  {/* Top edge highlight */}
+                  <div
+                    className="absolute top-0 left-5 right-5 h-px pointer-events-none"
+                    style={{
+                      background: `linear-gradient(90deg, transparent 0%, ${PAGE_LIGHT}88 50%, transparent 100%)`,
+                    }}
+                    aria-hidden="true"
+                  />
                   <div
                     className="absolute left-0 top-7 lg:top-8 bottom-7 lg:bottom-8 w-[2px] rounded-full"
-                    style={{ backgroundColor: `${PAGE_ACCENT}55` }}
+                    style={{
+                      background: `linear-gradient(180deg, ${PAGE_LIGHT} 0%, ${PAGE_ACCENT} 50%, ${PAGE_DARK} 100%)`,
+                      boxShadow: `0 0 8px ${PAGE_LIGHT}66`,
+                    }}
                     aria-hidden="true"
                   />
                   <div className="pl-2">
                     <div
                       className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl"
                       style={{
-                        backgroundColor: `${PAGE_ACCENT}14`,
+                        background: `linear-gradient(145deg, ${PAGE_LIGHT}1f 0%, ${PAGE_ACCENT}10 100%)`,
                         color: PAGE_ACCENT,
+                        boxShadow: `inset 0 1px 0 ${PAGE_LIGHT}55, 0 0 0 1px ${PAGE_ACCENT}22`,
                       }}
                     >
                       <Icon className="h-5 w-5" aria-hidden="true" />

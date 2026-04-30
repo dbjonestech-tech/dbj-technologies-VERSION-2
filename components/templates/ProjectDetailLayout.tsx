@@ -433,9 +433,25 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                     transition: { duration: reduced ? 0 : 0.6, ease: EASE_OUT },
                   },
                 }}
-                className="rounded-xl border bg-bg-primary p-6 lg:p-7 transition-all motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-lg"
-                style={{ borderColor: `${accent}22` }}
+                className="relative rounded-xl border p-6 lg:p-7 transition-all motion-safe:hover:-translate-y-1 overflow-hidden"
+                style={{
+                  borderColor: `${accent}30`,
+                  background: `linear-gradient(180deg, #ffffff 0%, ${accent}07 100%)`,
+                  boxShadow: [
+                    "inset 0 1px 0 rgba(255,255,255,0.95)",
+                    "0 1px 2px rgba(0,0,0,0.04)",
+                    `0 12px 32px -12px ${accent}28`,
+                    `0 32px 64px -32px ${accent}18`,
+                  ].join(", "),
+                }}
               >
+                <div
+                  className="absolute top-0 left-5 right-5 h-px pointer-events-none"
+                  style={{
+                    background: `linear-gradient(90deg, transparent 0%, ${accent}99 50%, transparent 100%)`,
+                  }}
+                  aria-hidden="true"
+                />
                 <h3
                   className="font-display text-lg font-bold mb-2.5"
                   style={{ color: accent }}

@@ -893,14 +893,48 @@ export default function AboutContent() {
                       },
                     },
                   }}
-                  className="relative rounded-2xl border border-white/[0.08] bg-white/[0.015] p-7 lg:p-8 transition-all duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:border-accent-blue/30 motion-safe:hover:shadow-[0_24px_60px_-30px_rgba(59,130,246,0.4)]"
+                  className="relative rounded-2xl border p-7 lg:p-8 transition-all duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:border-accent-blue/40 overflow-hidden"
+                  style={{
+                    borderColor: "rgba(59,130,246,0.18)",
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(59,130,246,0.04) 100%)",
+                    boxShadow: [
+                      "inset 0 1px 0 rgba(255,255,255,0.08)",
+                      "inset 0 0 0 1px rgba(255,255,255,0.03)",
+                      "0 1px 2px rgba(0,0,0,0.3)",
+                      "0 18px 48px -18px rgba(59,130,246,0.35)",
+                      "0 48px 100px -36px rgba(59,130,246,0.18)",
+                    ].join(", "),
+                  }}
                 >
+                  {/* Top edge highlight on dark surface */}
                   <div
-                    className="absolute left-0 top-7 lg:top-8 bottom-7 lg:bottom-8 w-[2px] rounded-full bg-accent-blue/40"
+                    className="absolute top-0 left-5 right-5 h-px pointer-events-none"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, transparent 0%, rgba(96,165,250,0.7) 50%, transparent 100%)",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <div
+                    className="absolute left-0 top-7 lg:top-8 bottom-7 lg:bottom-8 w-[2px] rounded-full"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(147,197,253,0.9) 0%, rgba(59,130,246,0.7) 50%, rgba(30,64,175,0.6) 100%)",
+                      boxShadow: "0 0 8px rgba(59,130,246,0.55)",
+                    }}
                     aria-hidden="true"
                   />
                   <div className="pl-2">
-                    <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue ring-1 ring-accent-blue/20">
+                    <div
+                      className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl text-accent-blue"
+                      style={{
+                        background:
+                          "linear-gradient(145deg, rgba(147,197,253,0.18) 0%, rgba(59,130,246,0.10) 100%)",
+                        boxShadow:
+                          "inset 0 1px 0 rgba(147,197,253,0.40), 0 0 0 1px rgba(59,130,246,0.25)",
+                      }}
+                    >
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </div>
                     <h3 className="font-display text-lg lg:text-xl font-bold text-white mb-3">

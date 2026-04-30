@@ -123,8 +123,25 @@ export function DesignBriefClosing({ accent, related }: DesignBriefClosingProps)
                 <motion.div key={m.slug} variants={card}>
                   <Link
                     href={`/work/design-briefs/${m.slug}`}
-                    className="group block rounded-xl overflow-hidden border border-text-primary/10 hover:border-text-primary/25 transition-all bg-bg-primary motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-xl"
+                    className="group relative block rounded-xl overflow-hidden border bg-bg-primary transition-all motion-safe:hover:-translate-y-1"
+                    style={{
+                      borderColor: `${m.paletteAccent}26`,
+                      boxShadow: [
+                        "inset 0 1px 0 rgba(255,255,255,0.85)",
+                        "0 1px 2px rgba(0,0,0,0.04)",
+                        `0 10px 28px -12px ${m.paletteAccent}25`,
+                        `0 28px 56px -28px ${m.paletteAccent}15`,
+                      ].join(", "),
+                    }}
                   >
+                    {/* Top edge highlight, tinted with the brief's accent */}
+                    <div
+                      className="absolute top-0 left-4 right-4 h-px pointer-events-none z-10"
+                      style={{
+                        background: `linear-gradient(90deg, transparent 0%, ${m.paletteAccent}88 50%, transparent 100%)`,
+                      }}
+                      aria-hidden="true"
+                    />
                     <div className="relative aspect-[4/3] overflow-hidden bg-bg-secondary">
                       <Image
                         src={m.preview}
@@ -134,11 +151,16 @@ export function DesignBriefClosing({ accent, related }: DesignBriefClosingProps)
                         sizes="(max-width: 640px) 100vw, 240px"
                       />
                     </div>
-                    <div className="p-4">
+                    <div className="p-4 relative">
                       <div
-                        className="font-mono text-[10px] uppercase tracking-[0.18em] mb-1.5"
+                        className="font-mono text-[10px] uppercase tracking-[0.18em] mb-1.5 flex items-center gap-1.5"
                         style={{ color: m.paletteAccent }}
                       >
+                        <span
+                          className="inline-block h-1.5 w-1.5 rounded-full"
+                          style={{ backgroundColor: m.paletteAccent }}
+                          aria-hidden="true"
+                        />
                         Design Brief
                       </div>
                       <div className="font-display text-base font-bold leading-tight">

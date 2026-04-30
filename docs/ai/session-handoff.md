@@ -6,7 +6,71 @@ Live snapshot of what the next session needs. Older sessions live under
 verbatim record of every session entry that was below this header before
 archive.
 
-## Most Recent Session: April 29, 2026 (late) -- Process page v2: silvery charcoal palette + glow/pulse motion (replaces indigo)
+## Most Recent Session: April 29, 2026 (late) -- Process v3: cyan palette + premium card recipe applied site-wide
+
+### What shipped
+
+Joshua said "make it more bluish, cyan, etc." and asked me to apply masterful card refinement (more texture, border, depth, shadow) site-wide. Swapped the slate palette for cyan and built a premium card recipe that's now applied to: Process hero ladder card, Process expectation cards, About OPS_CAPABILITIES cards (dark-bg variant), brief related-briefs cards, and case study tech-detail cards. Services / Pricing / Contact hero rebuilds are queued for the next pass since each needs a distinct hero composition rather than just a recolor and that deserves dedicated focus.
+
+### Files changed (4)
+
+- **`app/(marketing)/process/ProcessContent.tsx`**: palette swap from slate to cyan-600 (which is also the brand's `--accent-cyan`), with cyan-300/400/800 carrying the gradient depth. Hero ladder card and expectation cards both got the premium recipe.
+- **`components/design-briefs/DesignBriefClosing.tsx`**: related-briefs cards got the premium recipe with the per-brief accent driving the highlight gradient + tinted shadow.
+- **`components/templates/ProjectDetailLayout.tsx`**: tech-detail cards on case study pages got the premium recipe with the project's derived accent.
+- **`app/(marketing)/about/AboutContent.tsx`**: OPS_CAPABILITIES cards got the dark-surface variant of the premium recipe with brand-blue tinting.
+
+### New Process palette
+
+- `PAGE_ACCENT = "#0891b2"` (cyan-600 / brand `--accent-cyan`): structural elements
+- `PAGE_LIGHT = "#22d3ee"` (cyan-400): luminous halos and breathing pulses
+- `PAGE_DARK = "#155e75"` (cyan-800): depth in gradients and shadow tints
+- `PAGE_HIGHLIGHT = "#67e8f9"` (cyan-300): peak glow color, used on the hero card top-edge highlight
+- `BRAND_BLUE = "#3b82f6"` preserved for primary CTA buttons
+
+The page now reads as brushed-cyan-steel catching pulsing aqua light, the panel of a premium piece of marine hardware. Cyan-600 is far enough from blue-500 that the brand CTA still reads as the navigation anchor, while every other accent on the page belongs to the cyan family.
+
+### Premium card recipe (the artist's recipe)
+
+A reusable card-styling pattern applied to every card surface that received an upgrade. Combines five things on every card:
+
+1. **Inner top highlight** (light catching the surface): `inset 0 1px 0 rgba(255,255,255,0.95)` plus an absolutely positioned `h-px` strip at the top of the card with a horizontal gradient `transparent -> ${ACCENT}88 -> transparent` creating a luminous edge that fades into the card's corners.
+2. **Tinted gradient background**: `linear-gradient(180deg, #ffffff 0%, ${ACCENT}07 to ${ACCENT}10 100%)` so the card carries a faint hue shift from top to bottom rather than being flat white.
+3. **Tinted multi-layer shadow**: four to six stacked shadows including a sharp 0 1px 2px (defines the bottom edge), a mid 0 12px 32px -12px tinted with the accent color (creates depth), and a deep 0 32px 64px -32px tinted (creates atmosphere). On the Process hero ladder card the shadow stack reaches six layers including a slate-tinted distance shadow.
+4. **Inner left bar with gradient + glow**: `${PAGE_LIGHT} -> ${PAGE_ACCENT} -> ${PAGE_DARK}` vertical gradient plus `boxShadow 0 0 8px ${PAGE_LIGHT}66` so the bar reads as a luminous edge rather than a flat strip.
+5. **Brushed-metal icon chip**: 145deg gradient from light-tinted to accent-tinted with `inset 0 1px 0` highlight and `0 0 0 1px` accent ring. The icon chip looks like a polished metal coin set into the card.
+
+The recipe scales with the card surface: a small related-brief card gets a lighter version (4 shadow layers, 1px highlight), a hero card gets the full version (6 shadow layers, gradient highlight strip with cyan-300 peak).
+
+### Cards upgraded in this pass
+
+- **Process hero ladder card**: full premium recipe with cyan-300 peak in the top-edge highlight gradient. The 6-shadow stack creates pronounced depth.
+- **Process expectation cards**: premium recipe with cyan-tinted shadows, gradient top-edge highlight, gradient inner left bar with glow, brushed-metal icon chip.
+- **Brief related-briefs cards**: premium recipe with the per-brief accent driving the highlight + shadow tint. Cards now also show a small accent dot before the "Design Brief" eyebrow.
+- **Case study tech-detail cards**: premium recipe with the project's derived accent driving the tint. Top-edge highlight added.
+- **About OPS_CAPABILITIES cards** (dark variant): premium recipe adapted for dark surface. Subtle white inset highlight + blue-tinted gradient + multi-layer blue-tinted shadows. The icon chip uses a 145deg light-blue to mid-blue gradient for the brushed-metal feel.
+
+### Deferred
+
+- Services / Pricing / Contact hero rebuilds with their own page-identity colors. These pages need full hero compositions (capability stack / fee ledger / channel grid as proposed), not just recolors. Queued for the next session so each gets the same level of design care that Process got.
+- About VALUES cards (currently no card chrome, working as ranged-left typography). Could receive a subtle premium card treatment in a future pass if Joshua wants tighter consistency, but the current minimal approach works fine for that surface.
+
+### Verification
+
+- `npx tsc --noEmit`: clean (exit 0).
+- `npm run lint`: clean (exit 0).
+- Em-dash audit on all 4 changed files: 0.
+
+### Next recommended task
+
+After Vercel rebuild settles (1-3 min), incognito-load `/process` and watch: (1) the entire palette has shifted from grey to ocean cyan, (2) the hero ladder card has a luminous cyan-300 strip at the top edge that fades into corners, (3) the expectation cards now have inner top highlights, gradient inner left bars with glow, and brushed-metal icon chips, (4) the multi-layer cyan-tinted shadows give every card a sense of weight without feeling heavy. Then check `/about` and look at the OPS capability tiles, the brief detail page closings (any of the 8), and the case study detail pages (any of 4); every card on these surfaces should now have the premium recipe applied. If the recipe feels right, the next sprint should rebuild Services / Pricing / Contact heroes with their own distinct compositions and identity colors so the lookalike-cluster problem fully closes.
+
+### Final state (post-commit)
+
+- Will populate after this commit lands.
+
+---
+
+## Previous Session: April 29, 2026 (late) -- Process page v2: silvery charcoal palette + glow/pulse motion (replaces indigo)
 
 ### What shipped
 
