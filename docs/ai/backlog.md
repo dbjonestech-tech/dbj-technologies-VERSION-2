@@ -7,7 +7,7 @@
 - [ ] Build inbound lead response process: response template (acknowledge within 2 hours, 2-3 qualifying questions), discovery call structure (15-20 min), rough proposal format
 - [ ] Set up Google Voice for Workspace ($10/month, dedicated business line, add to email signature)
 - [ ] Run the Gemini Deep Research prompt for DFW competitive landscape, keyword research, and 90-day content plan
-- [x] Set up Google Business Profile (no physical storefront -- service area business setup) -- DONE 2026-04-30: GBP verified + active. Address Royse City TX 75189, service area Hunt County, phone (214) 325-8324, 5.0 / 2 reviews. Open NAP question: site brands as "Dallas, TX" but GBP shows Royse City -- decide whether to hide GBP address and broaden service area to "Dallas-Fort Worth Metroplex" OR widen `SITE.address` on the site to "Greater Dallas / DFW Metroplex".
+- [x] Set up Google Business Profile (no physical storefront -- service area business setup) -- DONE 2026-04-30: GBP verified + active. Address Royse City TX 75189, service area Hunt County, phone (682) 325-8324, 5.0 / 2 reviews. Open NAP question: site brands as "Dallas, TX" but GBP shows Royse City -- decide whether to hide GBP address and broaden service area to "Dallas-Fort Worth Metroplex" OR widen `SITE.address` on the site to "Greater Dallas / DFW Metroplex".
 
 ## Priority 2: Site Polish (Quick Wins)
 

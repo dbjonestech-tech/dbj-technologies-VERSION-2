@@ -52,8 +52,8 @@ export const SITE = {
   address: "Dallas, TX",
   email: "joshua@dbjtechnologies.com",
   // Display the lettered form so scrapers parsing /\d{3}-\d{3}-\d{4}/ skip it.
-  phoneDisplay: "214-DBJ-TECH",
-  phoneTel: "+12143258324",
+  phoneDisplay: "682-DBJ-TECH",
+  phoneTel: "+16823258324",
 };
 
 /* ─── NAV LINKS ─────────────────────────────────────── */
