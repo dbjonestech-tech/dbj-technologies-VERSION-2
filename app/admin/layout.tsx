@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { signOutAction } from "@/lib/auth/actions";
@@ -18,7 +19,6 @@ import {
   Repeat,
   Search,
   Server,
-  Trees,
   Workflow,
   Wifi,
   AlertTriangle,
@@ -172,30 +172,28 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 }
 
 /**
- * Canopy wordmark used in both the desktop sidebar header and the
- * mobile top header. Cyan-to-emerald gradient tile with a tree icon
- * (Lucide Trees) plus the "Canopy" wordmark and a small "by DBJ"
- * attribution. The /admin shell is the design prototype for the
- * Canopy product per project_canopy_brand memory; this branding
- * makes the relationship visible.
+ * Canopy wordmark for the admin shell. Renders /public/canopy-logo.webp
+ * (the official tree-and-wordmark logo, cyan on dark) with a small
+ * "by DBJ" attribution beside it. The /admin shell is the design
+ * prototype for the Canopy product per project_canopy_brand memory.
  */
 function CanopyWordmark() {
   return (
     <Link
       href="/admin"
       aria-label="Canopy"
-      className="inline-flex items-center gap-2.5"
+      className="inline-flex items-center gap-3"
     >
-      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-emerald-500 shadow-sm ring-1 ring-inset ring-white/30">
-        <Trees className="h-5 w-5 text-white" aria-hidden="true" />
-      </span>
-      <span className="flex flex-col leading-tight">
-        <span className="font-display text-base font-semibold tracking-tight text-zinc-900">
-          Canopy
-        </span>
-        <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-          by DBJ
-        </span>
+      <Image
+        src="/canopy-logo.webp"
+        alt="Canopy"
+        width={56}
+        height={42}
+        priority
+        className="h-10 w-auto rounded-md"
+      />
+      <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+        by DBJ
       </span>
     </Link>
   );
