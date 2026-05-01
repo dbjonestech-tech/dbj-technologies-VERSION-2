@@ -19,6 +19,7 @@ import {
 } from "@/lib/services/analytics";
 import RecentVisitorsTable from "./RecentVisitorsTable";
 import VisitorsLive from "./VisitorsLive";
+import { PALETTES } from "@/lib/admin/page-themes";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -105,7 +106,11 @@ export default async function VisitorsPage({ searchParams }: VisitorsPageProps) 
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
         <header className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
+          <span
+            aria-hidden="true"
+            className={`mb-3 block h-0.5 w-12 rounded-full ${PALETTES.sky.pageStripe}`}
+          />
+          <p className={`text-xs font-semibold uppercase tracking-[0.3em] ${PALETTES.sky.pageEyebrow}`}>
             Acquisition
           </p>
           <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
@@ -134,7 +139,7 @@ export default async function VisitorsPage({ searchParams }: VisitorsPageProps) 
           }
           subtitle="One row per person. Click any row to expand the full page-by-page timeline grouped by session."
         >
-          <RecentVisitorsTable rows={recentVisitors} />
+          <RecentVisitorsTable rows={recentVisitors} enableSearch enableFilters />
           <VisitorsPaginator
             isPaged={Boolean(beforeVisitors)}
             hasMore={hasMoreVisitors}
@@ -271,7 +276,7 @@ function TopPagesTable({ rows }: { rows: TopPageRow[] }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.path} className="border-t border-zinc-100">
+            <tr key={r.path} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
               <td className="px-3 py-2 font-mono text-xs text-zinc-900">{r.path}</td>
               <td className="px-3 py-2 text-right font-mono text-zinc-900">
                 {formatNumber(r.views)}
@@ -313,7 +318,7 @@ function TopSourcesTable({ rows }: { rows: TopSourceRow[] }) {
             const total = r.scanConversions + r.contactConversions;
             const rate = r.sessions > 0 ? (total / r.sessions) * 100 : 0;
             return (
-              <tr key={r.source} className="border-t border-zinc-100">
+              <tr key={r.source} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
                 <td className="px-3 py-2 font-mono text-xs text-zinc-900">
                   {r.source}
                 </td>
@@ -354,7 +359,7 @@ function GeoTable({ rows }: { rows: GeoRow[] }) {
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={`${r.country}-${r.region}-${r.city}-${i}`} className="border-t border-zinc-100">
+            <tr key={`${r.country}-${r.region}-${r.city}-${i}`} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
               <td className="px-3 py-2 font-mono text-xs">{r.country ?? "-"}</td>
               <td className="px-3 py-2 text-xs text-zinc-700">{r.region ?? "-"}</td>
               <td className="px-3 py-2 text-xs text-zinc-700">{r.city ?? "-"}</td>
@@ -384,7 +389,7 @@ function DevicesTable({ rows }: { rows: DeviceRow[] }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.deviceType} className="border-t border-zinc-100">
+            <tr key={r.deviceType} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
               <td className="px-3 py-2 font-mono text-xs text-zinc-900">
                 {r.deviceType}
               </td>
@@ -420,7 +425,7 @@ function RecentTable({ rows }: { rows: RecentPageViewRow[] }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id} className="border-t border-zinc-100">
+            <tr key={r.id} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
               <td className="px-3 py-2 font-mono text-xs text-zinc-900">
                 {r.path}
               </td>

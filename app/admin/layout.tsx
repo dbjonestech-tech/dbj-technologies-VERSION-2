@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { signOutAction } from "@/lib/auth/actions";
@@ -16,8 +15,10 @@ import {
   Briefcase,
   Globe,
   Filter,
+  Repeat,
   Search,
   Server,
+  Trees,
   Workflow,
   Wifi,
   AlertTriangle,
@@ -43,6 +44,7 @@ const NAV_GROUPS: {
     label: "Acquisition",
     items: [
       { label: "Visitors", href: "/admin/visitors", icon: Globe },
+      { label: "Recurring users", href: "/admin/recurring", icon: Repeat },
       { label: "Funnel", href: "/admin/funnel", icon: Filter },
       { label: "Search", href: "/admin/search", icon: Search },
       { label: "RUM", href: "/admin/performance/rum", icon: Zap },
@@ -89,15 +91,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="flex min-h-screen">
         <aside className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
           <div className="flex h-16 items-center border-b border-zinc-200 px-5">
-            <Link href="/admin" aria-label="Admin home" className="inline-flex items-center">
-              <Image
-                src="/brand/dbj_logo_horizontal.svg"
-                alt="DBJ Technologies"
-                width={130}
-                height={36}
-                priority
-              />
-            </Link>
+            <CanopyWordmark />
           </div>
           <nav className="flex-1 overflow-y-auto px-3 py-4">
             {NAV_GROUPS.map((group) => (
@@ -158,15 +152,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
         <main className="flex flex-1 flex-col">
           <header className="flex h-16 items-center justify-between border-b border-zinc-200 bg-white px-6 lg:hidden">
-            <Link href="/admin" aria-label="Admin home" className="inline-flex items-center">
-              <Image
-                src="/brand/dbj_logo_horizontal.svg"
-                alt="DBJ Technologies"
-                width={120}
-                height={32}
-                priority
-              />
-            </Link>
+            <CanopyWordmark />
+
             <form action={signOutAction}>
               <button
                 type="submit"
@@ -181,5 +168,35 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </main>
       </div>
     </div>
+  );
+}
+
+/**
+ * Canopy wordmark used in both the desktop sidebar header and the
+ * mobile top header. Cyan-to-emerald gradient tile with a tree icon
+ * (Lucide Trees) plus the "Canopy" wordmark and a small "by DBJ"
+ * attribution. The /admin shell is the design prototype for the
+ * Canopy product per project_canopy_brand memory; this branding
+ * makes the relationship visible.
+ */
+function CanopyWordmark() {
+  return (
+    <Link
+      href="/admin"
+      aria-label="Canopy"
+      className="inline-flex items-center gap-2.5"
+    >
+      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-emerald-500 shadow-sm ring-1 ring-inset ring-white/30">
+        <Trees className="h-5 w-5 text-white" aria-hidden="true" />
+      </span>
+      <span className="flex flex-col leading-tight">
+        <span className="font-display text-base font-semibold tracking-tight text-zinc-900">
+          Canopy
+        </span>
+        <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          by DBJ
+        </span>
+      </span>
+    </Link>
   );
 }

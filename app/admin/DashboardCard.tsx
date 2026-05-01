@@ -13,6 +13,7 @@ import {
   Filter,
   Globe,
   Mail,
+  Repeat,
   Search,
   Server,
   ShieldCheck,
@@ -24,6 +25,7 @@ import {
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { CardKpi, KpiTone } from "@/lib/services/dashboard-kpis";
+import { PALETTES, type PaletteName } from "@/lib/admin/page-themes";
 
 /* The dashboard page is a Server Component but this card is a Client
  * Component (motion + useState). Functions cannot cross the
@@ -40,6 +42,7 @@ const ICONS = {
   Filter,
   Globe,
   Mail,
+  Repeat,
   Search,
   Server,
   ShieldCheck,
@@ -51,78 +54,11 @@ const ICONS = {
 
 export type IconName = keyof typeof ICONS;
 
-export type CardTheme = "cyan" | "violet" | "amber" | "emerald" | "zinc";
-
-type ThemeTokens = {
-  /** Top accent stripe gradient. */
-  stripe: string;
-  /** Icon tile gradient background. */
-  iconTile: string;
-  /** Icon color. */
-  iconColor: string;
-  /** Hover shadow color tag (Tailwind colored-shadow class). */
-  hoverShadow: string;
-  /** Hover border color. */
-  hoverBorder: string;
-  /** Default KPI primary color when tone is "neutral". */
-  kpiNeutralText: string;
-  /** Subtle hover background gradient overlay. */
-  hoverOverlay: string;
-};
-
-const THEMES: Record<CardTheme, ThemeTokens> = {
-  cyan: {
-    stripe: "bg-gradient-to-r from-cyan-400 via-cyan-500 to-sky-500",
-    iconTile: "bg-gradient-to-br from-cyan-50 to-sky-100",
-    iconColor: "text-cyan-700",
-    hoverShadow: "hover:shadow-cyan-500/20",
-    hoverBorder: "group-hover:border-cyan-200",
-    kpiNeutralText: "text-cyan-700",
-    hoverOverlay: "from-cyan-50/0 via-cyan-50/50 to-cyan-50/0",
-  },
-  violet: {
-    stripe: "bg-gradient-to-r from-violet-400 via-violet-500 to-purple-500",
-    iconTile: "bg-gradient-to-br from-violet-50 to-purple-100",
-    iconColor: "text-violet-700",
-    hoverShadow: "hover:shadow-violet-500/20",
-    hoverBorder: "group-hover:border-violet-200",
-    kpiNeutralText: "text-violet-700",
-    hoverOverlay: "from-violet-50/0 via-violet-50/50 to-violet-50/0",
-  },
-  amber: {
-    stripe: "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500",
-    iconTile: "bg-gradient-to-br from-amber-50 to-orange-100",
-    iconColor: "text-amber-700",
-    hoverShadow: "hover:shadow-amber-500/20",
-    hoverBorder: "group-hover:border-amber-200",
-    kpiNeutralText: "text-amber-700",
-    hoverOverlay: "from-amber-50/0 via-amber-50/50 to-amber-50/0",
-  },
-  emerald: {
-    stripe: "bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500",
-    iconTile: "bg-gradient-to-br from-emerald-50 to-teal-100",
-    iconColor: "text-emerald-700",
-    hoverShadow: "hover:shadow-emerald-500/20",
-    hoverBorder: "group-hover:border-emerald-200",
-    kpiNeutralText: "text-emerald-700",
-    hoverOverlay: "from-emerald-50/0 via-emerald-50/50 to-emerald-50/0",
-  },
-  zinc: {
-    stripe: "bg-gradient-to-r from-zinc-300 via-zinc-400 to-zinc-500",
-    iconTile: "bg-gradient-to-br from-zinc-50 to-zinc-100",
-    iconColor: "text-zinc-700",
-    hoverShadow: "hover:shadow-zinc-500/15",
-    hoverBorder: "group-hover:border-zinc-300",
-    kpiNeutralText: "text-zinc-700",
-    hoverOverlay: "from-zinc-50/0 via-zinc-50/50 to-zinc-50/0",
-  },
-};
-
-function toneTextClass(tone: KpiTone | undefined, theme: CardTheme): string {
+function toneTextClass(tone: KpiTone | undefined, palette: PaletteName): string {
   if (tone === "positive") return "text-emerald-700";
   if (tone === "warning") return "text-amber-700";
   if (tone === "danger") return "text-red-700";
-  return THEMES[theme].kpiNeutralText;
+  return PALETTES[palette].kpiNeutralText;
 }
 
 function toneDotClass(tone: KpiTone | undefined): string {
@@ -137,7 +73,7 @@ export type DashboardCardProps = {
   description: string;
   href: string;
   iconName: IconName;
-  theme: CardTheme;
+  palette: PaletteName;
   kpi?: CardKpi;
 };
 
@@ -146,14 +82,14 @@ export default function DashboardCard({
   description,
   href,
   iconName,
-  theme,
+  palette,
   kpi,
 }: DashboardCardProps) {
-  const Icon = ICONS[iconName];
   const reduced = useReducedMotion();
   const [hovered, setHovered] = useState(false);
-  const tokens = THEMES[theme];
-  const kpiText = kpi ? toneTextClass(kpi.tone, theme) : "";
+  const Icon = ICONS[iconName];
+  const tokens = PALETTES[palette];
+  const kpiText = kpi ? toneTextClass(kpi.tone, palette) : "";
   const dotClass = toneDotClass(kpi?.tone);
 
   return (

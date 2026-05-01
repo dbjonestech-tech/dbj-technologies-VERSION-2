@@ -1,15 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
   ExternalLink,
   Mail,
   Phone,
+  Search,
+  X,
 } from "lucide-react";
 import type { RecentVisitorRow } from "@/lib/services/analytics";
+
+type FilterChip = "all" | "anonymous" | "self-disclosed" | "converted" | "mobile" | "desktop";
 
 /* Expandable per-visitor table for /admin/visitors. Each row collapses
  * one person's full activity into a single line. Click a row to fetch
@@ -130,47 +134,168 @@ function conversionBadge(row: RecentVisitorRow): React.ReactNode {
   return null;
 }
 
+function rowMatchesQuery(row: RecentVisitorRow, q: string): boolean {
+  if (!q) return true;
+  const haystack = [
+    row.visitorId,
+    row.contactName,
+    row.contactEmail,
+    row.contactCompany,
+    row.scanEmail,
+    row.scanBusinessName,
+    row.scanUrl,
+    row.city,
+    row.region,
+    row.country,
+    row.referrerHost,
+    row.utmSource,
+    row.utmCampaign,
+    row.topPath,
+    row.entryPath,
+  ]
+    .filter((v): v is string => Boolean(v))
+    .join(" ")
+    .toLowerCase();
+  return haystack.includes(q);
+}
+
+function rowMatchesChip(row: RecentVisitorRow, chip: FilterChip): boolean {
+  if (chip === "all") return true;
+  if (chip === "anonymous") {
+    return !row.contactName && !row.contactEmail && !row.scanEmail && !row.scanBusinessName;
+  }
+  if (chip === "self-disclosed") {
+    return Boolean(row.contactName || row.contactEmail || row.scanEmail || row.scanBusinessName);
+  }
+  if (chip === "converted") return row.convertedScan || row.convertedContact;
+  if (chip === "mobile") return row.deviceType === "mobile";
+  if (chip === "desktop") return row.deviceType === "desktop";
+  return true;
+}
+
 export type RecentVisitorsTableProps = {
   rows: RecentVisitorRow[];
+  enableSearch?: boolean;
+  enableFilters?: boolean;
 };
 
-export default function RecentVisitorsTable({ rows }: RecentVisitorsTableProps) {
+export default function RecentVisitorsTable({
+  rows,
+  enableSearch = false,
+  enableFilters = false,
+}: RecentVisitorsTableProps) {
+  const [query, setQuery] = useState("");
+  const [chip, setChip] = useState<FilterChip>("all");
+
+  const filteredRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return rows.filter((r) => rowMatchesQuery(r, q) && rowMatchesChip(r, chip));
+  }, [rows, query, chip]);
+
   if (rows.length === 0) {
     return <p className="text-sm text-zinc-500">No visitors yet.</p>;
   }
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[920px] text-sm">
-        <thead>
-          <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
-            <th className="px-3 py-2 font-semibold w-6"></th>
-            <th className="px-3 py-2 font-semibold">Visitor</th>
-            <th className="px-3 py-2 font-semibold">Source</th>
-            <th className="px-3 py-2 font-semibold">Geo</th>
-            <th className="px-3 py-2 font-semibold">Device</th>
-            <th className="px-3 py-2 text-right font-semibold">Sessions</th>
-            <th className="px-3 py-2 text-right font-semibold">Pages</th>
-            <th className="px-3 py-2 text-right font-semibold">Last seen</th>
-            <th className="px-3 py-2 text-right font-semibold">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <VisitorRow key={row.visitorId} row={row} />
-          ))}
-        </tbody>
-      </table>
+    <div>
+      {(enableSearch || enableFilters) && (
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {enableSearch ? (
+            <div className="relative w-full max-w-sm">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" aria-hidden="true" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by name, email, city, business..."
+                className="w-full rounded-md border border-zinc-200 bg-white py-1.5 pl-9 pr-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
+                  aria-label="Clear search"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              ) : null}
+            </div>
+          ) : (
+            <span />
+          )}
+          {enableFilters ? (
+            <div className="flex flex-wrap gap-1.5">
+              {(
+                [
+                  { id: "all", label: "All" },
+                  { id: "self-disclosed", label: "Self-disclosed" },
+                  { id: "anonymous", label: "Anonymous" },
+                  { id: "converted", label: "Converted" },
+                  { id: "mobile", label: "Mobile" },
+                  { id: "desktop", label: "Desktop" },
+                ] as const
+              ).map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setChip(c.id)}
+                  className={
+                    chip === c.id
+                      ? "rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-semibold text-white transition-colors"
+                      : "rounded-full bg-zinc-100 px-3 py-1 text-[11px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-200"
+                  }
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      )}
+      {filteredRows.length === 0 ? (
+        <p className="text-sm text-zinc-500">
+          {query || chip !== "all"
+            ? "No visitors match the current filter."
+            : "No visitors yet."}
+        </p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[920px] text-sm">
+            <thead className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
+              <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+                <th className="px-3 py-2 font-semibold w-6"></th>
+                <th className="px-3 py-2 font-semibold">Visitor</th>
+                <th className="px-3 py-2 font-semibold">Source</th>
+                <th className="px-3 py-2 font-semibold">Geo</th>
+                <th className="px-3 py-2 font-semibold">Device</th>
+                <th className="px-3 py-2 text-right font-semibold">Sessions</th>
+                <th className="px-3 py-2 text-right font-semibold">Pages</th>
+                <th className="px-3 py-2 text-right font-semibold">Last seen</th>
+                <th className="px-3 py-2 text-right font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRows.map((row, idx) => (
+                <VisitorRow key={row.visitorId} row={row} index={idx} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
 
-function VisitorRow({ row }: { row: RecentVisitorRow }) {
+function VisitorRow({ row, index }: { row: RecentVisitorRow; index: number }) {
   const [expanded, setExpanded] = useState(false);
   const [timeline, setTimeline] = useState<TimelineEntry[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
   const id = identitySummary(row);
+  const isEven = index % 2 === 1; /* Stripe every-other visitor row.
+   * Using "1 === odd" because design feels better with the FIRST
+   * row plain white (not striped), then second row striped, etc. */
 
   useEffect(() => {
     if (!expanded || fetchedRef.current) return;
@@ -200,7 +325,7 @@ function VisitorRow({ row }: { row: RecentVisitorRow }) {
   return (
     <>
       <tr
-        className="cursor-pointer border-t border-zinc-100 transition-colors hover:bg-zinc-50"
+        className={`cursor-pointer border-t border-zinc-100 transition-colors hover:bg-zinc-100/60 ${isEven ? "bg-zinc-50/50" : "bg-white"}`}
         onClick={() => setExpanded((v) => !v)}
       >
         <td className="px-3 py-3 text-zinc-400" aria-hidden="true">

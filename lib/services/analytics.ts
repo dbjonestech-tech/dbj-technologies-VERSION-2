@@ -1055,6 +1055,242 @@ export async function getRecentVisitors(
 }
 
 /**
+ * Recurring visitors only: visitor_id rows where the same person
+ * came back across more than one session. Sorted by session count
+ * DESC, then page-view count DESC, so the most-engaged repeat
+ * visitors surface first. Same row shape as getRecentVisitors so
+ * the existing RecentVisitorsTable client component renders them
+ * without modification.
+ */
+export async function getRecurringVisitors(
+  limit = 50,
+  beforeSessionCount?: number,
+  beforeLastSeenIso?: string
+): Promise<RecentVisitorRow[]> {
+  try {
+    const sql = getDb();
+    const cap = Math.max(1, Math.min(500, limit));
+    /* Cursor: (session_count, last_seen_at) tuple. Need both because
+     * many visitors can share the same session_count. We page using
+     * (session_count, last_seen_at) DESC so a stable cursor advances
+     * monotonically. Both null = first page. */
+    const sc = beforeSessionCount && Number.isFinite(beforeSessionCount)
+      ? Math.max(0, Math.floor(beforeSessionCount))
+      : null;
+    let cursor: string | null = null;
+    if (beforeLastSeenIso) {
+      const t = Date.parse(beforeLastSeenIso);
+      if (Number.isFinite(t)) cursor = new Date(t).toISOString();
+    }
+    const rows = (await sql`
+      WITH agg AS (
+        SELECT
+          pv.visitor_id,
+          COUNT(*)::int AS page_view_count,
+          COUNT(DISTINCT pv.session_id)::int AS session_count,
+          MIN(pv.created_at) AS first_seen_at,
+          MAX(pv.created_at) AS last_seen_at
+        FROM page_views pv
+        WHERE pv.is_bot = false
+        GROUP BY pv.visitor_id
+        HAVING COUNT(DISTINCT pv.session_id) > 1
+      ),
+      latest AS (
+        SELECT DISTINCT ON (pv.visitor_id)
+          pv.visitor_id,
+          pv.country, pv.region, pv.city,
+          pv.device_type, pv.browser, pv.os
+        FROM page_views pv
+        WHERE pv.is_bot = false
+        ORDER BY pv.visitor_id, pv.created_at DESC
+      ),
+      entry AS (
+        SELECT DISTINCT ON (pv.visitor_id)
+          pv.visitor_id, pv.path AS entry_path, pv.referrer_host
+        FROM page_views pv
+        WHERE pv.is_bot = false
+        ORDER BY pv.visitor_id, pv.created_at ASC
+      ),
+      exit_ AS (
+        SELECT DISTINCT ON (pv.visitor_id)
+          pv.visitor_id, pv.path AS exit_path
+        FROM page_views pv
+        WHERE pv.is_bot = false
+        ORDER BY pv.visitor_id, pv.created_at DESC
+      ),
+      utm AS (
+        SELECT DISTINCT ON (pv.visitor_id)
+          pv.visitor_id, pv.utm_source, pv.utm_medium, pv.utm_campaign
+        FROM page_views pv
+        WHERE pv.is_bot = false
+          AND (pv.utm_source IS NOT NULL OR pv.utm_medium IS NOT NULL OR pv.utm_campaign IS NOT NULL)
+        ORDER BY pv.visitor_id, pv.created_at DESC
+      ),
+      top_path AS (
+        SELECT visitor_id, path FROM (
+          SELECT
+            pv.visitor_id, pv.path,
+            ROW_NUMBER() OVER (
+              PARTITION BY pv.visitor_id
+              ORDER BY COUNT(*) DESC, pv.path ASC
+            ) AS rn
+          FROM page_views pv
+          WHERE pv.is_bot = false
+          GROUP BY pv.visitor_id, pv.path
+        ) ranked
+        WHERE rn = 1
+      ),
+      conv AS (
+        SELECT
+          s.visitor_id,
+          BOOL_OR(s.converted_scan_id IS NOT NULL) AS converted_scan,
+          BOOL_OR(s.converted_contact_id IS NOT NULL) AS converted_contact,
+          MAX(s.converted_scan_id::text) AS any_scan_id,
+          MAX(s.converted_contact_id::text) AS any_contact_id
+        FROM sessions s
+        GROUP BY s.visitor_id
+      )
+      SELECT
+        agg.visitor_id::text AS visitor_id,
+        agg.page_view_count,
+        agg.session_count,
+        agg.first_seen_at,
+        agg.last_seen_at,
+        latest.country, latest.region, latest.city,
+        latest.device_type, latest.browser, latest.os,
+        utm.utm_source, utm.utm_medium, utm.utm_campaign,
+        entry.referrer_host,
+        top_path.path AS top_path,
+        entry.entry_path,
+        exit_.exit_path,
+        COALESCE(conv.converted_scan, false) AS converted_scan,
+        COALESCE(conv.converted_contact, false) AS converted_contact,
+        conv.any_scan_id AS scan_id,
+        conv.any_contact_id AS contact_submission_id,
+        cs.name AS contact_name,
+        cs.email AS contact_email,
+        cs.phone AS contact_phone,
+        cs.company AS contact_company,
+        sc.email AS scan_email,
+        sc.business_name AS scan_business_name,
+        sc.url AS scan_url
+      FROM agg
+      LEFT JOIN latest ON latest.visitor_id = agg.visitor_id
+      LEFT JOIN entry ON entry.visitor_id = agg.visitor_id
+      LEFT JOIN exit_ ON exit_.visitor_id = agg.visitor_id
+      LEFT JOIN utm ON utm.visitor_id = agg.visitor_id
+      LEFT JOIN top_path ON top_path.visitor_id = agg.visitor_id
+      LEFT JOIN conv ON conv.visitor_id = agg.visitor_id
+      LEFT JOIN contact_submissions cs ON cs.id = conv.any_contact_id::uuid
+      LEFT JOIN scans sc ON sc.id = conv.any_scan_id::uuid
+      WHERE
+        (${sc}::int IS NULL OR ${cursor}::timestamptz IS NULL OR
+         agg.session_count < ${sc}::int OR
+         (agg.session_count = ${sc}::int AND agg.last_seen_at < ${cursor}::timestamptz))
+      ORDER BY agg.session_count DESC, agg.last_seen_at DESC
+      LIMIT ${cap}
+    `) as Array<{
+      visitor_id: string;
+      page_view_count: number;
+      session_count: number;
+      first_seen_at: string;
+      last_seen_at: string;
+      country: string | null;
+      region: string | null;
+      city: string | null;
+      device_type: string | null;
+      browser: string | null;
+      os: string | null;
+      utm_source: string | null;
+      utm_medium: string | null;
+      utm_campaign: string | null;
+      referrer_host: string | null;
+      top_path: string | null;
+      entry_path: string | null;
+      exit_path: string | null;
+      converted_scan: boolean;
+      converted_contact: boolean;
+      scan_id: string | null;
+      contact_submission_id: string | null;
+      contact_name: string | null;
+      contact_email: string | null;
+      contact_phone: string | null;
+      contact_company: string | null;
+      scan_email: string | null;
+      scan_business_name: string | null;
+      scan_url: string | null;
+    }>;
+    return rows.map((r) => ({
+      visitorId: r.visitor_id,
+      pageViewCount: r.page_view_count,
+      sessionCount: r.session_count,
+      firstSeenAt: r.first_seen_at,
+      lastSeenAt: r.last_seen_at,
+      country: r.country,
+      region: r.region,
+      city: r.city,
+      deviceType: r.device_type,
+      browser: r.browser,
+      os: r.os,
+      utmSource: r.utm_source,
+      utmMedium: r.utm_medium,
+      utmCampaign: r.utm_campaign,
+      referrerHost: r.referrer_host,
+      topPath: r.top_path,
+      entryPath: r.entry_path,
+      exitPath: r.exit_path,
+      convertedScan: r.converted_scan,
+      convertedContact: r.converted_contact,
+      scanId: r.scan_id,
+      contactSubmissionId: r.contact_submission_id,
+      contactName: r.contact_name,
+      contactEmail: r.contact_email,
+      contactPhone: r.contact_phone,
+      contactCompany: r.contact_company,
+      scanEmail: r.scan_email,
+      scanBusinessName: r.scan_business_name,
+      scanUrl: r.scan_url,
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] getRecurringVisitors failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
+}
+
+/**
+ * Count of visitors who came back across more than one session in
+ * the last 7 days. Drives the dashboard KPI on the Recurring users
+ * card.
+ */
+export async function getRecurringVisitorCount(
+  intervalDays = 7
+): Promise<number> {
+  try {
+    const sql = getDb();
+    const days = Math.max(1, Math.min(90, intervalDays));
+    const interval = `${days} days`;
+    const rows = (await sql`
+      SELECT COUNT(*)::int AS n FROM (
+        SELECT pv.visitor_id
+        FROM page_views pv
+        WHERE pv.is_bot = false
+          AND pv.created_at > now() - (${interval})::interval
+        GROUP BY pv.visitor_id
+        HAVING COUNT(DISTINCT pv.session_id) > 1
+      ) t
+    `) as { n: number }[];
+    return Number(rows[0]?.n ?? 0);
+  } catch (err) {
+    console.warn(
+      `[analytics] getRecurringVisitorCount failed: ${err instanceof Error ? err.message : err}`
+    );
+    return 0;
+  }
+}
+
+/**
  * Full chronological page-view timeline for a single visitor across
  * every session they ever had (subject to the 90-day raw page_views
  * retention window). Capped at 500 entries to keep the response

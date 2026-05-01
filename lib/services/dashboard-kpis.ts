@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db";
 import {
   getLiveVisitors,
+  getRecurringVisitorCount,
   getVisitorOverview,
 } from "@/lib/services/analytics";
 import { getFunnelStages } from "@/lib/services/funnel";
@@ -413,6 +414,19 @@ async function infrastructureKpi(): Promise<CardKpi> {
   };
 }
 
+async function recurringKpi(): Promise<CardKpi> {
+  const count = await safe(
+    () => getRecurringVisitorCount(7),
+    0,
+    "recurring.count"
+  );
+  return {
+    primary: count > 0 ? `${fmt(count)} recurring` : "no repeat visits yet",
+    secondary: "visitors with more than one session, last 7 days",
+    tone: count > 0 ? "positive" : "neutral",
+  };
+}
+
 async function usersKpi(): Promise<CardKpi> {
   const users = await safe(() => listAdminUsers(), [], "users.list");
   const active = users.filter((u) => u.status === "active").length;
@@ -442,6 +456,7 @@ export async function getDashboardKpis(): Promise<DashboardKpiMap> {
     search,
     rum,
     email,
+    recurring,
     costs,
     database,
     clients,
@@ -460,6 +475,7 @@ export async function getDashboardKpis(): Promise<DashboardKpiMap> {
     searchKpi(),
     rumKpi(),
     emailKpi(),
+    recurringKpi(),
     costsKpi(),
     databaseKpi(),
     clientsKpi(),
@@ -480,6 +496,7 @@ export async function getDashboardKpis(): Promise<DashboardKpiMap> {
     "/admin/search": search,
     "/admin/performance/rum": rum,
     "/admin/email": email,
+    "/admin/recurring": recurring,
     "/admin/costs": costs,
     "/admin/database": database,
     "/admin/clients": clients,
