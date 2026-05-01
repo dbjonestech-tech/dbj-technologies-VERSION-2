@@ -221,18 +221,18 @@ export async function getContacts(
       LEFT JOIN LATERAL (
         SELECT COUNT(*)::int AS cnt
         FROM scans s
-        WHERE s.email = c.email
+        WHERE LOWER(TRIM(s.email)) = c.email
       ) scan_t ON TRUE
       LEFT JOIN LATERAL (
         SELECT COUNT(*)::int AS cnt
         FROM contact_submissions cs
-        WHERE cs.email = c.email
+        WHERE LOWER(TRIM(cs.email)) = c.email
       ) form_t ON TRUE
       LEFT JOIN LATERAL (
         SELECT COUNT(*)::int AS cnt
         FROM email_events ee
         JOIN scans s ON s.id = ee.scan_id
-        WHERE s.email = c.email
+        WHERE LOWER(TRIM(s.email)) = c.email
       ) email_t ON TRUE
       WHERE
         (${status}::text IS NULL OR c.status = ${status}::text)
@@ -335,6 +335,7 @@ export async function getPathlightScansForContact(
   if (!email) return { latest: null, totalCount: 0 };
   try {
     const sql = getDb();
+    const norm = email.toLowerCase().trim();
     const rows = (await sql`
       SELECT
         s.id::text AS scan_id,
@@ -345,7 +346,7 @@ export async function getPathlightScansForContact(
         sr.revenue_impact
       FROM scans s
       LEFT JOIN scan_results sr ON sr.scan_id = s.id
-      WHERE s.email = ${email.toLowerCase().trim()}::text
+      WHERE LOWER(TRIM(s.email)) = ${norm}::text
       ORDER BY s.created_at DESC
       LIMIT 1
     `) as Array<{
@@ -359,7 +360,7 @@ export async function getPathlightScansForContact(
     const countRows = (await sql`
       SELECT COUNT(*)::int AS n
       FROM scans
-      WHERE email = ${email.toLowerCase().trim()}::text
+      WHERE LOWER(TRIM(email)) = ${norm}::text
     `) as { n: number }[];
     const total = Number(countRows[0]?.n ?? 0);
     const r = rows[0];
@@ -436,12 +437,12 @@ export async function getContactTimeline(
         SELECT DISTINCT s.visitor_id
         FROM sessions s
         JOIN scans sc ON sc.id = s.converted_scan_id
-        WHERE sc.email = ${norm}::text
+        WHERE LOWER(TRIM(sc.email)) = ${norm}::text
         UNION
         SELECT DISTINCT s.visitor_id
         FROM sessions s
         JOIN contact_submissions cs ON cs.id = s.converted_contact_id
-        WHERE cs.email = ${norm}::text
+        WHERE LOWER(TRIM(cs.email)) = ${norm}::text
       ),
       grouped AS (
         SELECT
@@ -476,7 +477,7 @@ export async function getContactTimeline(
         sr.revenue_impact
       FROM scans s
       LEFT JOIN scan_results sr ON sr.scan_id = s.id
-      WHERE s.email = ${norm}::text
+      WHERE LOWER(TRIM(s.email)) = ${norm}::text
       ORDER BY s.created_at DESC
       LIMIT ${PER_SOURCE_LIMIT}
     `) as Array<{
@@ -496,7 +497,7 @@ export async function getContactTimeline(
         project_type,
         created_at
       FROM contact_submissions
-      WHERE email = ${norm}::text
+      WHERE LOWER(TRIM(email)) = ${norm}::text
       ORDER BY created_at DESC
       LIMIT ${PER_SOURCE_LIMIT}
     `) as Array<{
@@ -515,7 +516,7 @@ export async function getContactTimeline(
         ee.sent_at
       FROM email_events ee
       JOIN scans s ON s.id = ee.scan_id
-      WHERE s.email = ${norm}::text
+      WHERE LOWER(TRIM(s.email)) = ${norm}::text
       ORDER BY ee.sent_at DESC
       LIMIT ${PER_SOURCE_LIMIT}
     `) as Array<{
@@ -546,7 +547,7 @@ export async function getContactTimeline(
         cp.id::text AS project_id, cp.name AS project_name, cp.created_at AS project_created
       FROM clients c
       LEFT JOIN client_projects cp ON cp.client_email = c.email
-      WHERE c.email = ${norm}::text
+      WHERE LOWER(TRIM(c.email)) = ${norm}::text
       ORDER BY cp.created_at DESC NULLS LAST
       LIMIT ${PER_SOURCE_LIMIT}
     `) as Array<{

@@ -83,7 +83,7 @@ export async function createContactAction(
       });
     }
     revalidatePath("/admin/contacts");
-    revalidatePath("/admin/pipeline");
+    revalidatePath("/admin/relationships/pipeline");
     revalidatePath("/admin");
     return { ok: true, data: created };
   } catch (err) {
@@ -141,7 +141,7 @@ export async function updateContactAction(
 
     revalidatePath("/admin/contacts");
     revalidatePath(`/admin/contacts/${id}`);
-    revalidatePath("/admin/pipeline");
+    revalidatePath("/admin/relationships/pipeline");
     revalidatePath("/admin");
     return { ok: true, data: updated };
   } catch (err) {
@@ -212,7 +212,7 @@ export async function syncContactsAction(): Promise<ActionResult<SyncResult>> {
     await requireAdmin();
     const result = await syncContactsFromExistingSources();
     revalidatePath("/admin/contacts");
-    revalidatePath("/admin/pipeline");
+    revalidatePath("/admin/relationships/pipeline");
     revalidatePath("/admin");
     return { ok: true, data: result };
   } catch (err) {
