@@ -9,7 +9,31 @@
 - [ ] Run the Gemini Deep Research prompt for DFW competitive landscape, keyword research, and 90-day content plan
 - [x] Set up Google Business Profile (no physical storefront -- service area business setup) -- DONE 2026-04-30: GBP verified + active. Address Royse City TX 75189, service area Hunt County, phone (682) 325-8324, 5.0 / 2 reviews. Open NAP question: site brands as "Dallas, TX" but GBP shows Royse City -- decide whether to hide GBP address and broaden service area to "Dallas-Fort Worth Metroplex" OR widen `SITE.address` on the site to "Greater Dallas / DFW Metroplex".
 
-## Priority 2: Site Polish (Quick Wins)
+## Priority 2: Canopy / Admin Polish (May 1+)
+
+- [x] **/admin/visitors PostHog/Vercel-Analytics rewrite (Phase 1).** Hero
+  Recharts area chart with previous-period ghost line, 6 metric tiles
+  with period-over-period deltas (bounce rate inverted), 3 breakdown
+  panels (top pages / top sources / devices+engagement) as styled-div
+  bars, stretch top-cities panel, range selector (7D/14D/30D/90D/custom)
+  driving a new `/admin/api/visitors-data` endpoint. Recent visitors
+  table preserved as-is. Phase 1 staged for review on May 1, 2026.
+- [ ] **CRM integration into Canopy (Phase 2).** Migration 022 for
+  `contacts` + `contact_notes`, `lib/services/contacts.ts` (with LATERAL
+  touchpoint counts, NOT visit count -- only scans/forms/emails), Server
+  Actions in `lib/actions/contacts.ts` (no API routes for these),
+  sidebar Relationships group between Acquisition and Operations,
+  `/admin/contacts` list, `/admin/contacts/[id]` detail with Pathlight
+  scan card, `/admin/pipeline` kanban, Dashboard Relationships card,
+  auto-creation wiring in scan finalize + contact form route + client
+  invitation accept flow. Phase 2 NOT YET STARTED -- review Phase 1
+  first.
+- [ ] After Phase 1 ships: run `vercel logs --status-code 500 --since 5m`
+  against the deployment URL to confirm RSC boundary is clean (this is
+  the only check that catches production-build-only RSC failures per
+  `feedback_rsc_boundary_runtime`).
+
+## Priority 2.1: Site Polish (Quick Wins)
 
 - [ ] Add Tyler's testimonial to homepage or about page once received
 - [ ] Verify all ~24 pages look correct (full visual audit -- Chrome MCP couldn't complete this due to scroll-triggered animations)

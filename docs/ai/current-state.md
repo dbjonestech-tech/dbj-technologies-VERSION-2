@@ -14,7 +14,7 @@ The internal admin dashboard is now positioned publicly as a productized engagem
 
 All routes under `/admin/*`, gated by Auth.js Google sign-in + `ADMIN_EMAILS` allow-list:
 - `/admin` (Dashboard): 8 headline stat cards with sparklines + trend deltas, worst-of-status banner, recent deploys/errors/sessions feeds, infrastructure summary
-- `/admin/visitors`: top pages, top referrers, UTM sources, devices, average engagement, live-presence card, 25-row recent sessions table
+- `/admin/visitors`: chart-driven analytics page (PostHog/Vercel-Analytics level). Hero Recharts area chart with previous-period ghost line; 6 metric tiles (visitors / sessions / page views / bounce rate / pages per session / conversions) with period-over-period deltas (bounce rate color-inverted); three breakdown panels (top pages, top sources, devices+engagement) as styled-div bars; optional top-cities geography panel; live presence + 25-row recent visitors table preserved as-is. Date range selector (7D / 14D / 30D / 90D + custom) updates the chart, tiles, and breakdowns via `/admin/api/visitors-data` without touching the URL params used by the recent-visitors `?before_v=` cursor. Phase 1 of the visitors-page-upgrade build (May 1, 2026)
 - `/admin/performance/rum`: 5 Web Vital cards with thresholded color (LCP/INP/CLS/TTFB/FCP), 14d trend sparklines, by-page table, by-device card
 - `/admin/platform`: deploy outcomes, 14d cadence, function p95, recent 12 deploys, hot 10 functions table
 - `/admin/infrastructure`: per-domain check grid (TLS/WHOIS/MX/SPF/DKIM/DMARC), TLS expiry countdown, auth posture bars

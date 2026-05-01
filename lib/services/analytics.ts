@@ -1632,3 +1632,631 @@ export async function attachContactToSession(args: {
     );
   }
 }
+
+/* ─────────────── Dashboard analytics (PostHog/Vercel level) ─────────────── */
+
+export type DashboardRange = "7d" | "14d" | "30d" | "90d";
+
+export type SeriesPoint = { date: string; visitors: number };
+
+export type DashboardMetrics = {
+  visitors: number;
+  sessions: number;
+  pageViews: number;
+  bounceRate: number;
+  pagesPerSession: number;
+  conversions: number;
+  previousVisitors: number | null;
+  previousSessions: number | null;
+  previousPageViews: number | null;
+  previousBounceRate: number | null;
+  previousPagesPerSession: number | null;
+  previousConversions: number | null;
+};
+
+export type DashboardTopPage = {
+  path: string;
+  prettyPath: string;
+  views: number;
+  sessions: number;
+  visitors: number;
+  pct: number;
+};
+
+export type DashboardTopSource = {
+  source: string;
+  sessions: number;
+  scanConversions: number;
+  contactConversions: number;
+  pct: number;
+};
+
+export type DashboardDevice = {
+  device: string;
+  sessions: number;
+  pct: number;
+};
+
+export type DashboardEngagement = {
+  engaged: number;
+  light: number;
+  none: number;
+  likelyBot: number;
+};
+
+export type DashboardTopCity = {
+  city: string;
+  region: string;
+  country: string;
+  visitors: number;
+};
+
+export type VisitorsDashboardData = {
+  windowDays: number;
+  currentStart: string;
+  currentEnd: string;
+  previousStart: string | null;
+  previousEnd: string | null;
+  series: SeriesPoint[];
+  comparisonSeries: SeriesPoint[];
+  metrics: DashboardMetrics;
+  topPages: DashboardTopPage[];
+  topSources: DashboardTopSource[];
+  devices: DashboardDevice[];
+  engagement: DashboardEngagement;
+  topCities: DashboardTopCity[];
+};
+
+function rangeDays(r: DashboardRange): number {
+  if (r === "7d") return 7;
+  if (r === "14d") return 14;
+  if (r === "90d") return 90;
+  return 30;
+}
+
+/* Pretty-print common admin paths. Mirrors the PageHeader shorthand
+ * the existing visitors page uses on its top-pages table. */
+function prettifyPath(path: string): string {
+  if (path === "/") return "Home";
+  if (path === "/about") return "About";
+  if (path === "/work") return "Work";
+  if (path === "/services") return "Services";
+  if (path === "/pricing") return "Pricing";
+  if (path === "/contact") return "Contact";
+  if (path === "/pathlight") return "Pathlight";
+  if (path.startsWith("/work/design-briefs/")) {
+    return "Design Brief: " + path.slice("/work/design-briefs/".length);
+  }
+  if (path.startsWith("/work/")) {
+    return "Case Study: " + path.slice("/work/".length);
+  }
+  if (path.startsWith("/services/")) {
+    return "Service: " + path.slice("/services/".length);
+  }
+  if (path.startsWith("/pricing/")) {
+    return "Pricing: " + path.slice("/pricing/".length);
+  }
+  if (path.startsWith("/pathlight/")) return "Scan report";
+  return path;
+}
+
+/**
+ * Single-call data fetch for the redesigned /admin/visitors dashboard.
+ * Runs every section in parallel inside its own try/catch so one bad
+ * section returns its empty default rather than blanking the whole
+ * page. Range is either a preset ("7d" / "14d" / "30d" / "90d") or an
+ * absolute [from, to] ISO pair; the comparison period is the immediately
+ * preceding window of equal length.
+ *
+ * If the comparison window has fewer than 3 daily data points (site is
+ * new, or no events before tracking started), the function returns
+ * comparisonSeries=[] and previous*=null. The frontend hides the ghost
+ * line and the trend deltas in that case.
+ */
+export async function getVisitorsDashboardData(
+  args:
+    | { range: DashboardRange }
+    | { from: string; to: string }
+): Promise<VisitorsDashboardData> {
+  // Resolve absolute window for current + previous periods.
+  let currentEnd: Date;
+  let currentStart: Date;
+  let windowDays: number;
+  if ("range" in args) {
+    windowDays = rangeDays(args.range);
+    currentEnd = new Date();
+    currentStart = new Date(currentEnd.getTime() - windowDays * 86_400_000);
+  } else {
+    const fromT = Date.parse(args.from);
+    const toT = Date.parse(args.to);
+    if (!Number.isFinite(fromT) || !Number.isFinite(toT) || toT <= fromT) {
+      windowDays = 30;
+      currentEnd = new Date();
+      currentStart = new Date(currentEnd.getTime() - windowDays * 86_400_000);
+    } else {
+      currentStart = new Date(fromT);
+      currentEnd = new Date(toT);
+      windowDays = Math.max(
+        1,
+        Math.round((currentEnd.getTime() - currentStart.getTime()) / 86_400_000)
+      );
+    }
+  }
+  const previousEnd = new Date(currentStart.getTime());
+  const previousStart = new Date(currentStart.getTime() - windowDays * 86_400_000);
+  const cs = currentStart.toISOString();
+  const ce = currentEnd.toISOString();
+  const ps = previousStart.toISOString();
+  const pe = previousEnd.toISOString();
+
+  const [
+    series,
+    comparisonSeries,
+    metrics,
+    topPages,
+    topSources,
+    devices,
+    engagement,
+    topCities,
+  ] = await Promise.all([
+    fetchDailyVisitors(cs, ce),
+    fetchDailyVisitors(ps, pe),
+    fetchAggregateMetricsWithComparison(cs, ce, ps, pe),
+    fetchTopPagesRange(cs, ce, 25),
+    fetchTopSourcesRange(cs, ce, 25),
+    fetchDevicesRange(cs, ce),
+    fetchEngagementRange(cs, ce),
+    fetchTopCitiesRange(cs, ce, 10),
+  ]);
+
+  // Comparison decisions: if previous window has fewer than 3 daily
+  // points, the comparison is too thin to plot. Hide ghost line and
+  // null out the previous metric values.
+  const insufficientHistory = comparisonSeries.length < 3;
+
+  return {
+    windowDays,
+    currentStart: cs,
+    currentEnd: ce,
+    previousStart: insufficientHistory ? null : ps,
+    previousEnd: insufficientHistory ? null : pe,
+    series: fillDailySeries(series, currentStart, currentEnd),
+    comparisonSeries: insufficientHistory
+      ? []
+      : fillDailySeries(comparisonSeries, previousStart, previousEnd),
+    metrics: insufficientHistory
+      ? {
+          ...metrics,
+          previousVisitors: null,
+          previousSessions: null,
+          previousPageViews: null,
+          previousBounceRate: null,
+          previousPagesPerSession: null,
+          previousConversions: null,
+        }
+      : metrics,
+    topPages,
+    topSources,
+    devices,
+    engagement,
+    topCities,
+  };
+}
+
+function fillDailySeries(
+  rows: SeriesPoint[],
+  start: Date,
+  end: Date
+): SeriesPoint[] {
+  // Fill missing days with 0 so the chart has a continuous x-axis. We
+  // operate in UTC because the SQL date_trunc uses UTC by default and
+  // the dashboard consumer treats every value as a calendar day.
+  const byDate = new Map(rows.map((r) => [r.date, r.visitors]));
+  const out: SeriesPoint[] = [];
+  const startDay = new Date(
+    Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate())
+  );
+  const endDay = new Date(
+    Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate())
+  );
+  for (
+    let cursor = startDay.getTime();
+    cursor <= endDay.getTime();
+    cursor += 86_400_000
+  ) {
+    const d = new Date(cursor);
+    const yyyy = d.getUTCFullYear();
+    const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(d.getUTCDate()).padStart(2, "0");
+    const key = `${yyyy}-${mm}-${dd}`;
+    out.push({ date: key, visitors: byDate.get(key) ?? 0 });
+  }
+  return out;
+}
+
+async function fetchDailyVisitors(
+  startIso: string,
+  endIso: string
+): Promise<SeriesPoint[]> {
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        to_char(date_trunc('day', created_at), 'YYYY-MM-DD') AS day,
+        COUNT(DISTINCT visitor_id)::int AS visitors
+      FROM page_views
+      WHERE created_at >= ${startIso}::timestamptz
+        AND created_at <  ${endIso}::timestamptz
+        AND is_bot = false
+      GROUP BY day
+      ORDER BY day ASC
+    `) as { day: string; visitors: number }[];
+    return rows.map((r) => ({ date: r.day, visitors: Number(r.visitors) }));
+  } catch (err) {
+    console.warn(
+      `[analytics] fetchDailyVisitors failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
+}
+
+async function fetchAggregateMetricsWithComparison(
+  cs: string,
+  ce: string,
+  ps: string,
+  pe: string
+): Promise<DashboardMetrics> {
+  try {
+    const sql = getDb();
+    // Page views + sessions + visitors for both windows in one round trip.
+    const rows = (await sql`
+      WITH cur_pv AS (
+        SELECT
+          COUNT(*)::int AS page_views,
+          COUNT(DISTINCT session_id)::int AS sessions,
+          COUNT(DISTINCT visitor_id)::int AS visitors
+        FROM page_views
+        WHERE created_at >= ${cs}::timestamptz
+          AND created_at <  ${ce}::timestamptz
+          AND is_bot = false
+      ),
+      cur_s AS (
+        SELECT
+          COUNT(*)::int AS total_sessions,
+          COUNT(*) FILTER (WHERE page_count = 1)::int AS bounced,
+          COALESCE(AVG(page_count), 0)::float8 AS avg_pages,
+          COUNT(*) FILTER (WHERE converted_scan_id IS NOT NULL)::int AS scans,
+          COUNT(*) FILTER (WHERE converted_contact_id IS NOT NULL)::int AS contacts
+        FROM sessions
+        WHERE started_at >= ${cs}::timestamptz
+          AND started_at <  ${ce}::timestamptz
+          AND is_bot = false
+      ),
+      prev_pv AS (
+        SELECT
+          COUNT(*)::int AS page_views,
+          COUNT(DISTINCT session_id)::int AS sessions,
+          COUNT(DISTINCT visitor_id)::int AS visitors
+        FROM page_views
+        WHERE created_at >= ${ps}::timestamptz
+          AND created_at <  ${pe}::timestamptz
+          AND is_bot = false
+      ),
+      prev_s AS (
+        SELECT
+          COUNT(*)::int AS total_sessions,
+          COUNT(*) FILTER (WHERE page_count = 1)::int AS bounced,
+          COALESCE(AVG(page_count), 0)::float8 AS avg_pages,
+          COUNT(*) FILTER (WHERE converted_scan_id IS NOT NULL)::int AS scans,
+          COUNT(*) FILTER (WHERE converted_contact_id IS NOT NULL)::int AS contacts
+        FROM sessions
+        WHERE started_at >= ${ps}::timestamptz
+          AND started_at <  ${pe}::timestamptz
+          AND is_bot = false
+      )
+      SELECT
+        cur_pv.page_views AS cur_pv_pageviews,
+        cur_pv.sessions   AS cur_pv_sessions,
+        cur_pv.visitors   AS cur_pv_visitors,
+        cur_s.total_sessions AS cur_s_total,
+        cur_s.bounced       AS cur_s_bounced,
+        cur_s.avg_pages     AS cur_s_avg_pages,
+        cur_s.scans         AS cur_s_scans,
+        cur_s.contacts      AS cur_s_contacts,
+        prev_pv.page_views AS prev_pv_pageviews,
+        prev_pv.sessions   AS prev_pv_sessions,
+        prev_pv.visitors   AS prev_pv_visitors,
+        prev_s.total_sessions AS prev_s_total,
+        prev_s.bounced       AS prev_s_bounced,
+        prev_s.avg_pages     AS prev_s_avg_pages,
+        prev_s.scans         AS prev_s_scans,
+        prev_s.contacts      AS prev_s_contacts
+      FROM cur_pv, cur_s, prev_pv, prev_s
+    `) as Array<{
+      cur_pv_pageviews: number;
+      cur_pv_sessions: number;
+      cur_pv_visitors: number;
+      cur_s_total: number;
+      cur_s_bounced: number;
+      cur_s_avg_pages: number;
+      cur_s_scans: number;
+      cur_s_contacts: number;
+      prev_pv_pageviews: number;
+      prev_pv_sessions: number;
+      prev_pv_visitors: number;
+      prev_s_total: number;
+      prev_s_bounced: number;
+      prev_s_avg_pages: number;
+      prev_s_scans: number;
+      prev_s_contacts: number;
+    }>;
+
+    const r = rows[0];
+    if (!r) return EMPTY_DASHBOARD_METRICS();
+
+    const curBounce =
+      r.cur_s_total > 0 ? (r.cur_s_bounced / r.cur_s_total) * 100 : 0;
+    const prevBounce =
+      r.prev_s_total > 0 ? (r.prev_s_bounced / r.prev_s_total) * 100 : 0;
+
+    return {
+      visitors: r.cur_pv_visitors,
+      sessions: r.cur_pv_sessions,
+      pageViews: r.cur_pv_pageviews,
+      bounceRate: Number(curBounce.toFixed(1)),
+      pagesPerSession: Number(r.cur_s_avg_pages.toFixed(2)),
+      conversions: r.cur_s_scans + r.cur_s_contacts,
+      previousVisitors: r.prev_pv_visitors,
+      previousSessions: r.prev_pv_sessions,
+      previousPageViews: r.prev_pv_pageviews,
+      previousBounceRate: Number(prevBounce.toFixed(1)),
+      previousPagesPerSession: Number(r.prev_s_avg_pages.toFixed(2)),
+      previousConversions: r.prev_s_scans + r.prev_s_contacts,
+    };
+  } catch (err) {
+    console.warn(
+      `[analytics] fetchAggregateMetricsWithComparison failed: ${err instanceof Error ? err.message : err}`
+    );
+    return EMPTY_DASHBOARD_METRICS();
+  }
+}
+
+function EMPTY_DASHBOARD_METRICS(): DashboardMetrics {
+  return {
+    visitors: 0,
+    sessions: 0,
+    pageViews: 0,
+    bounceRate: 0,
+    pagesPerSession: 0,
+    conversions: 0,
+    previousVisitors: 0,
+    previousSessions: 0,
+    previousPageViews: 0,
+    previousBounceRate: 0,
+    previousPagesPerSession: 0,
+    previousConversions: 0,
+  };
+}
+
+async function fetchTopPagesRange(
+  cs: string,
+  ce: string,
+  limit: number
+): Promise<DashboardTopPage[]> {
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        path,
+        COUNT(*)::int AS views,
+        COUNT(DISTINCT session_id)::int AS sessions,
+        COUNT(DISTINCT visitor_id)::int AS visitors
+      FROM page_views
+      WHERE created_at >= ${cs}::timestamptz
+        AND created_at <  ${ce}::timestamptz
+        AND is_bot = false
+      GROUP BY path
+      ORDER BY views DESC
+      LIMIT ${Math.max(1, Math.min(100, limit))}
+    `) as { path: string; views: number; sessions: number; visitors: number }[];
+    const total = rows.reduce((sum, r) => sum + Number(r.views), 0);
+    return rows.map((r) => ({
+      path: r.path,
+      prettyPath: prettifyPath(r.path),
+      views: Number(r.views),
+      sessions: Number(r.sessions),
+      visitors: Number(r.visitors),
+      pct: total > 0 ? Number(((Number(r.views) / total) * 100).toFixed(1)) : 0,
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] fetchTopPagesRange failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
+}
+
+async function fetchTopSourcesRange(
+  cs: string,
+  ce: string,
+  limit: number
+): Promise<DashboardTopSource[]> {
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        COALESCE(utm_source, referrer_host, '(direct)') AS source,
+        COUNT(*)::int AS sessions,
+        COUNT(*) FILTER (WHERE converted_scan_id IS NOT NULL)::int AS scan_conv,
+        COUNT(*) FILTER (WHERE converted_contact_id IS NOT NULL)::int AS contact_conv
+      FROM sessions
+      WHERE started_at >= ${cs}::timestamptz
+        AND started_at <  ${ce}::timestamptz
+        AND is_bot = false
+      GROUP BY source
+      ORDER BY sessions DESC
+      LIMIT ${Math.max(1, Math.min(50, limit))}
+    `) as {
+      source: string;
+      sessions: number;
+      scan_conv: number;
+      contact_conv: number;
+    }[];
+    const total = rows.reduce((sum, r) => sum + Number(r.sessions), 0);
+    return rows.map((r) => ({
+      source: r.source,
+      sessions: Number(r.sessions),
+      scanConversions: Number(r.scan_conv),
+      contactConversions: Number(r.contact_conv),
+      pct:
+        total > 0 ? Number(((Number(r.sessions) / total) * 100).toFixed(1)) : 0,
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] fetchTopSourcesRange failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
+}
+
+async function fetchDevicesRange(
+  cs: string,
+  ce: string
+): Promise<DashboardDevice[]> {
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        COALESCE(device_type, 'unknown') AS device,
+        COUNT(*)::int AS sessions
+      FROM sessions
+      WHERE started_at >= ${cs}::timestamptz
+        AND started_at <  ${ce}::timestamptz
+        AND is_bot = false
+      GROUP BY device
+      ORDER BY sessions DESC
+    `) as { device: string; sessions: number }[];
+    const total = rows.reduce((sum, r) => sum + Number(r.sessions), 0);
+    return rows.map((r) => ({
+      device: r.device,
+      sessions: Number(r.sessions),
+      pct: total > 0 ? Number(((Number(r.sessions) / total) * 100).toFixed(1)) : 0,
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] fetchDevicesRange failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
+}
+
+/**
+ * Engagement breakdown across non-bot sessions in the window.
+ * - engaged: any of the session's page views had dwell >= 30s OR scroll >= 50%
+ * - light: had a beacon at all but did not meet the engaged threshold
+ * - none: zero beacon rows for any of its page views
+ * - likelyBot: sessions with is_bot = true (separate count, not part of the
+ *   engaged/light/none totals)
+ */
+async function fetchEngagementRange(
+  cs: string,
+  ce: string
+): Promise<DashboardEngagement> {
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      WITH s AS (
+        SELECT id, is_bot FROM sessions
+        WHERE started_at >= ${cs}::timestamptz
+          AND started_at <  ${ce}::timestamptz
+      ),
+      pv_eng AS (
+        SELECT
+          pv.session_id,
+          COUNT(eng.page_view_id)::int AS beacon_rows,
+          MAX(eng.dwell_ms) AS max_dwell,
+          MAX(eng.max_scroll_pct) AS max_scroll
+        FROM page_views pv
+        LEFT JOIN page_view_engagement eng ON eng.page_view_id = pv.id
+        WHERE pv.created_at >= ${cs}::timestamptz
+          AND pv.created_at <  ${ce}::timestamptz
+        GROUP BY pv.session_id
+      ),
+      classified AS (
+        SELECT
+          s.id,
+          s.is_bot,
+          COALESCE(pv_eng.beacon_rows, 0) AS beacon_rows,
+          COALESCE(pv_eng.max_dwell, 0)   AS max_dwell,
+          COALESCE(pv_eng.max_scroll, 0)  AS max_scroll
+        FROM s
+        LEFT JOIN pv_eng ON pv_eng.session_id = s.id
+      )
+      SELECT
+        COUNT(*) FILTER (WHERE is_bot = true)::int AS likely_bot,
+        COUNT(*) FILTER (WHERE is_bot = false AND beacon_rows = 0)::int AS none_eng,
+        COUNT(*) FILTER (
+          WHERE is_bot = false AND beacon_rows > 0
+            AND (max_dwell < 30000 AND max_scroll < 50)
+        )::int AS light_eng,
+        COUNT(*) FILTER (
+          WHERE is_bot = false AND beacon_rows > 0
+            AND (max_dwell >= 30000 OR max_scroll >= 50)
+        )::int AS engaged
+      FROM classified
+    `) as {
+      likely_bot: number;
+      none_eng: number;
+      light_eng: number;
+      engaged: number;
+    }[];
+    const r = rows[0];
+    return {
+      engaged: r ? Number(r.engaged) : 0,
+      light: r ? Number(r.light_eng) : 0,
+      none: r ? Number(r.none_eng) : 0,
+      likelyBot: r ? Number(r.likely_bot) : 0,
+    };
+  } catch (err) {
+    console.warn(
+      `[analytics] fetchEngagementRange failed: ${err instanceof Error ? err.message : err}`
+    );
+    return { engaged: 0, light: 0, none: 0, likelyBot: 0 };
+  }
+}
+
+async function fetchTopCitiesRange(
+  cs: string,
+  ce: string,
+  limit: number
+): Promise<DashboardTopCity[]> {
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        COALESCE(city, '')    AS city,
+        COALESCE(region, '')  AS region,
+        COALESCE(country, '') AS country,
+        COUNT(DISTINCT visitor_id)::int AS visitors
+      FROM page_views
+      WHERE created_at >= ${cs}::timestamptz
+        AND created_at <  ${ce}::timestamptz
+        AND is_bot = false
+        AND city IS NOT NULL
+      GROUP BY country, region, city
+      ORDER BY visitors DESC
+      LIMIT ${Math.max(1, Math.min(50, limit))}
+    `) as { city: string; region: string; country: string; visitors: number }[];
+    return rows.map((r) => ({
+      city: r.city,
+      region: r.region,
+      country: r.country,
+      visitors: Number(r.visitors),
+    }));
+  } catch (err) {
+    console.warn(
+      `[analytics] fetchTopCitiesRange failed: ${err instanceof Error ? err.message : err}`
+    );
+    return [];
+  }
+}

@@ -1,5 +1,59 @@
 # Decision Log
 
+## May 1, 2026 (late) -- /admin/visitors upgraded to PostHog/Vercel-Analytics-level chart-driven page (Phase 1 of two-phase build)
+
+Decision: The `/admin/visitors` page was upgraded from a four-card stat
+grid + four flat tables to a chart-driven analytics page anchored by a
+hero time-series chart, six period-over-period metric tiles, and three
+visual breakdown panels (top pages, top sources, devices+engagement),
+plus a stretch top-cities panel. The recent visitors table at the
+bottom is preserved EXACTLY as-is (it is already at PostHog quality
+for per-visitor views). The Live presence section and DefinitionsPanel
+move into the new layout.
+
+Reason: The visitors page is the most-used /admin surface and the
+strongest proof-of-craft for Canopy (it is the first thing operators
+see when proving "this dashboard is worth $25K"). The four
+stat-cards-plus-tables layout read as a competent admin page, not as a
+$25K productized analytics product. PostHog and Vercel Analytics both
+lead with a chart hero with period-over-period comparison and tiled
+metrics; that pattern is the table-stakes shape for a buyer to read
+the page as serious. The recent-visitors table below the new section
+is the proprietary differentiator (per-visitor identity, full timeline,
+engagement column, bot heuristic, CSV export) so it stays untouched.
+
+Implementation choices:
+- **Recharts** chosen over a hand-rolled SVG chart for the hero
+  because the tooltip + comparison line + responsive resizing require
+  a real charting library; the breakdown bars stayed as styled divs
+  because they are simpler and faster to render at small sizes.
+- **State in React, NOT in URL.** Range pill clicks (7D / 14D / 30D /
+  90D / custom) trigger a client-side fetch to a new
+  `/admin/api/visitors-data` API route. This intentionally does NOT
+  push to the URL because the recent-visitors table below already
+  uses `?before_v=` and `?before=` for its two paginators, and
+  conflating them would break the back/forward behaviour. Trade-off:
+  the chart range is not bookmarkable. Acceptable because the table
+  pagination integrity matters more than chart-range deep links.
+- **Comparison-history threshold of 3 daily points.** When the
+  comparison window has fewer than 3 daily data points, the API
+  returns `comparisonSeries=[]` and `previous*=null`. The frontend
+  hides the ghost line and the trend deltas in that case. Three
+  points is the minimum that produces a non-degenerate comparison
+  shape; below that, the ghost line is visual noise.
+- **Bounce rate trend color is INVERTED.** Lower bounce = green
+  arrow, higher bounce = red. Every other metric uses the natural
+  direction.
+- **No `unstable_cache`.** Next 16 deprecates it; the Cache
+  Components / `'use cache'` directive is the forward path. For now
+  the route is `force-dynamic`. If the page is noticeably slow
+  (>2s), follow up with `'use cache'` per-section.
+
+Per the prerequisite: the dashboard floating-preview / sparkline work
+(commit b10428f) had to land first because Phase 2's CRM dashboard
+card depends on the same KPI infrastructure. Phase 2 (CRM integration)
+ships in its own commit.
+
 ## April 30, 2026 -- Canopy pulled from public pricing surface (premature to sell with one install); repositioned on Work page as proof-of-craft
 
 Decision: Less than 24 hours after the first Canopy install went live for Star Auto Service, Joshua flagged that listing Canopy as a $25,000 "Productized Engagement" on the public `/pricing` page was premature and amateurish. With one install (live for hours, audit log still empty, real beacon traffic not yet verified end-to-end, no testimonials, no proven case studies across multiple verticals, ICP still being validated), public pricing was selling something that did not yet exist as a true productized offering.

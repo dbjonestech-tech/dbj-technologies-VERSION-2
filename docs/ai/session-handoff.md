@@ -5,11 +5,98 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (end of May 1, 2026)
+## Current state (May 1, 2026 -- Phase 1 staged, not yet committed)
 
-### Most recent commits (top of `origin main`)
+### Phase 1 staged on disk (uncommitted)
 
-- (this commit) docs: update session-handoff with b10428f commit hash
+The visitors page rewrite is staged but not yet committed. Working tree
+has Phase 1 changes pending review. After review, these will land in a
+single commit titled `feat(admin/visitors): PostHog-level analytics
+with hero chart, metric tiles, and breakdown panels`. Phase 2 (CRM) is
+a separate session and a separate commit.
+
+### Phase 1 -- Visitors page upgrade (PostHog/Vercel Analytics level)
+
+`/admin/visitors` is upgraded from a stat-card + table layout to a
+chart-driven analytics page. The recent visitors table at the bottom
+is preserved exactly as-is. Files added/modified:
+
+- **`lib/services/analytics.ts`** (modified, +500 lines): new
+  `getVisitorsDashboardData({ range } | { from, to })` that runs all
+  required queries in parallel via `Promise.all` with per-section
+  try/catch so one failed query does not blank the whole page.
+  Returns `{ series, comparisonSeries, metrics, topPages, topSources,
+  devices, engagement, topCities }` with `previous*` companion values
+  on every metric for delta computation. If the comparison window has
+  fewer than 3 daily data points, `comparisonSeries` is `[]` and all
+  `previous*` are null so the frontend can hide the ghost line and the
+  trend deltas. Internal helpers: `fetchDailyVisitors`,
+  `fetchAggregateMetricsWithComparison` (one round-trip CTE for both
+  windows), `fetchTopPagesRange`, `fetchTopSourcesRange`,
+  `fetchDevicesRange`, `fetchEngagementRange` (engaged/light/none/
+  likelyBot via dwell >= 30s OR scroll >= 50% threshold per session),
+  `fetchTopCitiesRange`. Includes `prettifyPath()` and `fillDailySeries()`
+  utilities so the chart renders a continuous x-axis even when
+  no-traffic days exist.
+- **`app/admin/api/visitors-data/route.ts`** (new): force-dynamic
+  endpoint that accepts `range=7d|14d|30d|90d` OR `from=YYYY-MM-DD&
+  to=YYYY-MM-DD`. Auth gated by middleware.ts (admin session required
+  for /admin/*). No-store cache headers.
+- **`app/admin/visitors/VisitorsDashboard.tsx`** (new): single
+  client component owning the date range state and rendering the hero
+  Recharts area chart (with comparison ghost line and custom glass-
+  card tooltip), the summary line, the 6 metric tiles
+  (Visitors / Sessions / Page Views / Bounce Rate / Pages per Session
+  / Conversions, with bounce rate color-inverted), 3 breakdown panels
+  (Top Pages / Top Sources / Devices+Engagement, all styled-div bars,
+  no chart library), and an optional Top Cities geography panel.
+  Range selector is `7D | 14D | 30D | 90D` plus a calendar icon that
+  reveals inline From/To date inputs. State is in React only and does
+  NOT update URL params (avoids conflicting with the table's
+  `?before=` cursor). Subtle opacity pulse on the chart during fetch.
+  All Framer Motion respects `useReducedMotion()` (Recharts
+  `isAnimationActive={false}` when reduced).
+- **`app/admin/visitors/page.tsx`** (modified): the four-card
+  overview grid (24h / 7d / 30d / Custom) is removed. The old
+  Top pages / Top sources / Geography / Devices tables below the
+  recent visitors table are removed (now replaced by the visual
+  breakdown panels above). The Live header is tightened from
+  `Live (last 5 minutes) -- N visitors` to `Live · N active
+  visitor[s]`. The DefinitionsPanel moves from above the live
+  section to the very bottom of the page. The recent visitors table
+  is COMPLETELY UNCHANGED (structure, columns, engagement column,
+  bot heuristic, pages-visited chips, filter chips, expandable
+  rows, CSV export, `?before_v=` pagination cursor). Two paginators
+  (`?before=` page-views, `?before_v=` visitors) still operate
+  independently.
+- **`package.json`**: added `recharts ^3.8.1`.
+
+### Phase 1 verification at staging
+
+- `npx tsc --noEmit` clean
+- `npm run lint` clean (one round of useMemo dependency tightening)
+- `grep -l $'\xe2\x80\x94' <changed files>` empty
+- legacy-email grep across changed files returns empty
+- Local dev server starts; the admin route compiles. Note: middleware
+  redirects unauth requests to /signin before the page compiles, so
+  the bulletproof RSC-boundary check is a post-deploy
+  `vercel logs --status-code 500 --since 5m` against the production
+  URL after the user authorizes the push. This is the verification
+  pattern locked in by the `feedback_rsc_boundary_runtime` memory
+  (commit a28cd80 was the original incident).
+
+### Phase 2 (CRM) NOT YET STARTED
+
+Phase 2 ships in its own commit. Includes: migration 022 for contacts
++ contact_notes, lib/services/contacts.ts, lib/actions/contacts.ts,
+sidebar Relationships group between Acquisition and Operations, /admin/
+contacts list page, /admin/contacts/[id] detail page, /admin/pipeline
+kanban page, dashboard Relationships card, and auto-creation wiring
+in the scan pipeline + contact form + client invite flow.
+
+### Most recent committed history (top of `origin main`)
+
+- `5d6fa2e` docs: update session-handoff with b10428f commit hash
 - `b10428f` feat(admin): floating CardPreview popover + sparklines + recent activity on /admin cards
 - `8ad516c` feat(admin): always-visible KPIs + richer hover details on /admin cards
 - `451d126` feat(admin): self-service /admin/config status board + .env.example completed
@@ -36,7 +123,7 @@ of every change above.
   /admin now opens a portaled, viewport-anchored preview panel on hover
   (and on tap-the-chevron for touch devices). The preview shows the icon
   tile, title, status pill, primary KPI, a 14-day SVG sparkline of the
-  primary metric (no chart library — pure 100x36 viewBox, area + line +
+  primary metric (no chart library, pure 100x36 viewBox, area + line +
   last-point dot, currentColor-driven hue), an At-a-glance details column,
   and a Recent activity column (last 5 page views / scans / leads / email
   events / audit entries / pipeline runs / deploys / sentry issues / infra
