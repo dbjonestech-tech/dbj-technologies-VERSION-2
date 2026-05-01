@@ -5,21 +5,61 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Phase 2 shipped at `9fb9e01`)
+## Current state (May 1, 2026 -- Phase 2 shipped + audited at `b9a1833`)
 
-### Phase 1 shipped (commit `7f9ea05`)
+### Phase 1 shipped (commit `7f9ea05`, docs `76925b7`)
 
 `feat(admin/visitors): chart-driven analytics with hero chart, metric
-tiles, and breakdown panels`. Pushed to `origin main`. Phase 1 docs
-amended at `76925b7`.
+tiles, and breakdown panels`. Production deployment Ready. No 500s
+in `vercel logs --status-code 500 --since 5m`.
 
-### Phase 2 shipped (commit `9fb9e01`)
+### Phase 2 shipped (commit `9fb9e01`, docs `d09f49a`)
 
 `feat(admin/crm): contacts, pipeline, and unified timeline with
-Pathlight integration`. Pushed to `origin main`. Vercel auto-deploys.
-Migration 022 still needs to be applied to the prod Neon DB
-(`npx tsx lib/db/setup.ts`); until then the new pages render their
-empty state.
+Pathlight integration`. Production deployment Ready. Migration 022
+applied to prod Neon (verified via direct table introspection: both
+`contacts` and `contact_notes` exist, all five expected indexes are
+present, no redundant idx_contacts_email).
+
+### Phase 2 post-deploy audit fixes (commit `b9a1833`)
+
+`fix(admin/crm): correct kanban revalidatePath + normalize email case
+across scan-side joins`. Two real bugs surfaced from the audit:
+
+1. Server Actions revalidated `/admin/pipeline` (the Inngest pipeline
+   page) instead of `/admin/relationships/pipeline` (the CRM kanban).
+   Status changes from kanban cards now refresh the kanban as
+   intended.
+2. `scans.email` is stored as-typed by users (the scan submit route
+   does not lowercase before insert), but `contacts.email` is always
+   normalized to `lower(trim(...))` on write. Every LATERAL touchpoint
+   count and every timeline CTE that joined against scans now wraps
+   the comparison in `LOWER(TRIM(...))` so the join survives casing
+   inconsistencies. `contact_submissions.email` is already lowercased
+   on write so its joins are unaffected.
+
+### Production verification
+
+- Migration 022 applied cleanly: `contacts` (14 cols) +
+  `contact_notes` (6 cols), all five expected indexes
+  (`contacts_pkey`, `contacts_email_key`, `idx_contacts_status`,
+  `idx_contacts_follow_up`, `contact_notes_pkey`,
+  `idx_contact_notes_contact`).
+- Two production deployments Ready in Vercel (Phase 1 build, Phase 2
+  build). Audit-fix deployment building.
+- `vercel logs --status-code 500 --since 5m` returns no logs (no
+  500 errors).
+- `curl -I` against `/admin`, `/admin/visitors`, `/admin/contacts`,
+  `/admin/relationships/pipeline` all return 307 (auth redirect),
+  confirming routes compile and middleware works. No 500s, no
+  RSC-boundary failures.
+
+### Manual follow-up (still pending Joshua's hands)
+
+After the audit-fix deploy completes, click "Sync contacts" on
+`/admin/contacts` once to backfill from existing leads /
+contact_submissions / clients. The function is idempotent so running
+later or running twice is safe.
 
 CRM integration into Canopy. Migration 022 plus the Contacts /
 Pipeline pages, sidebar group, dashboard card, and auto-creation
