@@ -5,7 +5,7 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Phase 2 staged for commit)
+## Current state (May 1, 2026 -- Phase 2 shipped at `9fb9e01`)
 
 ### Phase 1 shipped (commit `7f9ea05`)
 
@@ -13,7 +13,13 @@ record of every May 1 entry that was below this header before this reset.
 tiles, and breakdown panels`. Pushed to `origin main`. Phase 1 docs
 amended at `76925b7`.
 
-### Phase 2 staged on disk (uncommitted)
+### Phase 2 shipped (commit `9fb9e01`)
+
+`feat(admin/crm): contacts, pipeline, and unified timeline with
+Pathlight integration`. Pushed to `origin main`. Vercel auto-deploys.
+Migration 022 still needs to be applied to the prod Neon DB
+(`npx tsx lib/db/setup.ts`); until then the new pages render their
+empty state.
 
 CRM integration into Canopy. Migration 022 plus the Contacts /
 Pipeline pages, sidebar group, dashboard card, and auto-creation
