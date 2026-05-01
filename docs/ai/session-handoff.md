@@ -64,6 +64,52 @@ of every change above.
 - `project_canopy_brand.md` updated. /admin is the design prototype for the
   Canopy product; Canopy UI work mirrors /admin patterns.
 
+### Latest work landed (May 1 evening): always-visible KPIs + richer hover details on /admin
+
+Joshua: "I want the data to be live data that always shows without hovering
+action. Also, if anything else should show that could enhance the value of
+it to the user when they do hover, after the current hover data is already
+shown, add that to it."
+
+The dashboard cards on /admin previously showed a small zinc dash at rest
+and faded the primary KPI in only on hover. Inverted that: primary +
+secondary are now always visible, and a richer details panel slides in
+on hover beneath them.
+
+- **`lib/services/dashboard-kpis.ts`** -- new `KpiDetail = { label, value,
+  tone? }` type and `details?: KpiDetail[]` field on `CardKpi`. Every
+  one of the 18 card-level KPI functions enriched with 2-4 detail items
+  drawn from data already being fetched (or one extra cheap query):
+  - **Visitors:** Sessions/Visitors/Bounce/7d views.
+  - **Monitor:** info/warn/error breakdown.
+  - **Scans:** 7d total, 7d success rate, 7d failed.
+  - **Leads:** 24h velocity, 7d split.
+  - **Funnel:** scan->complete %, scans started, scans completed,
+    session->contact %.
+  - **Search:** CTR, avg position, 28d impressions.
+  - **RUM:** INP p75, CLS p75, LCP p50.
+  - **Email:** complaint rate, bounced/failed/sent (7d).
+  - **Costs:** 7d total + per-provider 7d totals.
+  - **Database:** sessions, page views, leads, contact submissions.
+  - **Clients:** total clients, active projects, completed projects.
+  - **Audit:** last hour count, distinct actors, denied count.
+  - **Pipeline:** running now, avg duration, failed (24h).
+  - **Platform:** production hostname, last deploy age, building now,
+    failed (24h).
+  - **Errors:** top issue title + count + level, fatal count, error
+    count, total events.
+  - **Infrastructure:** closest TLS expiry domain + days, passing/
+    warning/failing counts.
+  - **Recurring:** 30d count, growth.
+  - **Users:** active, disabled, DB total, bootstrap allowlist size.
+- **`app/admin/DashboardCard.tsx`** -- removed the fade-in-on-hover
+  primary; the dot + primary + secondary now render at rest. New
+  details panel renders under the primary on hover (2-column grid,
+  label + value, tone-colored values). Reduced-motion users see the
+  same panel without the slide animation.
+
+Files: 2 changed.
+
 ### Latest work landed (May 1 evening): admin dashboard wiring audit + /admin/config
 
 After the visitors-page Engagement column shipped, Joshua asked for a full

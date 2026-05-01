@@ -24,7 +24,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-import type { CardKpi, KpiTone } from "@/lib/services/dashboard-kpis";
+import type { CardKpi, KpiTone, KpiDetail } from "@/lib/services/dashboard-kpis";
 import { PALETTES, type PaletteName } from "@/lib/admin/page-themes";
 
 /* The dashboard page is a Server Component but this card is a Client
@@ -59,6 +59,20 @@ function toneTextClass(tone: KpiTone | undefined, palette: PaletteName): string 
   if (tone === "warning") return "text-amber-700";
   if (tone === "danger") return "text-red-700";
   return PALETTES[palette].kpiNeutralText;
+}
+
+function DetailRow({ detail, palette }: { detail: KpiDetail; palette: PaletteName }) {
+  const valueColor = toneTextClass(detail.tone, palette);
+  return (
+    <div className="flex min-w-0 items-baseline justify-between gap-2">
+      <span className="truncate text-[10px] uppercase tracking-wider text-zinc-500">
+        {detail.label}
+      </span>
+      <span className={`shrink-0 font-mono text-[11px] font-semibold ${valueColor}`}>
+        {detail.value}
+      </span>
+    </div>
+  );
 }
 
 function toneDotClass(tone: KpiTone | undefined): string {
@@ -161,46 +175,56 @@ export default function DashboardCard({
           </p>
         </div>
 
-        {/* KPI footer reserved at bottom of the card. The container is
-            always mounted so card heights stay stable across hover.
-            The KPI line itself fades + slides in on hover. A subtle
-            zinc dash sits in default state so the bottom of every
-            card has the same visual weight. */}
+        {/* KPI footer. Primary + secondary are always visible (live
+            data at rest, no hover required). On hover, an additional
+            details panel slides down beneath. The card's min-height
+            absorbs the panel so neighboring cards don't jump; the
+            panel itself uses absolute positioning + a z-index so it
+            can overflow the bottom edge gracefully on smaller cards
+            without pushing other cards. */}
         {kpi ? (
           <div className="relative mt-auto pt-4">
             <div className="border-t border-zinc-100 pt-3">
-              <div className="relative h-5">
+              {/* Always-visible primary KPI line. */}
+              <div className="flex items-center gap-2">
                 <span
                   aria-hidden="true"
-                  className={`absolute inset-0 flex items-center transition-opacity duration-300 ${hovered ? "opacity-0" : "opacity-100"}`}
-                >
-                  <span className="inline-block h-1 w-10 rounded-full bg-zinc-200" />
+                  className={`inline-block h-1.5 w-1.5 rounded-full ${dotClass}`}
+                />
+                <span className={`font-mono text-[13px] font-semibold ${kpiText}`}>
+                  {kpi.primary}
                 </span>
+                {kpi.secondary ? (
+                  <span className="truncate text-[11px] text-zinc-500">
+                    {kpi.secondary}
+                  </span>
+                ) : null}
+              </div>
+
+              {/* Hover-only details panel. Mounted inside the card so
+                  it inherits the same border + bg, but absolutely
+                  positioned to not affect default card height. */}
+              {kpi.details && kpi.details.length > 0 ? (
                 <motion.div
                   aria-hidden={!hovered}
                   initial={false}
                   animate={
                     reduced
                       ? { opacity: hovered ? 1 : 0 }
-                      : { opacity: hovered ? 1 : 0, y: hovered ? 0 : 4 }
+                      : {
+                          opacity: hovered ? 1 : 0,
+                          y: hovered ? 0 : -4,
+                          pointerEvents: hovered ? "auto" : "none",
+                        }
                   }
                   transition={{ duration: 0.22, ease: "easeOut" }}
-                  className="absolute inset-0 flex items-center gap-2"
+                  className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5"
                 >
-                  <span
-                    aria-hidden="true"
-                    className={`inline-block h-1.5 w-1.5 rounded-full ${dotClass}`}
-                  />
-                  <span className={`font-mono text-[13px] font-semibold ${kpiText}`}>
-                    {kpi.primary}
-                  </span>
-                  {kpi.secondary ? (
-                    <span className="truncate text-[11px] text-zinc-500">
-                      {kpi.secondary}
-                    </span>
-                  ) : null}
+                  {kpi.details.map((d, i) => (
+                    <DetailRow key={`${d.label}-${i}`} detail={d} palette={palette} />
+                  ))}
                 </motion.div>
-              </div>
+              ) : null}
             </div>
           </div>
         ) : (
