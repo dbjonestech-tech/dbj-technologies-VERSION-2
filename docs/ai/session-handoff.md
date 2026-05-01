@@ -10,7 +10,9 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with 5d9a126 commit hash
+- (this commit) docs: update session-handoff with a37289e commit hash
+- `a37289e` feat(canopy admin): per-card palette system (18 hues), Canopy wordmark across admin shell, Recurring users page + dashboard card + KPI, Excel-style striped rows, search + filter chips on visitor tables
+- `6902697` docs: update session-handoff with 5d9a126 commit hash
 - `5d9a126` feat(admin): per-visitor view with self-disclosed identity, full timeline, and definitions panel on /admin/visitors
 - `37d65b8` docs: update session-handoff with a28cd80 commit hash
 - `a28cd80` fix(admin): pass icon name as string across RSC boundary (the Server -> Client function-prop crash that surfaced as "Application error: a client-side exception has occurred" on dbjtechnologies.com/admin in production)
