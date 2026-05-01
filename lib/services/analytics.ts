@@ -935,6 +935,10 @@ export type RecentVisitorRow = {
   topPath: string | null;
   entryPath: string | null;
   exitPath: string | null;
+  /* Every distinct path the visitor hit, ordered by first visit
+   * (chronological journey). Does not include query strings. Capped
+   * at 50 paths per visitor in SQL to keep the row small. */
+  pathsVisited: string[];
   /* Conversion flags + linked rows. */
   convertedScan: boolean;
   convertedContact: boolean;
@@ -1019,6 +1023,27 @@ export async function getRecentVisitors(
         ) ranked
         WHERE rn = 1
       ),
+      paths_visited AS (
+        /* Distinct paths per visitor, ordered by first visit so the
+         * client renders the journey chronologically. Capped at 50
+         * to keep the row size sane. */
+        SELECT
+          fp.visitor_id,
+          array_agg(fp.path ORDER BY fp.first_seen ASC) AS paths
+        FROM (
+          SELECT
+            pv.visitor_id, pv.path, MIN(pv.created_at) AS first_seen,
+            ROW_NUMBER() OVER (
+              PARTITION BY pv.visitor_id
+              ORDER BY MIN(pv.created_at) ASC
+            ) AS rn
+          FROM page_views pv
+          WHERE pv.is_bot = false
+          GROUP BY pv.visitor_id, pv.path
+        ) fp
+        WHERE fp.rn <= 50
+        GROUP BY fp.visitor_id
+      ),
       conv AS (
         SELECT
           s.visitor_id,
@@ -1042,6 +1067,7 @@ export async function getRecentVisitors(
         top_path.path AS top_path,
         entry.entry_path,
         exit_.exit_path,
+        COALESCE(paths_visited.paths, ARRAY[]::text[]) AS paths_visited,
         COALESCE(conv.converted_scan, false) AS converted_scan,
         COALESCE(conv.converted_contact, false) AS converted_contact,
         conv.any_scan_id AS scan_id,
@@ -1059,6 +1085,7 @@ export async function getRecentVisitors(
       LEFT JOIN exit_ ON exit_.visitor_id = agg.visitor_id
       LEFT JOIN utm ON utm.visitor_id = agg.visitor_id
       LEFT JOIN top_path ON top_path.visitor_id = agg.visitor_id
+      LEFT JOIN paths_visited ON paths_visited.visitor_id = agg.visitor_id
       LEFT JOIN conv ON conv.visitor_id = agg.visitor_id
       LEFT JOIN contact_submissions cs ON cs.id = conv.any_contact_id::uuid
       LEFT JOIN scans sc ON sc.id = conv.any_scan_id::uuid
@@ -1084,6 +1111,7 @@ export async function getRecentVisitors(
       top_path: string | null;
       entry_path: string | null;
       exit_path: string | null;
+      paths_visited: string[] | null;
       converted_scan: boolean;
       converted_contact: boolean;
       scan_id: string | null;
@@ -1115,6 +1143,7 @@ export async function getRecentVisitors(
       topPath: r.top_path,
       entryPath: r.entry_path,
       exitPath: r.exit_path,
+      pathsVisited: r.paths_visited ?? [],
       convertedScan: r.converted_scan,
       convertedContact: r.converted_contact,
       scanId: r.scan_id,
@@ -1221,6 +1250,26 @@ export async function getRecurringVisitors(
         ) ranked
         WHERE rn = 1
       ),
+      paths_visited AS (
+        /* Distinct paths per visitor in chronological journey order.
+         * Capped at 50 to keep the row size sane. */
+        SELECT
+          fp.visitor_id,
+          array_agg(fp.path ORDER BY fp.first_seen ASC) AS paths
+        FROM (
+          SELECT
+            pv.visitor_id, pv.path, MIN(pv.created_at) AS first_seen,
+            ROW_NUMBER() OVER (
+              PARTITION BY pv.visitor_id
+              ORDER BY MIN(pv.created_at) ASC
+            ) AS rn
+          FROM page_views pv
+          WHERE pv.is_bot = false
+          GROUP BY pv.visitor_id, pv.path
+        ) fp
+        WHERE fp.rn <= 50
+        GROUP BY fp.visitor_id
+      ),
       conv AS (
         SELECT
           s.visitor_id,
@@ -1244,6 +1293,7 @@ export async function getRecurringVisitors(
         top_path.path AS top_path,
         entry.entry_path,
         exit_.exit_path,
+        COALESCE(paths_visited.paths, ARRAY[]::text[]) AS paths_visited,
         COALESCE(conv.converted_scan, false) AS converted_scan,
         COALESCE(conv.converted_contact, false) AS converted_contact,
         conv.any_scan_id AS scan_id,
@@ -1261,6 +1311,7 @@ export async function getRecurringVisitors(
       LEFT JOIN exit_ ON exit_.visitor_id = agg.visitor_id
       LEFT JOIN utm ON utm.visitor_id = agg.visitor_id
       LEFT JOIN top_path ON top_path.visitor_id = agg.visitor_id
+      LEFT JOIN paths_visited ON paths_visited.visitor_id = agg.visitor_id
       LEFT JOIN conv ON conv.visitor_id = agg.visitor_id
       LEFT JOIN contact_submissions cs ON cs.id = conv.any_contact_id::uuid
       LEFT JOIN scans sc ON sc.id = conv.any_scan_id::uuid
@@ -1289,6 +1340,7 @@ export async function getRecurringVisitors(
       top_path: string | null;
       entry_path: string | null;
       exit_path: string | null;
+      paths_visited: string[] | null;
       converted_scan: boolean;
       converted_contact: boolean;
       scan_id: string | null;
@@ -1320,6 +1372,7 @@ export async function getRecurringVisitors(
       topPath: r.top_path,
       entryPath: r.entry_path,
       exitPath: r.exit_path,
+      pathsVisited: r.paths_visited ?? [],
       convertedScan: r.converted_scan,
       convertedContact: r.converted_contact,
       scanId: r.scan_id,

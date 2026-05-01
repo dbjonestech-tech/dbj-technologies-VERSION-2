@@ -10,12 +10,46 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with cc529a0 commit hash
+- (this commit) docs: update session-handoff with the visitors-page paths column
+- `feat(admin/visitors): per-visitor "Pages visited" column with clean labels` (this sprint)
 - `cc529a0` feat(canopy admin): all 18 admin pages now wear their palette via shared PageHeader (chip pill + stripe + colored eyebrow); per-column color rotation in every data table via .canopy-table CSS rules (8-hue rotation)
 - `20bc0a4` perf(marketing): cut Lighthouse-flagged paint and main-thread cost on /about, /services, /pricing, /work
 
 Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys
 from main. Next 04:00 UTC Lighthouse cron will re-evaluate.
+
+### What landed in this session: per-visitor "Pages visited" column
+
+Joshua noticed the /admin/visitors table showed sessions and page-view counts
+but did not show *which* pages each visitor hit unless you expanded the row.
+Added a new "Pages visited" column rendered as small pill chips with clean
+labels (Home, Work, Pricing, etc.) so the journey reads at a glance.
+
+- **`lib/services/analytics.ts`** -- added a `paths_visited` CTE to both
+  `getRecentVisitors` and `getRecurringVisitors`. Returns the distinct paths
+  per visitor in chronological order (ordered by first-visit timestamp),
+  capped at 50 paths per visitor to keep the row size sane. Added
+  `pathsVisited: string[]` to the `RecentVisitorRow` shape; both query
+  result-row types and mappers updated.
+- **`app/admin/visitors/RecentVisitorsTable.tsx`** -- new `prettifyPath()`
+  helper maps `/` -> "Home", `/about` -> "About", `/work/canopy` ->
+  "Work / Canopy", `/pathlight/<scanId>` -> "Pathlight Report", etc.
+  New `PagesVisitedChips` component renders up to 4 chips with a "+N more"
+  overflow indicator (full path tooltip on hover). New "Pages visited"
+  column inserted between Device and Sessions; table min-width bumped
+  from 920px to 1080px. Search filter now also matches against pretty
+  labels so typing "Pricing" finds anyone who hit `/pricing`. CSV export
+  gets a new `paths_visited` column with paths joined by ` | `.
+- **/admin/recurring** automatically picks up the new column because it
+  reuses the same `RecentVisitorsTable` component.
+
+Files touched: 2 modified.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- Live verification deferred until Vercel deploys.
 
 ### What landed in this session: marketing-site Lighthouse perf sprint
 

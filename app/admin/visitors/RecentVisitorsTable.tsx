@@ -87,6 +87,61 @@ function sourceLabel(row: RecentVisitorRow): string {
 }
 
 /**
+ * Map a URL path to a clean human label for the Pages column.
+ * Top-level marketing routes get a single word ("Home", "Work").
+ * Dynamic segments collapse to their parent route (e.g.
+ * /work/canopy -> "Work / Canopy", /pathlight/<scanId> -> "Pathlight Report").
+ */
+function prettifyPath(path: string): string {
+  if (!path) return path;
+  const clean = path.split("?")[0]!.split("#")[0]!.replace(/\/+$/, "") || "/";
+  if (clean === "/") return "Home";
+
+  const TOP: Record<string, string> = {
+    "/about": "About",
+    "/work": "Work",
+    "/services": "Services",
+    "/pricing": "Pricing",
+    "/contact": "Contact",
+    "/pathlight": "Pathlight",
+    "/process": "Process",
+    "/why-dbj": "Why DBJ",
+    "/faq": "FAQ",
+    "/privacy": "Privacy",
+    "/terms": "Terms",
+    "/websites": "Websites",
+    "/portal-access": "Portal Access",
+    "/signin": "Sign in",
+  };
+  if (TOP[clean]) return TOP[clean]!;
+
+  const segments = clean.split("/").filter(Boolean);
+  const root = `/${segments[0]}`;
+
+  /* Pathlight scan reports are dynamic per scan id. */
+  if (root === "/pathlight" && segments.length >= 2) return "Pathlight Report";
+
+  /* Nested marketing routes: parent label + last meaningful segment.
+   * /work/canopy -> "Work / Canopy"
+   * /work/design-briefs/landscaping -> "Work / Design Briefs / Landscaping" */
+  if (TOP[root]) {
+    const tail = segments
+      .slice(1)
+      .map((s) =>
+        s
+          .split("-")
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ")
+      )
+      .join(" / ");
+    return tail ? `${TOP[root]} / ${tail}` : TOP[root]!;
+  }
+
+  /* Admin or other surfaces fall back to the literal path. */
+  return clean;
+}
+
+/**
  * Build a display name for a visitor. Returns the most specific
  * identity we have: contact-form name > scan business > scan email >
  * contact email > short visitor id. Always includes a privacy
@@ -160,6 +215,7 @@ const CSV_COLUMNS = [
   "top_path",
   "entry_path",
   "exit_path",
+  "paths_visited",
   "source",
   "utm_campaign",
   "city",
@@ -193,6 +249,7 @@ function rowsToCsv(rows: RecentVisitorRow[]): string {
       r.topPath,
       r.entryPath,
       r.exitPath,
+      r.pathsVisited.join(" | "),
       r.utmSource ?? r.referrerHost ?? "(direct)",
       r.utmCampaign,
       r.city,
@@ -251,6 +308,10 @@ function rowMatchesQuery(row: RecentVisitorRow, q: string): boolean {
     row.utmCampaign,
     row.topPath,
     row.entryPath,
+    /* Match by raw path (e.g. "/pricing") OR by clean label
+     * ("Pricing"), so the search box works for either. */
+    ...row.pathsVisited,
+    ...row.pathsVisited.map(prettifyPath),
   ]
     .filter((v): v is string => Boolean(v))
     .join(" ")
@@ -386,7 +447,7 @@ export default function RecentVisitorsTable({
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="canopy-table w-full min-w-[920px] text-sm">
+          <table className="canopy-table w-full min-w-[1080px] text-sm">
             <thead className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
               <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
                 <th className="px-3 py-2 font-semibold w-6"></th>
@@ -394,6 +455,7 @@ export default function RecentVisitorsTable({
                 <th className="px-3 py-2 font-semibold">Source</th>
                 <th className="px-3 py-2 font-semibold">Geo</th>
                 <th className="px-3 py-2 font-semibold">Device</th>
+                <th className="px-3 py-2 font-semibold">Pages visited</th>
                 <th className="px-3 py-2 text-right font-semibold">Sessions</th>
                 <th className="px-3 py-2 text-right font-semibold">Pages</th>
                 <th className="px-3 py-2 text-right font-semibold">Last seen</th>
@@ -484,6 +546,9 @@ function VisitorRow({ row, index }: { row: RecentVisitorRow; index: number }) {
         <td className="px-3 py-3 text-xs text-zinc-700">{sourceLabel(row)}</td>
         <td className="px-3 py-3 text-xs text-zinc-700">{geoLabel(row)}</td>
         <td className="px-3 py-3 text-xs text-zinc-700">{deviceLabel(row)}</td>
+        <td className="px-3 py-3">
+          <PagesVisitedChips paths={row.pathsVisited} />
+        </td>
         <td className="px-3 py-3 text-right font-mono text-xs text-zinc-900">
           {row.sessionCount}
         </td>
@@ -497,7 +562,7 @@ function VisitorRow({ row, index }: { row: RecentVisitorRow; index: number }) {
       </tr>
       {expanded ? (
         <tr className="border-t border-zinc-100 bg-zinc-50/50">
-          <td colSpan={9} className="px-3 py-4">
+          <td colSpan={10} className="px-3 py-4">
             <ExpandedDetail
               row={row}
               identity={id}
@@ -759,6 +824,43 @@ function Timeline({ entries }: { entries: TimelineEntry[] }) {
           </ol>
         </div>
       ))}
+    </div>
+  );
+}
+
+/**
+ * Renders the chronological list of pages a visitor hit as small pill
+ * chips with clean labels. Caps the visible chips at 4 and folds the
+ * rest behind a "+N more" indicator (full list still lives in the
+ * expanded timeline below). Empty array renders an em-dash so the
+ * column never collapses.
+ */
+function PagesVisitedChips({ paths }: { paths: string[] }) {
+  if (!paths || paths.length === 0) {
+    return <span className="text-xs text-zinc-400">-</span>;
+  }
+  const VISIBLE = 4;
+  const visible = paths.slice(0, VISIBLE);
+  const overflow = paths.length - visible.length;
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      {visible.map((p, i) => (
+        <span
+          key={`${p}-${i}`}
+          className="inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700 ring-1 ring-sky-100"
+          title={p}
+        >
+          {prettifyPath(p)}
+        </span>
+      ))}
+      {overflow > 0 ? (
+        <span
+          className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-600 ring-1 ring-zinc-200"
+          title={paths.slice(VISIBLE).join(", ")}
+        >
+          +{overflow} more
+        </span>
+      ) : null}
     </div>
   );
 }
