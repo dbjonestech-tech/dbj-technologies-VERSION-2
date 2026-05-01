@@ -61,6 +61,32 @@ After the audit-fix deploy completes, click "Sync contacts" on
 contact_submissions / clients. The function is idempotent so running
 later or running twice is safe.
 
+### Dashboard hover popover feedback-loop fix (commit `e74c37c`)
+
+Joshua reported the floating CardPreview popover glitched hard when
+hovering the upper portion of a dashboard card while behaving
+perfectly when hovering the always-visible KPI footer at the bottom.
+Root cause: the card's outer `motion.div` had a spring `y: -3` lift
+on hover. The spring could overshoot, and the lift moved the card
+bounds under the cursor. Near any card edge the cursor would
+oscillate inside / outside the moving bounds, framer's hover-end
+fired, the close timer started, framer's hover-start fired again,
+`openPreview` recaptured a fresh `anchorRect`, the popover
+repositioned, repeat. The lower KPI footer happened not to glitch
+because the popover anchored on the opposite side of the cursor
+there, so the feedback loop never reached a re-entry edge.
+
+Fix: dropped the y-lift, swapped the outer motion.div for a plain
+div with native `onPointerEnter` / `onPointerLeave`, and added
+`relatedTarget` guards on both the card and the popover so a
+cursor crossing card -> popover (or popover -> card) never schedules
+a close in the first place. The 140ms scheduleClose grace remains
+as a fallback. Inner motion.span animations (icon scale, arrow
+reveal) are preserved so the hover affordance still feels alive.
+Also: `openPreview` now captures `anchorRect` only on the first
+open (`!previewOpen` guard) to prevent position jitter from
+redundant rect captures during edge-case hover cycling.
+
 CRM integration into Canopy. Migration 022 plus the Contacts /
 Pipeline pages, sidebar group, dashboard card, and auto-creation
 wiring across the scan pipeline, contact form route, and client
