@@ -6,10 +6,13 @@ import {
 } from "@/lib/services/analytics";
 import { getFunnelStages } from "@/lib/services/funnel";
 import { getRumOverview } from "@/lib/services/rum";
-import { getEmailKpiByType } from "@/lib/services/email-kpi";
+import { getEmailKpiByType, getEmailKpiTrend } from "@/lib/services/email-kpi";
 import { getProviderSpendUsd } from "@/lib/services/api-usage";
 import { getClientStats } from "@/lib/auth/clients";
-import { getCurrentDeploymentSummary } from "@/lib/services/vercel-platform";
+import {
+  getCurrentDeploymentSummary,
+  getRecentDeployments,
+} from "@/lib/services/vercel-platform";
 import { getTopSentryIssues } from "@/lib/services/sentry-summary";
 import { getLatestInfraStatuses } from "@/lib/services/infrastructure";
 import { getLevelSummary } from "@/lib/services/monitoring";
@@ -36,6 +39,24 @@ export type KpiDetail = {
   tone?: KpiTone;
 };
 
+/** A single point in a card's small time-series sparkline. */
+export type SparkPoint = {
+  /** Short label (e.g. "Apr 28") used for tooltip / aria. */
+  label: string;
+  /** Numeric value at this bucket. */
+  value: number;
+};
+
+/** Compact line item shown in a card's preview "recent activity" feed. */
+export type RecentEvent = {
+  /** Left-side title (event name, scan url, deploy sha, etc.). */
+  title: string;
+  /** Right-side meta (relative time, status, count). */
+  meta: string;
+  /** Optional tone applied to the meta value. */
+  tone?: KpiTone;
+};
+
 export type CardKpi = {
   primary: string;
   secondary?: string;
@@ -43,6 +64,16 @@ export type CardKpi = {
   /** Additional context shown when the operator hovers the card.
    *  Kept short (2-4 items) so the panel does not dominate. */
   details?: KpiDetail[];
+  /** 14-day sparkline of the primary metric. Optional because some
+   *  cards have no natural time-series source (Errors, Infrastructure,
+   *  Users, Clients, Recurring). */
+  spark?: {
+    points: SparkPoint[];
+    /** Pretty unit label, e.g. "views/day". Shown beneath the chart. */
+    unit?: string;
+  };
+  /** Up to 5 recent activity items shown in the preview popover. */
+  recent?: RecentEvent[];
 };
 
 export type DashboardKpiMap = Record<string, CardKpi>;
@@ -73,6 +104,43 @@ function fmtRelDays(iso: string): string {
   return `${Math.floor(ms / 86_400_000)}d ago`;
 }
 
+function shortDayLabel(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+/* Pad a sparse list of {day, n} rows into a contiguous SparkPoint[] of
+ * the requested length, ending today (UTC day-aligned). Missing days
+ * get value=0. Day keys are normalized to YYYY-MM-DD so timestamptz
+ * input from Postgres compares cleanly. */
+function fillSparkPoints(
+  rows: Array<{ day: string | Date; n: number | string | null }>,
+  days: number
+): SparkPoint[] {
+  const map = new Map<string, number>();
+  for (const r of rows) {
+    const key = new Date(r.day).toISOString().slice(0, 10);
+    map.set(key, Number(r.n ?? 0));
+  }
+  const out: SparkPoint[] = [];
+  const now = new Date();
+  now.setUTCHours(0, 0, 0, 0);
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setUTCDate(d.getUTCDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    out.push({ label: shortDayLabel(key), value: map.get(key) ?? 0 });
+  }
+  return out;
+}
+
+/* Truncate long display strings (URLs, paths, commit messages) used in
+ * the Recent feed so the preview row stays single-line. */
+function shortenText(s: string, max = 40): string {
+  if (s.length <= max) return s;
+  return `${s.slice(0, max - 1)}…`;
+}
+
 async function safe<T>(fn: () => Promise<T>, fallback: T, label: string): Promise<T> {
   try {
     return await fn();
@@ -85,10 +153,36 @@ async function safe<T>(fn: () => Promise<T>, fallback: T, label: string): Promis
 }
 
 async function visitorsKpi(): Promise<CardKpi> {
-  const [live, today, week] = await Promise.all([
+  const sql = getDb();
+  const [live, today, week, sparkRows, recentRows] = await Promise.all([
     safe(() => getLiveVisitors(), [], "visitors.live"),
     safe(() => getVisitorOverview("1 day"), null, "visitors.overview.1d"),
     safe(() => getVisitorOverview("7 days"), null, "visitors.overview.7d"),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', created_at)::date AS day, COUNT(*)::int AS n
+          FROM page_views
+          WHERE created_at > now() - interval '14 days'
+            AND is_bot = false
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "visitors.spark"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT path, created_at
+          FROM page_views
+          WHERE created_at > now() - interval '24 hours'
+            AND is_bot = false
+          ORDER BY created_at DESC
+          LIMIT 5
+        `) as { path: string; created_at: string }[],
+      [] as { path: string; created_at: string }[],
+      "visitors.recent"
+    ),
   ]);
   const liveCount = live.length;
   const todayViews = today?.pageViews ?? 0;
@@ -113,15 +207,45 @@ async function visitorsKpi(): Promise<CardKpi> {
         : "in the last 24 hours",
     tone: liveCount > 0 ? "positive" : "neutral",
     details,
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "views/day" },
+    recent: recentRows.map((r) => ({
+      title: shortenText(r.path),
+      meta: fmtRelDays(r.created_at),
+    })),
   };
 }
 
 async function monitorKpi(): Promise<CardKpi> {
-  const summary = await safe(
-    () => getLevelSummary("1 day"),
-    { info: 0, warn: 0, error: 0 },
-    "monitor.levels"
-  );
+  const sql = getDb();
+  const [summary, sparkRows, recentRows] = await Promise.all([
+    safe(
+      () => getLevelSummary("1 day"),
+      { info: 0, warn: 0, error: 0 },
+      "monitor.levels"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', created_at)::date AS day, COUNT(*)::int AS n
+          FROM monitoring_events
+          WHERE created_at > now() - interval '14 days'
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "monitor.spark"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT event, level, created_at
+          FROM monitoring_events
+          ORDER BY created_at DESC
+          LIMIT 5
+        `) as { event: string; level: string; created_at: string }[],
+      [] as { event: string; level: string; created_at: string }[],
+      "monitor.recent"
+    ),
+  ]);
   const total = summary.info + summary.warn + summary.error;
   const errors = summary.error;
   return {
@@ -141,38 +265,72 @@ async function monitorKpi(): Promise<CardKpi> {
         tone: summary.error > 0 ? "danger" : "positive",
       },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "events/day" },
+    recent: recentRows.map((r) => ({
+      title: shortenText(r.event, 32),
+      meta: fmtRelDays(r.created_at),
+      tone:
+        r.level === "error"
+          ? "danger"
+          : r.level === "warn"
+            ? "warning"
+            : "neutral",
+    })),
   };
 }
 
 async function scansKpi(): Promise<CardKpi> {
-  const rows = await safe(
-    async () => {
-      const sql = getDb();
-      return (await sql`
-        SELECT
-          COUNT(*) FILTER (WHERE created_at > now() - interval '1 day')::int AS today,
-          COUNT(*) FILTER (WHERE created_at > now() - interval '7 days')::int AS week,
-          COUNT(*) FILTER (WHERE status IN ('pending', 'scanning', 'analyzing'))::int AS active,
-          COUNT(*) FILTER (WHERE status = 'failed' AND created_at > now() - interval '7 days')::int AS failed_week,
-          COUNT(*) FILTER (WHERE status = 'complete' AND created_at > now() - interval '7 days')::int AS complete_week
-        FROM scans
-      `) as {
+  const sql = getDb();
+  const [rows, sparkRows, recentRows] = await Promise.all([
+    safe(
+      async () =>
+        (await sql`
+          SELECT
+            COUNT(*) FILTER (WHERE created_at > now() - interval '1 day')::int AS today,
+            COUNT(*) FILTER (WHERE created_at > now() - interval '7 days')::int AS week,
+            COUNT(*) FILTER (WHERE status IN ('pending', 'scanning', 'analyzing'))::int AS active,
+            COUNT(*) FILTER (WHERE status = 'failed' AND created_at > now() - interval '7 days')::int AS failed_week,
+            COUNT(*) FILTER (WHERE status = 'complete' AND created_at > now() - interval '7 days')::int AS complete_week
+          FROM scans
+        `) as {
+          today: number;
+          week: number;
+          active: number;
+          failed_week: number;
+          complete_week: number;
+        }[],
+      [] as {
         today: number;
         week: number;
         active: number;
         failed_week: number;
         complete_week: number;
-      }[];
-    },
-    [] as {
-      today: number;
-      week: number;
-      active: number;
-      failed_week: number;
-      complete_week: number;
-    }[],
-    "scans.counts"
-  );
+      }[],
+      "scans.counts"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', created_at)::date AS day, COUNT(*)::int AS n
+          FROM scans
+          WHERE created_at > now() - interval '14 days'
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "scans.spark"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT url, status, created_at
+          FROM scans
+          ORDER BY created_at DESC
+          LIMIT 5
+        `) as { url: string; status: string; created_at: string }[],
+      [] as { url: string; status: string; created_at: string }[],
+      "scans.recent"
+    ),
+  ]);
   const r = rows[0] ?? {
     today: 0,
     week: 0,
@@ -209,29 +367,80 @@ async function scansKpi(): Promise<CardKpi> {
         tone: r.failed_week > 0 ? "warning" : "neutral",
       },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "scans/day" },
+    recent: recentRows.map((row) => ({
+      title: shortenText(row.url.replace(/^https?:\/\//, ""), 36),
+      meta: `${row.status} · ${fmtRelDays(row.created_at)}`,
+      tone:
+        row.status === "complete"
+          ? "positive"
+          : row.status === "failed"
+            ? "danger"
+            : "neutral",
+    })),
   };
 }
 
 async function leadsKpi(): Promise<CardKpi> {
-  const rows = await safe(
-    async () => {
-      const sql = getDb();
-      const [leads, contacts, leads24, contacts24] = (await Promise.all([
-        sql`SELECT COUNT(*)::int AS n FROM leads WHERE created_at > now() - interval '7 days'`,
-        sql`SELECT COUNT(*)::int AS n FROM contact_submissions WHERE created_at > now() - interval '7 days'`,
-        sql`SELECT COUNT(*)::int AS n FROM leads WHERE created_at > now() - interval '1 day'`,
-        sql`SELECT COUNT(*)::int AS n FROM contact_submissions WHERE created_at > now() - interval '1 day'`,
-      ])) as { n: number }[][];
-      return {
-        leads: Number(leads[0]?.n ?? 0),
-        contacts: Number(contacts[0]?.n ?? 0),
-        leads24: Number(leads24[0]?.n ?? 0),
-        contacts24: Number(contacts24[0]?.n ?? 0),
-      };
-    },
-    { leads: 0, contacts: 0, leads24: 0, contacts24: 0 },
-    "leads.counts"
-  );
+  const sql = getDb();
+  const [rows, sparkRows, recentRows] = await Promise.all([
+    safe(
+      async () => {
+        const [leads, contacts, leads24, contacts24] = (await Promise.all([
+          sql`SELECT COUNT(*)::int AS n FROM leads WHERE created_at > now() - interval '7 days'`,
+          sql`SELECT COUNT(*)::int AS n FROM contact_submissions WHERE created_at > now() - interval '7 days'`,
+          sql`SELECT COUNT(*)::int AS n FROM leads WHERE created_at > now() - interval '1 day'`,
+          sql`SELECT COUNT(*)::int AS n FROM contact_submissions WHERE created_at > now() - interval '1 day'`,
+        ])) as { n: number }[][];
+        return {
+          leads: Number(leads[0]?.n ?? 0),
+          contacts: Number(contacts[0]?.n ?? 0),
+          leads24: Number(leads24[0]?.n ?? 0),
+          contacts24: Number(contacts24[0]?.n ?? 0),
+        };
+      },
+      { leads: 0, contacts: 0, leads24: 0, contacts24: 0 },
+      "leads.counts"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT day, SUM(n)::int AS n FROM (
+            SELECT date_trunc('day', created_at)::date AS day, COUNT(*)::int AS n
+            FROM leads
+            WHERE created_at > now() - interval '14 days'
+            GROUP BY 1
+            UNION ALL
+            SELECT date_trunc('day', created_at)::date AS day, COUNT(*)::int AS n
+            FROM contact_submissions
+            WHERE created_at > now() - interval '14 days'
+            GROUP BY 1
+          ) t GROUP BY day ORDER BY day
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "leads.spark"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT title, source, created_at FROM (
+            SELECT email AS title, 'scan signup' AS source, created_at
+            FROM leads
+            ORDER BY created_at DESC
+            LIMIT 5
+          ) UNION ALL (
+            SELECT email AS title, 'contact form' AS source, created_at
+            FROM contact_submissions
+            ORDER BY created_at DESC
+            LIMIT 5
+          )
+          ORDER BY created_at DESC
+          LIMIT 5
+        `) as { title: string; source: string; created_at: string }[],
+      [] as { title: string; source: string; created_at: string }[],
+      "leads.recent"
+    ),
+  ]);
   const total = rows.leads + rows.contacts;
   const total24 = rows.leads24 + rows.contacts24;
   return {
@@ -247,11 +456,30 @@ async function leadsKpi(): Promise<CardKpi> {
       { label: "Scan signups (7d)", value: fmt(rows.leads) },
       { label: "Contact form (7d)", value: fmt(rows.contacts) },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "leads/day" },
+    recent: recentRows.map((row) => ({
+      title: shortenText(row.title, 32),
+      meta: `${row.source} · ${fmtRelDays(row.created_at)}`,
+    })),
   };
 }
 
 async function funnelKpi(): Promise<CardKpi> {
-  const stages = await safe(() => getFunnelStages(7), [], "funnel.stages");
+  const sql = getDb();
+  const [stages, sparkRows] = await Promise.all([
+    safe(() => getFunnelStages(7), [], "funnel.stages"),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', started_at)::date AS day, COUNT(*)::int AS n
+          FROM sessions
+          WHERE started_at > now() - interval '14 days'
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "funnel.spark"
+    ),
+  ]);
   const sessions = stages[0]?.count ?? 0;
   const scanStarts = stages[1]?.count ?? 0;
   const scanComplete = stages[2]?.count ?? 0;
@@ -265,7 +493,7 @@ async function funnelKpi(): Promise<CardKpi> {
     tone: sessions === 0 ? "neutral" : scanRate >= 5 ? "positive" : scanRate >= 1 ? "neutral" : "warning",
     details: [
       {
-        label: "Scan -> complete",
+        label: "Scan completion rate",
         value: scanStarts > 0 ? fmtPct(completeRate, 1) : "-",
         tone:
           scanStarts === 0
@@ -279,29 +507,42 @@ async function funnelKpi(): Promise<CardKpi> {
       { label: "Scans started", value: fmt(scanStarts) },
       { label: "Scans completed", value: fmt(scanComplete) },
       {
-        label: "Session -> contact",
+        label: "Contact rate",
         value: sessions > 0 ? fmtPct(contactRate, 2) : "-",
       },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "sessions/day" },
   };
 }
 
 async function searchKpi(): Promise<CardKpi> {
-  const rows = await safe(
-    async () => {
-      const sql = getDb();
-      return (await sql`
-        SELECT
-          COALESCE(SUM(impressions), 0)::int AS impressions,
-          COALESCE(SUM(clicks), 0)::int AS clicks,
-          COALESCE(AVG(NULLIF(position, 0)), 0)::float8 AS avg_position
-        FROM search_console_daily
-        WHERE date > current_date - interval '28 days'
-      `) as { impressions: number; clicks: number; avg_position: number }[];
-    },
-    [] as { impressions: number; clicks: number; avg_position: number }[],
-    "search.totals"
-  );
+  const sql = getDb();
+  const [rows, sparkRows] = await Promise.all([
+    safe(
+      async () =>
+        (await sql`
+          SELECT
+            COALESCE(SUM(impressions), 0)::int AS impressions,
+            COALESCE(SUM(clicks), 0)::int AS clicks,
+            COALESCE(AVG(NULLIF(position, 0)), 0)::float8 AS avg_position
+          FROM search_console_daily
+          WHERE date > current_date - interval '28 days'
+        `) as { impressions: number; clicks: number; avg_position: number }[],
+      [] as { impressions: number; clicks: number; avg_position: number }[],
+      "search.totals"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date::date AS day, SUM(clicks)::int AS n
+          FROM search_console_daily
+          WHERE date > current_date - interval '14 days'
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "search.spark"
+    ),
+  ]);
   const r = rows[0] ?? { impressions: 0, clicks: 0, avg_position: 0 };
   if (r.impressions === 0) {
     return {
@@ -332,11 +573,30 @@ async function searchKpi(): Promise<CardKpi> {
       },
       { label: "Impressions (28d)", value: fmt(r.impressions) },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "clicks/day" },
   };
 }
 
 async function rumKpi(): Promise<CardKpi> {
-  const rum = await safe(() => getRumOverview(7), null, "rum.overview");
+  const sql = getDb();
+  const [rum, sparkRows] = await Promise.all([
+    safe(() => getRumOverview(7), null, "rum.overview"),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', pv.created_at)::date AS day,
+                 PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY eng.cwv_lcp_ms)::int AS n
+          FROM page_views pv
+          JOIN page_view_engagement eng ON eng.page_view_id = pv.id
+          WHERE pv.created_at > now() - interval '14 days'
+            AND pv.is_bot = false
+            AND eng.cwv_lcp_ms IS NOT NULL
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "rum.spark"
+    ),
+  ]);
   if (!rum || rum.views === 0 || rum.lcp.p75 === null) {
     return {
       primary: "no data yet",
@@ -380,11 +640,28 @@ async function rumKpi(): Promise<CardKpi> {
       },
       { label: "LCP p50", value: fmtMs(rum.lcp.p50) },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "ms LCP p75" },
   };
 }
 
 async function emailKpi(): Promise<CardKpi> {
-  const rows = await safe(() => getEmailKpiByType(7), [], "email.kpi");
+  const sql = getDb();
+  const [rows, trendRows, recentRows] = await Promise.all([
+    safe(() => getEmailKpiByType(7), [], "email.kpi"),
+    safe(() => getEmailKpiTrend(14), [], "email.trend"),
+    safe(
+      async () =>
+        (await sql`
+          SELECT email_type, status, sent_at
+          FROM email_events
+          ORDER BY sent_at DESC
+          LIMIT 5
+        `) as { email_type: string | null; status: string; sent_at: string }[],
+      [] as { email_type: string | null; status: string; sent_at: string }[],
+      "email.recent"
+    ),
+  ]);
+  const sparkRows = trendRows.map((r) => ({ day: r.day, n: r.delivered }));
   let sent = 0;
   let delivered = 0;
   let bounced = 0;
@@ -403,6 +680,7 @@ async function emailKpi(): Promise<CardKpi> {
       secondary: "delivery, bounce, complaint rate by type",
       tone: "neutral",
       details: [],
+      spark: { points: fillSparkPoints(sparkRows, 14), unit: "delivered/day" },
     };
   }
   const deliveryRate = (delivered / sent) * 100;
@@ -428,6 +706,19 @@ async function emailKpi(): Promise<CardKpi> {
       },
       { label: "Sent (7d)", value: fmt(sent) },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "delivered/day" },
+    recent: recentRows.map((row) => ({
+      title: row.email_type ?? "email",
+      meta: `${row.status} · ${fmtRelDays(row.sent_at)}`,
+      tone:
+        row.status === "delivered"
+          ? "positive"
+          : row.status === "bounced" || row.status === "complained"
+            ? "danger"
+            : row.status === "delivery_delayed" || row.status === "failed"
+              ? "warning"
+              : "neutral",
+    })),
   };
 }
 
@@ -435,7 +726,8 @@ async function costsKpi(): Promise<CardKpi> {
   /* 24h totals plus 7d totals so the operator sees both today and the
    * weekly trend. Six small queries run in parallel; each is cached
    * in api_usage_events so the cost is negligible. */
-  const [a24, b24, p24, e24, a7, b7, p7, e7] = await Promise.all([
+  const sql = getDb();
+  const [a24, b24, p24, e24, a7, b7, p7, e7, sparkRows] = await Promise.all([
     safe(() => getProviderSpendUsd("anthropic", 24), 0, "costs.anthropic.24h"),
     safe(() => getProviderSpendUsd("browserless", 24), 0, "costs.browserless.24h"),
     safe(() => getProviderSpendUsd("pagespeed", 24), 0, "costs.pagespeed.24h"),
@@ -444,6 +736,18 @@ async function costsKpi(): Promise<CardKpi> {
     safe(() => getProviderSpendUsd("browserless", 24 * 7), 0, "costs.browserless.7d"),
     safe(() => getProviderSpendUsd("pagespeed", 24 * 7), 0, "costs.pagespeed.7d"),
     safe(() => getProviderSpendUsd("elevenlabs", 24 * 7), 0, "costs.elevenlabs.7d"),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', occurred_at)::date AS day,
+                 COALESCE(SUM(cost_usd), 0)::float8 AS n
+          FROM api_usage_events
+          WHERE occurred_at > now() - interval '14 days'
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "costs.spark"
+    ),
   ]);
   const total24 = a24 + b24 + p24 + e24;
   const total7 = a7 + b7 + p7 + e7;
@@ -465,31 +769,45 @@ async function costsKpi(): Promise<CardKpi> {
         tone: e7 > 0 ? "neutral" : "neutral",
       },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "USD/day" },
   };
 }
 
 async function databaseKpi(): Promise<CardKpi> {
-  const data = await safe(
-    async () => {
-      const sql = getDb();
-      const [scans, pv, sessions, leads, contacts] = (await Promise.all([
-        sql`SELECT COUNT(*)::int AS n FROM scans`,
-        sql`SELECT COUNT(*)::int AS n FROM page_views`,
-        sql`SELECT COUNT(*)::int AS n FROM sessions`,
-        sql`SELECT COUNT(*)::int AS n FROM leads`,
-        sql`SELECT COUNT(*)::int AS n FROM contact_submissions`,
-      ])) as { n: number }[][];
-      return {
-        scans: Number(scans[0]?.n ?? 0),
-        pageViews: Number(pv[0]?.n ?? 0),
-        sessions: Number(sessions[0]?.n ?? 0),
-        leads: Number(leads[0]?.n ?? 0),
-        contacts: Number(contacts[0]?.n ?? 0),
-      };
-    },
-    { scans: 0, pageViews: 0, sessions: 0, leads: 0, contacts: 0 },
-    "database.counts"
-  );
+  const sql = getDb();
+  const [data, sparkRows] = await Promise.all([
+    safe(
+      async () => {
+        const [scans, pv, sessions, leads, contacts] = (await Promise.all([
+          sql`SELECT COUNT(*)::int AS n FROM scans`,
+          sql`SELECT COUNT(*)::int AS n FROM page_views`,
+          sql`SELECT COUNT(*)::int AS n FROM sessions`,
+          sql`SELECT COUNT(*)::int AS n FROM leads`,
+          sql`SELECT COUNT(*)::int AS n FROM contact_submissions`,
+        ])) as { n: number }[][];
+        return {
+          scans: Number(scans[0]?.n ?? 0),
+          pageViews: Number(pv[0]?.n ?? 0),
+          sessions: Number(sessions[0]?.n ?? 0),
+          leads: Number(leads[0]?.n ?? 0),
+          contacts: Number(contacts[0]?.n ?? 0),
+        };
+      },
+      { scans: 0, pageViews: 0, sessions: 0, leads: 0, contacts: 0 },
+      "database.counts"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', created_at)::date AS day, COUNT(*)::int AS n
+          FROM page_views
+          WHERE created_at > now() - interval '14 days'
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "database.spark"
+    ),
+  ]);
   return {
     primary: `${fmt(data.scans)} scans`,
     secondary: `${fmt(data.pageViews)} page views recorded`,
@@ -500,6 +818,7 @@ async function databaseKpi(): Promise<CardKpi> {
       { label: "Leads", value: fmt(data.leads) },
       { label: "Contact submissions", value: fmt(data.contacts) },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "rows/day" },
   };
 }
 
@@ -535,32 +854,65 @@ async function clientsKpi(): Promise<CardKpi> {
 }
 
 async function auditKpi(): Promise<CardKpi> {
-  const rows = await safe(
-    async () => {
-      const sql = getDb();
-      return (await sql`
-        SELECT
-          COUNT(*)::int AS total,
-          COUNT(*) FILTER (WHERE result = 'denied')::int AS denied,
-          COUNT(DISTINCT actor_email)::int AS actors,
-          COUNT(*) FILTER (WHERE created_at > now() - interval '1 hour')::int AS last_hour
-        FROM admin_audit_log
-        WHERE created_at > now() - interval '1 day'
-      `) as {
+  const sql = getDb();
+  const [rows, sparkRows, recentRows] = await Promise.all([
+    safe(
+      async () =>
+        (await sql`
+          SELECT
+            COUNT(*)::int AS total,
+            COUNT(*) FILTER (WHERE result = 'denied')::int AS denied,
+            COUNT(DISTINCT email)::int AS actors,
+            COUNT(*) FILTER (WHERE created_at > now() - interval '1 hour')::int AS last_hour
+          FROM admin_audit_log
+          WHERE created_at > now() - interval '1 day'
+        `) as {
+          total: number;
+          denied: number;
+          actors: number;
+          last_hour: number;
+        }[],
+      [] as {
         total: number;
         denied: number;
         actors: number;
         last_hour: number;
-      }[];
-    },
-    [] as {
-      total: number;
-      denied: number;
-      actors: number;
-      last_hour: number;
-    }[],
-    "audit.counts"
-  );
+      }[],
+      "audit.counts"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', created_at)::date AS day, COUNT(*)::int AS n
+          FROM admin_audit_log
+          WHERE created_at > now() - interval '14 days'
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "audit.spark"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT email, event, result, created_at
+          FROM admin_audit_log
+          ORDER BY created_at DESC
+          LIMIT 5
+        `) as {
+          email: string | null;
+          event: string;
+          result: string;
+          created_at: string;
+        }[],
+      [] as {
+        email: string | null;
+        event: string;
+        result: string;
+        created_at: string;
+      }[],
+      "audit.recent"
+    ),
+  ]);
   const r = rows[0] ?? { total: 0, denied: 0, actors: 0, last_hour: 0 };
   return {
     primary: `${fmt(r.total)} events`,
@@ -582,38 +934,68 @@ async function auditKpi(): Promise<CardKpi> {
         tone: r.denied > 0 ? "warning" : "positive",
       },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "events/day" },
+    recent: recentRows.map((row) => ({
+      title: shortenText(row.email ?? "unknown", 28),
+      meta: `${row.event} · ${fmtRelDays(row.created_at)}`,
+      tone: row.result === "denied" ? "warning" : "neutral",
+    })),
   };
 }
 
 async function pipelineKpi(): Promise<CardKpi> {
-  const rows = await safe(
-    async () => {
-      const sql = getDb();
-      return (await sql`
-        SELECT
-          COUNT(*)::int AS runs,
-          COUNT(*) FILTER (WHERE status = 'failed')::int AS failed,
-          COUNT(*) FILTER (WHERE status IN ('running', 'started'))::int AS running,
-          AVG(EXTRACT(EPOCH FROM (ended_at - started_at)) * 1000)
-            FILTER (WHERE status = 'completed' AND ended_at IS NOT NULL AND started_at IS NOT NULL)
-            ::float8 AS avg_duration_ms
-        FROM inngest_runs
-        WHERE COALESCE(started_at, observed_at) > now() - interval '24 hours'
-      `) as {
+  const sql = getDb();
+  const [rows, sparkRows, recentRows] = await Promise.all([
+    safe(
+      async () =>
+        (await sql`
+          SELECT
+            COUNT(*)::int AS runs,
+            COUNT(*) FILTER (WHERE status = 'failed')::int AS failed,
+            COUNT(*) FILTER (WHERE status IN ('running', 'started'))::int AS running,
+            AVG(EXTRACT(EPOCH FROM (ended_at - started_at)) * 1000)
+              FILTER (WHERE status = 'completed' AND ended_at IS NOT NULL AND started_at IS NOT NULL)
+              ::float8 AS avg_duration_ms
+          FROM inngest_runs
+          WHERE COALESCE(started_at, observed_at) > now() - interval '24 hours'
+        `) as {
+          runs: number;
+          failed: number;
+          running: number;
+          avg_duration_ms: number | null;
+        }[],
+      [] as {
         runs: number;
         failed: number;
         running: number;
         avg_duration_ms: number | null;
-      }[];
-    },
-    [] as {
-      runs: number;
-      failed: number;
-      running: number;
-      avg_duration_ms: number | null;
-    }[],
-    "pipeline.runs"
-  );
+      }[],
+      "pipeline.runs"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', COALESCE(started_at, observed_at))::date AS day,
+                 COUNT(*)::int AS n
+          FROM inngest_runs
+          WHERE COALESCE(started_at, observed_at) > now() - interval '14 days'
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "pipeline.spark"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT function_id, status, COALESCE(started_at, observed_at) AS at
+          FROM inngest_runs
+          ORDER BY COALESCE(started_at, observed_at) DESC
+          LIMIT 5
+        `) as { function_id: string; status: string; at: string }[],
+      [] as { function_id: string; status: string; at: string }[],
+      "pipeline.recent"
+    ),
+  ]);
   const r = rows[0] ?? { runs: 0, failed: 0, running: 0, avg_duration_ms: null };
   if (r.runs === 0) {
     return {
@@ -621,6 +1003,12 @@ async function pipelineKpi(): Promise<CardKpi> {
       secondary: "no Inngest runs in last 24h",
       tone: "neutral",
       details: [],
+      spark: { points: fillSparkPoints(sparkRows, 14), unit: "runs/day" },
+      recent: recentRows.map((row) => ({
+        title: shortenText(row.function_id, 32),
+        meta: `${row.status} · ${fmtRelDays(row.at)}`,
+        tone: row.status === "failed" ? "danger" : "neutral",
+      })),
     };
   }
   const successRate = ((r.runs - r.failed) / r.runs) * 100;
@@ -642,21 +1030,47 @@ async function pipelineKpi(): Promise<CardKpi> {
         tone: r.failed > 0 ? "danger" : "positive",
       },
     ],
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "runs/day" },
+    recent: recentRows.map((row) => ({
+      title: shortenText(row.function_id, 32),
+      meta: `${row.status} · ${fmtRelDays(row.at)}`,
+      tone:
+        row.status === "failed"
+          ? "danger"
+          : row.status === "completed"
+            ? "positive"
+            : "neutral",
+    })),
   };
 }
 
 async function platformKpi(): Promise<CardKpi> {
-  const summary = await safe(
-    () => getCurrentDeploymentSummary(),
-    {
-      productionState: null,
-      productionUrl: null,
-      productionAge: null,
-      failedLast24h: 0,
-      buildingNow: 0,
-    },
-    "platform.deploy"
-  );
+  const sql = getDb();
+  const [summary, sparkRows, recentDeploys] = await Promise.all([
+    safe(
+      () => getCurrentDeploymentSummary(),
+      {
+        productionState: null as string | null,
+        productionUrl: null as string | null,
+        productionAge: null as string | null,
+        failedLast24h: 0,
+        buildingNow: 0,
+      },
+      "platform.deploy"
+    ),
+    safe(
+      async () =>
+        (await sql`
+          SELECT date_trunc('day', created_at)::date AS day, COUNT(*)::int AS n
+          FROM vercel_deployments
+          WHERE created_at > now() - interval '14 days'
+          GROUP BY 1 ORDER BY 1
+        `) as { day: string; n: number }[],
+      [] as { day: string; n: number }[],
+      "platform.spark"
+    ),
+    safe(() => getRecentDeployments(5), [], "platform.recent"),
+  ]);
   const state = summary.productionState ?? "UNKNOWN";
   const tone: KpiTone =
     state === "READY"
@@ -695,6 +1109,26 @@ async function platformKpi(): Promise<CardKpi> {
         : `${summary.failedLast24h} failed deploy${summary.failedLast24h === 1 ? "" : "s"} (24h)`,
     tone,
     details,
+    spark: { points: fillSparkPoints(sparkRows, 14), unit: "deploys/day" },
+    recent: recentDeploys.map((d) => {
+      const label = d.commitMessage
+        ? shortenText(d.commitMessage, 36)
+        : d.branch
+          ? `${d.branch}${d.commitSha ? ` · ${d.commitSha.slice(0, 7)}` : ""}`
+          : "deploy";
+      return {
+        title: label,
+        meta: `${d.state.toLowerCase()} · ${fmtRelDays(d.createdAt)}`,
+        tone:
+          d.state === "READY"
+            ? "positive"
+            : d.state === "ERROR"
+              ? "danger"
+              : d.state === "BUILDING" || d.state === "QUEUED"
+                ? "warning"
+                : "neutral",
+      };
+    }),
   };
 }
 
@@ -752,6 +1186,16 @@ async function errorsKpi(): Promise<CardKpi> {
     secondary: `${fmt(totalEvents)} total event${totalEvents === 1 ? "" : "s"} in last 24h`,
     tone: issues.length >= 5 ? "danger" : "warning",
     details,
+    recent: issues.slice(0, 5).map((i) => ({
+      title: shortenText(i.title, 40),
+      meta: `${fmt(i.count)} event${i.count === 1 ? "" : "s"} · ${i.level}`,
+      tone:
+        i.level === "fatal"
+          ? "danger"
+          : i.level === "error"
+            ? "warning"
+            : "neutral",
+    })),
   };
 }
 
@@ -810,11 +1254,29 @@ async function infrastructureKpi(): Promise<CardKpi> {
     value: fmt(fail),
     tone: fail > 0 ? "danger" : "positive",
   });
+  /* Surface the most-recently-checked rows as the recent feed,
+   * weighted to fails/warns first so the panel reads as an action list. */
+  const sorted = [...rows].sort((a, b) => {
+    const order = (s: string) => (s === "fail" ? 0 : s === "warn" ? 1 : 2);
+    const diff = order(a.status) - order(b.status);
+    if (diff !== 0) return diff;
+    return new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime();
+  });
   return {
     primary: fail === 0 && warn === 0 ? `${pass} checks passing` : `${fail} failing, ${warn} warning`,
     secondary: `${rows.length} domain check${rows.length === 1 ? "" : "s"} total`,
     tone,
     details,
+    recent: sorted.slice(0, 5).map((r) => ({
+      title: shortenText(`${r.target} · ${r.resource}`, 36),
+      meta: `${r.status} · ${fmtRelDays(r.checkedAt)}`,
+      tone:
+        r.status === "fail"
+          ? "danger"
+          : r.status === "warn"
+            ? "warning"
+            : "positive",
+    })),
   };
 }
 

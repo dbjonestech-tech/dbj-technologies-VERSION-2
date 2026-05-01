@@ -9,7 +9,7 @@ record of every May 1 entry that was below this header before this reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with 8ad516c commit hash
+- (this commit) feat(admin): floating CardPreview popover + sparklines + recent activity on /admin cards
 - `8ad516c` feat(admin): always-visible KPIs + richer hover details on /admin cards
 - `451d126` feat(admin): self-service /admin/config status board + .env.example completed
 - `ff416e4` feat(canopy admin): sidebar nav items inherit each destination page's palette color
@@ -31,6 +31,26 @@ of every change above.
 
 ### Themes shipped May 1 (one-line each)
 
+- **Floating CardPreview popover for the /admin dashboard.** Each card on
+  /admin now opens a portaled, viewport-anchored preview panel on hover
+  (and on tap-the-chevron for touch devices). The preview shows the icon
+  tile, title, status pill, primary KPI, a 14-day SVG sparkline of the
+  primary metric (no chart library — pure 100x36 viewBox, area + line +
+  last-point dot, currentColor-driven hue), an At-a-glance details column,
+  and a Recent activity column (last 5 page views / scans / leads / email
+  events / audit entries / pipeline runs / deploys / sentry issues / infra
+  checks depending on the card). Auto-flips above/below based on viewport
+  space; horizontally clamps to viewport with a 16px gutter. Closes on
+  Escape, outside click, X button. The card structure was refactored from
+  `<Link>`-wraps-everything to the standard "absolute-fill Link + sibling
+  content + sibling chevron button" pattern so the touch-only chevron can
+  open the popover without navigating. Also fixed three latent bugs in the
+  pre-existing dashboard-kpis aggregates that were silently failing via the
+  `safe()` fallback: `actor_email`/`action` should have been `email`/`event`
+  in admin_audit_log, `created_at` should have been `occurred_at` in
+  api_usage_events, and `function_name` should have been `function_id` in
+  inngest_runs. The audit / costs / pipeline cards were quietly returning
+  zero before this commit; they show real numbers now.
 - **Marketing-site Lighthouse perf sprint.** /about hero quality cut, per-word
   scroll reveal removed, /services hero halos collapsed to a static gradient,
   card box-shadow stacks reduced from 4 to 2 layers across pricing/services/work.
