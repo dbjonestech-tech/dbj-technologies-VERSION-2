@@ -25,8 +25,11 @@ import {
   Zap,
   ShieldCheck,
   Settings,
+  ClipboardList,
+  Kanban,
 } from "lucide-react";
 import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
+import { getContactsDashboardSummary } from "@/lib/services/contacts";
 
 export const metadata: Metadata = {
   title: { default: "Admin", template: "%s | DBJ Admin" },
@@ -42,9 +45,14 @@ type NavItem = {
    * label/icon color matches the destination page's identity. */
   palette: PaletteName;
   disabled?: boolean;
+  /* When set, the nav row renders a small numeric or pulse badge.
+   * Used for the Contacts overdue follow-up indicator so an admin
+   * sees stale-lead pressure from any /admin page. */
+  badge?: { count: number; tone: "danger" | "info" } | null;
 };
 
-const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
+function buildNavGroups(overdueCount: number): { label: string; items: NavItem[] }[] {
+  return [
   {
     label: "Overview",
     items: [
@@ -59,6 +67,24 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
       { label: "Funnel", href: "/admin/funnel", icon: Filter, palette: "violet" },
       { label: "Search", href: "/admin/search", icon: Search, palette: "indigo" },
       { label: "RUM", href: "/admin/performance/rum", icon: Zap, palette: "fuchsia" },
+    ],
+  },
+  {
+    label: "Relationships",
+    items: [
+      {
+        label: "Contacts",
+        href: "/admin/contacts",
+        icon: ClipboardList,
+        palette: "pink",
+        badge: overdueCount > 0 ? { count: overdueCount, tone: "danger" } : null,
+      },
+      {
+        label: "Pipeline",
+        href: "/admin/relationships/pipeline",
+        icon: Kanban,
+        palette: "rose",
+      },
     ],
   },
   {
@@ -90,13 +116,20 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
       { label: "Config", href: "/admin/config", icon: Settings, palette: "teal" },
     ],
   },
-];
+  ];
+}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user?.isAdmin) {
     redirect("/signin?callbackUrl=/admin");
   }
+  /* Sidebar overdue badge: cheap query against the partial
+   * idx_contacts_follow_up index. Keeps the badge live across every
+   * /admin page without requiring per-page wiring. Best-effort: any
+   * failure inside getContactsDashboardSummary already returns zeros. */
+  const summary = await getContactsDashboardSummary();
+  const navGroups = buildNavGroups(summary.overdue);
 
   return (
     <div className="min-h-screen w-full" style={{ backgroundColor: "#FAFAFA" }}>
@@ -106,7 +139,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <CanopyWordmark />
           </div>
           <nav className="flex-1 overflow-y-auto px-3 py-4">
-            {NAV_GROUPS.map((group) => (
+            {navGroups.map((group) => (
               <div key={group.label} className="mb-6">
                 <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
                   {group.label}
@@ -145,6 +178,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                             aria-hidden="true"
                           />
                           <span>{item.label}</span>
+                          {item.badge && item.badge.count > 0 ? (
+                            <span
+                              aria-label={`${item.badge.count} overdue`}
+                              className={`ml-auto inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[10px] font-semibold ${
+                                item.badge.tone === "danger"
+                                  ? "bg-red-500 text-white"
+                                  : "bg-zinc-200 text-zinc-700"
+                              }`}
+                            >
+                              {item.badge.count}
+                            </span>
+                          ) : null}
                         </Link>
                       </li>
                     );

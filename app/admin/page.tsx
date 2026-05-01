@@ -49,6 +49,13 @@ const COLUMNS: Column[] = [
         palette: "sky",
       },
       {
+        label: "Relationships",
+        description: "Follow-ups, new leads, and pipeline at a glance.",
+        href: "/admin/contacts",
+        iconName: "ClipboardList",
+        palette: "pink",
+      },
+      {
         label: "Monitor",
         description: "Live event tail with funnel counts, severity, and Lighthouse trend.",
         href: "/admin/monitor",

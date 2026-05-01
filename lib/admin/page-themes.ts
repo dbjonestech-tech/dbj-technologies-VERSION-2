@@ -26,6 +26,7 @@ export type PaletteName =
   | "fuchsia"
   | "purple"
   | "pink"
+  | "rose"
   | "amber"
   | "orange"
   | "yellow"
@@ -201,6 +202,21 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     chipRing: "ring-pink-200",
     rowHover: "hover:bg-pink-50",
   },
+  rose: {
+    stripe: "bg-gradient-to-r from-rose-400 via-rose-500 to-pink-500",
+    iconTile: "bg-gradient-to-br from-rose-50 to-rose-100",
+    iconColor: "text-rose-700",
+    hoverShadow: "hover:shadow-rose-500/20",
+    hoverBorder: "group-hover:border-rose-200",
+    kpiNeutralText: "text-rose-700",
+    hoverOverlay: "from-rose-50/0 via-rose-50/50 to-rose-50/0",
+    dot: "bg-rose-500",
+    pageStripe: "bg-gradient-to-r from-rose-400 to-rose-600",
+    pageEyebrow: "text-rose-700",
+    chipBg: "bg-rose-50",
+    chipRing: "ring-rose-200",
+    rowHover: "hover:bg-rose-50",
+  },
   amber: {
     stripe: "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500",
     iconTile: "bg-gradient-to-br from-amber-50 to-orange-100",
@@ -353,6 +369,8 @@ export const PAGE_PALETTE: Record<string, PaletteName> = {
   "/admin/performance/rum": "fuchsia",
   "/admin/email": "purple",
   "/admin/recurring": "pink",
+  "/admin/contacts": "pink",
+  "/admin/relationships/pipeline": "rose",
   "/admin/costs": "amber",
   "/admin/database": "orange",
   "/admin/clients": "yellow",

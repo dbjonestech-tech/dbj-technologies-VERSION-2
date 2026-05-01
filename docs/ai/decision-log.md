@@ -1,5 +1,87 @@
 # Decision Log
 
+## May 1, 2026 (late) -- Lightweight CRM integrated into Canopy (Phase 2 of two-phase build)
+
+Decision: Phase 2 of the visitors-page-upgrade build adds a lightweight
+relationship-management layer to Canopy: contacts table unified by
+email, contact_notes for the activity audit trail, three new admin
+pages (`/admin/contacts`, `/admin/contacts/[id]`,
+`/admin/relationships/pipeline`), a Relationships sidebar group with
+an overdue-follow-up badge, a Relationships dashboard card, and
+auto-creation wiring across the scan pipeline + contact form route +
+client invitation accept flow.
+
+Reason: Until this build, the CRM-style information was scattered:
+leads in the Pathlight signups tab, prospects in contact_submissions,
+clients in clients, and any per-person notes only in Joshua's head.
+With three real install-zero candidates in flight (Star Auto already
+live, two more being scoped), a single per-person view with lifecycle
+tracking, follow-up dates, and a unified timeline is the difference
+between "I think we talked about that in March" and "Tyler's last
+contact was a contact-form submission on Apr 28; status=qualified;
+follow-up Apr 30 with the proposal walkthrough." The CRM also makes
+Canopy itself more buyable: a Canopy install includes "leads
+captured + lifecycle tracked + Pathlight scans alongside" instead of
+just "analytics tables."
+
+Implementation choices:
+- **Email is the unifying key.** No anonymous visitors are imported
+  into contacts. The CRM is exclusively for people you can actually
+  follow up with. Anonymous visitors stay on /admin/visitors. The
+  contacts.email column is `TEXT UNIQUE NOT NULL`; the unique index
+  from the constraint is the only email index needed.
+- **Server Actions instead of new API routes for mutations.** Phase 1
+  added one API route for the visitors dashboard polling. Phase 2's
+  six mutations (createContact, updateContact, addNote, deleteNote,
+  changeStatus, sync) all go through `lib/actions/contacts.ts` with
+  per-action `revalidatePath` calls. Server Actions keep auth and
+  invalidation co-located with the call site, removing the need for
+  six small route handlers.
+- **Touchpoint counts via LATERAL, not N+1.** The list view shows
+  "1 scan, 2 forms, 3 emails" per contact. Computing those counts
+  in three LATERAL subqueries inside `getContacts` keeps the page
+  load to a single round trip; per-row count queries would be
+  ~90 round trips per page at 30 contacts.
+- **Page-view "visits" deliberately omitted from touchpoints.** Page
+  views require an email to visitor_id linkage chain that's
+  unstable. Listing "5 visits" without that linkage would mean
+  scanning every contact's potential page_views which is O(N x
+  page_views), and the dashed visit-count would mislead anyway. The
+  detail-page timeline still shows page views (grouped by
+  session_id from migration 014) for contacts whose visitor_id is
+  resolvable.
+- **NO drag-and-drop on the kanban.** Per-card status dropdown.
+  Drag-and-drop adds significant complexity (drag libraries, drop
+  targets, mobile touch support, optimistic reorder) for minimal
+  UX gain at low contact volumes. A click-to-change dropdown is
+  the right interaction for this version. Revisit when contact
+  count exceeds 100 and dragging starts to feel faster than
+  clicking.
+- **NO pipeline-value sum.** The Pathlight `estimatedMonthlyLoss`
+  is the client's revenue leakage, not the DBJ deal value. Showing
+  a pipeline-value total based on it would lie about the studio's
+  forecast. If deal value tracking is needed later, add an optional
+  manual `deal_value` field to contacts.
+- **Route is `/admin/relationships/pipeline`, NOT `/admin/pipeline`.**
+  The latter is the existing Inngest pipeline health page and
+  cannot be repurposed. The user-facing label "Pipeline" stays the
+  same.
+- **Auto-creation upserts are best-effort.** Each upsert lives
+  inside try/catch and never blocks the parent flow. A scan
+  pipeline failure must not fail because the CRM upsert hit a
+  unique-constraint race. Same for the contact form route and the
+  client invitation accept flow.
+- **Pathlight scan card on the contact detail page** shows the
+  most recent scan's score, business name, and estimated monthly
+  impact. This is admin-only so the Pathlight rule about not
+  exposing internals on public surfaces does not apply, but the
+  card stays outcome-led (no model names, no pipeline detail).
+
+Migration 022 must be applied to prod Neon before the contacts pages
+hydrate in production. Until then, all reads return the empty
+default and the new pages render the empty state. Apply via
+`npx tsx lib/db/setup.ts`.
+
 ## May 1, 2026 (late) -- /admin/visitors upgraded to PostHog/Vercel-Analytics-level chart-driven page (Phase 1 of two-phase build)
 
 Decision: The `/admin/visitors` page was upgraded from a four-card stat

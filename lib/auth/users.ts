@@ -246,7 +246,34 @@ export async function acceptInvitationFor(
       SELECT role FROM upserted_client
     `) as { role: string }[];
     const r = rows[0]?.role;
-    if (r === "admin" || r === "client") return r;
+    if (r === "admin" || r === "client") {
+      /* Client invitation accepted: ensure a CRM contact exists with
+       * the terminal status (won) and source (client_import). Best-
+       * effort: a failure here MUST NOT block sign-in. */
+      if (r === "client") {
+        try {
+          const detail = (await sql`
+            SELECT email, name, company FROM clients WHERE email = ${e} LIMIT 1
+          `) as { email: string; name: string | null; company: string | null }[];
+          const c = detail[0];
+          if (c) {
+            const { upsertContactFromClient } = await import(
+              "@/lib/services/contacts"
+            );
+            await upsertContactFromClient({
+              email: c.email,
+              name: c.name,
+              company: c.company,
+            });
+          }
+        } catch (err) {
+          console.warn(
+            `[admin-users] client contact upsert failed: ${err instanceof Error ? err.message : err}`
+          );
+        }
+      }
+      return r;
+    }
     return null;
   } catch (err) {
     console.warn("[admin-users] acceptInvitationFor failed:", err);

@@ -18,16 +18,26 @@
   bars, stretch top-cities panel, range selector (7D/14D/30D/90D/custom)
   driving a new `/admin/api/visitors-data` endpoint. Recent visitors
   table preserved as-is. Phase 1 staged for review on May 1, 2026.
-- [ ] **CRM integration into Canopy (Phase 2).** Migration 022 for
-  `contacts` + `contact_notes`, `lib/services/contacts.ts` (with LATERAL
-  touchpoint counts, NOT visit count -- only scans/forms/emails), Server
-  Actions in `lib/actions/contacts.ts` (no API routes for these),
-  sidebar Relationships group between Acquisition and Operations,
-  `/admin/contacts` list, `/admin/contacts/[id]` detail with Pathlight
-  scan card, `/admin/pipeline` kanban, Dashboard Relationships card,
-  auto-creation wiring in scan finalize + contact form route + client
-  invitation accept flow. Phase 2 NOT YET STARTED -- review Phase 1
-  first.
+- [x] **CRM integration into Canopy (Phase 2).** Migration 022 for
+  `contacts` + `contact_notes`, `lib/services/contacts.ts` with LATERAL
+  touchpoint counts (NOT visits, since page_views requires a visitor-id
+  linkage chain), Server Actions in `lib/actions/contacts.ts` (no API
+  routes for these), sidebar Relationships group between Acquisition
+  and Operations, `/admin/contacts` list, `/admin/contacts/[id]`
+  detail with Pathlight scan card, `/admin/relationships/pipeline`
+  kanban (the route is `/admin/relationships/pipeline` because the
+  existing `/admin/pipeline` is for the Inngest pipeline page),
+  Dashboard Relationships card, auto-creation wiring in scan finalize
+  + contact form route + client invitation accept flow. Phase 2
+  staged for commit on May 1.
+- [ ] **Apply migration 022 to prod Neon.** `npx tsx lib/db/setup.ts`.
+  Until applied, `/admin/contacts` and `/admin/relationships/pipeline`
+  render their empty state because every contacts read returns the
+  empty default (each query is wrapped in try/catch).
+- [ ] **After applying migration 022, click "Sync contacts" on
+  /admin/contacts** to backfill from existing leads /
+  contact_submissions / clients (idempotent: running twice with no
+  new data returns 0/0).
 - [ ] After Phase 1 ships: run `vercel logs --status-code 500 --since 5m`
   against the deployment URL to confirm RSC boundary is clean (this is
   the only check that catches production-build-only RSC failures per

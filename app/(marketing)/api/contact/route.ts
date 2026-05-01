@@ -5,6 +5,7 @@ import { track } from "@/lib/services/monitoring";
 import { getDb } from "@/lib/db";
 import { attachContactToSession } from "@/lib/services/analytics";
 import { readSessionIdFromRequest } from "@/lib/services/visitor-id";
+import { upsertContactFromForm } from "@/lib/services/contacts";
 
 /* Best-effort: a DB outage must not block lead capture once the
  * Resend send has already happened. Failures swallow to console.warn.
@@ -251,6 +252,15 @@ export async function POST(request: Request) {
     if (sessionId && contactSubmissionId) {
       await attachContactToSession({ sessionId, contactSubmissionId });
     }
+    /* CRM auto-creation. Best-effort; never blocks the form submission.
+     * Preserves existing non-null fields on the contact (a returning
+     * prospect's company stays even if this submission omitted it). */
+    await upsertContactFromForm({
+      email,
+      name: name || null,
+      company: company || null,
+      phone: phone || null,
+    });
     await track("contact.submitted", {
       projectType: safe.projectType,
       hasBudget: Boolean(safe.budget),

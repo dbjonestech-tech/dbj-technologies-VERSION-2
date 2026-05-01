@@ -18,6 +18,11 @@ import { getLatestInfraStatuses } from "@/lib/services/infrastructure";
 import { getLevelSummary } from "@/lib/services/monitoring";
 import { listAdminUsers } from "@/lib/auth/users";
 import { getAllowlistSize } from "@/lib/auth/allowlist";
+import {
+  getContactsDashboardSummary,
+  getDailyNewContacts,
+  getRecentRelationshipEvents,
+} from "@/lib/services/contacts";
 
 /**
  * Per-card KPI payload rendered on hover on the admin dashboard. Each
@@ -1330,6 +1335,85 @@ async function usersKpi(): Promise<CardKpi> {
   };
 }
 
+async function relationshipsKpi(): Promise<CardKpi> {
+  const [summary, daily, recent] = await Promise.all([
+    safe(
+      () => getContactsDashboardSummary(),
+      { total: 0, newThisWeek: 0, overdue: 0, byStatus: { new: 0, contacted: 0, qualified: 0, proposal: 0, won: 0, lost: 0 } },
+      "relationships.summary"
+    ),
+    safe(() => getDailyNewContacts(14), [], "relationships.daily"),
+    safe(() => getRecentRelationshipEvents(3), [], "relationships.recent"),
+  ]);
+
+  let primary: string;
+  let tone: KpiTone;
+  if (summary.overdue > 0) {
+    primary = `${fmt(summary.overdue)} overdue`;
+    tone = "danger";
+  } else if (summary.newThisWeek > 0) {
+    primary = `${fmt(summary.newThisWeek)} new this week`;
+    tone = "neutral";
+  } else if (summary.total > 0) {
+    primary = "All caught up";
+    tone = "positive";
+  } else {
+    primary = "No contacts yet";
+    tone = "neutral";
+  }
+
+  const sparkPoints: SparkPoint[] = daily.map((d) => ({
+    label: shortDayLabel(d.date),
+    value: d.count,
+  }));
+
+  return {
+    primary,
+    secondary: `${fmt(summary.total)} total contact${summary.total === 1 ? "" : "s"}`,
+    tone,
+    details: [
+      {
+        label: "New (status)",
+        value: fmt(summary.byStatus.new),
+        tone: summary.byStatus.new > 0 ? "neutral" : undefined,
+      },
+      {
+        label: "Contacted",
+        value: fmt(summary.byStatus.contacted),
+      },
+      {
+        label: "Qualified",
+        value: fmt(summary.byStatus.qualified),
+      },
+      {
+        label: "Proposal",
+        value: fmt(summary.byStatus.proposal),
+        tone: summary.byStatus.proposal > 0 ? "positive" : undefined,
+      },
+      {
+        label: "Won",
+        value: fmt(summary.byStatus.won),
+        tone: summary.byStatus.won > 0 ? "positive" : undefined,
+      },
+      {
+        label: "Overdue",
+        value: fmt(summary.overdue),
+        tone: summary.overdue > 0 ? "danger" : "positive",
+      },
+    ],
+    spark: sparkPoints.length > 0
+      ? { points: sparkPoints, unit: "new/day" }
+      : undefined,
+    recent:
+      recent.length > 0
+        ? recent.map((r) => ({
+            title: r.title,
+            meta: fmtRelDays(r.timestamp),
+          }))
+        : undefined,
+  };
+}
+
 /**
  * Fetch every dashboard KPI in parallel. Returns a map keyed by the
  * card's href so the dashboard page can look up KPIs by Card.href
@@ -1346,6 +1430,7 @@ export async function getDashboardKpis(): Promise<DashboardKpiMap> {
     rum,
     email,
     recurring,
+    relationships,
     costs,
     database,
     clients,
@@ -1365,6 +1450,7 @@ export async function getDashboardKpis(): Promise<DashboardKpiMap> {
     rumKpi(),
     emailKpi(),
     recurringKpi(),
+    relationshipsKpi(),
     costsKpi(),
     databaseKpi(),
     clientsKpi(),
@@ -1386,6 +1472,7 @@ export async function getDashboardKpis(): Promise<DashboardKpiMap> {
     "/admin/performance/rum": rum,
     "/admin/email": email,
     "/admin/recurring": recurring,
+    "/admin/contacts": relationships,
     "/admin/costs": costs,
     "/admin/database": database,
     "/admin/clients": clients,

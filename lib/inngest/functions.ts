@@ -26,6 +26,7 @@ import { snapshotVercelDeployments } from "../services/vercel-platform";
 import { snapshotAnthropicBudget } from "../services/anthropic-budget";
 import { importSearchConsoleDaily } from "../services/search-console";
 import { refreshEmailKpi } from "../services/email-kpi";
+import { upsertContactFromScan } from "../services/contacts";
 import {
   MONITORED_PAGES,
   STRATEGIES,
@@ -284,7 +285,7 @@ export const scanRequested = inngest.createFunction(
               curatedMatch.confidence === "medium")
           ) {
             console.log(
-              `[research-benchmark] Curated match: "${curatedMatch.name}" (${curatedMatch.confidence}) — skipping web research`
+              `[research-benchmark] Curated match: "${curatedMatch.name}" (${curatedMatch.confidence}), skipping web research`
             );
             const curatedBenchmark = buildBenchmarkFromVertical(curatedMatch);
             try {
@@ -444,6 +445,30 @@ export const scanRequested = inngest.createFunction(
       );
 
       await step.run("s6", async () => {
+        /* CRM auto-creation. Best-effort: any failure here MUST NOT
+         * block the scan pipeline. The upsert preserves the contact's
+         * existing source/status if they already converted via another
+         * channel (form submission, client invite). See
+         * lib/services/contacts.ts upsertContactFromScan. */
+        try {
+          const sql = getDb();
+          const rows = (await sql`
+            SELECT email, business_name FROM scans WHERE id = ${scanId} LIMIT 1
+          `) as { email: string; business_name: string | null }[];
+          const r = rows[0];
+          if (r?.email) {
+            await upsertContactFromScan({
+              email: r.email,
+              scanId,
+              businessName: r.business_name,
+            });
+          }
+        } catch (err) {
+          console.warn(
+            `[scan.contact-upsert] failed: ${err instanceof Error ? err.message : err}`
+          );
+        }
+
         const haveScreenshots =
           screenshots.desktop !== null || screenshots.mobile !== null;
         const errors: string[] = [];

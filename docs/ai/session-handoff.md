@@ -5,13 +5,104 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Phase 1 shipped at `7f9ea05`)
+## Current state (May 1, 2026 -- Phase 2 staged for commit)
 
 ### Phase 1 shipped (commit `7f9ea05`)
 
 `feat(admin/visitors): chart-driven analytics with hero chart, metric
-tiles, and breakdown panels`. Pushed to `origin main`. Vercel
-auto-deploys. Working tree clean before Phase 2 begins.
+tiles, and breakdown panels`. Pushed to `origin main`. Phase 1 docs
+amended at `76925b7`.
+
+### Phase 2 staged on disk (uncommitted)
+
+CRM integration into Canopy. Migration 022 plus the Contacts /
+Pipeline pages, sidebar group, dashboard card, and auto-creation
+wiring across the scan pipeline, contact form route, and client
+invitation flow. Files:
+
+- **`lib/db/migrations/022_contacts_crm.sql`** (new): contacts and
+  contact_notes tables. Email is `TEXT UNIQUE NOT NULL` so the unique
+  index from the constraint is the only email index needed (no
+  redundant idx_contacts_email partial). Indexes on status and a
+  partial index on follow_up_date WHERE NOT NULL.
+- **`lib/services/contacts.ts`** (new): list / detail / timeline /
+  mutation reads. Touchpoint counts on the list view come from
+  LATERAL subqueries against scans / contact_submissions / email_events
+  and are returned per-row in the same query (NO N+1). Timeline is a
+  per-source CTE-with-LIMIT pattern so the page_views table is never
+  fully scanned. Includes upsertContactFromScan / Form / Client
+  helpers used by the auto-creation wiring.
+- **`lib/actions/contacts.ts`** (new): every Phase 2 mutation as a
+  Server Action (createContact, updateContact, addNote, deleteNote,
+  changeStatus, sync). Auth-gated, revalidates the relevant paths.
+  No new API routes.
+- **`app/admin/contacts/page.tsx`** + **`ContactsList.tsx`** (new):
+  server-rendered list page with filter chips + search + Sync /
+  New buttons; client component drives the URL filter state.
+- **`app/admin/contacts/[id]/page.tsx`** + **`ContactHeader.tsx`** +
+  **`ContactNotes.tsx`** (new): two-column header (inline-editable
+  fields + Pathlight scan card on the right when one exists), unified
+  timeline below, notes input + manual-note delete affordances.
+  Pathlight card is admin-only and surfaces score + estimated monthly
+  impact (no internals leak per Pathlight rules).
+- **`app/admin/relationships/pipeline/page.tsx`** + **`PipelineBoard.tsx`**
+  (new): six-column kanban (New / Contacted / Qualified / Proposal /
+  Won / Lost), per-card status dropdown (NO drag-and-drop). Routed
+  under /admin/relationships/pipeline because /admin/pipeline is the
+  Inngest pipeline page.
+- **`app/admin/layout.tsx`** (modified): RELATIONSHIPS sidebar group
+  inserted between Acquisition and Operations. Contacts row carries a
+  red overdue badge when getContactsDashboardSummary().overdue > 0.
+- **`app/admin/page.tsx`** (modified): Relationships card added to
+  the TODAY column.
+- **`app/admin/DashboardCard.tsx`** (modified): ClipboardList icon
+  registered in the icon map.
+- **`lib/admin/page-themes.ts`** (modified): rose palette added,
+  /admin/contacts -> pink and /admin/relationships/pipeline -> rose
+  registered in PAGE_PALETTE.
+- **`lib/services/dashboard-kpis.ts`** (modified): relationshipsKpi
+  added, mapped to /admin/contacts. Rest line shows overdue / new
+  this week / "All caught up". Hover detail shows status breakdown,
+  14d sparkline of new-contacts/day, and 3 most-recent timeline
+  events across all contacts.
+- **`lib/inngest/functions.ts`** (modified): scan finalize step now
+  upserts a contact from the scan email (best-effort try/catch; never
+  blocks the pipeline).
+- **`app/(marketing)/api/contact/route.ts`** (modified): contact
+  form route upserts a contact from the form email after the durable
+  insert (best-effort).
+- **`lib/auth/users.ts`** (modified): client invitation accept flow
+  upserts a contact with source=client_import + status=won (best-
+  effort).
+
+### Phase 2 verification
+
+- `npx tsc --noEmit` clean
+- `npm run lint` clean
+- em-dash grep across all Phase 2 changed files returns empty
+- legacy-email grep across all Phase 2 changed files returns empty
+- migration 022 SQL reads back syntactically valid (CREATE TABLE +
+  CREATE INDEX statements only)
+- Phase 1 RSC boundary post-deploy check still pending in
+  `vercel logs --status-code 500`
+- Phase 2 RSC boundary post-deploy check needs the same after
+  authorized push
+
+### Phase 2 NOT YET DEPLOYED -- migration 022 must be applied
+
+Migration 022 is staged on disk and tracked in git but has NOT been
+applied to the production Neon DB. Before the CRM pages will hydrate
+in production:
+
+1. Apply migration 022 to prod Neon. Run from the project root:
+   `npx tsx lib/db/setup.ts`
+2. Verify contacts and contact_notes tables exist.
+3. Open /admin/contacts and click "Sync contacts" to backfill from
+   existing leads / contact_submissions / clients.
+
+Without step 1, every contacts read returns the empty default (the
+service wraps every query in try/catch by design) and the new pages
+render the empty state.
 
 ### Phase 1 -- Visitors page upgrade (PostHog/Vercel Analytics level)
 
