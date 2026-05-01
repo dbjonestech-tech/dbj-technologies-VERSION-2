@@ -10,8 +10,9 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with 7146feb commit hash
-- `7146feb` feat(canopy admin): coordinated table styling — every column tinted (header AND cell text), every row striped, on every admin page via the .canopy-table CSS in globals.css
+- (this commit) docs: update session-handoff with 0738d48 commit hash
+- `0738d48` feat(admin/visitors): Engagement column + bot heuristic for at-a-glance human/bot disambiguation
+- `7146feb` feat(canopy admin): coordinated table styling -- every column tinted (header AND cell text), every row striped, on every admin page via the .canopy-table CSS in globals.css
 - `d94c87c` feat(admin/visitors): add per-visitor "Pages visited" column with clean labels
 - `cc529a0` feat(canopy admin): all 18 admin pages now wear their palette via shared PageHeader (chip pill + stripe + colored eyebrow); per-column color rotation in every data table via .canopy-table CSS rules (8-hue rotation)
 - `20bc0a4` perf(marketing): cut Lighthouse-flagged paint and main-thread cost on /about, /services, /pricing, /work
