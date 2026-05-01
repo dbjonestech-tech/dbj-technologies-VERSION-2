@@ -9,7 +9,8 @@ record of every May 1 entry that was below this header before this reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) feat(admin): floating CardPreview popover + sparklines + recent activity on /admin cards
+- (this commit) docs: update session-handoff with b10428f commit hash
+- `b10428f` feat(admin): floating CardPreview popover + sparklines + recent activity on /admin cards
 - `8ad516c` feat(admin): always-visible KPIs + richer hover details on /admin cards
 - `451d126` feat(admin): self-service /admin/config status board + .env.example completed
 - `ff416e4` feat(canopy admin): sidebar nav items inherit each destination page's palette color
