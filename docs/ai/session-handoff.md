@@ -5,15 +5,13 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Phase 1 staged, not yet committed)
+## Current state (May 1, 2026 -- Phase 1 shipped at `7f9ea05`)
 
-### Phase 1 staged on disk (uncommitted)
+### Phase 1 shipped (commit `7f9ea05`)
 
-The visitors page rewrite is staged but not yet committed. Working tree
-has Phase 1 changes pending review. After review, these will land in a
-single commit titled `feat(admin/visitors): PostHog-level analytics
-with hero chart, metric tiles, and breakdown panels`. Phase 2 (CRM) is
-a separate session and a separate commit.
+`feat(admin/visitors): chart-driven analytics with hero chart, metric
+tiles, and breakdown panels`. Pushed to `origin main`. Vercel
+auto-deploys. Working tree clean before Phase 2 begins.
 
 ### Phase 1 -- Visitors page upgrade (PostHog/Vercel Analytics level)
 
