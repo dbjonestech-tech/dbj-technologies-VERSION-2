@@ -14,7 +14,15 @@ import {
 } from "lucide-react";
 import type { RecentVisitorRow } from "@/lib/services/analytics";
 
-type FilterChip = "all" | "anonymous" | "self-disclosed" | "converted" | "mobile" | "desktop";
+type FilterChip =
+  | "all"
+  | "anonymous"
+  | "self-disclosed"
+  | "converted"
+  | "mobile"
+  | "desktop"
+  | "engaged"
+  | "likely-bot";
 
 /* Expandable per-visitor table for /admin/visitors. Each row collapses
  * one person's full activity into a single line. Click a row to fetch
@@ -141,6 +149,99 @@ function prettifyPath(path: string): string {
   return clean;
 }
 
+/* ─── ENGAGEMENT + BOT HEURISTIC ─────────────────────────────
+ * The single most useful disambiguation signal we have at this
+ * layer is the engagement beacon: did the page view ever get a
+ * dwell_ms or max_scroll_pct fired? Bots that scrape via fetch
+ * never fire it; headless browsers usually skip it; humans almost
+ * always fire at least *something*.
+ *
+ * Combined with single-page + single-session + a known-datacenter
+ * geo, we can flag likely-bot rows visually without claiming
+ * certainty. The filter chips and bot? badge surface this. */
+
+/** Tier used to color the engagement dot. */
+type EngagementTier = "engaged" | "light" | "none";
+
+/** Cities/regions known to be cloud-datacenter origins (not human population centers).
+ *  AWS, GCP, Azure, Equinix colos. Not exhaustive; the high-confidence ones. */
+const DATACENTER_GEOS: Array<{
+  city?: string;
+  region?: string;
+  country?: string;
+}> = [
+  { city: "Ashburn", region: "VA", country: "US" }, // AWS us-east-1
+  { city: "Boardman", region: "OR", country: "US" }, // AWS us-west-2
+  { city: "Columbus", region: "OH", country: "US" }, // AWS us-east-2
+  { city: "Hilliard", region: "OH", country: "US" }, // AWS us-east-2
+  { city: "The Dalles", region: "OR", country: "US" }, // GCP
+  { city: "Council Bluffs", region: "IA", country: "US" }, // GCP
+  { city: "Secaucus", region: "NJ", country: "US" }, // Equinix NY4/NY5
+  { city: "Quincy", region: "WA", country: "US" }, // Azure / Vantage
+  { city: "Singapore", country: "SG" }, // AWS ap-southeast-1
+  { city: "São Paulo", country: "BR" }, // AWS sa-east-1
+  { city: "Sao Paulo", country: "BR" },
+  { city: "Frankfurt am Main", country: "DE" }, // AWS eu-central-1
+  { city: "Dublin", country: "IE" }, // AWS eu-west-1
+  { city: "Canary Wharf", country: "GB" }, // datacenter cluster
+];
+
+function geoLooksLikeDatacenter(row: {
+  city: string | null;
+  region: string | null;
+  country: string | null;
+}): boolean {
+  const c = (row.city ?? "").toLowerCase();
+  const r = (row.region ?? "").toLowerCase();
+  const co = (row.country ?? "").toLowerCase();
+  return DATACENTER_GEOS.some((d) => {
+    if (d.city && c !== d.city.toLowerCase()) return false;
+    if (d.region && r !== d.region.toLowerCase()) return false;
+    if (d.country && co !== d.country.toLowerCase()) return false;
+    return true;
+  });
+}
+
+function engagementTier(row: RecentVisitorRow): EngagementTier {
+  /* Self-disclosed identity always overrides; these are converted
+   * humans, no matter what their dwell looks like. */
+  if (row.contactName || row.contactEmail || row.scanEmail) return "engaged";
+
+  const dwell = row.maxDwellMs ?? 0;
+  const scroll = row.maxScrollPct ?? 0;
+  const engaged = row.engagedPageCount ?? 0;
+
+  /* No beacon at all + no scroll + dwell zero/null = read like a
+   * headless fetch or a bot. */
+  if (engaged === 0 && dwell === 0 && scroll === 0) return "none";
+
+  /* Strong human signal: 5s+ dwell OR 25%+ scroll OR multiple pages. */
+  if (dwell >= 5000 || scroll >= 25 || row.pageViewCount >= 2) return "engaged";
+
+  /* Got something but it's weak. */
+  return "light";
+}
+
+/** Combines engagement tier + datacenter geo + single-page-single-session
+ *  into a "likely bot" flag. This is the chip that surfaces in Status. */
+function looksLikeBot(row: RecentVisitorRow): boolean {
+  if (row.contactName || row.contactEmail || row.scanEmail) return false;
+  const tier = engagementTier(row);
+  if (tier !== "none") return false;
+  const isSinglePageSingleSession =
+    row.sessionCount === 1 && row.pageViewCount === 1;
+  return isSinglePageSingleSession && geoLooksLikeDatacenter(row);
+}
+
+function formatDwellShort(ms: number | null): string {
+  if (ms === null || ms === 0) return "0s";
+  if (ms < 1000) return `${ms}ms`;
+  if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`;
+  const m = Math.floor(ms / 60_000);
+  const s = Math.floor((ms % 60_000) / 1000);
+  return s ? `${m}m ${s}s` : `${m}m`;
+}
+
 /**
  * Build a display name for a visitor. Returns the most specific
  * identity we have: contact-form name > scan business > scan email >
@@ -216,6 +317,11 @@ const CSV_COLUMNS = [
   "entry_path",
   "exit_path",
   "paths_visited",
+  "max_dwell_ms",
+  "max_scroll_pct",
+  "engaged_pages",
+  "engagement_tier",
+  "likely_bot",
   "source",
   "utm_campaign",
   "city",
@@ -250,6 +356,11 @@ function rowsToCsv(rows: RecentVisitorRow[]): string {
       r.entryPath,
       r.exitPath,
       r.pathsVisited.join(" | "),
+      r.maxDwellMs,
+      r.maxScrollPct,
+      r.engagedPageCount,
+      engagementTier(r),
+      looksLikeBot(r),
       r.utmSource ?? r.referrerHost ?? "(direct)",
       r.utmCampaign,
       r.city,
@@ -330,6 +441,8 @@ function rowMatchesChip(row: RecentVisitorRow, chip: FilterChip): boolean {
   if (chip === "converted") return row.convertedScan || row.convertedContact;
   if (chip === "mobile") return row.deviceType === "mobile";
   if (chip === "desktop") return row.deviceType === "desktop";
+  if (chip === "engaged") return engagementTier(row) === "engaged";
+  if (chip === "likely-bot") return looksLikeBot(row);
   return true;
 }
 
@@ -406,6 +519,8 @@ export default function RecentVisitorsTable({
                     { id: "self-disclosed", label: "Self-disclosed" },
                     { id: "anonymous", label: "Anonymous" },
                     { id: "converted", label: "Converted" },
+                    { id: "engaged", label: "Engaged" },
+                    { id: "likely-bot", label: "Likely bot" },
                     { id: "mobile", label: "Mobile" },
                     { id: "desktop", label: "Desktop" },
                   ] as const
@@ -447,7 +562,7 @@ export default function RecentVisitorsTable({
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="canopy-table w-full min-w-[1080px] text-sm">
+          <table className="canopy-table w-full min-w-[1240px] text-sm">
             <thead className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
               <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
                 <th className="px-3 py-2 font-semibold w-6"></th>
@@ -456,6 +571,7 @@ export default function RecentVisitorsTable({
                 <th className="px-3 py-2 font-semibold">Geo</th>
                 <th className="px-3 py-2 font-semibold">Device</th>
                 <th className="px-3 py-2 font-semibold">Pages visited</th>
+                <th className="px-3 py-2 font-semibold">Engagement</th>
                 <th className="px-3 py-2 text-right font-semibold">Sessions</th>
                 <th className="px-3 py-2 text-right font-semibold">Pages</th>
                 <th className="px-3 py-2 text-right font-semibold">Last seen</th>
@@ -549,6 +665,9 @@ function VisitorRow({ row, index }: { row: RecentVisitorRow; index: number }) {
         <td className="px-3 py-3">
           <PagesVisitedChips paths={row.pathsVisited} />
         </td>
+        <td className="px-3 py-3">
+          <EngagementCell row={row} />
+        </td>
         <td className="px-3 py-3 text-right font-mono text-xs text-zinc-900">
           {row.sessionCount}
         </td>
@@ -558,11 +677,23 @@ function VisitorRow({ row, index }: { row: RecentVisitorRow; index: number }) {
         <td className="px-3 py-3 text-right font-mono text-xs text-zinc-500">
           {formatRelative(row.lastSeenAt)}
         </td>
-        <td className="px-3 py-3 text-right">{conversionBadge(row)}</td>
+        <td className="px-3 py-3 text-right">
+          <div className="flex flex-wrap items-center justify-end gap-1">
+            {looksLikeBot(row) ? (
+              <span
+                className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-rose-700 ring-1 ring-rose-200"
+                title="Zero engagement + single page + datacenter geo. Heuristic, not certainty."
+              >
+                bot?
+              </span>
+            ) : null}
+            {conversionBadge(row)}
+          </div>
+        </td>
       </tr>
       {expanded ? (
         <tr className="border-t border-zinc-100 bg-zinc-50/50">
-          <td colSpan={10} className="px-3 py-4">
+          <td colSpan={11} className="px-3 py-4">
             <ExpandedDetail
               row={row}
               identity={id}
@@ -743,6 +874,11 @@ function Field({
 }
 
 function FactsCard({ row }: { row: RecentVisitorRow }) {
+  const tier = engagementTier(row);
+  const tierLabel =
+    tier === "engaged" ? "engaged" : tier === "light" ? "light" : "no signal";
+  const datacenter = geoLooksLikeDatacenter(row);
+  const botFlagged = looksLikeBot(row);
   return (
     <div className="rounded-xl border border-zinc-200 bg-white p-4">
       <h4 className="mb-3 font-display text-sm font-semibold text-zinc-900">
@@ -754,6 +890,22 @@ function FactsCard({ row }: { row: RecentVisitorRow }) {
         <Fact label="Top page" value={row.topPath ?? "-"} mono />
         <Fact label="Entry path" value={row.entryPath ?? "-"} mono />
         <Fact label="Exit path" value={row.exitPath ?? "-"} mono />
+        <Fact
+          label="Engagement"
+          value={`${tierLabel} (max dwell ${formatDwellShort(row.maxDwellMs)}, max scroll ${row.maxScrollPct ?? 0}%, beacon fired on ${row.engagedPageCount}/${row.pageViewCount} page${row.pageViewCount === 1 ? "" : "s"})`}
+        />
+        {datacenter ? (
+          <Fact
+            label="Geo signal"
+            value="city/region matches a known cloud datacenter region"
+          />
+        ) : null}
+        {botFlagged ? (
+          <Fact
+            label="Bot signal"
+            value="zero engagement + single page + datacenter geo (heuristic, not certainty)"
+          />
+        ) : null}
         {row.utmCampaign ? (
           <Fact
             label="Campaign"
@@ -861,6 +1013,49 @@ function PagesVisitedChips({ paths }: { paths: string[] }) {
           +{overflow} more
         </span>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * Renders dwell + scroll for the visitor's deepest read alongside a
+ * colored dot signaling engagement tier. Green = engaged signal,
+ * amber = light signal, rose = no signal at all (bot or pure cold
+ * landing). Self-disclosed identities always render green regardless
+ * of beacon data.
+ */
+function EngagementCell({ row }: { row: RecentVisitorRow }) {
+  const tier = engagementTier(row);
+  const dotColor =
+    tier === "engaged"
+      ? "bg-emerald-500"
+      : tier === "light"
+        ? "bg-amber-400"
+        : "bg-rose-400";
+  const dotRing =
+    tier === "engaged"
+      ? "ring-emerald-200"
+      : tier === "light"
+        ? "ring-amber-200"
+        : "ring-rose-200";
+  const dwell = formatDwellShort(row.maxDwellMs);
+  const scroll = row.maxScrollPct === null ? 0 : row.maxScrollPct;
+  const tooltip =
+    tier === "engaged"
+      ? "Engaged: 5s+ dwell, 25%+ scroll, multi-page, or self-disclosed identity"
+      : tier === "light"
+        ? "Light signal: beacon fired but dwell/scroll are below the engaged threshold"
+        : "No engagement signal at all. Common with bots and headless fetchers.";
+  return (
+    <div className="flex items-center gap-2" title={tooltip}>
+      <span
+        className={`inline-block h-2 w-2 shrink-0 rounded-full ring-2 ${dotColor} ${dotRing}`}
+        aria-hidden="true"
+      />
+      <div className="flex flex-col font-mono text-[11px] leading-tight">
+        <span className="text-zinc-900">{dwell}</span>
+        <span className="text-zinc-500">{scroll}% scroll</span>
+      </div>
     </div>
   );
 }

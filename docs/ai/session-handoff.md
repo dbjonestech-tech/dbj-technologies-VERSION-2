@@ -19,7 +19,51 @@ header before the April 30 reset.
 Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys
 from main. Next 04:00 UTC Lighthouse cron will re-evaluate.
 
-### What landed in this session: per-visitor "Pages visited" column
+### What landed in this session: visitors-page Engagement column + bot heuristic
+
+Joshua asked whether the global visitor traffic was bots or real demand. The
+"Pages visited" column made it clear visitors are landing on deep specific
+pages (case studies, pricing tiers), which weakened the pure-bot read but did
+not falsify it. The next disambiguation lever was the engagement beacon
+(dwell_ms, max_scroll_pct on page_view_engagement) which was already captured
+but not surfaced. Added it as a visible column plus a "bot?" heuristic chip
+so the read is at-a-glance.
+
+- **`lib/services/analytics.ts`** -- added an `engagement` CTE in both
+  `getRecentVisitors` and `getRecurringVisitors`. Joins `page_views` to
+  `page_view_engagement` and aggregates per visitor: `MAX(dwell_ms)`,
+  `MAX(max_scroll_pct)`, and `COUNT(eng.page_view_id)` as
+  `engaged_page_count`. New fields on `RecentVisitorRow`: `maxDwellMs`,
+  `maxScrollPct`, `engagedPageCount`. Both query result-row types and
+  mappers updated.
+- **`app/admin/visitors/RecentVisitorsTable.tsx`** -- new `engagementTier()`
+  helper classifies each visitor as `engaged | light | none` based on
+  dwell, scroll, page count, and self-disclosed identity. New
+  `looksLikeBot()` heuristic flags rows with zero engagement + single page
+  + datacenter-region geo (Ashburn VA, Singapore SG, etc; explicit
+  whitelist of known cloud-datacenter cities/regions in `DATACENTER_GEOS`).
+  New "Engagement" column renders dwell + scroll + a colored dot (emerald
+  / amber / rose) with a tooltip explaining the tier. New "bot?" rose
+  chip in the Status column when `looksLikeBot()` fires. Two new filter
+  chips: "Engaged" and "Likely bot". `FactsCard` in the expanded detail
+  surfaces the full engagement breakdown plus geo and bot flags. CSV
+  export gets columns: `max_dwell_ms`, `max_scroll_pct`, `engaged_pages`,
+  `engagement_tier`, `likely_bot`. Table min-width bumped from 1080px to
+  1240px to accommodate the column.
+- **/admin/recurring** picks up the column automatically (shared component).
+
+Read this column and the bot? chip together. A row showing 0s dwell, 0%
+scroll, single page, Ashburn VA = almost certainly a crawler. A row showing
+45s dwell, 60% scroll, even on a single page = a real human reading.
+
+Files touched: 2 modified.
+
+### Verification (engagement column)
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+
+### What landed earlier in this session: per-visitor "Pages visited" column
 
 Joshua noticed the /admin/visitors table showed sessions and page-view counts
 but did not show *which* pages each visitor hit unless you expanded the row.

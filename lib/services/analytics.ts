@@ -939,6 +939,16 @@ export type RecentVisitorRow = {
    * (chronological journey). Does not include query strings. Capped
    * at 50 paths per visitor in SQL to keep the row small. */
   pathsVisited: string[];
+  /* Engagement signals aggregated from page_view_engagement. Single
+   * highest dwell across any of the visitor's page views, deepest
+   * scroll across any page view, and the count of pages where the
+   * engagement beacon actually fired (some signal at all). When
+   * engagedPageCount is 0, the visitor saw the page but never
+   * scrolled or stayed long enough for the beacon. The strongest
+   * single bot tell at this layer. */
+  maxDwellMs: number | null;
+  maxScrollPct: number | null;
+  engagedPageCount: number;
   /* Conversion flags + linked rows. */
   convertedScan: boolean;
   convertedContact: boolean;
@@ -1044,6 +1054,22 @@ export async function getRecentVisitors(
         WHERE fp.rn <= 50
         GROUP BY fp.visitor_id
       ),
+      engagement AS (
+        /* Aggregate dwell + scroll signals from page_view_engagement.
+         * MAX over a visitor's page views surfaces the deepest read
+         * they did anywhere; engaged_page_count is the count of page
+         * views with any beacon at all (zero = beacon never fired,
+         * the strongest bot tell at this layer). */
+        SELECT
+          pv.visitor_id,
+          MAX(eng.dwell_ms) AS max_dwell_ms,
+          MAX(eng.max_scroll_pct) AS max_scroll_pct,
+          COUNT(eng.page_view_id)::int AS engaged_page_count
+        FROM page_views pv
+        LEFT JOIN page_view_engagement eng ON eng.page_view_id = pv.id
+        WHERE pv.is_bot = false
+        GROUP BY pv.visitor_id
+      ),
       conv AS (
         SELECT
           s.visitor_id,
@@ -1068,6 +1094,9 @@ export async function getRecentVisitors(
         entry.entry_path,
         exit_.exit_path,
         COALESCE(paths_visited.paths, ARRAY[]::text[]) AS paths_visited,
+        engagement.max_dwell_ms,
+        engagement.max_scroll_pct,
+        COALESCE(engagement.engaged_page_count, 0) AS engaged_page_count,
         COALESCE(conv.converted_scan, false) AS converted_scan,
         COALESCE(conv.converted_contact, false) AS converted_contact,
         conv.any_scan_id AS scan_id,
@@ -1086,6 +1115,7 @@ export async function getRecentVisitors(
       LEFT JOIN utm ON utm.visitor_id = agg.visitor_id
       LEFT JOIN top_path ON top_path.visitor_id = agg.visitor_id
       LEFT JOIN paths_visited ON paths_visited.visitor_id = agg.visitor_id
+      LEFT JOIN engagement ON engagement.visitor_id = agg.visitor_id
       LEFT JOIN conv ON conv.visitor_id = agg.visitor_id
       LEFT JOIN contact_submissions cs ON cs.id = conv.any_contact_id::uuid
       LEFT JOIN scans sc ON sc.id = conv.any_scan_id::uuid
@@ -1112,6 +1142,9 @@ export async function getRecentVisitors(
       entry_path: string | null;
       exit_path: string | null;
       paths_visited: string[] | null;
+      max_dwell_ms: number | null;
+      max_scroll_pct: number | null;
+      engaged_page_count: number | null;
       converted_scan: boolean;
       converted_contact: boolean;
       scan_id: string | null;
@@ -1144,6 +1177,9 @@ export async function getRecentVisitors(
       entryPath: r.entry_path,
       exitPath: r.exit_path,
       pathsVisited: r.paths_visited ?? [],
+      maxDwellMs: r.max_dwell_ms === null ? null : Math.round(Number(r.max_dwell_ms)),
+      maxScrollPct: r.max_scroll_pct === null ? null : Math.round(Number(r.max_scroll_pct)),
+      engagedPageCount: r.engaged_page_count ?? 0,
       convertedScan: r.converted_scan,
       convertedContact: r.converted_contact,
       scanId: r.scan_id,
@@ -1270,6 +1306,21 @@ export async function getRecurringVisitors(
         WHERE fp.rn <= 50
         GROUP BY fp.visitor_id
       ),
+      engagement AS (
+        /* Same engagement aggregator as getRecentVisitors. Surfaces
+         * deepest read + deepest scroll across any of the visitor's
+         * page views, plus the count of pages with any beacon at
+         * all. zero engaged pages = strongest bot tell. */
+        SELECT
+          pv.visitor_id,
+          MAX(eng.dwell_ms) AS max_dwell_ms,
+          MAX(eng.max_scroll_pct) AS max_scroll_pct,
+          COUNT(eng.page_view_id)::int AS engaged_page_count
+        FROM page_views pv
+        LEFT JOIN page_view_engagement eng ON eng.page_view_id = pv.id
+        WHERE pv.is_bot = false
+        GROUP BY pv.visitor_id
+      ),
       conv AS (
         SELECT
           s.visitor_id,
@@ -1294,6 +1345,9 @@ export async function getRecurringVisitors(
         entry.entry_path,
         exit_.exit_path,
         COALESCE(paths_visited.paths, ARRAY[]::text[]) AS paths_visited,
+        engagement.max_dwell_ms,
+        engagement.max_scroll_pct,
+        COALESCE(engagement.engaged_page_count, 0) AS engaged_page_count,
         COALESCE(conv.converted_scan, false) AS converted_scan,
         COALESCE(conv.converted_contact, false) AS converted_contact,
         conv.any_scan_id AS scan_id,
@@ -1312,6 +1366,7 @@ export async function getRecurringVisitors(
       LEFT JOIN utm ON utm.visitor_id = agg.visitor_id
       LEFT JOIN top_path ON top_path.visitor_id = agg.visitor_id
       LEFT JOIN paths_visited ON paths_visited.visitor_id = agg.visitor_id
+      LEFT JOIN engagement ON engagement.visitor_id = agg.visitor_id
       LEFT JOIN conv ON conv.visitor_id = agg.visitor_id
       LEFT JOIN contact_submissions cs ON cs.id = conv.any_contact_id::uuid
       LEFT JOIN scans sc ON sc.id = conv.any_scan_id::uuid
@@ -1341,6 +1396,9 @@ export async function getRecurringVisitors(
       entry_path: string | null;
       exit_path: string | null;
       paths_visited: string[] | null;
+      max_dwell_ms: number | null;
+      max_scroll_pct: number | null;
+      engaged_page_count: number | null;
       converted_scan: boolean;
       converted_contact: boolean;
       scan_id: string | null;
@@ -1373,6 +1431,9 @@ export async function getRecurringVisitors(
       entryPath: r.entry_path,
       exitPath: r.exit_path,
       pathsVisited: r.paths_visited ?? [],
+      maxDwellMs: r.max_dwell_ms === null ? null : Math.round(Number(r.max_dwell_ms)),
+      maxScrollPct: r.max_scroll_pct === null ? null : Math.round(Number(r.max_scroll_pct)),
+      engagedPageCount: r.engaged_page_count ?? 0,
       convertedScan: r.converted_scan,
       convertedContact: r.converted_contact,
       scanId: r.scan_id,
