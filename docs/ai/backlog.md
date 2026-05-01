@@ -14,8 +14,12 @@
 - [ ] Add Tyler's testimonial to homepage or about page once received
 - [ ] Verify all ~24 pages look correct (full visual audit -- Chrome MCP couldn't complete this due to scroll-triggered animations)
 - [ ] **Manual: register `www.dbjtechnologies.com` as an alias domain in the Vercel dashboard so the new vercel.json www-host redirect actually fires.** Without the domain attached to the project, requests to www never reach Vercel's routing layer. After adding, verify `curl -I https://www.dbjtechnologies.com/` returns `301` to `https://dbjtechnologies.com/`.
-- [ ] Audit found AboutContent.tsx ScrollWordBatch (line 129) does not honor `prefers-reduced-motion`. Text still transitions opacity 0.3->1 plus color #4b5563->#d1d5db on scroll for users who set the OS preference. Final scrolled-past state is fully readable; pre-scroll state at 30% opacity gray-600 on near-black is the audit's "extremely faded" complaint. Low priority; leave alone unless explicitly asked since AboutContent is fragile.
+- [x] AboutContent.tsx ScrollWordBatch reduce-motion concern -- RESOLVED 2026-05-01 by removing the per-word scroll-reveal entirely as part of the Lighthouse perf sprint. Replaced with a single `motion.p` whileInView fade.
 - [ ] (Optional) After confirming www->apex 301 in Vercel, drop `https://www.dbjtechnologies.com` from the contact-form `allowedOrigins` allowlist in `app/(marketing)/api/contact/route.ts:60-62`. Currently kept as a defensive belt-and-suspenders entry.
+- [ ] (Perf, deferred from May 1 sprint) Hybridize `Navbar`: server-render the inline DBJ wordmark SVG + nav link list, keep only the mobile-menu toggle and scroll-detect as a tiny client island. Currently the entire navbar (framer-motion + lucide + AnimatePresence) hydrates on every page just to track `scrolled` and toggle the mobile menu.
+- [ ] (Perf, deferred from May 1 sprint) Move the duplicate inline DBJ wordmark SVG out of `Navbar.tsx:63-89` and `Footer.tsx:27-52` into a single shared `<symbol>` reference (or a single component using `<Image>`). Currently ~25KB of identical SVG path data ships in every HTML response.
+- [ ] (Perf, deferred from May 1 sprint) `/contact`: drop `react-hook-form + @hookform/resolvers + zod` (~30-40KB minified gzip) for native HTML5 validation, OR keep them but `dynamic()` import the form behind a client island.
+- [ ] (Perf, deferred from May 1 sprint) `/contact`: remove `useSearchParams` if the package-selection feature can be moved to URL hash or to a client-only widget. Currently `useSearchParams` opts the entire page out of static rendering on every visit.
 
 ## Context Pack Maintenance (recurring)
 

@@ -383,9 +383,7 @@ export default function PricingContent() {
               background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}10 100%)`,
               boxShadow: [
                 "inset 0 1px 0 rgba(255,255,255,0.95)",
-                "0 1px 2px rgba(0,0,0,0.04)",
                 `0 22px 56px -16px ${PAGE_ACCENT}40`,
-                `0 56px 112px -32px ${PAGE_ACCENT}30`,
               ].join(", "),
             }}
           >
@@ -563,15 +561,11 @@ export default function PricingContent() {
                   boxShadow: tier.popular
                     ? [
                         "inset 0 1px 0 rgba(255,255,255,0.95)",
-                        "0 1px 2px rgba(0,0,0,0.04)",
                         `0 18px 48px -16px ${PAGE_ACCENT}40`,
-                        `0 48px 100px -32px ${PAGE_ACCENT}28`,
                       ].join(", ")
                     : [
                         "inset 0 1px 0 rgba(255,255,255,0.95)",
-                        "0 1px 2px rgba(0,0,0,0.04)",
                         `0 12px 32px -12px ${PAGE_ACCENT}25`,
-                        `0 32px 64px -32px ${PAGE_ACCENT}15`,
                       ].join(", "),
                 }}
               >
@@ -789,9 +783,7 @@ export default function PricingContent() {
                   background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}06 100%)`,
                   boxShadow: [
                     "inset 0 1px 0 rgba(255,255,255,0.95)",
-                    "0 1px 2px rgba(0,0,0,0.04)",
                     `0 10px 28px -12px ${PAGE_ACCENT}22`,
-                    `0 28px 56px -28px ${PAGE_ACCENT}12`,
                   ].join(", "),
                 }}
               >

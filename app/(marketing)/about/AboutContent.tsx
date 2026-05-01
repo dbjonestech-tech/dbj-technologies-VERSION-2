@@ -8,7 +8,6 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
-  type MotionValue,
   type Variants,
 } from "framer-motion";
 import {
@@ -34,8 +33,6 @@ import {
 } from "@/lib/constants";
 
 const valueIcons = [Zap, Eye, Target, Heart];
-
-const headlineChars = ABOUT_CONTENT.headline.split("");
 
 /* ─── CANOPY CAPABILITY TILES ──────────────────────
    The 6 tiles surfaced on the About page as proof-of-craft
@@ -84,23 +81,17 @@ const storySections = [
 /* ─── AMBIENT PARTICLES ────────────────────────────
    Static, deterministic positions / motion deltas so SSR and
    client agree byte-for-byte. CSS-driven animation only. */
+/* Particle count reduced from 16 to 6: each particle is its own
+   always-running CSS animation with willChange:transform, paying a
+   compositor layer + main-thread cost. Six well-spaced particles
+   read the same as sixteen at the page's scale. */
 const AMBIENT_PARTICLES = [
-  { top: "8%", left: "12%", size: 2, dur: 18, dx: 30, dy: -20 },
   { top: "15%", right: "8%", size: 3, dur: 22, dx: -25, dy: 15 },
-  { top: "25%", left: "4%", size: 2, dur: 20, dx: 20, dy: 25 },
   { top: "32%", right: "15%", size: 2.5, dur: 24, dx: -15, dy: -30 },
   { top: "45%", left: "18%", size: 2, dur: 16, dx: 35, dy: 10 },
-  { top: "52%", right: "5%", size: 3, dur: 26, dx: -20, dy: 20 },
   { top: "60%", left: "8%", size: 2, dur: 19, dx: 15, dy: -25 },
-  { top: "70%", right: "12%", size: 2.5, dur: 23, dx: -30, dy: -10 },
   { top: "78%", left: "25%", size: 2, dur: 21, dx: 25, dy: 15 },
   { top: "85%", right: "20%", size: 3, dur: 17, dx: -10, dy: -20 },
-  { top: "12%", left: "45%", size: 2, dur: 25, dx: -15, dy: 30 },
-  { top: "40%", left: "35%", size: 2.5, dur: 20, dx: 20, dy: -15 },
-  { top: "65%", right: "30%", size: 2, dur: 22, dx: -25, dy: 10 },
-  { top: "90%", left: "15%", size: 2, dur: 19, dx: 10, dy: -25 },
-  { top: "5%", right: "35%", size: 2.5, dur: 24, dx: -20, dy: 20 },
-  { top: "55%", left: "50%", size: 2, dur: 18, dx: 15, dy: -10 },
 ] as const;
 
 function AmbientParticles() {
@@ -135,73 +126,25 @@ function AmbientParticles() {
   );
 }
 
-/* ─── SCROLL REVEAL TEXT (3-word batched word illumination) ─── */
+/* ─── REVEAL TEXT ─────────────────────────────────
+   Single whileInView fade replaces the previous per-word
+   scroll-linked reveal. The earlier version subscribed
+   ~400 motion.span elements to a useTransform across four
+   chapter sections, which dominated mobile main-thread
+   time on /about. Visual cue (text appearing as you read)
+   is preserved via a single fade; reading flow is identical. */
 function ScrollRevealText({ text }: { text: string }) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start 0.9", "end 0.4"],
-  });
-
-  const words = text.split(" ");
-  const batches: string[][] = [];
-  for (let i = 0; i < words.length; i += 3) {
-    batches.push(words.slice(i, i + 3));
-  }
-
   return (
-    <p ref={containerRef} className="text-lg leading-relaxed">
-      {batches.map((batch, i) => {
-        const start = i / batches.length;
-        const end = Math.min(start + 1.5 / batches.length, 1);
-        return (
-          <ScrollWordBatch
-            key={i}
-            words={batch}
-            range={[start, end]}
-            progress={scrollYProgress}
-          />
-        );
-      })}
-    </p>
-  );
-}
-
-function ScrollWordBatch({
-  words,
-  range,
-  progress,
-}: {
-  words: string[];
-  range: [number, number];
-  progress: MotionValue<number>;
-}) {
-  const opacity = useTransform(progress, range, [0.3, 1]);
-  const color = useTransform(progress, range, ["#4b5563", "#d1d5db"]);
-
-  return (
-    <>
-      {words.map((word, i) => (
-        <motion.span
-          key={i}
-          style={{ opacity, color }}
-          /* `inline` (not `inline-block`): inline-block collapses
-             trailing whitespace inside the box, which ate the space
-             after the last word of each batch and produced
-             "smartdecisions", "buriedby", etc. on the live site.
-             Single concatenated text child (not two adjacent
-             children): two text children inside motion.span produced
-             an intermittent hydration mismatch ("Failed to execute
-             'insertBefore'") because React 18's text-marker
-             insertion is unreliable through framer-motion's
-             forwardRef wrapper. One string = one DOM text node = no
-             mismatch. */
-          className="inline"
-        >
-          {word + (i < words.length - 1 ? "\u00A0" : " ")}
-        </motion.span>
-      ))}
-    </>
+    <motion.p
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={VIEWPORT}
+      transition={{ duration: 0.7, ease: EASE_OUT }}
+      className="text-lg leading-relaxed"
+      style={{ color: "#c5ccd8" }}
+    >
+      {text}
+    </motion.p>
   );
 }
 
@@ -531,7 +474,6 @@ export default function AboutContent() {
                   fill
                   sizes="(max-width: 1024px) 320px, (max-width: 1280px) 600px, 720px"
                   className="object-cover"
-                  quality={95}
                   priority
                 />
               </motion.div>
@@ -562,19 +504,15 @@ export default function AboutContent() {
               <span className="sr-only">
                 {ABOUT_CONTENT.headline} {ABOUT_CONTENT.headlineAccent}
               </span>
-              <span aria-hidden="true" className="block">
-                {headlineChars.map((char, i) => (
-                  <motion.span
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 + i * 0.02, duration: 0.3 }}
-                    style={{ display: "inline-block" }}
-                  >
-                    {char === " " ? "\u00A0" : char}
-                  </motion.span>
-                ))}
-              </span>
+              <motion.span
+                aria-hidden="true"
+                className="block"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5, ease: EASE_OUT }}
+              >
+                {ABOUT_CONTENT.headline}
+              </motion.span>
               <motion.span
                 aria-hidden="true"
                 initial={{ opacity: 0, y: 20 }}
@@ -908,10 +846,7 @@ export default function AboutContent() {
                       "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(59,130,246,0.04) 100%)",
                     boxShadow: [
                       "inset 0 1px 0 rgba(255,255,255,0.08)",
-                      "inset 0 0 0 1px rgba(255,255,255,0.03)",
-                      "0 1px 2px rgba(0,0,0,0.3)",
                       "0 18px 48px -18px rgba(59,130,246,0.35)",
-                      "0 48px 100px -36px rgba(59,130,246,0.18)",
                     ].join(", "),
                   }}
                 >

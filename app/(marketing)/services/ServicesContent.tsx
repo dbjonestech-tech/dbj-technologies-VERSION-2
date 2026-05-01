@@ -205,11 +205,7 @@ function CapabilityStack({ reduce }: { reduce: boolean | null }) {
             style={{
               borderColor: `${PAGE_ACCENT}30`,
               background: `linear-gradient(135deg, #ffffff 0%, ${PAGE_LIGHT}08 100%)`,
-              boxShadow: [
-                "inset 0 1px 0 rgba(255,255,255,0.95)",
-                "0 1px 2px rgba(0,0,0,0.03)",
-                `0 6px 16px -8px ${PAGE_ACCENT}22`,
-              ].join(", "),
+              boxShadow: `0 6px 16px -8px ${PAGE_ACCENT}22`,
             }}
           >
             {/* Leading accent bar */}
@@ -410,49 +406,19 @@ export default function ServicesContent() {
 
             {/* RIGHT: Capability Stack signature */}
             <div className="relative">
-              {/* Outer breathing halo. Two stacked halos with offset
-                  timings so the stack appears lit from beneath, like
-                  a stack of architectural drawings on a light table. */}
-              {!reduce ? (
-                <>
-                  <motion.div
-                    className="absolute -inset-8 lg:-inset-12 -z-10 blur-3xl pointer-events-none"
-                    style={{
-                      background: `radial-gradient(ellipse at center, ${PAGE_LIGHT} 0%, transparent 70%)`,
-                    }}
-                    animate={{ opacity: [0.16, 0.32, 0.16] }}
-                    transition={{
-                      duration: 5.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 0.4,
-                    }}
-                    aria-hidden="true"
-                  />
-                  <motion.div
-                    className="absolute -inset-6 lg:-inset-10 -z-10 blur-2xl pointer-events-none"
-                    style={{
-                      background: `radial-gradient(ellipse at 60% 40%, ${PAGE_ACCENT} 0%, transparent 60%)`,
-                    }}
-                    animate={{ opacity: [0.10, 0.22, 0.10] }}
-                    transition={{
-                      duration: 6.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 1.6,
-                    }}
-                    aria-hidden="true"
-                  />
-                </>
-              ) : (
-                <div
-                  className="absolute -inset-8 lg:-inset-12 -z-10 blur-3xl pointer-events-none opacity-25"
-                  style={{
-                    background: `radial-gradient(ellipse at center, ${PAGE_LIGHT} 0%, transparent 70%)`,
-                  }}
-                  aria-hidden="true"
-                />
-              )}
+              {/* Static halo (was previously two infinite-loop motion.divs
+                  with blur-3xl/blur-2xl, animating opacity forever). On
+                  desktop those two animated blur regions composited every
+                  frame across a ~600px-wide area and dominated /services
+                  desktop paint cost. A single static gradient reads the
+                  same as the breathing version at the page's scale. */}
+              <div
+                className="absolute -inset-8 lg:-inset-12 -z-10 blur-3xl pointer-events-none opacity-25"
+                style={{
+                  background: `radial-gradient(ellipse at center, ${PAGE_LIGHT} 0%, transparent 70%)`,
+                }}
+                aria-hidden="true"
+              />
               <div
                 className="relative rounded-2xl lg:rounded-3xl border p-4 sm:p-6 lg:p-8 transform-gpu overflow-hidden"
                 style={{
@@ -460,11 +426,7 @@ export default function ServicesContent() {
                   background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}0d 60%, ${PAGE_ACCENT}0a 100%)`,
                   boxShadow: [
                     "inset 0 1px 0 rgba(255,255,255,0.95)",
-                    "inset 0 0 0 1px rgba(255,255,255,0.4)",
-                    "0 1px 2px rgba(0,0,0,0.04)",
                     `0 18px 48px -16px ${PAGE_ACCENT}40`,
-                    `0 48px 100px -32px ${PAGE_ACCENT}30`,
-                    `0 80px 140px -40px ${PAGE_DARK}25`,
                   ].join(", "),
                 }}
               >

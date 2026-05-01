@@ -134,9 +134,7 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                   background: `linear-gradient(180deg, #ffffff 0%, ${PAGE_LIGHT}07 100%)`,
                   boxShadow: [
                     "inset 0 1px 0 rgba(255,255,255,0.95)",
-                    "0 1px 2px rgba(0,0,0,0.04)",
                     `0 14px 36px -14px ${PAGE_ACCENT}28`,
-                    `0 36px 72px -32px ${PAGE_ACCENT}1a`,
                   ].join(", "),
                 }}
               >
@@ -404,9 +402,7 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                   background: `linear-gradient(180deg, #ffffff 0%, ${brief.paletteAccent}06 100%)`,
                   boxShadow: [
                     "inset 0 1px 0 rgba(255,255,255,0.95)",
-                    "0 1px 2px rgba(0,0,0,0.04)",
                     `0 14px 36px -14px ${brief.paletteAccent}28`,
-                    `0 36px 72px -32px ${brief.paletteAccent}1a`,
                   ].join(", "),
                 }}
               >

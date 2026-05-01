@@ -6,7 +6,78 @@ Live snapshot of what the next session needs. Older sessions live under
 which holds the verbatim record of every session entry that was below this
 header before the April 30 reset.
 
-## Current state (end of April 30, 2026)
+## Current state (end of May 1, 2026)
+
+### What landed in this session: marketing-site Lighthouse perf sprint
+
+The /admin Monitor dashboard surfaced 12 `lighthouse.regression` errors at the
+04:00 UTC cron run; the daily Lighthouse cron flagged every marketing page
+below the 90 floor. Worst offenders before this sprint: `/pricing` desktop 48,
+`/services` desktop 56, `/contact` mobile 62, `/about` mobile 66. Diagnosed
+from source (no traces) and fixed the high-confidence wins. **Files touched:
+4 modified.**
+
+- **`/about` hero photo: `quality={95}` removed.** `AboutContent.tsx` was loading
+  `/images/joshua-jones.webp` (640KB source) at quality 95 with `priority` and
+  `sizes` up to 720px. Default Next.js quality 75 cuts the served image roughly
+  in half without visible loss. This was almost certainly the LCP offender on
+  /about mobile.
+- **`/about` per-word scroll-reveal removed.** `ScrollRevealText` previously wrapped
+  every word in 4 chapter bodies in a `motion.span` subscribed to
+  `useTransform(scrollYProgress, ...)`. Across the four chapters that was ~400
+  active MotionValue subscriptions firing on every scroll frame. Replaced with
+  a single `motion.p` whileInView fade. Reading flow identical, no per-word
+  illumination cue. The orphaned `ScrollWordBatch` function and unused
+  `MotionValue` import were removed.
+- **`/about` per-character H1 reveal collapsed to a single fade.** The headline
+  was animating each character via its own `motion.span` (35+ on mount, each
+  with its own delay). Replaced with one `motion.span` block fade.
+- **`/about` ambient particle count: 16 → 6.** Each particle is a CSS-animated
+  div with `willChange: transform`, so it pays a compositor layer + main-thread
+  cost forever. Six well-spaced particles read the same as sixteen at the
+  page's scale.
+- **`/services` hero halos: two infinite-loop `blur-3xl` motion.divs replaced with
+  one static gradient.** `ServicesContent.tsx:416-446` previously composited a
+  ~600px-wide animated blur region every frame on desktop. Single biggest cause
+  of /services desktop = 56. Now a single static blurred gradient at opacity 25.
+- **Card box-shadow stacks reduced from 4–5 layers to 2 layers** across pricing
+  tiers + addons + Fix Sprint card (`PricingContent.tsx`), services capability
+  rows + capability container (`ServicesContent.tsx`), work project cards +
+  design-brief cards (`WorkContent.tsx`), and About ops capability cards
+  (`AboutContent.tsx`). The dropped layers were small `0 1px 2px rgba(0,0,0,.04)`
+  hairlines and 80–112px-blur 2nd-tier shadows; the visible glow stays.
+
+### What did NOT change (deliberately)
+
+- HeroCinema phase system on `/` (frontend.md says do not touch without explicit
+  permission).
+- `Navbar` / `Footer` inline SVG logos, `react-hook-form + zod` on `/contact`,
+  `useSearchParams` on `/contact`. Each is a real perf cost (~25KB inline SVG
+  per page, ~30-40KB form-library JS, opt-out of static rendering) but
+  represents a riskier refactor. Listed in backlog.
+
+### Expected impact on tomorrow's 04:00 UTC cron
+
+- `/pricing` desktop 48 → mid-70s+ (shadow-stack reduction is the lever; cards
+  paint cheaper on desktop's multi-column grid).
+- `/services` desktop 56 → mid-70s+ (removing two infinite blur halos was the
+  biggest single fix on this page).
+- `/about` mobile 66 → low-80s+ (image weight + per-word reveal removal).
+- `/about` desktop 78 → low-90s+.
+- `/contact`, `/work` likely unchanged this round (untouched).
+
+The `lighthouse.regression` floor stays at 90 so cron will still fire alerts
+until the remaining backlog items land. RUM data from the analytics beacon is
+the actual source of truth; Lighthouse is a synthetic check.
+
+### Verification
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- Visual smoke not yet run; recommend Joshua eyeballs `/about`, `/services`,
+  `/pricing`, `/work` in incognito after Vercel deploys.
+
+
 
 ### Most recent commits (top of `origin main`)
 
