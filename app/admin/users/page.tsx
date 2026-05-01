@@ -12,6 +12,7 @@ import {
   reactivateAdminUserAction,
   revokeInvitationAction,
 } from "./actions";
+import PageHeader from "../PageHeader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -141,20 +142,12 @@ export default async function AdminUsersPage({
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Account
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Users
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Invite collaborators by email. They sign in with Google and
-            land on the admin shell. The ADMIN_EMAILS env list remains
-            the bootstrap fallback so a database outage cannot lock you
-            out.
-          </p>
-        </header>
+        <PageHeader
+          palette="zinc"
+          section="Account"
+          pageName="Users"
+          description="Invite collaborators by email. They sign in with Google and land on the admin shell. The ADMIN_EMAILS env list remains the bootstrap fallback so a database outage cannot lock you out."
+        />
 
         {flash ? <FlashBanner flash={flash} /> : null}
 
@@ -288,7 +281,7 @@ function InvitedAdminsCard({
         </p>
       </header>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[700px] text-sm">
+        <table className="canopy-table w-full min-w-[700px] text-sm">
           <thead className="bg-zinc-50">
             <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
               <th className="px-3 py-2 font-semibold">Email</th>
@@ -390,7 +383,7 @@ function InvitationsCard({
         </p>
       </header>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[800px] text-sm">
+        <table className="canopy-table w-full min-w-[800px] text-sm">
           <thead className="bg-zinc-50">
             <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
               <th className="px-3 py-2 font-semibold">Invitee</th>

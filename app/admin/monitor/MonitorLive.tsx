@@ -78,7 +78,7 @@ export default function MonitorLive({
         </span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[700px] text-sm">
+        <table className="canopy-table w-full min-w-[700px] text-sm">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
               <th className="px-3 py-2 font-semibold">Time</th>

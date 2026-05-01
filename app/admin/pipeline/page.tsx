@@ -5,6 +5,7 @@ import {
   type FunctionHealth,
   type RecentInngestRun,
 } from "@/lib/services/inngest-health";
+import PageHeader from "../PageHeader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -39,20 +40,12 @@ export default async function PipelinePage() {
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Health
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Inngest pipeline
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Run history per function, sourced from the Inngest webhook
-            and the inngestHealthHourly catch-up cron. Failure rate
-            and p95 trending -- the early warning for Pathlight pipeline
-            regressions.
-          </p>
-        </header>
+        <PageHeader
+          palette="emerald"
+          section="Health"
+          pageName="Inngest pipeline"
+          description="Run history per function, sourced from the Inngest webhook and the inngestHealthHourly catch-up cron. Failure rate and p95 trending: the early warning for Pathlight pipeline regressions."
+        />
 
         <Section title="Function health (7 days)">
           <FunctionTable rows={health} />
@@ -76,7 +69,7 @@ function FunctionTable({ rows }: { rows: FunctionHealth[] }) {
     );
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[800px] text-sm">
+      <table className="canopy-table w-full min-w-[800px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Function</th>
@@ -123,7 +116,7 @@ function RecentRunsTable({ rows }: { rows: RecentInngestRun[] }) {
     return <p className="text-sm text-zinc-500">No recent runs.</p>;
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[700px] text-sm">
+      <table className="canopy-table w-full min-w-[700px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Function</th>

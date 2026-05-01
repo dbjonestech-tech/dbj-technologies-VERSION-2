@@ -57,6 +57,12 @@ export type PaletteTokens = {
   pageStripe: string;
   /** Page-header eyebrow text color (replaces zinc-400). */
   pageEyebrow: string;
+  /** Page-header chip pill background (light tint of the palette). */
+  chipBg: string;
+  /** Page-header chip pill ring (inset border). */
+  chipRing: string;
+  /** Table-row hover tint (light wash of the palette). */
+  rowHover: string;
 };
 
 export const PALETTES: Record<PaletteName, PaletteTokens> = {
@@ -71,6 +77,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-sky-500",
     pageStripe: "bg-gradient-to-r from-sky-400 to-sky-600",
     pageEyebrow: "text-sky-700",
+    chipBg: "bg-sky-50",
+    chipRing: "ring-sky-200",
+    rowHover: "hover:bg-sky-50",
   },
   cyan: {
     stripe: "bg-gradient-to-r from-cyan-400 via-cyan-500 to-sky-500",
@@ -83,6 +92,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-cyan-500",
     pageStripe: "bg-gradient-to-r from-cyan-400 to-cyan-600",
     pageEyebrow: "text-cyan-700",
+    chipBg: "bg-cyan-50",
+    chipRing: "ring-cyan-200",
+    rowHover: "hover:bg-cyan-50",
   },
   teal: {
     stripe: "bg-gradient-to-r from-teal-400 via-teal-500 to-cyan-500",
@@ -95,6 +107,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-teal-500",
     pageStripe: "bg-gradient-to-r from-teal-400 to-teal-600",
     pageEyebrow: "text-teal-700",
+    chipBg: "bg-teal-50",
+    chipRing: "ring-teal-200",
+    rowHover: "hover:bg-teal-50",
   },
   blue: {
     stripe: "bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500",
@@ -107,6 +122,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-blue-500",
     pageStripe: "bg-gradient-to-r from-blue-400 to-blue-600",
     pageEyebrow: "text-blue-700",
+    chipBg: "bg-blue-50",
+    chipRing: "ring-blue-200",
+    rowHover: "hover:bg-blue-50",
   },
   violet: {
     stripe: "bg-gradient-to-r from-violet-400 via-violet-500 to-purple-500",
@@ -119,6 +137,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-violet-500",
     pageStripe: "bg-gradient-to-r from-violet-400 to-violet-600",
     pageEyebrow: "text-violet-700",
+    chipBg: "bg-violet-50",
+    chipRing: "ring-violet-200",
+    rowHover: "hover:bg-violet-50",
   },
   indigo: {
     stripe: "bg-gradient-to-r from-indigo-400 via-indigo-500 to-violet-500",
@@ -131,6 +152,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-indigo-500",
     pageStripe: "bg-gradient-to-r from-indigo-400 to-indigo-600",
     pageEyebrow: "text-indigo-700",
+    chipBg: "bg-indigo-50",
+    chipRing: "ring-indigo-200",
+    rowHover: "hover:bg-indigo-50",
   },
   fuchsia: {
     stripe: "bg-gradient-to-r from-fuchsia-400 via-fuchsia-500 to-pink-500",
@@ -143,6 +167,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-fuchsia-500",
     pageStripe: "bg-gradient-to-r from-fuchsia-400 to-fuchsia-600",
     pageEyebrow: "text-fuchsia-700",
+    chipBg: "bg-fuchsia-50",
+    chipRing: "ring-fuchsia-200",
+    rowHover: "hover:bg-fuchsia-50",
   },
   purple: {
     stripe: "bg-gradient-to-r from-purple-400 via-purple-500 to-fuchsia-500",
@@ -155,6 +182,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-purple-500",
     pageStripe: "bg-gradient-to-r from-purple-400 to-purple-600",
     pageEyebrow: "text-purple-700",
+    chipBg: "bg-purple-50",
+    chipRing: "ring-purple-200",
+    rowHover: "hover:bg-purple-50",
   },
   pink: {
     stripe: "bg-gradient-to-r from-pink-400 via-pink-500 to-rose-500",
@@ -167,6 +197,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-pink-500",
     pageStripe: "bg-gradient-to-r from-pink-400 to-pink-600",
     pageEyebrow: "text-pink-700",
+    chipBg: "bg-pink-50",
+    chipRing: "ring-pink-200",
+    rowHover: "hover:bg-pink-50",
   },
   amber: {
     stripe: "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500",
@@ -179,6 +212,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-amber-500",
     pageStripe: "bg-gradient-to-r from-amber-400 to-amber-600",
     pageEyebrow: "text-amber-700",
+    chipBg: "bg-amber-50",
+    chipRing: "ring-amber-200",
+    rowHover: "hover:bg-amber-50",
   },
   orange: {
     stripe: "bg-gradient-to-r from-orange-400 via-orange-500 to-red-500",
@@ -191,6 +227,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-orange-500",
     pageStripe: "bg-gradient-to-r from-orange-400 to-orange-600",
     pageEyebrow: "text-orange-700",
+    chipBg: "bg-orange-50",
+    chipRing: "ring-orange-200",
+    rowHover: "hover:bg-orange-50",
   },
   yellow: {
     stripe: "bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500",
@@ -203,6 +242,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-yellow-500",
     pageStripe: "bg-gradient-to-r from-yellow-400 to-yellow-600",
     pageEyebrow: "text-yellow-700",
+    chipBg: "bg-yellow-50",
+    chipRing: "ring-yellow-200",
+    rowHover: "hover:bg-yellow-50",
   },
   stone: {
     stripe: "bg-gradient-to-r from-stone-400 via-stone-500 to-stone-600",
@@ -215,6 +257,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-stone-500",
     pageStripe: "bg-gradient-to-r from-stone-400 to-stone-600",
     pageEyebrow: "text-stone-700",
+    chipBg: "bg-stone-50",
+    chipRing: "ring-stone-200",
+    rowHover: "hover:bg-stone-100",
   },
   emerald: {
     stripe: "bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500",
@@ -227,6 +272,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-emerald-500",
     pageStripe: "bg-gradient-to-r from-emerald-400 to-emerald-600",
     pageEyebrow: "text-emerald-700",
+    chipBg: "bg-emerald-50",
+    chipRing: "ring-emerald-200",
+    rowHover: "hover:bg-emerald-50",
   },
   green: {
     stripe: "bg-gradient-to-r from-green-400 via-green-500 to-emerald-500",
@@ -239,6 +287,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-green-500",
     pageStripe: "bg-gradient-to-r from-green-400 to-green-600",
     pageEyebrow: "text-green-700",
+    chipBg: "bg-green-50",
+    chipRing: "ring-green-200",
+    rowHover: "hover:bg-green-50",
   },
   red: {
     stripe: "bg-gradient-to-r from-red-400 via-red-500 to-rose-500",
@@ -251,6 +302,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-red-500",
     pageStripe: "bg-gradient-to-r from-red-400 to-red-600",
     pageEyebrow: "text-red-700",
+    chipBg: "bg-red-50",
+    chipRing: "ring-red-200",
+    rowHover: "hover:bg-red-50",
   },
   lime: {
     stripe: "bg-gradient-to-r from-lime-400 via-lime-500 to-green-500",
@@ -263,6 +317,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-lime-500",
     pageStripe: "bg-gradient-to-r from-lime-400 to-lime-600",
     pageEyebrow: "text-lime-700",
+    chipBg: "bg-lime-50",
+    chipRing: "ring-lime-200",
+    rowHover: "hover:bg-lime-50",
   },
   zinc: {
     stripe: "bg-gradient-to-r from-zinc-300 via-zinc-400 to-zinc-500",
@@ -275,6 +332,9 @@ export const PALETTES: Record<PaletteName, PaletteTokens> = {
     dot: "bg-zinc-400",
     pageStripe: "bg-gradient-to-r from-zinc-300 to-zinc-500",
     pageEyebrow: "text-zinc-600",
+    chipBg: "bg-zinc-100",
+    chipRing: "ring-zinc-300",
+    rowHover: "hover:bg-zinc-100",
   },
 };
 

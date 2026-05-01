@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getDb } from "@/lib/db";
+import PageHeader from "../PageHeader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -222,19 +223,12 @@ export default async function AdminLeadsPage({
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Operations
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Leads
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Pathlight scan signups and contact-form inquiries side by side.
-            Resend remains the canonical delivery path; this view is the
-            durable record.
-          </p>
-        </header>
+        <PageHeader
+          palette="blue"
+          section="Today"
+          pageName="Leads"
+          description="Pathlight scan signups and contact-form inquiries side by side. Resend remains the canonical delivery path; this view is the durable record."
+        />
 
         <section className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Total scan leads" value={formatNumber(counts.totalLeads)} />
@@ -396,7 +390,7 @@ function LeadsTable({ rows }: { rows: LeadRow[] }) {
   return (
     <section className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[800px] text-sm">
+        <table className="canopy-table w-full min-w-[800px] text-sm">
           <thead className="bg-zinc-50">
             <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
               <th className="px-4 py-3 font-semibold">Email</th>
@@ -472,7 +466,7 @@ function ContactsTable({ rows }: { rows: ContactRow[] }) {
   return (
     <section className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[900px] text-sm">
+        <table className="canopy-table w-full min-w-[900px] text-sm">
           <thead className="bg-zinc-50">
             <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
               <th className="px-4 py-3 font-semibold">Submitted</th>

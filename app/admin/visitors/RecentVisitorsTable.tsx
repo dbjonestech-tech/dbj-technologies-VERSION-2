@@ -386,7 +386,7 @@ export default function RecentVisitorsTable({
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] text-sm">
+          <table className="canopy-table w-full min-w-[920px] text-sm">
             <thead className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
               <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
                 <th className="px-3 py-2 font-semibold w-6"></th>

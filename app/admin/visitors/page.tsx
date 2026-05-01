@@ -18,9 +18,9 @@ import {
   type TopSourceRow,
   type VisitorOverview,
 } from "@/lib/services/analytics";
+import PageHeader from "../PageHeader";
 import RecentVisitorsTable from "./RecentVisitorsTable";
 import VisitorsLive from "./VisitorsLive";
-import { PALETTES } from "@/lib/admin/page-themes";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -150,24 +150,12 @@ export default async function VisitorsPage({ searchParams }: VisitorsPageProps) 
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="relative mb-8">
-          <span
-            aria-hidden="true"
-            className={`mb-4 block h-1.5 w-24 rounded-full ${PALETTES.sky.pageStripe}`}
-          />
-          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-700 ring-1 ring-inset ring-sky-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-sky-500" aria-hidden="true" />
-            Acquisition · Visitors
-          </span>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Visitors
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            First-party analytics. Every visitor as a person, with their
-            full path, source, geo, device, and conversion state.
-            Identity surfaces only when they self-disclosed it via a form.
-          </p>
-        </header>
+        <PageHeader
+          palette="sky"
+          section="Acquisition"
+          pageName="Visitors"
+          description="First-party analytics. Every visitor as a person, with their full path, source, geo, device, and conversion state. Identity surfaces only when they self-disclosed it via a form."
+        />
 
         <OverviewSection
           rows={[overview24, overview7d, overview30d]}
@@ -429,7 +417,7 @@ function TopPagesTable({ rows }: { rows: TopPageRow[] }) {
     return <p className="text-sm text-zinc-500">No data yet.</p>;
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[600px] text-sm">
+      <table className="canopy-table w-full min-w-[600px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Path</th>
@@ -468,7 +456,7 @@ function TopSourcesTable({ rows }: { rows: TopSourceRow[] }) {
     return <p className="text-sm text-zinc-500">No data yet.</p>;
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[600px] text-sm">
+      <table className="canopy-table w-full min-w-[600px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Source</th>
@@ -513,7 +501,7 @@ function GeoTable({ rows }: { rows: GeoRow[] }) {
     return <p className="text-sm text-zinc-500">No data yet.</p>;
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="canopy-table w-full text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Country</th>
@@ -544,7 +532,7 @@ function DevicesTable({ rows }: { rows: DeviceRow[] }) {
     return <p className="text-sm text-zinc-500">No data yet.</p>;
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="canopy-table w-full text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Device</th>
@@ -577,7 +565,7 @@ function RecentTable({ rows }: { rows: RecentPageViewRow[] }) {
     return <p className="text-sm text-zinc-500">No data yet.</p>;
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[760px] text-sm">
+      <table className="canopy-table w-full min-w-[760px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Path</th>

@@ -5,6 +5,7 @@ import {
   type PercentileBand,
   type RumByPage,
 } from "@/lib/services/rum";
+import PageHeader from "../../PageHeader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -55,19 +56,12 @@ export default async function RumPage({
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Performance
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Real-user CWV
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Field measurements from actual visitors, captured by the
-            engagement beacon. Distinct from synthetic Lighthouse -- this
-            is what real users on real networks experience.
-          </p>
-        </header>
+        <PageHeader
+          palette="fuchsia"
+          section="Acquisition"
+          pageName="Real-user CWV"
+          description="Field measurements from actual visitors, captured by the engagement beacon. Distinct from synthetic Lighthouse, this is what real users on real networks experience."
+        />
 
         <div className="mb-6 flex flex-wrap gap-2">
           <DeviceTab label="All devices" href="/admin/performance/rum" active={filter === null} />
@@ -138,7 +132,7 @@ function RumTable({ rows }: { rows: RumByPage[] }) {
     return <p className="text-sm text-zinc-500">No engagement data yet.</p>;
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[900px] text-sm">
+      <table className="canopy-table w-full min-w-[900px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Path</th>

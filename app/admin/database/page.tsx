@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getDb } from "@/lib/db";
+import PageHeader from "../PageHeader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -208,19 +209,12 @@ export default async function AdminDatabasePage() {
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Operations
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Database
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Row counts and last-activity timestamps for every Pathlight,
-            email, telemetry, and admin table. Read-only. Inserts and
-            mutations stay in the application code paths that own them.
-          </p>
-        </header>
+        <PageHeader
+          palette="orange"
+          section="Operations"
+          pageName="Database"
+          description="Row counts and last-activity timestamps for every Pathlight, email, telemetry, and admin table. Read-only. Inserts and mutations stay in the application code paths that own them."
+        />
 
         <section className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Tracked tables" value={String(catalog.length)} />
@@ -253,7 +247,7 @@ export default async function AdminDatabasePage() {
                 <p className="mt-1 text-xs text-zinc-500">{g.description}</p>
               </header>
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[800px] text-sm">
+                <table className="canopy-table w-full min-w-[800px] text-sm">
                   <thead>
                     <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
                       <th className="px-3 py-2 font-semibold">Table</th>

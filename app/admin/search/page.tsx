@@ -7,6 +7,7 @@ import {
   type GscPageRow,
   type GscQueryRow,
 } from "@/lib/services/search-console";
+import PageHeader from "../PageHeader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -30,19 +31,12 @@ export default async function SearchConsolePage() {
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Acquisition
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Search Console
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Pulled daily by searchConsoleDaily at 06:00 UTC. The
-            opportunities table flags pages with high impressions but
-            position 5-15: the cheapest CTR wins on the site.
-          </p>
-        </header>
+        <PageHeader
+          palette="indigo"
+          section="Acquisition"
+          pageName="Search Console"
+          description="Pulled daily by searchConsoleDaily at 06:00 UTC. The opportunities table flags pages with high impressions but position 5-15: the cheapest CTR wins on the site."
+        />
 
         <Section title="Top queries (28 days)">
           {queries.length === 0 ? (
@@ -81,7 +75,7 @@ function EmptyState() {
 function QueriesTable({ rows }: { rows: GscQueryRow[] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[600px] text-sm">
+      <table className="canopy-table w-full min-w-[600px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Query</th>
@@ -118,7 +112,7 @@ function QueriesTable({ rows }: { rows: GscQueryRow[] }) {
 function PagesTable({ rows }: { rows: GscPageRow[] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[700px] text-sm">
+      <table className="canopy-table w-full min-w-[700px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Page</th>
@@ -155,7 +149,7 @@ function PagesTable({ rows }: { rows: GscPageRow[] }) {
 function OpportunitiesTable({ rows }: { rows: GscOpportunityRow[] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[700px] text-sm">
+      <table className="canopy-table w-full min-w-[700px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Page</th>

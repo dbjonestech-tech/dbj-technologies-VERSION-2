@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getClientStats, listClients } from "@/lib/auth/clients";
+import PageHeader from "../PageHeader";
 import {
   archiveClientAction,
   inviteClientAction,
@@ -84,19 +85,12 @@ export default async function AdminClientsPage({
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Operations
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Clients
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Invite engagement clients to the white-glove portal. Each
-            client gets a private project dashboard, deliverables vault,
-            and Pathlight scan history scoped to their email.
-          </p>
-        </header>
+        <PageHeader
+          palette="yellow"
+          section="Operations"
+          pageName="Clients"
+          description="Invite engagement clients to the white-glove portal. Each client gets a private project dashboard, deliverables vault, and Pathlight scan history scoped to their email."
+        />
 
         {flash ? <FlashBanner flash={flash} /> : null}
 
@@ -256,7 +250,7 @@ function ClientsTable({
         </h2>
       </header>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[800px] text-sm">
+        <table className="canopy-table w-full min-w-[800px] text-sm">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
               <th className="px-6 py-3 font-semibold">Email</th>

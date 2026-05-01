@@ -3,6 +3,7 @@ import {
   getLatestInfraStatuses,
   type InfraStatusRow,
 } from "@/lib/services/infrastructure";
+import PageHeader from "../PageHeader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -50,20 +51,12 @@ export default async function InfrastructurePage() {
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Health
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Infrastructure
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            TLS, WHOIS, MX, SPF, DKIM, and DMARC for every managed
-            domain. Daily check at 08:00 UTC. Sentry-warns at 14 days
-            from cert expiry, 30 days from registration expiry, or any
-            DNS auth fail.
-          </p>
-        </header>
+        <PageHeader
+          palette="lime"
+          section="Health"
+          pageName="Infrastructure"
+          description="TLS, WHOIS, MX, SPF, DKIM, and DMARC for every managed domain. Daily check at 08:00 UTC. Sentry-warns at 14 days from cert expiry, 30 days from registration expiry, or any DNS auth fail."
+        />
 
         {byTarget.size === 0 ? (
           <p className="text-sm text-zinc-500">No checks recorded yet. The first cron run hydrates this page.</p>

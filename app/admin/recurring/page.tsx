@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getRecurringVisitors } from "@/lib/services/analytics";
+import PageHeader from "../PageHeader";
 import RecentVisitorsTable from "../visitors/RecentVisitorsTable";
-import { PALETTES } from "@/lib/admin/page-themes";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -40,30 +40,16 @@ export default async function RecurringUsersPage({ searchParams }: RecurringPage
   const isPaged = beforeSc !== undefined && beforeIso !== undefined;
   const hasMore = rows.length === PAGE_SIZE;
   const last = rows.length > 0 ? rows[rows.length - 1]! : null;
-  const palette = PALETTES.pink;
 
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="relative mb-8">
-          <span
-            aria-hidden="true"
-            className={`mb-4 block h-1.5 w-24 rounded-full ${palette.pageStripe}`}
-          />
-          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-pink-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-pink-700 ring-1 ring-inset ring-pink-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-pink-500" aria-hidden="true" />
-            Acquisition · Recurring users
-          </span>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Recurring users
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Every visitor who came back across more than one session,
-            sorted by visit count. The most-engaged repeat visitors at
-            the top. Click any row to expand the full per-visitor
-            page-by-page timeline.
-          </p>
-        </header>
+        <PageHeader
+          palette="pink"
+          section="Acquisition"
+          pageName="Recurring users"
+          description="Every visitor who came back across more than one session, sorted by visit count. The most-engaged repeat visitors at the top. Click any row to expand the full per-visitor page-by-page timeline."
+        />
 
         <section className="mb-6 rounded-xl border border-zinc-200 bg-white p-6">
           <div className="mb-4">

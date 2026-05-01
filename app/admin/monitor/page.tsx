@@ -10,6 +10,7 @@ import {
   type MonitoringEventRow,
 } from "@/lib/services/monitoring";
 import { MONITORED_PAGES, STRATEGIES } from "@/lib/services/lighthouse-monitor";
+import PageHeader from "../PageHeader";
 import MonitorLive from "./MonitorLive";
 
 export const dynamic = "force-dynamic";
@@ -63,20 +64,12 @@ export default async function AdminMonitor() {
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Operations
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Monitor
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Real-time view of Pathlight and the marketing site. Funnel
-            counts and Lighthouse trends read from monitoring_events and
-            lighthouse_history. The live tail at the bottom streams new
-            events as they land.
-          </p>
-        </header>
+        <PageHeader
+          palette="cyan"
+          section="Today"
+          pageName="Monitor"
+          description="Real-time view of Pathlight and the marketing site. Funnel counts and Lighthouse trends read from monitoring_events and lighthouse_history. The live tail at the bottom streams new events as they land."
+        />
 
         <CanarySection canary={canary} />
 
@@ -143,7 +136,7 @@ function FunnelSection({
   return (
     <Section title="Funnel">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[700px] text-sm">
+        <table className="canopy-table w-full min-w-[700px] text-sm">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
               <th className="px-3 py-2 font-semibold">Stage</th>
@@ -315,7 +308,7 @@ function LighthouseSection({ rows }: { rows: LighthouseRow[] }) {
   return (
     <Section title="Lighthouse latest">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[700px] text-sm">
+        <table className="canopy-table w-full min-w-[700px] text-sm">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
               <th className="px-3 py-2 font-semibold">Page</th>

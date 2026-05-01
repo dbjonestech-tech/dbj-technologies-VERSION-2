@@ -5,6 +5,7 @@ import {
   type EmailKpiDailyPoint,
   type EmailKpiSummary,
 } from "@/lib/services/email-kpi";
+import PageHeader from "../PageHeader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -44,20 +45,12 @@ export default async function EmailPage() {
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Health
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Email
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Sent vs delivered vs bounced vs complained over the last 30
-            days. Bounce above 2% or complaints above 0.1% will trigger
-            Resend domain throttling, so those rates are colored red
-            well before the limit.
-          </p>
-        </header>
+        <PageHeader
+          palette="purple"
+          section="Acquisition"
+          pageName="Email"
+          description="Sent vs delivered vs bounced vs complained over the last 30 days. Bounce above 2% or complaints above 0.1% will trigger Resend domain throttling, so those rates are colored red well before the limit."
+        />
 
         <Section title="By email type (30 days)">
           {byType.length === 0 ? (
@@ -84,7 +77,7 @@ export default async function EmailPage() {
 function ByTypeTable({ rows }: { rows: EmailKpiSummary[] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[800px] text-sm">
+      <table className="canopy-table w-full min-w-[800px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Email type</th>
@@ -123,7 +116,7 @@ function ByTypeTable({ rows }: { rows: EmailKpiSummary[] }) {
 function TrendTable({ rows }: { rows: EmailKpiDailyPoint[] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="canopy-table w-full text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
             <th className="px-3 py-2 font-semibold">Day</th>
