@@ -106,14 +106,17 @@ export default function DashboardCard({
   const kpiText = kpi ? toneTextClass(kpi.tone, palette) : "";
   const dotClass = toneDotClass(kpi?.tone);
 
-  /* Capture the card's rect each time the preview opens so positioning
-   * is fresh after any layout shift since the card mounted. */
+  /* Capture the card's rect when the preview first opens. We do NOT
+   * recapture on subsequent hover-starts while the preview is already
+   * open: that caused position jitter when framer's hover-end/enter
+   * cycle re-fired (e.g. brief pointer-leave events near card edges).
+   * The popover's own useLayoutEffect handles scroll/resize updates. */
   function openPreview() {
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
       closeTimer.current = null;
     }
-    if (cardRef.current) {
+    if (cardRef.current && !previewOpen) {
       setAnchorRect(cardRef.current.getBoundingClientRect());
     }
     setPreviewOpen(true);
@@ -141,17 +144,26 @@ export default function DashboardCard({
 
   return (
     <>
-      <motion.div
+      <div
         ref={cardRef}
         data-card-id={href}
-        animate={reduced ? undefined : { y: hovered ? -3 : 0 }}
-        transition={{ type: "spring", stiffness: 320, damping: 26 }}
-        onHoverStart={() => {
+        onPointerEnter={() => {
           setHovered(true);
           openPreview();
         }}
-        onHoverEnd={() => {
+        onPointerLeave={(e) => {
           setHovered(false);
+          /* If the cursor moved INTO the popover (portaled to body)
+           * skip the close. The popover carries data-card-preview so
+           * we can detect it without coupling to framer's hover model.
+           * This fixes the open-close feedback loop where framer's
+           * hover-end fired during minor pointer movement and the
+           * popover's onPointerEnter could not always race the
+           * scheduleClose timer in time. */
+          const related = e.relatedTarget as HTMLElement | null;
+          if (related && related.closest && related.closest('[data-card-preview="true"]')) {
+            return;
+          }
           scheduleClose();
         }}
         className="relative h-full"
@@ -279,7 +291,7 @@ export default function DashboardCard({
             <ChevronUp className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
-      </motion.div>
+      </div>
 
       <AnimatePresence>
         {previewOpen && anchorRect ? (
@@ -293,7 +305,16 @@ export default function DashboardCard({
             kpi={kpi}
             onClose={() => setPreviewOpen(false)}
             onPointerEnter={cancelClose}
-            onPointerLeave={scheduleClose}
+            onPointerLeave={(e) => {
+              /* Mirror the card's relatedTarget guard: if the cursor
+               * went back to the originating card, skip the close so
+               * the user can move freely between card and popover. */
+              const related = e.relatedTarget as HTMLElement | null;
+              if (related && related.closest && related.closest("[data-card-id]")) {
+                return;
+              }
+              scheduleClose();
+            }}
           />
         ) : null}
       </AnimatePresence>

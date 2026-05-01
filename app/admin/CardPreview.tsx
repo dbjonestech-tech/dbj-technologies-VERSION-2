@@ -28,8 +28,10 @@ export type CardPreviewProps = {
   onClose: () => void;
   /** Called when the cursor enters the popover, so the parent can cancel its leave timer. */
   onPointerEnter?: () => void;
-  /** Called when the cursor leaves the popover (parent applies grace timer before closing). */
-  onPointerLeave?: () => void;
+  /** Called when the cursor leaves the popover. The parent inspects
+   * relatedTarget to decide whether the cursor returned to the
+   * originating card (in which case it skips the close). */
+  onPointerLeave?: (e: React.PointerEvent<HTMLDivElement>) => void;
 };
 
 const PREVIEW_MAX_WIDTH = 480;
@@ -218,6 +220,7 @@ export default function CardPreview({
       ref={containerRef}
       role="dialog"
       aria-label={`${label} preview`}
+      data-card-preview="true"
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
       initial={reduced ? { opacity: 0 } : { opacity: 0, y: 6 }}
