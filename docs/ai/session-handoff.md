@@ -61,6 +61,25 @@ After the audit-fix deploy completes, click "Sync contacts" on
 contact_submissions / clients. The function is idempotent so running
 later or running twice is safe.
 
+### Multi-popover stuck-open fix (commit `7e9c164`)
+
+After the hover-loop fix landed, Joshua spotted a follow-on bug: a
+prior popover would stay open after hovering a different card. The
+`relatedTarget` guards from the previous fix matched ANY card or ANY
+popover, so when the cursor crossed Card-A-popover -> Card-B, the
+Card A popover saw the cursor entering "a card" and skipped its
+close. Both popovers stayed visible.
+
+Fix: tag each popover with `data-card-preview-of=<href>` and compare
+the exact href value in both the card's pointerleave guard
+(`data-card-preview-of` matches the card's `href`) and the popover's
+pointerleave guard (`data-card-id` matches this popover's
+originating href). Same specificity added to CardPreview's outside-
+click handler so a click on a different card no longer pins the
+current popover open. The 140ms scheduleClose grace stays as the
+transition window between popovers; outside that grace, only one
+popover is ever open at a time.
+
 ### Dashboard hover popover feedback-loop fix (commit `e74c37c`)
 
 Joshua reported the floating CardPreview popover glitched hard when
