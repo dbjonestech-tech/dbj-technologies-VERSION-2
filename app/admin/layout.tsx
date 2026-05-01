@@ -23,59 +23,69 @@ import {
   Wifi,
   AlertTriangle,
   Zap,
+  ShieldCheck,
 } from "lucide-react";
+import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
 
 export const metadata: Metadata = {
   title: { default: "Admin", template: "%s | DBJ Admin" },
   robots: { index: false, follow: false, nocache: true },
 };
 
-const NAV_GROUPS: {
+type NavItem = {
   label: string;
-  items: { label: string; href: string; icon: typeof LayoutDashboard; disabled?: boolean }[];
-}[] = [
+  href: string;
+  icon: typeof LayoutDashboard;
+  /* Palette name pulled into class strings on the rendered Link.
+   * Mirrors PAGE_PALETTE in lib/admin/page-themes.ts so the sidebar
+   * label/icon color matches the destination page's identity. */
+  palette: PaletteName;
+  disabled?: boolean;
+};
+
+const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   {
     label: "Overview",
     items: [
-      { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+      { label: "Dashboard", href: "/admin", icon: LayoutDashboard, palette: "zinc" },
     ],
   },
   {
     label: "Acquisition",
     items: [
-      { label: "Visitors", href: "/admin/visitors", icon: Globe },
-      { label: "Recurring users", href: "/admin/recurring", icon: Repeat },
-      { label: "Funnel", href: "/admin/funnel", icon: Filter },
-      { label: "Search", href: "/admin/search", icon: Search },
-      { label: "RUM", href: "/admin/performance/rum", icon: Zap },
+      { label: "Visitors", href: "/admin/visitors", icon: Globe, palette: "sky" },
+      { label: "Recurring users", href: "/admin/recurring", icon: Repeat, palette: "pink" },
+      { label: "Funnel", href: "/admin/funnel", icon: Filter, palette: "violet" },
+      { label: "Search", href: "/admin/search", icon: Search, palette: "indigo" },
+      { label: "RUM", href: "/admin/performance/rum", icon: Zap, palette: "fuchsia" },
     ],
   },
   {
     label: "Operations",
     items: [
-      { label: "Monitor", href: "/admin/monitor", icon: Activity },
-      { label: "Costs", href: "/admin/costs", icon: DollarSign },
-      { label: "Scans", href: "/admin/scans", icon: FileText },
-      { label: "Leads", href: "/admin/leads", icon: Mail },
-      { label: "Clients", href: "/admin/clients", icon: Briefcase },
-      { label: "Database", href: "/admin/database", icon: Database },
+      { label: "Monitor", href: "/admin/monitor", icon: Activity, palette: "cyan" },
+      { label: "Costs", href: "/admin/costs", icon: DollarSign, palette: "amber" },
+      { label: "Scans", href: "/admin/scans", icon: FileText, palette: "teal" },
+      { label: "Leads", href: "/admin/leads", icon: Mail, palette: "blue" },
+      { label: "Clients", href: "/admin/clients", icon: Briefcase, palette: "yellow" },
+      { label: "Database", href: "/admin/database", icon: Database, palette: "orange" },
     ],
   },
   {
     label: "Health",
     items: [
-      { label: "Pipeline", href: "/admin/pipeline", icon: Workflow },
-      { label: "Platform", href: "/admin/platform", icon: Server },
-      { label: "Errors", href: "/admin/errors", icon: AlertTriangle },
-      { label: "Email", href: "/admin/email", icon: Mail },
-      { label: "Infrastructure", href: "/admin/infrastructure", icon: Wifi },
+      { label: "Pipeline", href: "/admin/pipeline", icon: Workflow, palette: "emerald" },
+      { label: "Platform", href: "/admin/platform", icon: Server, palette: "green" },
+      { label: "Errors", href: "/admin/errors", icon: AlertTriangle, palette: "red" },
+      { label: "Email", href: "/admin/email", icon: Mail, palette: "purple" },
+      { label: "Infrastructure", href: "/admin/infrastructure", icon: Wifi, palette: "lime" },
     ],
   },
   {
     label: "Account",
     items: [
-      { label: "Audit log", href: "/admin/audit", icon: FileText },
-      { label: "Users", href: "/admin/users", icon: Users },
+      { label: "Audit log", href: "/admin/audit", icon: ShieldCheck, palette: "stone" },
+      { label: "Users", href: "/admin/users", icon: Users, palette: "zinc" },
     ],
   },
 ];
@@ -115,13 +125,23 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                         </li>
                       );
                     }
+                    /* Pull the palette tokens for this item so the
+                     * sidebar label/icon match the destination page's
+                     * color identity. The icon uses iconColor (-700)
+                     * and the label uses pageEyebrow (also -700);
+                     * pulling from a shared map keeps them in sync
+                     * with the dashboard card and the page header. */
+                    const tokens = getPalette(item.href);
                     return (
                       <li key={item.label}>
                         <Link
                           href={item.href}
-                          className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                          className={`group flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-zinc-100 ${tokens.pageEyebrow}`}
                         >
-                          <Icon className="h-4 w-4" aria-hidden="true" />
+                          <Icon
+                            className={`h-4 w-4 ${tokens.iconColor}`}
+                            aria-hidden="true"
+                          />
                           <span>{item.label}</span>
                         </Link>
                       </li>
