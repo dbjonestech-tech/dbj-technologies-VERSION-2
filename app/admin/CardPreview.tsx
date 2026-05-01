@@ -186,10 +186,19 @@ export default function CardPreview({
       const node = containerRef.current;
       if (!node) return;
       if (!node.contains(e.target as Node)) {
-        /* Don't close if the click is on the originating card; the
-         * parent handles that case via its own hover/tap state. */
+        /* Don't close if the click is on THIS card. Any other card's
+         * click is treated as an outside click for this popover; that
+         * other card's own state will open its own popover. Without
+         * the href specificity, clicking any card pinned every open
+         * popover. */
         const cardEl = document.elementFromPoint(e.clientX, e.clientY);
-        if (cardEl && cardEl.closest("[data-card-id]")) return;
+        const matched = cardEl?.closest?.("[data-card-id]");
+        if (
+          matched &&
+          (matched as HTMLElement).getAttribute("data-card-id") === href
+        ) {
+          return;
+        }
         onClose();
       }
     }
@@ -199,7 +208,7 @@ export default function CardPreview({
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("mousedown", onClick);
     };
-  }, [onClose]);
+  }, [onClose, href]);
 
   if (!mounted) return null;
 
@@ -221,6 +230,7 @@ export default function CardPreview({
       role="dialog"
       aria-label={`${label} preview`}
       data-card-preview="true"
+      data-card-preview-of={href}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
       initial={reduced ? { opacity: 0 } : { opacity: 0, y: 6 }}

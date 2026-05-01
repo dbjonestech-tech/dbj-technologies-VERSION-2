@@ -153,15 +153,25 @@ export default function DashboardCard({
         }}
         onPointerLeave={(e) => {
           setHovered(false);
-          /* If the cursor moved INTO the popover (portaled to body)
-           * skip the close. The popover carries data-card-preview so
-           * we can detect it without coupling to framer's hover model.
-           * This fixes the open-close feedback loop where framer's
-           * hover-end fired during minor pointer movement and the
-           * popover's onPointerEnter could not always race the
-           * scheduleClose timer in time. */
+          /* Only skip the close if the cursor moved into THIS card's
+           * own popover. Matching any popover (not just our own) was
+           * the cause of multiple popovers staying open simultaneously
+           * when the user moved quickly between cards: the cursor
+           * could pass over a different card's popover during transit,
+           * triggering this guard and pinning the wrong popover open.
+           * data-card-preview-of carries the originating card's href
+           * so we identify the right pair. */
           const related = e.relatedTarget as HTMLElement | null;
-          if (related && related.closest && related.closest('[data-card-preview="true"]')) {
+          const targetPreview =
+            related && related.closest
+              ? related.closest("[data-card-preview-of]")
+              : null;
+          if (
+            targetPreview &&
+            (targetPreview as HTMLElement).getAttribute(
+              "data-card-preview-of"
+            ) === href
+          ) {
             return;
           }
           scheduleClose();
@@ -306,11 +316,20 @@ export default function DashboardCard({
             onClose={() => setPreviewOpen(false)}
             onPointerEnter={cancelClose}
             onPointerLeave={(e) => {
-              /* Mirror the card's relatedTarget guard: if the cursor
-               * went back to the originating card, skip the close so
-               * the user can move freely between card and popover. */
+              /* Only skip close if the cursor returned to THIS popover's
+               * own originating card. Without the href check, moving
+               * the cursor from one popover to a different card pinned
+               * the first popover open (the bug Joshua spotted: Costs
+               * popover stayed visible after hovering Funnel). */
               const related = e.relatedTarget as HTMLElement | null;
-              if (related && related.closest && related.closest("[data-card-id]")) {
+              const targetCard =
+                related && related.closest
+                  ? related.closest("[data-card-id]")
+                  : null;
+              if (
+                targetCard &&
+                (targetCard as HTMLElement).getAttribute("data-card-id") === href
+              ) {
                 return;
               }
               scheduleClose();
