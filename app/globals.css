@@ -981,19 +981,52 @@ select:focus-visible {
 .canopy-table thead th:nth-child(8n+7) { color: #c2410c; } /* orange-700 */
 .canopy-table thead th:nth-child(8n+8) { color: #4338ca; } /* indigo-700 */
 
-/* Cell text color rotation — matches each column's header hue but
-   one shade darker (-800) for foreground readability on white +
-   striped backgrounds. The `tbody td` selector + `:nth-child`
-   pseudo-class give specificity (0,1,2) which beats single-class
-   Tailwind utilities like `text-zinc-900` (specificity 0,1,0). */
-.canopy-table tbody td:nth-child(8n+1) { color: #075985; } /* sky-800 */
-.canopy-table tbody td:nth-child(8n+2) { color: #5b21b6; } /* violet-800 */
-.canopy-table tbody td:nth-child(8n+3) { color: #065f46; } /* emerald-800 */
-.canopy-table tbody td:nth-child(8n+4) { color: #92400e; } /* amber-800 */
-.canopy-table tbody td:nth-child(8n+5) { color: #86198f; } /* fuchsia-800 */
-.canopy-table tbody td:nth-child(8n+6) { color: #115e59; } /* teal-800 */
-.canopy-table tbody td:nth-child(8n+7) { color: #9a3412; } /* orange-800 */
-.canopy-table tbody td:nth-child(8n+8) { color: #3730a3; } /* indigo-800 */
+/* Cell text color rotation — matches each column's header hue
+   exactly (same -700 shade) so the column reads as one unit.
+   Headers stay distinct via uppercase + tracking-wider type
+   styling, not via a different color shade.
+
+   The `:not([class*="bg-"])` clause on descendants forces nested
+   <div> / <span> / <a> with their own gray text utilities
+   (text-zinc-900, text-zinc-700, etc.) to INHERIT the td color —
+   without this, e.g. /admin/database's nested
+   `<div class="text-zinc-900">scans</div>` cell text wins via
+   descendant-class specificity. Status badges (any element with
+   bg-* on it, like `bg-emerald-50 text-emerald-700`) are excluded
+   so meaningful status colors keep their hue. */
+
+.canopy-table tbody td:nth-child(8n+1),
+.canopy-table tbody td:nth-child(8n+1) :not([class*="bg-"]):not([class*="ring-"]) {
+  color: #0369a1; /* sky-700 */
+}
+.canopy-table tbody td:nth-child(8n+2),
+.canopy-table tbody td:nth-child(8n+2) :not([class*="bg-"]):not([class*="ring-"]) {
+  color: #6d28d9; /* violet-700 */
+}
+.canopy-table tbody td:nth-child(8n+3),
+.canopy-table tbody td:nth-child(8n+3) :not([class*="bg-"]):not([class*="ring-"]) {
+  color: #047857; /* emerald-700 */
+}
+.canopy-table tbody td:nth-child(8n+4),
+.canopy-table tbody td:nth-child(8n+4) :not([class*="bg-"]):not([class*="ring-"]) {
+  color: #b45309; /* amber-700 */
+}
+.canopy-table tbody td:nth-child(8n+5),
+.canopy-table tbody td:nth-child(8n+5) :not([class*="bg-"]):not([class*="ring-"]) {
+  color: #a21caf; /* fuchsia-700 */
+}
+.canopy-table tbody td:nth-child(8n+6),
+.canopy-table tbody td:nth-child(8n+6) :not([class*="bg-"]):not([class*="ring-"]) {
+  color: #0f766e; /* teal-700 */
+}
+.canopy-table tbody td:nth-child(8n+7),
+.canopy-table tbody td:nth-child(8n+7) :not([class*="bg-"]):not([class*="ring-"]) {
+  color: #c2410c; /* orange-700 */
+}
+.canopy-table tbody td:nth-child(8n+8),
+.canopy-table tbody td:nth-child(8n+8) :not([class*="bg-"]):not([class*="ring-"]) {
+  color: #4338ca; /* indigo-700 */
+}
 
 /* Excel-style row striping. Even rows get a subtle wash; odd rows
    stay white. Applied at tr level so the entire row band reads,
