@@ -10,7 +10,8 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with 20bc0a4 commit hash
+- (this commit) docs: update session-handoff with cc529a0 commit hash
+- `cc529a0` feat(canopy admin): all 18 admin pages now wear their palette via shared PageHeader (chip pill + stripe + colored eyebrow); per-column color rotation in every data table via .canopy-table CSS rules (8-hue rotation)
 - `20bc0a4` perf(marketing): cut Lighthouse-flagged paint and main-thread cost on /about, /services, /pricing, /work
 
 Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys
