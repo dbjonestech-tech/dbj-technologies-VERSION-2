@@ -56,11 +56,11 @@ of every change above.
 
 ### Durable lessons saved to memory this session
 
-- `feedback_rsc_boundary_runtime.md` — tsc + lint clean does not validate the
+- `feedback_rsc_boundary_runtime.md`. tsc + lint clean does not validate the
   Server -> Client prop boundary; functions cannot serialize across.
-- `feedback_honest_skip_recommendations.md` — when asked "should we build X?",
+- `feedback_honest_skip_recommendations.md`. When asked "should we build X?",
   default to honest skip; Joshua's bar is "very valuable + durable."
-- `project_canopy_brand.md` updated — /admin is the design prototype for the
+- `project_canopy_brand.md` updated. /admin is the design prototype for the
   Canopy product; Canopy UI work mirrors /admin patterns.
 
 ### Unresolved / next session
