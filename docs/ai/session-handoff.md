@@ -63,6 +63,57 @@ of every change above.
 - `project_canopy_brand.md` updated. /admin is the design prototype for the
   Canopy product; Canopy UI work mirrors /admin patterns.
 
+### Latest work landed (May 1 evening): admin dashboard wiring audit + /admin/config
+
+After the visitors-page Engagement column shipped, Joshua asked for a full
+audit of every admin page to ensure data is wired correctly. The audit
+confirmed there are no code-level wiring bugs; every page resolves its
+imports, every service degrades safely (returns null/[] with a console.warn)
+when env vars are absent, and every snapshot/import is wired to an Inngest
+cron. The gaps are all ops-side: 7 pages render empty until env vars are
+set in Vercel and two webhooks are registered. Surfaced the gaps as a
+self-service status board so future-you never has to grep again.
+
+- **`.env.example`** updated with every admin-side var that was previously
+  undocumented: `ANALYTICS_IP_SALT_BASE`, `ADMIN_EMAILS`,
+  `ANTHROPIC_ADMIN_KEY`, `ANTHROPIC_MONTHLY_BUDGET_USD`, `SENTRY_AUTH_TOKEN`,
+  `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, `VERCEL_API_TOKEN`,
+  `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID`, `VERCEL_WEBHOOK_SECRET`,
+  `INNGEST_WEBHOOK_SECRET`, `GOOGLE_SC_CREDENTIALS_JSON`,
+  `GOOGLE_SC_SITE_URL`, plus the optional ElevenLabs + Vercel Blob group.
+  Grouped by purpose with whereToGet inline.
+- **`lib/admin/env-config.ts`** new declarative catalog: every admin env
+  var with name + group + requirement (required/recommended/optional) +
+  description + whereToGet + affectedPages + isPublic. Plus
+  `ADMIN_WEBHOOKS` (Vercel + Inngest + Resend) with endpoint, registerAt,
+  events, secret. Plus `checkEnvVarStatuses()` server-only helper that
+  reads process.env and returns booleans only. Values are never read or
+  rendered.
+- **`/admin/config`** new page (palette: teal, section: Account). Topline
+  4-stat panel (total set, required missing, recommended missing,
+  optional missing). Red banner if any required vars are missing. One
+  grouped table per feature area. Webhooks table at the bottom with the
+  two registrations needed in Vercel + Inngest dashboards.
+- **Sidebar nav** updated: new "Config" item under Account with the
+  Settings (gear) icon, palette teal.
+
+What still needs Joshua's hands (the /admin/config page lists this live):
+
+1. Set in Vercel -> Project -> Settings -> Environment Variables (Production):
+   - `ANALYTICS_IP_SALT_BASE` (privacy; `openssl rand -hex 32`)
+   - `ANTHROPIC_ADMIN_KEY` + `ANTHROPIC_MONTHLY_BUDGET_USD` -> /admin/costs
+   - `SENTRY_AUTH_TOKEN` + `SENTRY_ORG_SLUG` + `SENTRY_PROJECT_SLUG` -> /admin/errors
+   - `VERCEL_API_TOKEN` + `VERCEL_PROJECT_ID` + optional `VERCEL_TEAM_ID` + `VERCEL_WEBHOOK_SECRET` -> /admin/platform
+   - `INNGEST_WEBHOOK_SECRET` -> /admin/pipeline realtime
+   - `GOOGLE_SC_CREDENTIALS_JSON` + `GOOGLE_SC_SITE_URL` -> /admin/search
+2. Register two webhooks once the matching secrets are set:
+   - `https://dbjtechnologies.com/api/webhooks/vercel` in Vercel project
+     Webhooks settings, all `deployment.*` events, secret matches
+     `VERCEL_WEBHOOK_SECRET`.
+   - `https://dbjtechnologies.com/api/webhooks/inngest` in the Inngest
+     dashboard, all run-lifecycle events, secret matches
+     `INNGEST_WEBHOOK_SECRET`.
+
 ### Unresolved / next session
 
 - **Sessions index page** (per-session sortable view) was scoped during the

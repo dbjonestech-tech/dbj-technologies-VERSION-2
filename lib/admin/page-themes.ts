@@ -362,6 +362,7 @@ export const PAGE_PALETTE: Record<string, PaletteName> = {
   "/admin/errors": "red",
   "/admin/infrastructure": "lime",
   "/admin/users": "zinc",
+  "/admin/config": "teal",
 };
 
 export function getPalette(href: string): PaletteTokens {

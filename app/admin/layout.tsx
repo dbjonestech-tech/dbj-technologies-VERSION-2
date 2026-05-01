@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   Zap,
   ShieldCheck,
+  Settings,
 } from "lucide-react";
 import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
 
@@ -86,6 +87,7 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
     items: [
       { label: "Audit log", href: "/admin/audit", icon: ShieldCheck, palette: "stone" },
       { label: "Users", href: "/admin/users", icon: Users, palette: "zinc" },
+      { label: "Config", href: "/admin/config", icon: Settings, palette: "teal" },
     ],
   },
 ];
