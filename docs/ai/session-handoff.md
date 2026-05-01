@@ -8,14 +8,22 @@ header before the April 30 reset.
 
 ## Current state (end of May 1, 2026)
 
+### Most recent commits (top of `origin main`)
+
+- (this commit) docs: update session-handoff with 20bc0a4 commit hash
+- `20bc0a4` perf(marketing): cut Lighthouse-flagged paint and main-thread cost on /about, /services, /pricing, /work
+
+Working tree clean. All changes pushed to `origin main`. Vercel auto-deploys
+from main. Next 04:00 UTC Lighthouse cron will re-evaluate.
+
 ### What landed in this session: marketing-site Lighthouse perf sprint
 
 The /admin Monitor dashboard surfaced 12 `lighthouse.regression` errors at the
 04:00 UTC cron run; the daily Lighthouse cron flagged every marketing page
 below the 90 floor. Worst offenders before this sprint: `/pricing` desktop 48,
 `/services` desktop 56, `/contact` mobile 62, `/about` mobile 66. Diagnosed
-from source (no traces) and fixed the high-confidence wins. **Files touched:
-4 modified.**
+from source (no traces) and fixed the high-confidence wins. **Commit `20bc0a4`,
+4 source files + 2 doc files modified.**
 
 - **`/about` hero photo: `quality={95}` removed.** `AboutContent.tsx` was loading
   `/images/joshua-jones.webp` (640KB source) at quality 95 with `priority` and
