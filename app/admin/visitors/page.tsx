@@ -9,6 +9,7 @@ import {
   getTopPages,
   getTopSources,
   getVisitorOverview,
+  getVisitorOverviewBetween,
   type GeoRow,
   type DeviceRow,
   type RecentPageViewRow,
@@ -42,6 +43,40 @@ function parseBeforeCursor(
   return Number.isFinite(t) ? new Date(t).toISOString() : undefined;
 }
 
+/**
+ * Parse a YYYY-MM-DD date param from search params. Returns the UTC
+ * midnight for "from" and 23:59:59.999 UTC for "to" so a same-day
+ * range still matches at least one day's data.
+ */
+function parseDateParam(
+  raw: string | string[] | undefined,
+  variant: "from" | "to"
+): string | null {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  if (!value) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const t = Date.parse(value + "T00:00:00.000Z");
+  if (!Number.isFinite(t)) return null;
+  if (variant === "to") {
+    return new Date(t + 24 * 60 * 60 * 1000 - 1).toISOString();
+  }
+  return new Date(t).toISOString();
+}
+
+/**
+ * YYYY-MM-DD formatter for <input type="date" value={...}>.
+ * Pulls the date in UTC since the inputs we receive are UTC ISO.
+ */
+function isoToDateInputValue(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 function formatNumber(n: number): string {
   return new Intl.NumberFormat("en-US").format(n);
 }
@@ -69,10 +104,17 @@ export default async function VisitorsPage({ searchParams }: VisitorsPageProps) 
   const params = await searchParams;
   const before = parseBeforeCursor(params);
   const beforeVisitors = parseBeforeCursor({ before: params["before_v"] });
+  /* Custom date-range parameters drive the optional 4th overview
+   * card. Both must be present and valid for the card to render. */
+  const fromIso = parseDateParam(params["from"], "from");
+  const toIso = parseDateParam(params["to"], "to");
+  const customRangeActive = Boolean(fromIso && toIso);
+
   const [
     overview24,
     overview7d,
     overview30d,
+    overviewCustom,
     topPages,
     topSources,
     geo,
@@ -84,6 +126,9 @@ export default async function VisitorsPage({ searchParams }: VisitorsPageProps) 
     getVisitorOverview("1 day"),
     getVisitorOverview("7 days"),
     getVisitorOverview("30 days"),
+    customRangeActive && fromIso && toIso
+      ? getVisitorOverviewBetween(fromIso, toIso)
+      : Promise.resolve<VisitorOverview | null>(null),
     getTopPages("7 days", 25),
     getTopSources("7 days", 25),
     getGeoBreakdown("7 days", 25),
@@ -105,14 +150,15 @@ export default async function VisitorsPage({ searchParams }: VisitorsPageProps) 
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-8">
+        <header className="relative mb-8">
           <span
             aria-hidden="true"
-            className={`mb-3 block h-0.5 w-12 rounded-full ${PALETTES.sky.pageStripe}`}
+            className={`mb-4 block h-1.5 w-24 rounded-full ${PALETTES.sky.pageStripe}`}
           />
-          <p className={`text-xs font-semibold uppercase tracking-[0.3em] ${PALETTES.sky.pageEyebrow}`}>
-            Acquisition
-          </p>
+          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-700 ring-1 ring-inset ring-sky-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-sky-500" aria-hidden="true" />
+            Acquisition · Visitors
+          </span>
           <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
             Visitors
           </h1>
@@ -123,7 +169,12 @@ export default async function VisitorsPage({ searchParams }: VisitorsPageProps) 
           </p>
         </header>
 
-        <OverviewSection rows={[overview24, overview7d, overview30d]} />
+        <OverviewSection
+          rows={[overview24, overview7d, overview30d]}
+          custom={overviewCustom}
+          fromInputValue={isoToDateInputValue(fromIso)}
+          toInputValue={isoToDateInputValue(toIso)}
+        />
 
         <DefinitionsPanel />
 
@@ -139,7 +190,13 @@ export default async function VisitorsPage({ searchParams }: VisitorsPageProps) 
           }
           subtitle="One row per person. Click any row to expand the full page-by-page timeline grouped by session."
         >
-          <RecentVisitorsTable rows={recentVisitors} enableSearch enableFilters />
+          <RecentVisitorsTable
+            rows={recentVisitors}
+            enableSearch
+            enableFilters
+            enableCsvExport
+            exportSlug="visitors"
+          />
           <VisitorsPaginator
             isPaged={Boolean(beforeVisitors)}
             hasMore={hasMoreVisitors}
@@ -219,32 +276,140 @@ function RecentPaginator({
   );
 }
 
-function OverviewSection({ rows }: { rows: VisitorOverview[] }) {
+function OverviewSection({
+  rows,
+  custom,
+  fromInputValue,
+  toInputValue,
+}: {
+  rows: VisitorOverview[];
+  custom: VisitorOverview | null;
+  fromInputValue: string;
+  toInputValue: string;
+}) {
   const labels = ["24h", "7d", "30d"];
   return (
-    <section className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-      {rows.map((row, i) => (
-        <div
-          key={labels[i]}
-          className="rounded-xl border border-zinc-200 bg-white p-5"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-            {labels[i]}
-          </p>
-          <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
-            <Stat label="Page views" value={formatNumber(row.pageViews)} />
-            <Stat label="Sessions" value={formatNumber(row.sessions)} />
-            <Stat label="Visitors" value={formatNumber(row.uniqueVisitors)} />
-            <Stat label="Bounce" value={`${row.bounceRatePct}%`} />
-            <Stat label="Pages/session" value={row.avgPagesPerSession.toFixed(2)} />
-            <Stat
-              label="Conversions"
-              value={`${formatNumber(row.scanConversions + row.contactConversions)}`}
-            />
-          </div>
-        </div>
-      ))}
+    <section className="mb-6 space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {rows.map((row, i) => (
+          <OverviewCard key={labels[i]} label={labels[i]!} row={row} />
+        ))}
+        <CustomRangeCard
+          custom={custom}
+          fromInputValue={fromInputValue}
+          toInputValue={toInputValue}
+        />
+      </div>
     </section>
+  );
+}
+
+function OverviewCard({ label, row }: { label: string; row: VisitorOverview }) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-5">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+        {label}
+      </p>
+      <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+        <Stat label="Page views" value={formatNumber(row.pageViews)} />
+        <Stat label="Sessions" value={formatNumber(row.sessions)} />
+        <Stat label="Visitors" value={formatNumber(row.uniqueVisitors)} />
+        <Stat label="Bounce" value={`${row.bounceRatePct}%`} />
+        <Stat label="Pages/session" value={row.avgPagesPerSession.toFixed(2)} />
+        <Stat
+          label="Conversions"
+          value={`${formatNumber(row.scanConversions + row.contactConversions)}`}
+        />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Native HTML form with two date inputs. Submits via GET so the URL
+ * carries the range and the page can be bookmarked / shared / deep-
+ * linked. Server-side parsing in parseDateParam normalizes the
+ * range to a UTC day window.
+ */
+function CustomRangeCard({
+  custom,
+  fromInputValue,
+  toInputValue,
+}: {
+  custom: VisitorOverview | null;
+  fromInputValue: string;
+  toInputValue: string;
+}) {
+  return (
+    <div className="rounded-xl border border-pink-200 bg-gradient-to-br from-white to-pink-50/40 p-5">
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-pink-700">
+          Custom range
+        </p>
+        {custom ? (
+          <Link
+            href="/admin/visitors"
+            className="text-[10px] font-medium text-zinc-500 hover:text-zinc-700"
+          >
+            Clear
+          </Link>
+        ) : null}
+      </div>
+      <form
+        action="/admin/visitors"
+        method="get"
+        className="mt-3 flex flex-wrap items-end gap-2"
+      >
+        <label className="flex flex-col text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+          From
+          <input
+            type="date"
+            name="from"
+            defaultValue={fromInputValue}
+            required
+            className="mt-1 rounded-md border border-zinc-200 bg-white px-2 py-1 font-mono text-xs text-zinc-900 focus:border-pink-400 focus:outline-none"
+          />
+        </label>
+        <label className="flex flex-col text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+          To
+          <input
+            type="date"
+            name="to"
+            defaultValue={toInputValue}
+            required
+            className="mt-1 rounded-md border border-zinc-200 bg-white px-2 py-1 font-mono text-xs text-zinc-900 focus:border-pink-400 focus:outline-none"
+          />
+        </label>
+        <button
+          type="submit"
+          className="rounded-md bg-pink-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-pink-700"
+        >
+          Apply
+        </button>
+      </form>
+      {custom ? (
+        <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+          <Stat label="Page views" value={formatNumber(custom.pageViews)} />
+          <Stat label="Sessions" value={formatNumber(custom.sessions)} />
+          <Stat label="Visitors" value={formatNumber(custom.uniqueVisitors)} />
+          <Stat label="Bounce" value={`${custom.bounceRatePct}%`} />
+          <Stat
+            label="Pages/session"
+            value={custom.avgPagesPerSession.toFixed(2)}
+          />
+          <Stat
+            label="Conversions"
+            value={`${formatNumber(custom.scanConversions + custom.contactConversions)}`}
+          />
+        </div>
+      ) : (
+        <p className="mt-3 text-[11px] leading-relaxed text-zinc-500">
+          Pick any two dates to see visitors, sessions, conversions for
+          that exact window. State is in the URL so you can bookmark
+          or share the view.
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -276,7 +441,7 @@ function TopPagesTable({ rows }: { rows: TopPageRow[] }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.path} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
+            <tr key={r.path} className="border-t border-zinc-100 transition-colors even:bg-zinc-100/70 hover:bg-sky-50">
               <td className="px-3 py-2 font-mono text-xs text-zinc-900">{r.path}</td>
               <td className="px-3 py-2 text-right font-mono text-zinc-900">
                 {formatNumber(r.views)}
@@ -318,7 +483,7 @@ function TopSourcesTable({ rows }: { rows: TopSourceRow[] }) {
             const total = r.scanConversions + r.contactConversions;
             const rate = r.sessions > 0 ? (total / r.sessions) * 100 : 0;
             return (
-              <tr key={r.source} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
+              <tr key={r.source} className="border-t border-zinc-100 transition-colors even:bg-zinc-100/70 hover:bg-sky-50">
                 <td className="px-3 py-2 font-mono text-xs text-zinc-900">
                   {r.source}
                 </td>
@@ -359,7 +524,7 @@ function GeoTable({ rows }: { rows: GeoRow[] }) {
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={`${r.country}-${r.region}-${r.city}-${i}`} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
+            <tr key={`${r.country}-${r.region}-${r.city}-${i}`} className="border-t border-zinc-100 transition-colors even:bg-zinc-100/70 hover:bg-sky-50">
               <td className="px-3 py-2 font-mono text-xs">{r.country ?? "-"}</td>
               <td className="px-3 py-2 text-xs text-zinc-700">{r.region ?? "-"}</td>
               <td className="px-3 py-2 text-xs text-zinc-700">{r.city ?? "-"}</td>
@@ -389,7 +554,7 @@ function DevicesTable({ rows }: { rows: DeviceRow[] }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.deviceType} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
+            <tr key={r.deviceType} className="border-t border-zinc-100 transition-colors even:bg-zinc-100/70 hover:bg-sky-50">
               <td className="px-3 py-2 font-mono text-xs text-zinc-900">
                 {r.deviceType}
               </td>
@@ -425,7 +590,7 @@ function RecentTable({ rows }: { rows: RecentPageViewRow[] }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id} className="border-t border-zinc-100 transition-colors even:bg-zinc-50/50 hover:bg-zinc-100/60">
+            <tr key={r.id} className="border-t border-zinc-100 transition-colors even:bg-zinc-100/70 hover:bg-sky-50">
               <td className="px-3 py-2 font-mono text-xs text-zinc-900">
                 {r.path}
               </td>

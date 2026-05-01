@@ -297,6 +297,87 @@ export async function getVisitorOverview(
   }
 }
 
+/**
+ * Visitor overview for an arbitrary [start, end) date range. Same
+ * shape as getVisitorOverview but uses an absolute start/end window
+ * instead of a "now() - interval" relative interval. Used by the
+ * custom date-range card on /admin/visitors.
+ *
+ * Validates and re-emits canonical ISO timestamps before SQL
+ * interpolation so we never pass raw user input through to Postgres.
+ * A null/invalid input returns an empty zeroed overview.
+ */
+export async function getVisitorOverviewBetween(
+  startIso: string,
+  endIso: string
+): Promise<VisitorOverview> {
+  const startT = Date.parse(startIso);
+  const endT = Date.parse(endIso);
+  if (!Number.isFinite(startT) || !Number.isFinite(endT) || endT <= startT) {
+    return EMPTY_OVERVIEW(`${startIso} → ${endIso}`);
+  }
+  const start = new Date(startT).toISOString();
+  const end = new Date(endT).toISOString();
+  try {
+    const sql = getDb();
+    const rows = (await sql`
+      SELECT
+        COUNT(*)::int AS page_views,
+        COUNT(DISTINCT session_id)::int AS sessions,
+        COUNT(DISTINCT visitor_id)::int AS unique_visitors
+      FROM page_views
+      WHERE created_at >= ${start}::timestamptz
+        AND created_at <  ${end}::timestamptz
+        AND is_bot = false
+    `) as { page_views: number; sessions: number; unique_visitors: number }[];
+
+    const conv = (await sql`
+      SELECT
+        COUNT(*) FILTER (WHERE converted_scan_id IS NOT NULL)::int AS scans,
+        COUNT(*) FILTER (WHERE converted_contact_id IS NOT NULL)::int AS contacts,
+        COUNT(*)::int AS total_sessions,
+        COUNT(*) FILTER (WHERE page_count = 1)::int AS bounced_sessions,
+        COALESCE(AVG(page_count), 0)::float8 AS avg_pages
+      FROM sessions
+      WHERE started_at >= ${start}::timestamptz
+        AND started_at <  ${end}::timestamptz
+        AND is_bot = false
+    `) as {
+      scans: number;
+      contacts: number;
+      total_sessions: number;
+      bounced_sessions: number;
+      avg_pages: number;
+    }[];
+
+    const r = rows[0] ?? { page_views: 0, sessions: 0, unique_visitors: 0 };
+    const c = conv[0] ?? {
+      scans: 0,
+      contacts: 0,
+      total_sessions: 0,
+      bounced_sessions: 0,
+      avg_pages: 0,
+    };
+    const bounce =
+      c.total_sessions > 0 ? (c.bounced_sessions / c.total_sessions) * 100 : 0;
+    return {
+      windowLabel: `${start} → ${end}`,
+      pageViews: r.page_views,
+      sessions: r.sessions,
+      uniqueVisitors: r.unique_visitors,
+      bounceRatePct: Number(bounce.toFixed(1)),
+      avgPagesPerSession: Number(c.avg_pages.toFixed(2)),
+      scanConversions: c.scans,
+      contactConversions: c.contacts,
+    };
+  } catch (err) {
+    console.warn(
+      `[analytics] getVisitorOverviewBetween failed: ${err instanceof Error ? err.message : err}`
+    );
+    return EMPTY_OVERVIEW(`${start} → ${end}`);
+  }
+}
+
 export type TopPageRow = {
   path: string;
   views: number;

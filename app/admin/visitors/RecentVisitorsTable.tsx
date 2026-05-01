@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
+  Download,
   ExternalLink,
   Mail,
   Phone,
@@ -134,6 +135,104 @@ function conversionBadge(row: RecentVisitorRow): React.ReactNode {
   return null;
 }
 
+/**
+ * RFC 4180 compliant CSV cell escape. Wraps any value containing a
+ * comma, double-quote, CR, or LF in double quotes; escapes inner
+ * double quotes by doubling. Numbers and booleans are coerced to
+ * string. null/undefined render as empty cell.
+ */
+function csvCell(value: string | number | boolean | null | undefined): string {
+  if (value === null || value === undefined) return "";
+  const s = String(value);
+  if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+const CSV_COLUMNS = [
+  "visitor_id",
+  "name",
+  "email",
+  "company",
+  "phone",
+  "website",
+  "sessions",
+  "page_views",
+  "top_path",
+  "entry_path",
+  "exit_path",
+  "source",
+  "utm_campaign",
+  "city",
+  "region",
+  "country",
+  "device",
+  "browser",
+  "os",
+  "first_seen",
+  "last_seen",
+  "converted_scan",
+  "converted_contact",
+] as const;
+
+function rowsToCsv(rows: RecentVisitorRow[]): string {
+  const lines: string[] = [CSV_COLUMNS.join(",")];
+  for (const r of rows) {
+    const id = identitySummary(r);
+    const name = r.contactName ?? (id.source === "scan" ? r.scanBusinessName : null);
+    const email = r.contactEmail ?? r.scanEmail;
+    const company = r.contactCompany ?? r.scanBusinessName;
+    const cells: (string | number | boolean | null | undefined)[] = [
+      r.visitorId,
+      name,
+      email,
+      company,
+      r.contactPhone,
+      r.scanUrl,
+      r.sessionCount,
+      r.pageViewCount,
+      r.topPath,
+      r.entryPath,
+      r.exitPath,
+      r.utmSource ?? r.referrerHost ?? "(direct)",
+      r.utmCampaign,
+      r.city,
+      r.region,
+      r.country,
+      r.deviceType,
+      r.browser,
+      r.os,
+      r.firstSeenAt,
+      r.lastSeenAt,
+      r.convertedScan,
+      r.convertedContact,
+    ];
+    lines.push(cells.map(csvCell).join(","));
+  }
+  return lines.join("\r\n") + "\r\n";
+}
+
+function downloadCsv(content: string, filename: string): void {
+  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function timestampSlug(): string {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}-${hh}${mi}`;
+}
+
 function rowMatchesQuery(row: RecentVisitorRow, q: string): boolean {
   if (!q) return true;
   const haystack = [
@@ -177,12 +276,21 @@ export type RecentVisitorsTableProps = {
   rows: RecentVisitorRow[];
   enableSearch?: boolean;
   enableFilters?: boolean;
+  enableCsvExport?: boolean;
+  /**
+   * Slug folded into the CSV filename so an export from /admin/recurring
+   * is distinguishable from one off /admin/visitors. Defaults to
+   * "visitors".
+   */
+  exportSlug?: string;
 };
 
 export default function RecentVisitorsTable({
   rows,
   enableSearch = false,
   enableFilters = false,
+  enableCsvExport = false,
+  exportSlug = "visitors",
 }: RecentVisitorsTableProps) {
   const [query, setQuery] = useState("");
   const [chip, setChip] = useState<FilterChip>("all");
@@ -191,6 +299,12 @@ export default function RecentVisitorsTable({
     const q = query.trim().toLowerCase();
     return rows.filter((r) => rowMatchesQuery(r, q) && rowMatchesChip(r, chip));
   }, [rows, query, chip]);
+
+  const handleExport = () => {
+    const csv = rowsToCsv(filteredRows);
+    const chipSlug = chip === "all" ? "" : `-${chip}`;
+    downloadCsv(csv, `canopy-${exportSlug}-${timestampSlug()}${chipSlug}.csv`);
+  };
 
   if (rows.length === 0) {
     return <p className="text-sm text-zinc-500">No visitors yet.</p>;
@@ -223,33 +337,45 @@ export default function RecentVisitorsTable({
           ) : (
             <span />
           )}
-          {enableFilters ? (
-            <div className="flex flex-wrap gap-1.5">
-              {(
-                [
-                  { id: "all", label: "All" },
-                  { id: "self-disclosed", label: "Self-disclosed" },
-                  { id: "anonymous", label: "Anonymous" },
-                  { id: "converted", label: "Converted" },
-                  { id: "mobile", label: "Mobile" },
-                  { id: "desktop", label: "Desktop" },
-                ] as const
-              ).map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setChip(c.id)}
-                  className={
-                    chip === c.id
-                      ? "rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-semibold text-white transition-colors"
-                      : "rounded-full bg-zinc-100 px-3 py-1 text-[11px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-200"
-                  }
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {enableFilters
+              ? (
+                  [
+                    { id: "all", label: "All" },
+                    { id: "self-disclosed", label: "Self-disclosed" },
+                    { id: "anonymous", label: "Anonymous" },
+                    { id: "converted", label: "Converted" },
+                    { id: "mobile", label: "Mobile" },
+                    { id: "desktop", label: "Desktop" },
+                  ] as const
+                ).map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setChip(c.id)}
+                    className={
+                      chip === c.id
+                        ? "rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-semibold text-white transition-colors"
+                        : "rounded-full bg-zinc-100 px-3 py-1 text-[11px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-200"
+                    }
+                  >
+                    {c.label}
+                  </button>
+                ))
+              : null}
+            {enableCsvExport ? (
+              <button
+                type="button"
+                onClick={handleExport}
+                disabled={filteredRows.length === 0}
+                className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-[11px] font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label="Export filtered rows as CSV"
+              >
+                <Download className="h-3 w-3" aria-hidden="true" />
+                Export CSV ({filteredRows.length})
+              </button>
+            ) : null}
+          </div>
         </div>
       )}
       {filteredRows.length === 0 ? (
@@ -325,7 +451,7 @@ function VisitorRow({ row, index }: { row: RecentVisitorRow; index: number }) {
   return (
     <>
       <tr
-        className={`cursor-pointer border-t border-zinc-100 transition-colors hover:bg-zinc-100/60 ${isEven ? "bg-zinc-50/50" : "bg-white"}`}
+        className={`cursor-pointer border-t border-zinc-100 transition-colors hover:bg-sky-50 ${isEven ? "bg-zinc-100/70" : "bg-white"}`}
         onClick={() => setExpanded((v) => !v)}
       >
         <td className="px-3 py-3 text-zinc-400" aria-hidden="true">

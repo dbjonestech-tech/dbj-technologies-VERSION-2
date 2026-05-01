@@ -45,14 +45,15 @@ export default async function RecurringUsersPage({ searchParams }: RecurringPage
   return (
     <div className="px-6 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <header className="mb-8">
+        <header className="relative mb-8">
           <span
             aria-hidden="true"
-            className={`mb-3 block h-0.5 w-12 rounded-full ${palette.pageStripe}`}
+            className={`mb-4 block h-1.5 w-24 rounded-full ${palette.pageStripe}`}
           />
-          <p className={`text-xs font-semibold uppercase tracking-[0.3em] ${palette.pageEyebrow}`}>
-            Acquisition
-          </p>
+          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-pink-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-pink-700 ring-1 ring-inset ring-pink-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-pink-500" aria-hidden="true" />
+            Acquisition · Recurring users
+          </span>
           <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
             Recurring users
           </h1>
@@ -75,7 +76,13 @@ export default async function RecurringUsersPage({ searchParams }: RecurringPage
               shown only when self-disclosed via a form submission.
             </p>
           </div>
-          <RecentVisitorsTable rows={rows} enableSearch enableFilters />
+          <RecentVisitorsTable
+            rows={rows}
+            enableSearch
+            enableFilters
+            enableCsvExport
+            exportSlug="recurring-users"
+          />
           <RecurringPaginator
             isPaged={isPaged}
             hasMore={hasMore}
