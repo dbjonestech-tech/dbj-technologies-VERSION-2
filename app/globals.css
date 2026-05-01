@@ -956,12 +956,21 @@ select:focus-visible {
 .about-cta-dark .text-section { color: #ffffff; }
 .about-cta-dark .text-text-secondary { color: #9ca3af !important; }
 
-/* ─── CANOPY ADMIN: PER-COLUMN HEADER COLOR ROTATION ───────────── */
-/* Each data table on /admin/* tagged with .canopy-table inherits a
-   refined column-header color rotation so columns are easily
-   distinguished at a glance. Only the <th> label text is colored;
-   cells stay neutral so readability + row-striping remain intact.
-   Rotation is 8 elegant hues that cycle on tables with more columns. */
+/* ─── CANOPY ADMIN: TABLE STYLE SYSTEM ─────────────────────────── */
+/* Every data table on /admin/* tagged with .canopy-table inherits a
+   coordinated style: per-column header + cell color rotation, Excel-
+   style alternating row stripe, palette-aware row hover, and a
+   subtle column separator on hover for read-across legibility.
+   Centralized here so we don't have to edit ~30 individual table
+   bodies to apply the look uniformly.
+
+   8-hue rotation: sky / violet / emerald / amber / fuchsia /
+   teal / orange / indigo. Headers use the -700 shade, cells use
+   the -800 shade for readability. Selectors include `tbody` and
+   `:nth-child` pseudo-class so they outweigh single-class Tailwind
+   utility classes on individual <td> elements. */
+
+/* Header row text color rotation (existing). */
 .canopy-table thead th { color: #71717a; /* zinc-500 default */ }
 .canopy-table thead th:nth-child(8n+1) { color: #0369a1; } /* sky-700 */
 .canopy-table thead th:nth-child(8n+2) { color: #6d28d9; } /* violet-700 */
@@ -971,9 +980,40 @@ select:focus-visible {
 .canopy-table thead th:nth-child(8n+6) { color: #0f766e; } /* teal-700 */
 .canopy-table thead th:nth-child(8n+7) { color: #c2410c; } /* orange-700 */
 .canopy-table thead th:nth-child(8n+8) { color: #4338ca; } /* indigo-700 */
-/* Subtle vertical column separator on hover within tbody rows so
-   columns delineate even more cleanly when the operator is reading
-   across. Only on hovered rows so it does not add visual noise. */
+
+/* Cell text color rotation — matches each column's header hue but
+   one shade darker (-800) for foreground readability on white +
+   striped backgrounds. The `tbody td` selector + `:nth-child`
+   pseudo-class give specificity (0,1,2) which beats single-class
+   Tailwind utilities like `text-zinc-900` (specificity 0,1,0). */
+.canopy-table tbody td:nth-child(8n+1) { color: #075985; } /* sky-800 */
+.canopy-table tbody td:nth-child(8n+2) { color: #5b21b6; } /* violet-800 */
+.canopy-table tbody td:nth-child(8n+3) { color: #065f46; } /* emerald-800 */
+.canopy-table tbody td:nth-child(8n+4) { color: #92400e; } /* amber-800 */
+.canopy-table tbody td:nth-child(8n+5) { color: #86198f; } /* fuchsia-800 */
+.canopy-table tbody td:nth-child(8n+6) { color: #115e59; } /* teal-800 */
+.canopy-table tbody td:nth-child(8n+7) { color: #9a3412; } /* orange-800 */
+.canopy-table tbody td:nth-child(8n+8) { color: #3730a3; } /* indigo-800 */
+
+/* Excel-style row striping. Even rows get a subtle wash; odd rows
+   stay white. Applied at tr level so the entire row band reads,
+   even where individual cells use color tints from the rules
+   above. zinc-100 at 60% opacity reads as a visible-but-quiet
+   stripe against white. */
+.canopy-table tbody tr:nth-child(even) > td {
+  background-color: rgb(244 244 245 / 0.55);
+}
+
+/* Row hover: a touch warmer than the stripe so the user knows
+   which row their cursor is on. Slate is intentionally palette-
+   neutral so it doesn't compete with the column tints. */
+.canopy-table tbody tr:hover > td {
+  background-color: rgb(241 245 249 / 0.85); /* slate-100/85 */
+}
+
+/* Subtle vertical column separator on hover so columns delineate
+   even more cleanly when reading across long rows. Only on the
+   hovered row to avoid visual noise everywhere else. */
 .canopy-table tbody tr:hover td + td {
   border-left: 1px solid rgba(0, 0, 0, 0.04);
 }
