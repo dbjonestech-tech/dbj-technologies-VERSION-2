@@ -10,7 +10,9 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with 7944e06 commit hash
+- (this commit) docs: update session-handoff with 98e4071 commit hash
+- `98e4071` feat(canopy admin): CSV export, custom date-range overview card, beefier page accents (h-1.5 w-24 stripe + colored pill chip eyebrow), Excel-style row striping (bumped from /50 opacity to bg-zinc-100/70 with palette-tinted hover)
+- `9746a77` docs: update session-handoff with 7944e06 commit hash
 - `7944e06` fix(admin): use the actual Canopy logo file (canopy-logo.webp) in the admin shell instead of the typographic substitute
 - `0681486` docs: update session-handoff with a37289e commit hash
 - `a37289e` feat(canopy admin): per-card palette system (18 hues), Canopy wordmark across admin shell, Recurring users page + dashboard card + KPI, Excel-style striped rows, search + filter chips on visitor tables
