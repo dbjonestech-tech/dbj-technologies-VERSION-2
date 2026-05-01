@@ -10,8 +10,8 @@ header before the April 30 reset.
 
 ### Most recent commits (top of `origin main`)
 
-- (this commit) docs: update session-handoff with the visitors-page paths column
-- `feat(admin/visitors): per-visitor "Pages visited" column with clean labels` (this sprint)
+- (this commit) docs: update session-handoff with d94c87c commit hash
+- `d94c87c` feat(admin/visitors): add per-visitor "Pages visited" column with clean labels
 - `cc529a0` feat(canopy admin): all 18 admin pages now wear their palette via shared PageHeader (chip pill + stripe + colored eyebrow); per-column color rotation in every data table via .canopy-table CSS rules (8-hue rotation)
 - `20bc0a4` perf(marketing): cut Lighthouse-flagged paint and main-thread cost on /about, /services, /pricing, /work
 
