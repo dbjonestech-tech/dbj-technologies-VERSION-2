@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 2 staged uncommitted; Phase 1 + migrations 023/024/025/026 applied to prod Neon)
+## Current state (May 1, 2026 -- Canopy v2 Phase 2 shipped at `f73d116`, pushed to origin main, working tree clean. Migrations 023/024/025/026 all applied to prod Neon.)
 
-### Phase 2 staged this session (pre-commit): Activities and Tasks
+### Phase 2 shipped at `f73d116`: Activities and Tasks
 
 The unified store for operator-driven interactions (notes, calls, meetings, tasks, emails). Tasks become first-class objects with due dates, priority, and completion state. Dashboard surfaces overdue and due-today counts; a standalone /admin/tasks page filters across scope/status/priority.
 
