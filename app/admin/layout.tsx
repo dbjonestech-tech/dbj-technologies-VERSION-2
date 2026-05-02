@@ -162,7 +162,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen w-full" style={{ backgroundColor: "#FAFAFA" }}>
       <div className="flex min-h-screen">
         <aside className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
-          <div className="flex h-16 items-center border-b border-zinc-200 px-5">
+          <div className="flex items-center border-b border-zinc-200 px-5 py-5">
             <CanopyWordmark />
           </div>
           <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -245,7 +245,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </aside>
 
         <main className="flex flex-1 flex-col">
-          <header className="flex h-16 items-center justify-between border-b border-zinc-200 bg-white px-6 lg:hidden">
+          <header className="flex min-h-16 items-center justify-between border-b border-zinc-200 bg-white px-6 py-3 lg:hidden">
             <CanopyWordmark />
 
             <form action={signOutAction}>
@@ -281,12 +281,12 @@ function CanopyWordmark() {
       <Image
         src="/canopy-logo.webp"
         alt="Canopy"
-        width={56}
-        height={42}
+        width={160}
+        height={120}
         priority
-        className="h-10 w-auto rounded-md"
+        className="h-20 w-auto rounded-md"
       />
-      <span className="text-sm font-bold uppercase leading-tight tracking-[0.14em] text-zinc-700">
+      <span className="text-[10px] font-semibold uppercase leading-tight tracking-[0.16em] text-zinc-600">
         By DBJ
         <br />
         Technologies
