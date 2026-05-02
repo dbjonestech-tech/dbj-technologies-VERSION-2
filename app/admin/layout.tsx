@@ -266,9 +266,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 }
 
 /**
- * Canopy wordmark for the admin shell. Renders /public/canopy-logo.webp
- * (the official tree-and-wordmark logo, cyan on dark) with a "BY DBJ
- * TECHNOLOGIES" attribution beside it. The /admin shell is the design
+ * Canopy wordmark for the admin shell. Renders the simplified tree icon
+ * (/public/canopy-icon.webp, transparent background) alongside the
+ * "Canopy" name and a "by DBJ Technologies" attribution as live text.
+ * The full tree+wordmark image (/public/canopy-logo.webp) is reserved
+ * for marketing surfaces where it can render large enough for the
+ * embedded wordmark to be legible. The /admin shell is the design
  * prototype for the Canopy product per project_canopy_brand memory.
  */
 function CanopyWordmark() {
@@ -276,20 +279,24 @@ function CanopyWordmark() {
     <Link
       href="/admin"
       aria-label="Canopy by DBJ Technologies"
-      className="inline-flex items-center gap-3"
+      className="inline-flex items-center gap-2.5"
     >
       <Image
-        src="/canopy-logo.webp"
-        alt="Canopy"
-        width={160}
-        height={120}
+        src="/canopy-icon.webp"
+        alt=""
+        aria-hidden
+        width={48}
+        height={48}
         priority
-        className="h-20 w-auto rounded-md"
+        className="h-12 w-12 shrink-0"
       />
-      <span className="text-[10px] font-semibold uppercase leading-tight tracking-[0.16em] text-zinc-600">
-        By DBJ
-        <br />
-        Technologies
+      <span className="flex flex-col leading-tight">
+        <span className="text-lg font-semibold tracking-tight text-zinc-900">
+          Canopy
+        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+          by DBJ Technologies
+        </span>
       </span>
     </Link>
   );
