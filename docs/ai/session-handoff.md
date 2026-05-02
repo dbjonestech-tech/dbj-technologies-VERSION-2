@@ -5,7 +5,43 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- admin observability secrets + Sentry filter + scan-pipeline correctness/cost fix + screenshot reliability refactor all shipped, working tree clean, pushed to origin main)
+## Current state (May 2, 2026 -- Phase 4 foundation staged uncommitted; admin observability secrets + Sentry filter + scan-pipeline correctness/cost fix + screenshot reliability refactor previously shipped this session)
+
+### Phase 4 foundation in working tree (uncommitted)
+
+OAuth + at-rest encryption + connect/disconnect routes + Connected Accounts panel under `/admin/canopy`. Working tree, both `npx tsc --noEmit` and `npm run lint` clean, no em dashes.
+
+Files added:
+
+- `lib/db/migrations/033_email_sync.sql` -- creates `oauth_tokens` (per-admin Google OAuth credentials, encrypted at rest, UNIQUE on (user_email, provider)), `email_messages` (in/out gmail-message-id-keyed records with arrays for opened_at + JSONB for clicked_links, FK to contacts CASCADE / deals SET NULL / admin_users SET NULL / templates SET NULL), `email_templates` (per-owner reusable copy with merge_fields TEXT[] and soft-delete via archived_at). Idempotent: every CREATE uses IF NOT EXISTS, the FK from email_messages -> email_templates is added with DROP CONSTRAINT IF EXISTS / ADD CONSTRAINT so a partial replay leaves the schema converged. NOT YET applied to prod Neon.
+- `lib/canopy/email/encryption.ts` -- AES-256-GCM helpers. Format is `iv:authTag:ciphertext` all hex so each row is fully self-contained and IV reuse is structurally impossible. Loads key from `OAUTH_TOKEN_ENCRYPTION_KEY` env var (must be 64 hex chars). `isTokenEncryptionConfigured()` lets UI render a config nag without throwing.
+- `lib/canopy/email/oauth-tokens.ts` -- DB CRUD over `oauth_tokens`. `upsertOAuthToken` with ON CONFLICT update (preserves the refresh token across reconnects when Google omits it on consent), `getOAuthTokenForUser` (decrypts on read), `listConnectedAccounts` (returns metadata only, never decrypts), `deleteOAuthToken`, `updateAccessTokenAfterRefresh`, `updateIngestCheckpoint`.
+- `lib/integrations/google-oauth.ts` -- the application boundary with Google's APIs. Builds the authorize URL with `access_type=offline` + `prompt=consent` so a refresh token is always issued. `exchangeCodeForTokens`, `refreshAccessToken`, `revokeToken` (treats 400 from /revoke as already-invalid, not an error), `fetchUserInfo`, `getValidAccessToken` (auto-refreshes when within 60s of expiry; returns null if no refresh token is on file). `GOOGLE_OAUTH_SCOPES` is the single source of truth for scope set (openid + userinfo.email/profile + gmail.send/readonly/modify); a future code path cannot quietly widen scopes.
+- `app/api/integrations/google/start/route.ts` -- session-gated GET. Generates a 24-byte hex CSRF state, sets it in an HttpOnly Secure SameSite=Lax cookie with a 600s TTL, redirects to Google's authorize URL.
+- `app/api/integrations/google/callback/route.ts` -- session-gated GET. Validates the state cookie, exchanges the code, fetches the connected Gmail address via /userinfo, encrypts and upserts the tokens, redirects to `/admin/canopy?google=connected&email=<addr>`. Failures redirect to `/admin/canopy?google=error&reason=<reason>` so the operator sees a clear surface instead of a 500. Audit-logs the connection via `recordChange`.
+- `app/api/integrations/google/disconnect/route.ts` -- session-gated POST (form submit, no JS required). Best-effort revocation at Google (logs but doesn't throw if revoke fails so the local row is always cleaned up). Audit-logged.
+- `app/admin/canopy/ConnectedAccountsPanel.tsx` -- server component. Renders a config nag when env vars are missing (separate nags for OAuth client and encryption key); when configured, shows the signed-in admin's connection status with Connect / Disconnect controls; when there are multiple admins connected, shows the org-wide list below.
+- `app/admin/canopy/page.tsx` -- threads `searchParams` through to render a flash banner for `?google=connected|disconnected|error` returns from the OAuth routes; mounts `ConnectedAccountsPanel` between the custom-fields manager and the recent-changes feed.
+
+### Joshua's open items for Phase 4
+
+1. Generate an encryption key locally and add to Vercel:
+   `openssl rand -hex 32` -> add as `OAUTH_TOKEN_ENCRYPTION_KEY` for all three Vercel environments (Production, Preview, Development).
+2. Apply migration 033 to prod Neon. The schema is idempotent so re-running is safe.
+3. (Already done this session) `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET` are already in Vercel from earlier in the session. The previously-exposed secret was rotated; confirmed disabled.
+
+### Phase 4 still to ship (subsequent commits)
+
+- Gmail ingest Inngest cron (every 5 min): Gmail History API pull per connected user, contact-email matching, deal attachment, thread continuity.
+- Email tracking endpoints: 1x1 transparent gif at `/api/email/pixel/[messageId]` and 302 redirector at `/api/email/click/[messageId]`.
+- Compose modal on contact + deal detail pages with template picker and live merge-field preview.
+- Email Templates editor under `/admin/canopy`.
+- `lib/email/render.ts` merge field substitution: `{{contact.name}}`, `{{contact.company}}`, `{{deal.value}}`, `{{pathlight.score}}`.
+- Inbound email integration into the contact timeline as a new activity type.
+
+---
+
+## Prior state (May 2, 2026 -- admin observability secrets + Sentry filter + scan-pipeline correctness/cost fix + screenshot reliability refactor all shipped, working tree clean, pushed to origin main)
 
 Four commits this session, in order:
 
