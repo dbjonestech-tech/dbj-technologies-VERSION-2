@@ -3,7 +3,8 @@ import { recordBrowserlessUsage } from "./api-usage";
 export type Viewport = { width: number; height: number };
 
 const DEFAULT_BROWSERLESS_BASE = "https://production-sfo.browserless.io";
-const SCREENSHOT_TIMEOUT_MS = 45_000;
+const SCREENSHOT_TIMEOUT_MS = 55_000;
+const SCREENSHOT_RETRY_DELAY_MS = 3_000;
 const PDF_TIMEOUT_MS = 60_000;
 
 // Runs inside Browserless v2 /function (Puppeteer in a managed Chromium).
@@ -12,14 +13,62 @@ const PDF_TIMEOUT_MS = 60_000;
 // interaction-gated entrance animations so the captured frame shows real
 // content instead of a permanent blueprint overlay.
 //
+// We also block heavy third-party origins (analytics, chat widgets, video
+// embeds) at request time. These are the dominant cause of pages never
+// hitting networkidle: chat widgets keep persistent connections open, GTM
+// fires waves of pixel requests, video players stream metadata. They add
+// nothing to the screenshot but block the page from settling.
+//
+// Strategy is layered:
+//   "primary":  networkidle2 with 35s timeout (most sites)
+//   "fallback": domcontentloaded with 25s timeout + longer settle (heavy
+//                or slow sites that never reach networkidle2 in time)
+// captureScreenshot tries primary first, then falls back on failure.
+//
 // After navigation we try to dismiss any GDPR/CCPA cookie banner by
 // matching common accept-button text and aria-labels. If no banner is
 // found the click silently no-ops. We then wait for document.fonts.ready
-// so type renders before capture, and finally apply the existing 3s
-// settle window for any tail animations.
+// so type renders before capture, and finally apply a settle window for
+// any tail animations.
 const SCREENSHOT_FUNCTION = `
+const BLOCKED_HOSTS = [
+  'googletagmanager.com',
+  'google-analytics.com',
+  'googleadservices.com',
+  'doubleclick.net',
+  'facebook.net',
+  'connect.facebook.net',
+  'intercom.io',
+  'intercomcdn.com',
+  'widget.intercom.io',
+  'drift.com',
+  'driftcdn.com',
+  'js.driftt.com',
+  'hotjar.com',
+  'static.hotjar.com',
+  'fullstory.com',
+  'segment.com',
+  'segment.io',
+  'mixpanel.com',
+  'amplitude.com',
+  'cdn.amplitude.com',
+  'tawk.to',
+  'embed.tawk.to',
+  'crisp.chat',
+  'client.crisp.chat',
+  'zdassets.com',
+  'static.zdassets.com',
+  'zopim.com',
+  'static.zopim.com',
+  'linkedin.com/li/track',
+  'snap.licdn.com',
+  'bing.com/api',
+  'clarity.ms',
+];
+
 export default async function ({ page, context }) {
-  const { url, width, height } = context;
+  const { url, width, height, strategy } = context;
+  const isFallback = strategy === 'fallback';
   await page.emulateMediaFeatures([
     { name: "prefers-reduced-motion", value: "reduce" }
   ]);
@@ -31,7 +80,33 @@ export default async function ({ page, context }) {
   } else {
     await page.setViewport({ width, height });
   }
-  await page.goto(url, { waitUntil: "networkidle0", timeout: 25000 });
+
+  try {
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      try {
+        const reqUrl = req.url();
+        const type = req.resourceType();
+        if (type === 'media') {
+          return req.abort();
+        }
+        for (const host of BLOCKED_HOSTS) {
+          if (reqUrl.indexOf(host) !== -1) {
+            return req.abort();
+          }
+        }
+        req.continue();
+      } catch (_e) {
+        try { req.continue(); } catch (_e2) { /* request already handled */ }
+      }
+    });
+  } catch (_err) { /* request interception is best-effort */ }
+
+  const waitUntil = isFallback ? 'domcontentloaded' : 'networkidle2';
+  const navTimeout = isFallback ? 25000 : 35000;
+  const settleMs = isFallback ? 5000 : 2500;
+
+  await page.goto(url, { waitUntil, timeout: navTimeout });
 
   try {
     await page.evaluate(() => {
@@ -58,7 +133,7 @@ export default async function ({ page, context }) {
     );
   } catch (_err) { /* fonts.ready unavailable on some pages */ }
 
-  await new Promise((resolve) => setTimeout(resolve, 2500));
+  await new Promise((resolve) => setTimeout(resolve, settleMs));
   const buffer = await page.screenshot({
     type: "jpeg",
     quality: 80,
@@ -71,15 +146,31 @@ export default async function ({ page, context }) {
 }
 `;
 
+type ScreenshotStrategy = "primary" | "fallback";
+
 type BrowserlessFunctionBody = {
   code: string;
-  context: { url: string; width: number; height: number };
+  context: {
+    url: string;
+    width: number;
+    height: number;
+    strategy: ScreenshotStrategy;
+  };
 };
 
-export async function captureScreenshot(
+function isPermanentBrowserlessError(message: string): boolean {
+  // 401/403 = auth/permission, no point retrying.
+  if (/\((40[13])\)/.test(message)) return true;
+  // 404 from /function endpoint typically means a misconfigured base URL.
+  if (/\(404\)/.test(message)) return true;
+  return false;
+}
+
+async function captureScreenshotAttempt(
   url: string,
   viewport: Viewport,
-  scanId: string | null = null
+  strategy: ScreenshotStrategy,
+  scanId: string | null
 ): Promise<Buffer> {
   const token = process.env.BROWSERLESS_API_KEY;
   if (!token) {
@@ -89,7 +180,12 @@ export async function captureScreenshot(
 
   const body: BrowserlessFunctionBody = {
     code: SCREENSHOT_FUNCTION,
-    context: { url, width: viewport.width, height: viewport.height },
+    context: {
+      url,
+      width: viewport.width,
+      height: viewport.height,
+      strategy,
+    },
   };
 
   const operation =
@@ -133,14 +229,38 @@ export async function captureScreenshot(
       scanId,
       operation,
       durationMs: Date.now() - start,
-      status: "fail",
+      status: strategy === "primary" ? "retry" : "fail",
     });
     if ((err as Error).name === "AbortError") {
-      throw new Error("Browserless screenshot timed out after 45s.");
+      throw new Error(
+        `Browserless screenshot timed out after ${SCREENSHOT_TIMEOUT_MS / 1000}s (strategy=${strategy}).`
+      );
     }
     throw err;
   } finally {
     clearTimeout(timer);
+  }
+}
+
+export async function captureScreenshot(
+  url: string,
+  viewport: Viewport,
+  scanId: string | null = null
+): Promise<Buffer> {
+  try {
+    return await captureScreenshotAttempt(url, viewport, "primary", scanId);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (isPermanentBrowserlessError(message)) {
+      throw err;
+    }
+    console.warn(
+      `[browserless] primary screenshot failed for ${url} (${viewport.width}x${viewport.height}): ${message.slice(0, 200)}; retrying with fallback strategy`
+    );
+    await new Promise((resolve) =>
+      setTimeout(resolve, SCREENSHOT_RETRY_DELAY_MS)
+    );
+    return await captureScreenshotAttempt(url, viewport, "fallback", scanId);
   }
 }
 
