@@ -90,7 +90,7 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
         palette: "violet",
       },
       {
-        label: "Pipeline",
+        label: "Stage board",
         href: "/admin/relationships/pipeline",
         icon: Kanban,
         palette: "rose",

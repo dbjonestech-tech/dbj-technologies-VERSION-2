@@ -34,6 +34,8 @@ import { getRescansForContact } from "@/lib/services/pathlight-rescan";
 import { getAiSearchChecksForContact } from "@/lib/services/ai-search-checks";
 import { getLatestLeadScore } from "@/lib/canopy/lead-scoring";
 import { getContactAnalytics } from "@/lib/analytics/contact";
+import { getSessionRole, getQueryOwnerFilter } from "@/lib/canopy/rbac";
+import { getEntityAuditTrail } from "@/lib/canopy/audit";
 import PageHeader from "../../PageHeader";
 import ContactHeader from "./ContactHeader";
 import ContactNotes from "./ContactNotes";
@@ -46,6 +48,7 @@ import AISearchCheckPanel from "../../components/AISearchCheckPanel";
 import LeadScoreBadge from "../../components/LeadScoreBadge";
 import EngagementSparkline from "../../components/EngagementSparkline";
 import NextBestAction from "../../components/NextBestAction";
+import EntityAuditList from "../../components/EntityAuditList";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -64,7 +67,9 @@ export default async function ContactDetailPage({ params }: Props) {
   const id = Number.parseInt(idRaw, 10);
   if (!Number.isFinite(id) || id <= 0) notFound();
 
-  const contact = await getContact(id);
+  const sr = await getSessionRole();
+  const ownerFilter = getQueryOwnerFilter(sr);
+  const contact = await getContact(id, ownerFilter);
   if (!contact) notFound();
 
   const [
@@ -81,6 +86,7 @@ export default async function ContactDetailPage({ params }: Props) {
     aiChecks,
     leadScore,
     analytics,
+    audit,
   ] = await Promise.all([
     getContactTimeline(contact.email, contact.id, 50),
     getContactNotes(contact.id),
@@ -95,6 +101,7 @@ export default async function ContactDetailPage({ params }: Props) {
     getAiSearchChecksForContact(contact.id, 30),
     getLatestLeadScore(contact.id),
     getContactAnalytics(contact.id),
+    getEntityAuditTrail("contact", String(contact.id), 30),
   ]);
   const budgetRemaining = Math.max(
     0,
@@ -229,6 +236,10 @@ export default async function ContactDetailPage({ params }: Props) {
             <ActivityFeed activities={activities} />
           </section>
         ) : null}
+
+        <div className="mt-6">
+          <EntityAuditList audit={audit} />
+        </div>
 
         <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-6">
           <header className="mb-4">

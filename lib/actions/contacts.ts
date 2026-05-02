@@ -66,6 +66,7 @@ export async function createContactAction(
       status: input.status ?? "new",
       followUpDate: input.followUpDate?.trim() || null,
       source: input.source ?? "manual",
+      ownerEmail: admin.email,
     });
     if (!created) {
       return {

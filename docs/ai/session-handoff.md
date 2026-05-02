@@ -5,9 +5,50 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 8 shipped at `6d7d7f1`, pushed to origin main, working tree clean. Migration 030 applied to prod Neon.)
+## Current state (May 1, 2026 -- Phase 8 follow-ups staged uncommitted; migration 031 applied to prod Neon)
 
-### Phase 8 shipped at `6d7d7f1`: Multi-User Enterprise - RBAC, API tokens, webhooks
+### Phase 8 follow-ups staged this session (pre-commit): sales-role scoping + per-entity audit + sidebar polish
+
+Pre-Phase-9 cleanup pass. Closes the highest-value Phase 8 deferred item (sales-role per-row query scoping for contacts + deals) and brings contact detail to feature parity with deal detail (per-entity audit log viewer). Plus minor sidebar disambiguation and a plan-doc note so future sessions don't trip on the migration numbering drift.
+
+- `lib/db/migrations/031_owner_scope.sql` (APPLIED to prod Neon) - adds `contacts.owner_email TEXT` and a partial index `contacts_owner_idx` on owner_email WHERE NOT NULL. deals + activities already had owner_email from Phases 1 + 2; contacts was the gap.
+- `lib/canopy/rbac.ts` - new `getQueryOwnerFilter(sessionRole)` helper. Returns the user's email for sales role (so `WHERE owner_email = ${filter}` scopes the query), null for everyone else (admin / manager / viewer all see every row). Viewer is intentionally NOT scoped because it's an internal read-only role (auditor / finance lead), not a customer-facing role.
+- `lib/services/contacts.ts` - `getContacts({ ownerEmail })` and `getContact(id, ownerFilter)` honor the filter via `(${ownerFilter}::text IS NULL OR c.owner_email = ${ownerFilter}::text)`. ContactRow + ContactRowDb + rowToContact + CreateContactInput all extended with ownerEmail. createContact INSERT now includes the column.
+- `lib/services/deals.ts` - `getDealsForKanban(ownerFilter)` accepts the filter; the deals kanban board respects sales-role scope. **Known gap:** `getDealRollups` is unscoped, so the three rollup tiles (Weighted pipeline, Unweighted pipeline, Closed-Won this month) at the top of /admin/deals show install-wide totals to a sales user. Same for `getContactsDashboardSummary`. Documented as a follow-up; the data shown is read-only and the per-row Kanban below is correctly scoped.
+- `lib/actions/contacts.ts` - `createContactAction` passes `ownerEmail: admin.email` to createContact, so manually-created contacts get owned by their creator. Auto-synced contacts (from scans, contact-form submissions, client imports) keep `owner_email = NULL` which means "unassigned" - invisible to sales role until an admin reassigns.
+- `app/admin/contacts/page.tsx` and `/admin/contacts/[id]/page.tsx` - both load `getSessionRole()` + `getQueryOwnerFilter()` and pass through. A sales user with no owned contacts now sees an empty list instead of everyone's records.
+- `app/admin/deals/page.tsx` - same threading.
+- `app/admin/components/EntityAuditList.tsx` - extracted from the deal detail page's inline rendering. Single point of truth for the per-entity audit row format (action, actor, before -> after JSON). Now used on both contact and deal detail pages.
+- `app/admin/contacts/[id]/page.tsx` - mounts EntityAuditList at the bottom (parity with deal detail). New `getEntityAuditTrail("contact", String(contact.id), 30)` in the page's Promise.all.
+- `app/admin/deals/[id]/page.tsx` - refactored to use the shared EntityAuditList; deletes ~30 lines of duplicated JSX.
+- `app/admin/layout.tsx` - sidebar Relationships > "Pipeline" -> "Stage board" so the surviving label collisions (Stage board kanban, Sales analytics, Health > Pipeline scan engine) are now distinct.
+- `docs/ai/canopy-build-plan.md` - inline note at the top documenting the actual migration numbering drift (028=Phase6, 029=Phase5, 030=Phase8, 031=Phase8 follow-up; Phase 9 will take 032).
+
+### Acceptance signals
+
+- `npx tsc --noEmit` and `npm run lint` clean (verified).
+- Migration 031 applied to prod Neon successfully.
+- A sales-role user (created via /admin/canopy/team) viewing /admin/contacts sees only contacts where `owner_email = their_email`. Auto-created contacts default to NULL owner_email and are invisible to sales until reassigned.
+- /admin/contacts/[id] of a contact NOT owned by the current sales user returns 404.
+- /admin/deals stage kanban respects the same scope.
+- /admin/contacts/[id] now renders an "Audit log" section at the bottom showing every audit-log row tagged with entity_type='contact' and entity_id=<id>.
+- The deal detail page still renders its audit section (now via the shared component).
+
+### What's still deferred
+
+- **getDealRollups + getContactsDashboardSummary scoping**: rollup tiles show install-wide totals to sales users. Honest discrepancy; documented above. Add a 2nd-pass when Phase 9 settles.
+- **Auto-assign owner on Pathlight scan ingestion**: contacts created from scans get owner_email NULL. If an install wants scans to auto-assign to a default sales user, that's a settings-driven follow-up.
+- **Mentions parser** (Phase 8 spec item, deferred again): needs schema + UI + read-state.
+- **CSV import wizard** (Phase 8 spec item, deferred again): substantial parser + column-mapping UI.
+- **White-label live preview** (Phase 8 spec item, deferred again): Phase 0 has the editor; preview is cosmetic.
+
+### Next recommended task
+
+**Phase 9 - Pathlight Advanced (gated)** is now clean and clear to implement. All dependencies (Phases 0, 6, 8) are stable and shipped. Migration takes `032`.
+
+---
+
+## Prior state -- Phase 8 shipped at `6d7d7f1`: Multi-User Enterprise - RBAC, API tokens, webhooks
 
 The enterprise-readiness pass. Three independent surfaces ship together because they share the same admin_users table extension and audit-log polling pattern: role widening on admin_users (admin / manager / sales / viewer), Bearer-token authenticated REST API at /api/v1/*, and outbound HMAC-signed webhooks driven by a 1-minute Inngest cron over canopy_audit_log.
 

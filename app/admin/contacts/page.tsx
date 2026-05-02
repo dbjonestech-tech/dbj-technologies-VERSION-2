@@ -8,6 +8,7 @@ import {
   type ContactSource,
 } from "@/lib/services/contacts";
 import { listSequences } from "@/lib/canopy/automation/sequences";
+import { getSessionRole, getQueryOwnerFilter } from "@/lib/canopy/rbac";
 import PageHeader from "../PageHeader";
 import ContactsList from "./ContactsList";
 
@@ -45,12 +46,15 @@ export default async function ContactsPage({ searchParams }: Props) {
   const search = parseString(params["q"]);
   const overdueOnly = params["overdue"] === "1";
 
+  const sr = await getSessionRole();
+  const ownerFilter = getQueryOwnerFilter(sr);
   const [contacts, summary, sequences] = await Promise.all([
     getContacts({
       status,
       source,
       search: search || undefined,
       overdueOnly,
+      ownerEmail: ownerFilter,
     }),
     getContactsDashboardSummary(),
     listSequences(),

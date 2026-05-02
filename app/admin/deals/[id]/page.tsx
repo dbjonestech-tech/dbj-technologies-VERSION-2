@@ -13,6 +13,7 @@ import ActivityComposer from "../../components/ActivityComposer";
 import ActivityFeed from "../../components/ActivityFeed";
 import TagsBar from "../../components/TagsBar";
 import CustomFieldsPanel from "../../components/CustomFieldsPanel";
+import EntityAuditList from "../../components/EntityAuditList";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -100,45 +101,12 @@ export default async function DealDetailPage({ params }: Props) {
           <ActivityFeed activities={activities} />
         </section>
 
-        <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-6">
-          <header className="mb-3">
-            <h2 className="font-display text-base font-semibold text-zinc-900">
-              Audit log
-            </h2>
-            <p className="mt-1 text-xs text-zinc-500">
-              Every change to this deal, who made it, and the before/after values. Powered by canopy_audit_log.
-            </p>
-          </header>
-          {audit.length === 0 ? (
-            <p className="text-sm text-zinc-500">
-              No changes recorded yet.
-            </p>
-          ) : (
-            <ul className="divide-y divide-zinc-100">
-              {audit.map((row) => (
-                <li key={row.id} className="py-3 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-zinc-700">{row.action}</span>
-                    <span className="text-xs text-zinc-500">
-                      {new Date(row.occurred_at).toLocaleString()}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {row.actor_email ?? "system"}
-                    {row.before && row.after ? (
-                      <>
-                        {" "}
-                        <span className="font-mono">
-                          {JSON.stringify(row.before)} → {JSON.stringify(row.after)}
-                        </span>
-                      </>
-                    ) : null}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        <div className="mt-6">
+          <EntityAuditList
+            audit={audit}
+            description="Every change to this deal, who made it, and the before/after values. Powered by canopy_audit_log."
+          />
+        </div>
       </div>
     </div>
   );

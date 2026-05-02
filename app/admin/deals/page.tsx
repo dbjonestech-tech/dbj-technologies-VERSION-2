@@ -5,6 +5,7 @@ import {
   getDealRollups,
   formatDealValue,
 } from "@/lib/services/deals";
+import { getSessionRole, getQueryOwnerFilter } from "@/lib/canopy/rbac";
 import PageHeader from "../PageHeader";
 import DealKanbanBoard from "./DealKanbanBoard";
 
@@ -17,8 +18,10 @@ export const metadata: Metadata = {
 };
 
 export default async function DealsPage() {
+  const sr = await getSessionRole();
+  const ownerFilter = getQueryOwnerFilter(sr);
   const [byStage, rollups] = await Promise.all([
-    getDealsForKanban(),
+    getDealsForKanban(ownerFilter),
     getDealRollups(),
   ]);
 

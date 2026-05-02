@@ -30,10 +30,24 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 - [ ] Verify `/admin/canopy` master-kill toggle round-trips: flip OFF, audit row appears in feed; flip ON, audit row appears.
 - [ ] After committing: `vercel logs --status-code 500 --since 5m` to confirm no RSC boundary failures (per `feedback_rsc_boundary_runtime`).
 
-### Phase 8 done in working tree (uncommitted as of May 1 latest)
+### Phase 8 follow-ups done in working tree (uncommitted as of May 1 latest)
 
-- [x] **Phase 8: Multi-User Enterprise (partial - core RBAC + tokens + webhooks).** Migration `030_rbac.sql` (APPLIED to prod Neon) widens admin_users.role CHECK and adds api_tokens, webhooks, webhook_deliveries. `lib/canopy/{rbac,api-tokens,webhooks}.ts` services. `lib/actions/{api-tokens,webhooks,team}.ts` audit-logged Server Actions. `app/api/v1/{contacts,deals}/route.ts` Bearer-authenticated REST endpoints. canopyWebhookDispatch Inngest cron (1 min) over canopy_audit_log. `/admin/canopy/team` and `/admin/canopy/api` pages.
-- [ ] **Phase 8 follow-ups (deferred from this session):** sales-role query scoping (touch every contacts/deals service for per-row owner filter), mentions parser + read-state UI, CSV import wizard, white-label live preview, per-entity audit log viewer.
+- [x] **Sales-role per-row query scoping for contacts + deals.** Migration `031_owner_scope.sql` (APPLIED to prod Neon) adds contacts.owner_email + partial index. `lib/canopy/rbac.ts` adds `getQueryOwnerFilter`. `getContacts({ownerEmail})` / `getContact(id, ownerFilter)` / `getDealsForKanban(ownerFilter)` honor the filter. createContactAction sets owner_email = admin.email on insert.
+- [x] **Per-entity audit log viewer on contact detail.** Extracted `EntityAuditList` shared component; mounted on contact + deal detail pages.
+- [x] **Sidebar Pipeline disambiguation.** Relationships > Pipeline renamed to "Stage board" so the three Pipeline labels stop colliding.
+- [x] **Migration numbering drift documented in canopy-build-plan.md.**
+
+### Phase 8 done earlier this session
+
+- [x] **Phase 8: Multi-User Enterprise (core RBAC + tokens + webhooks).** Migration `030_rbac.sql` (APPLIED to prod Neon) widens admin_users.role CHECK and adds api_tokens, webhooks, webhook_deliveries. `lib/canopy/{rbac,api-tokens,webhooks}.ts` services. `lib/actions/{api-tokens,webhooks,team}.ts` audit-logged Server Actions. `app/api/v1/{contacts,deals}/route.ts` Bearer-authenticated REST endpoints. canopyWebhookDispatch Inngest cron (1 min) over canopy_audit_log. `/admin/canopy/team` and `/admin/canopy/api` pages.
+
+### Still deferred (lower value vs cost; not Phase 9 blockers)
+
+- [ ] getDealRollups + getContactsDashboardSummary scoping for sales role. Cosmetic discrepancy: rollup tiles show install-wide totals while the per-row list below is scoped.
+- [ ] Auto-assign owner_email on Pathlight scan-driven contact ingestion (currently NULL = unassigned).
+- [ ] Mentions parser + read-state UI (Phase 8 spec item).
+- [ ] CSV import wizard with column mapping (Phase 8 spec item).
+- [ ] White-label live preview pane (Phase 8 spec item).
 
 ### Phase 5 done in working tree (uncommitted as of May 1 latest)
 

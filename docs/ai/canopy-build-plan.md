@@ -4,6 +4,8 @@ A phased, surgical plan to evolve Canopy (the `/admin` surface in this repo) int
 
 > Read this with `docs/ai/current-state.md`, `docs/ai/decision-log.md`, `docs/ai/do-not-break.md` open. Every phase respects those files.
 
+> **Migration numbering note (May 1, 2026):** Phases 4 + 5 were initially deferred to ship 6 + 7 first, so the actual migration files no longer match the plan's reserved numbers below. Actual ordering: `028 = Phase 6 pathlight_integrations`, `029 = Phase 5 automation`, `030 = Phase 8 rbac`, `031 = Phase 8 follow-up owner_scope`. **Phase 9 takes `032` when shipped, not the reserved `032` in the plan section.** When Phase 4 (email integration) ships, it consumes the next free slot at the time. Always run `ls lib/db/migrations/ | tail -3` before writing a new migration so the number stays sequential.
+
 ---
 
 ## What is already built (do not redo)

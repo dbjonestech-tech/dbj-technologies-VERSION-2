@@ -94,7 +94,9 @@ const DEAL_SELECT = `
   d.updated_at
 `;
 
-export async function getDealsForKanban(): Promise<Record<DealStage, DealRow[]>> {
+export async function getDealsForKanban(
+  ownerFilter: string | null = null
+): Promise<Record<DealStage, DealRow[]>> {
   const empty: Record<DealStage, DealRow[]> = {
     new: [],
     contacted: [],
@@ -115,6 +117,7 @@ export async function getDealsForKanban(): Promise<Record<DealStage, DealRow[]>>
         d.source, d.notes, d.created_at, d.updated_at
       FROM deals d
       JOIN contacts c ON c.id = d.contact_id
+      WHERE (${ownerFilter}::text IS NULL OR d.owner_email = ${ownerFilter}::text)
       ORDER BY
         CASE d.stage
           WHEN 'new' THEN 1 WHEN 'contacted' THEN 2 WHEN 'qualified' THEN 3

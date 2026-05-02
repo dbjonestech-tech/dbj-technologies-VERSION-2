@@ -57,6 +57,21 @@ export async function requireRole(required: Role): Promise<SessionRole> {
   return sr;
 }
 
+/* Returns the email a list query should filter ownership by. Returns
+ * null when the role has no per-row scope (admin / manager / viewer
+ * all see every record). Sales role returns the user's own email so
+ * the query layer can apply WHERE owner_email = ${filter} or, when
+ * targeting unassigned-or-mine rows, WHERE owner_email = ${filter}.
+ *
+ * Note: viewer is intentionally NOT scoped - it's a read-only role
+ * for principals like an outside auditor or finance lead, not a
+ * customer-facing role. If we add that role later, narrow this. */
+export function getQueryOwnerFilter(sr: SessionRole | null): string | null {
+  if (!sr) return null;
+  if (sr.role === "sales") return sr.email;
+  return null;
+}
+
 export async function listAdminUsers(): Promise<Array<{
   email: string;
   role: Role;

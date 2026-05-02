@@ -55,6 +55,7 @@ export type ContactRow = {
   lastActivityAt: string | null;
   createdAt: string;
   updatedAt: string;
+  ownerEmail: string | null;
 };
 
 export type ContactListRow = ContactRow & {
@@ -70,6 +71,11 @@ export type ContactListFilters = {
   source?: ContactSource | "all";
   search?: string;
   overdueOnly?: boolean;
+  /* Sales-role scope. When set, only rows whose owner_email matches
+   * are returned. Pass null / undefined for admin / manager / viewer
+   * who see everything. The page route reads this from the role
+   * helper (lib/canopy/rbac.getQueryOwnerFilter). */
+  ownerEmail?: string | null;
 };
 
 export type ContactNoteEntry = {
@@ -121,6 +127,7 @@ function rowToContact(r: ContactRowDb): ContactRow {
     lastActivityAt: r.last_activity_at,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
+    ownerEmail: r.owner_email ?? null,
   };
 }
 
@@ -139,6 +146,7 @@ type ContactRowDb = {
   last_activity_at: string | null;
   created_at: string;
   updated_at: string;
+  owner_email?: string | null;
 };
 
 export async function getContactsDashboardSummary(): Promise<ContactsDashboardSummary> {
@@ -204,6 +212,7 @@ export async function getContacts(
     const search = filters.search?.trim() || null;
     const searchPattern = search ? `%${search.replace(/[%_\\]/g, "\\$&")}%` : null;
     const overdueOnly = filters.overdueOnly === true;
+    const ownerFilter = filters.ownerEmail ?? null;
 
     /* Single query with LATERAL touchpoints. Each LATERAL count runs
      * once per contact row using the email index on the source table.
@@ -243,6 +252,7 @@ export async function getContacts(
              c.company ILIKE ${searchPattern}::text)
         AND (${overdueOnly}::bool IS FALSE OR
              (c.follow_up_date IS NOT NULL AND c.follow_up_date < CURRENT_DATE))
+        AND (${ownerFilter}::text IS NULL OR c.owner_email = ${ownerFilter}::text)
       ORDER BY
         COALESCE(c.last_activity_at, c.created_at) DESC,
         c.id DESC
@@ -268,7 +278,10 @@ export async function getContacts(
   }
 }
 
-export async function getContact(id: number): Promise<ContactRow | null> {
+export async function getContact(
+  id: number,
+  ownerFilter: string | null = null
+): Promise<ContactRow | null> {
   if (!Number.isFinite(id) || id <= 0) return null;
   try {
     const sql = getDb();
@@ -276,9 +289,10 @@ export async function getContact(id: number): Promise<ContactRow | null> {
       SELECT
         id, email, name, company, phone, website,
         status, follow_up_date, source, pathlight_scan_id,
-        notes_count, last_activity_at, created_at, updated_at
+        notes_count, last_activity_at, created_at, updated_at, owner_email
       FROM contacts
       WHERE id = ${id}::bigint
+        AND (${ownerFilter}::text IS NULL OR owner_email = ${ownerFilter}::text)
       LIMIT 1
     `) as ContactRowDb[];
     return rows[0] ? rowToContact(rows[0]) : null;
@@ -741,6 +755,7 @@ export type CreateContactInput = {
   status?: ContactStatus;
   followUpDate?: string | null;
   source?: ContactSource;
+  ownerEmail?: string | null;
 };
 
 export async function createContact(
@@ -752,7 +767,7 @@ export async function createContact(
     const sql = getDb();
     const rows = (await sql`
       INSERT INTO contacts
-        (email, name, company, phone, website, status, follow_up_date, source, last_activity_at)
+        (email, name, company, phone, website, status, follow_up_date, source, owner_email, last_activity_at)
       VALUES (
         ${email}::text,
         ${input.name ?? null},
@@ -762,12 +777,13 @@ export async function createContact(
         ${input.status ?? "new"}::text,
         ${input.followUpDate ?? null}::date,
         ${input.source ?? "manual"}::text,
+        ${input.ownerEmail ?? null}::text,
         now()
       )
       RETURNING
         id, email, name, company, phone, website,
         status, follow_up_date, source, pathlight_scan_id,
-        notes_count, last_activity_at, created_at, updated_at
+        notes_count, last_activity_at, created_at, updated_at, owner_email
     `) as ContactRowDb[];
     return rows[0] ? rowToContact(rows[0]) : null;
   } catch (err) {
