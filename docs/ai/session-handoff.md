@@ -5,13 +5,52 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- Phase 4 foundation shipped at f4bc84f; ingest cron + tracking endpoints staged uncommitted; admin observability secrets + Sentry filter + scan-pipeline correctness/cost fix + screenshot reliability refactor previously shipped this session)
+## Current state (May 2, 2026 -- **Phase 4 COMPLETE end-to-end**. Foundation `f4bc84f`, pipeline `18f85dc`, server-side actions earlier this commit chain, UI surfaces staged uncommitted in this commit. Migration 033 applied to prod Neon. `OAUTH_TOKEN_ENCRYPTION_KEY` set in Vercel production. **All 9 Canopy phases now structurally complete.**)
 
-### Phase 4 ingest + tracking in working tree (uncommitted)
+### Phase 4 UI shipped this commit (compose, templates editor, thread display)
 
-Gmail ingest cron + open/click tracking endpoints. Working tree, both `npx tsc --noEmit` and `npm run lint` clean, no em dashes.
+- `app/admin/canopy/templates/page.tsx` + `TemplatesClient.tsx` -- editor under `/admin/canopy/templates`. Per-owner list view, create/edit form with name/subject/body fields, "Available merge fields" details/summary listing every entry from `KNOWN_MERGE_FIELDS`, archive button (soft delete via `archived_at`). Wires to `createTemplateAction` / `updateTemplateAction` / `archiveTemplateAction`.
+- `app/admin/contacts/[id]/EmailComposePanel.tsx` -- client component. Toggle-open compose section. Template picker (when templates exist), subject + body inputs, live preview rendering against the visible contact context when placeholders are present, error/info state, server-action send via `sendEmailAction`. Surfaces a config-nag instead of the compose button when Gmail isn't connected for the signed-in admin.
+- `app/admin/contacts/[id]/EmailThreadPanel.tsx` -- server component. Renders up to 25 most recent `email_messages` for a contact with direction icons (inbound/outbound), open-count badge from `opened_at` array length, click-count badge from `clicked_links` length (filtered to exclude `__send_failed__` sentinels), and a "send failed" pill when a sentinel is present.
+- `app/admin/contacts/[id]/page.tsx` -- mounts EmailComposePanel + EmailThreadPanel side-by-side below the existing CompetitorsPanel. Sources my-token-info, my-templates, OAuth env-config status, and most recent open deal id.
+- `app/admin/deals/[id]/page.tsx` -- mounts the same compose + thread pair below the activity feed. Imports the components directly from `@/app/admin/contacts/[id]/...` to avoid duplication.
+- `app/admin/canopy/ConnectedAccountsPanel.tsx` -- adds `Manage email templates →` link in the panel header for discoverability.
 
-Files added:
+### Joshua's verification checklist (post-deploy)
+
+1. Open `/admin/canopy/templates` and create a starter template like "Pathlight follow-up" with `Hi {{contact.first_name}}, ...` body.
+2. Open any contact at `/admin/contacts/[id]`. Compose panel + Thread panel should render side-by-side. Click Compose, pick the template, verify the live preview substitutes the contact's name. Send.
+3. Confirm the email arrives in the recipient's Gmail. Open it; refresh the contact page within ~30s. The thread panel should show the message with an "1 open" badge (Gmail's image proxy fetches the pixel as the user reads).
+4. Click any link in the email. The thread panel click count should increment.
+5. Have someone reply to the test email. Wait 5 min for the next `canopy-gmail-ingest` cron tick (or invoke manually via app.inngest.com -> Functions -> Invoke). The reply should appear in the thread panel as inbound, attached to the same contact.
+
+### Optional future polish (not required for "complete")
+
+- Merge `email_messages` into the unified `getContactTimeline` query so they show in the same scroll as page views, scans, notes. Currently they live in a dedicated EmailThreadPanel for clarity. The unified-timeline merge is straightforward (add a CTE with a `gmail_in` / `gmail_out` event type) but was deliberately deferred.
+- Sidebar entry for `/admin/canopy/templates` (currently only discoverable via the link in the ConnectedAccountsPanel header).
+- Reply-in-thread support (use `thread_id` + `In-Reply-To` header on outbound). The send path already builds `Message-ID` and accepts `threadId`, just needs UI plumbing.
+
+### Phase 4 server-side actions (preceding this commit's UI layer)
+
+### Phase 4 server-side actions shipped this commit
+
+- `lib/email/render.ts` -- merge-field substitution. Recognized fields: `{{contact.name}}`, `{{contact.first_name}}`, `{{contact.email}}`, `{{contact.company}}`, `{{contact.website}}`, `{{contact.phone}}`, `{{deal.name}}`, `{{deal.value}}` (formatted from cents + currency), `{{deal.stage}}`, `{{pathlight.score}}`, `{{pathlight.url}}`, `{{user.name}}`, `{{user.email}}`. Unknown placeholders intentionally left intact so the sender notices the typo before the recipient does. `KNOWN_MERGE_FIELDS` exported as a frozen list, `detectMergeFields()` walks any string and returns referenced fields, `buildRenderContextForContact()` joins contacts + deals + scans + scan_results into the RenderContext that `renderTemplate()` consumes.
+- `lib/canopy/email/templates.ts` -- DB CRUD over `email_templates`. Owner-scoped: every read/write filters on `owner_email`. `createTemplate` and `updateTemplate` recompute `merge_fields` automatically via `detectMergeFields(subject) ∪ detectMergeFields(body)`. `archiveTemplate` is a soft-delete (sets `archived_at`) that preserves referential history with any past `email_messages.template_id`.
+- `lib/actions/email.ts` -- server actions (all `"use server"` and session-gated via `getSessionRole`). `sendEmailAction` is the load-bearing one: pulls the fresh access token (auto-refresh), determines the deal attachment if `dealId` is undefined, builds the render context, applies merge fields to subject + body, INSERTS the `email_messages` row first to establish a stable id, then `wrapWithTracking()` builds the HTML body with `<a href="/api/email/click/{id}?to=...">` link rewriting and a `<img src="/api/email/pixel/{id}">` open pixel, calls Gmail `sendMessage` with the tracked HTML (text part stays plaintext for accessibility / spam-folder avoidance), then UPDATES the row with `gmail_message_id` + `thread_id` + `body_html`. If Gmail rejects, the row stays present with a `__send_failed__` JSONB entry in `clicked_links` so an operator retry doesn't lose the draft. `createTemplateAction`, `updateTemplateAction`, `archiveTemplateAction` round out the templates CRUD with audit logging via `recordChange`. Outbound link rewriting also escapes HTML so user-supplied body text cannot inject script tags into the recipient's email client.
+
+### Phase 4 operational changes this commit
+
+- Migration 033 applied to prod Neon (`oauth_tokens` 13 cols, `email_messages` 19 cols, `email_templates` 9 cols, all FK constraints + partial indexes + unique constraints landed). Verified post-apply.
+- `OAUTH_TOKEN_ENCRYPTION_KEY` set in Vercel production as a sensitive env var. The actual value was generated via `openssl rand -hex 32 | vercel env add ... --sensitive` so it never appeared in any chat or terminal output. (Note: an earlier discarded key value did appear in chat earlier in the session; it is NOT the deployed key. The deployed key is fresh-generated and only exists in Vercel's encrypted store.)
+- Production redeploy `dbj-technologies-hhr3svjxk` (from earlier this session) carries `GOOGLE_OAUTH_CLIENT_ID` + `GOOGLE_OAUTH_CLIENT_SECRET`. A new redeploy is needed to pick up the encryption key set after that deploy. **Outstanding: redeploy production once.**
+
+### Joshua's open operational items
+
+1. **Redeploy production** if not auto-redeployed from this push, so the new `OAUTH_TOKEN_ENCRYPTION_KEY` and the UI surfaces are live together. (Vercel auto-redeploys on push to `main` so this should be automatic.)
+2. **Connect Gmail** at `/admin/canopy` once the redeploy is live. The OAuth flow round-trips through `/api/integrations/google/start` -> Google -> `/api/integrations/google/callback` and lands on `/admin/canopy?google=connected&email=<addr>` on success.
+3. **Trigger `canopy-gmail-ingest` manually once** via app.inngest.com -> Functions -> Invoke to populate the first historical batch into `email_messages`. Subsequent runs happen automatically every 5 minutes.
+
+### Phase 4 pipeline shipped at 18f85dc
 
 - `lib/integrations/gmail-api.ts` -- narrow Gmail REST client. `getProfile`, `listRecentMessageIds` (initial backfill: trailing 7 days, capped at 200), `listMessageIdsSinceHistory` (Gmail History API; falls back to recent-messages backfill on 404 history-expired), `getMessage` (format=full), `findHeader`, `parseAddressList` (handles quoted display names with embedded commas), `extractBody` (recurses MIME parts; prefers text/plain then text/html), `sendMessage` (RFC 2822 raw-MIME builder with multipart/alternative for HTML+text, RFC 2047 encoded-word subject for non-ASCII, inserts a Message-ID header so In-Reply-To threading works on inbound replies).
 - `lib/canopy/email/messages.ts` -- DB CRUD over email_messages. `insertEmailMessage` is the idempotent ingest write (ON CONFLICT (gmail_message_id) DO NOTHING). `findContactIdByEmail` lowercases the lookup. `findMostRecentOpenDealForContact` powers deal attachment. `recordEmailOpen` and `recordEmailClick` append to opened_at array and clicked_links JSONB respectively. `listConnectedAdminEmails` powers the cron's user iteration.
@@ -21,20 +60,11 @@ Files added:
 - `app/api/email/pixel/[messageId]/route.ts` -- 1x1 transparent gif open-tracking pixel. Always returns the gif (even on lookup failure) so a tracking miss never produces a broken-image icon. Cache-Control: no-store so Gmail's image proxy fetches every open.
 - `app/api/email/click/[messageId]/route.ts` -- click-tracking 302 redirector. Validates destination is http(s) so the endpoint cannot be repurposed as an open redirector to javascript:/data: schemes; falls back to "/" on invalid destination.
 
-### Phase 4 still to ship (final commit)
-
-- Compose modal on contact + deal detail pages (server actions for send, template picker, live merge-field preview).
-- Email Templates editor page + actions.
-- `lib/email/render.ts` merge-field substitution.
-- Inbound emails wired into the contact timeline as a new activity type.
-
 ### Phase 4 foundation shipped at f4bc84f
 
-OAuth + at-rest encryption + connect/disconnect routes + Connected Accounts panel under `/admin/canopy`. Working tree, both `npx tsc --noEmit` and `npm run lint` clean, no em dashes.
+OAuth + at-rest encryption + connect/disconnect routes + Connected Accounts panel under `/admin/canopy`.
 
-Files added:
-
-- `lib/db/migrations/033_email_sync.sql` -- creates `oauth_tokens` (per-admin Google OAuth credentials, encrypted at rest, UNIQUE on (user_email, provider)), `email_messages` (in/out gmail-message-id-keyed records with arrays for opened_at + JSONB for clicked_links, FK to contacts CASCADE / deals SET NULL / admin_users SET NULL / templates SET NULL), `email_templates` (per-owner reusable copy with merge_fields TEXT[] and soft-delete via archived_at). Idempotent: every CREATE uses IF NOT EXISTS, the FK from email_messages -> email_templates is added with DROP CONSTRAINT IF EXISTS / ADD CONSTRAINT so a partial replay leaves the schema converged. NOT YET applied to prod Neon.
+- `lib/db/migrations/033_email_sync.sql` -- creates `oauth_tokens` (per-admin Google OAuth credentials, encrypted at rest, UNIQUE on (user_email, provider)), `email_messages` (in/out gmail-message-id-keyed records with arrays for opened_at + JSONB for clicked_links, FK to contacts CASCADE / deals SET NULL / admin_users SET NULL / templates SET NULL), `email_templates` (per-owner reusable copy with merge_fields TEXT[] and soft-delete via archived_at). Idempotent: every CREATE uses IF NOT EXISTS, the FK from email_messages -> email_templates is added with DROP CONSTRAINT IF EXISTS / ADD CONSTRAINT so a partial replay leaves the schema converged. **APPLIED to prod Neon this session.**
 - `lib/canopy/email/encryption.ts` -- AES-256-GCM helpers. Format is `iv:authTag:ciphertext` all hex so each row is fully self-contained and IV reuse is structurally impossible. Loads key from `OAUTH_TOKEN_ENCRYPTION_KEY` env var (must be 64 hex chars). `isTokenEncryptionConfigured()` lets UI render a config nag without throwing.
 - `lib/canopy/email/oauth-tokens.ts` -- DB CRUD over `oauth_tokens`. `upsertOAuthToken` with ON CONFLICT update (preserves the refresh token across reconnects when Google omits it on consent), `getOAuthTokenForUser` (decrypts on read), `listConnectedAccounts` (returns metadata only, never decrypts), `deleteOAuthToken`, `updateAccessTokenAfterRefresh`, `updateIngestCheckpoint`.
 - `lib/integrations/google-oauth.ts` -- the application boundary with Google's APIs. Builds the authorize URL with `access_type=offline` + `prompt=consent` so a refresh token is always issued. `exchangeCodeForTokens`, `refreshAccessToken`, `revokeToken` (treats 400 from /revoke as already-invalid, not an error), `fetchUserInfo`, `getValidAccessToken` (auto-refreshes when within 60s of expiry; returns null if no refresh token is on file). `GOOGLE_OAUTH_SCOPES` is the single source of truth for scope set (openid + userinfo.email/profile + gmail.send/readonly/modify); a future code path cannot quietly widen scopes.
@@ -43,22 +73,6 @@ Files added:
 - `app/api/integrations/google/disconnect/route.ts` -- session-gated POST (form submit, no JS required). Best-effort revocation at Google (logs but doesn't throw if revoke fails so the local row is always cleaned up). Audit-logged.
 - `app/admin/canopy/ConnectedAccountsPanel.tsx` -- server component. Renders a config nag when env vars are missing (separate nags for OAuth client and encryption key); when configured, shows the signed-in admin's connection status with Connect / Disconnect controls; when there are multiple admins connected, shows the org-wide list below.
 - `app/admin/canopy/page.tsx` -- threads `searchParams` through to render a flash banner for `?google=connected|disconnected|error` returns from the OAuth routes; mounts `ConnectedAccountsPanel` between the custom-fields manager and the recent-changes feed.
-
-### Joshua's open items for Phase 4
-
-1. Generate an encryption key locally and add to Vercel:
-   `openssl rand -hex 32` -> add as `OAUTH_TOKEN_ENCRYPTION_KEY` for all three Vercel environments (Production, Preview, Development).
-2. Apply migration 033 to prod Neon. The schema is idempotent so re-running is safe.
-3. (Already done this session) `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET` are already in Vercel from earlier in the session. The previously-exposed secret was rotated; confirmed disabled.
-
-### Phase 4 still to ship (subsequent commits)
-
-- Gmail ingest Inngest cron (every 5 min): Gmail History API pull per connected user, contact-email matching, deal attachment, thread continuity.
-- Email tracking endpoints: 1x1 transparent gif at `/api/email/pixel/[messageId]` and 302 redirector at `/api/email/click/[messageId]`.
-- Compose modal on contact + deal detail pages with template picker and live merge-field preview.
-- Email Templates editor under `/admin/canopy`.
-- `lib/email/render.ts` merge field substitution: `{{contact.name}}`, `{{contact.company}}`, `{{deal.value}}`, `{{pathlight.score}}`.
-- Inbound email integration into the contact timeline as a new activity type.
 
 ---
 

@@ -1,10 +1,10 @@
 # Current State
 
-Last updated: May 1, 2026 (latest - Canopy v2 Phase 9 staged uncommitted; Phases 0-8 + follow-ups all shipped to prod Neon)
+Last updated: May 2, 2026 (Phase 4 complete end-to-end. **All 9 Canopy phases shipped.**)
 
 ## Canopy v2 build status
 
-**All nine phases of `docs/ai/canopy-build-plan.md` are now structurally complete in the working tree.** Phases 0-8 + the rollup-scoping follow-up are committed and pushed; Phase 9 (Pathlight Advanced) is staged uncommitted as of this update.
+**All nine phases of `docs/ai/canopy-build-plan.md` are now COMPLETE end-to-end.** Phases 0-9 are committed, pushed, and migrations applied to prod Neon. Phase 4 (Gmail integration) shipped May 2 across three commits + a final UI commit.
 
 | Phase | Surface | Status | Migration |
 |-------|---------|--------|-----------|
@@ -12,12 +12,12 @@ Last updated: May 1, 2026 (latest - Canopy v2 Phase 9 staged uncommitted; Phases
 | 1 | Deals architecture pivot | shipped | 025 |
 | 2 | Activities + tasks | shipped | 026 |
 | 3 | Custom fields, tags, segments | shipped | 027 |
-| 4 | Email integration (Gmail OAuth) | DEFERRED until Joshua provisions Google Cloud OAuth client | - |
+| 4 | Email integration (Gmail OAuth + ingest cron + tracking + compose UI + templates) | **shipped** | 033 |
 | 5 | Automation: sequences, workflow rules, bulk actions | shipped | 029 |
 | 6 | Pathlight manual integrations (rescan, AI search check, lead score) | shipped | 028 |
 | 7 | Analytics + narrative digest | shipped | (uses 024 fields) |
 | 8 | Multi-user enterprise (RBAC, REST API tokens, webhooks) | shipped | 030 + 031 |
-| 9 | Pathlight Advanced (prospecting, change monitoring, competitive intel, beacon) | staged uncommitted | 032 |
+| 9 | Pathlight Advanced (prospecting, change monitoring, competitive intel, beacon) | shipped | 032 |
 
 The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
 

@@ -50,7 +50,13 @@ import EngagementSparkline from "../../components/EngagementSparkline";
 import NextBestAction from "../../components/NextBestAction";
 import EntityAuditList from "../../components/EntityAuditList";
 import CompetitorsPanel from "./CompetitorsPanel";
+import EmailComposePanel from "./EmailComposePanel";
+import EmailThreadPanel from "./EmailThreadPanel";
 import { listCompetitors } from "@/lib/canopy/competitors";
+import { getOAuthTokenForUser } from "@/lib/canopy/email/oauth-tokens";
+import { listTemplatesForOwner } from "@/lib/canopy/email/templates";
+import { isGoogleOAuthConfigured } from "@/lib/integrations/google-oauth";
+import { isTokenEncryptionConfigured } from "@/lib/canopy/email/encryption";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -113,6 +119,21 @@ export default async function ContactDetailPage({ params }: Props) {
     0,
     canopySettings.monthly_scan_budget - canopySettings.scans_used_this_period
   );
+
+  const oauthEnvOk = isGoogleOAuthConfigured() && isTokenEncryptionConfigured();
+  const myTokenInfo = sr && oauthEnvOk
+    ? await getOAuthTokenForUser(sr.email).catch(() => null)
+    : null;
+  const myTemplates = sr && oauthEnvOk
+    ? await listTemplatesForOwner(sr.email).catch(() => [])
+    : [];
+  const ableToSend = Boolean(myTokenInfo);
+  const unavailableReason = !oauthEnvOk
+    ? "Email integration is not configured (env vars missing)."
+    : !myTokenInfo
+      ? "Connect Gmail in /admin/canopy first."
+      : null;
+  const openDeal = deals.find((d) => d.closed_at === null) ?? null;
 
   return (
     <div className="px-6 py-10 sm:px-10">
@@ -249,6 +270,26 @@ export default async function ContactDetailPage({ params }: Props) {
           gateBlocked={!competitiveGate.allowed}
           gateReason={competitiveGate.reason ?? null}
         />
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <EmailComposePanel
+            contactId={contact.id}
+            dealId={openDeal?.id ?? null}
+            contactEmail={contact.email}
+            contactName={contact.name}
+            contactCompany={contact.company}
+            fromEmail={myTokenInfo?.connectedEmail ?? null}
+            templates={myTemplates.map((t) => ({
+              id: t.id,
+              name: t.name,
+              subject: t.subject,
+              bodyMarkdown: t.body_markdown,
+            }))}
+            ableToSend={ableToSend}
+            unavailableReason={unavailableReason}
+          />
+          <EmailThreadPanel contactId={contact.id} />
+        </div>
 
         <div className="mt-6">
           <EntityAuditList audit={audit} />

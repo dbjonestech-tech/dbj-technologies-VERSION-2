@@ -42,10 +42,19 @@ export default async function ConnectedAccountsPanel({
         <h2 className="font-display text-base font-semibold text-zinc-900">
           Connected accounts
         </h2>
-        <span className="text-xs text-zinc-500">
-          Gmail two-way sync for compose, reply tracking, and timeline ingestion
-        </span>
+        <a
+          href="/admin/canopy/templates"
+          className="text-xs font-medium text-sky-700 hover:underline"
+        >
+          Manage email templates →
+        </a>
       </div>
+      <p className="mb-4 text-xs text-zinc-500">
+        Gmail two-way sync for compose, reply tracking, and timeline
+        ingestion. Inbound and outbound messages match to contacts by email
+        address; matched messages attach to the most recent open deal
+        automatically.
+      </p>
 
       {!oauthConfigured && (
         <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
