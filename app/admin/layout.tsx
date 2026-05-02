@@ -267,15 +267,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
 /**
  * Canopy wordmark for the admin shell. Renders /public/canopy-logo.webp
- * (the official tree-and-wordmark logo, cyan on dark) with a small
- * "by DBJ" attribution beside it. The /admin shell is the design
+ * (the official tree-and-wordmark logo, cyan on dark) with a "BY DBJ
+ * TECHNOLOGIES" attribution beside it. The /admin shell is the design
  * prototype for the Canopy product per project_canopy_brand memory.
  */
 function CanopyWordmark() {
   return (
     <Link
       href="/admin"
-      aria-label="Canopy"
+      aria-label="Canopy by DBJ Technologies"
       className="inline-flex items-center gap-3"
     >
       <Image
@@ -286,8 +286,10 @@ function CanopyWordmark() {
         priority
         className="h-10 w-auto rounded-md"
       />
-      <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-        by DBJ
+      <span className="text-sm font-bold uppercase leading-tight tracking-[0.14em] text-zinc-700">
+        By DBJ
+        <br />
+        Technologies
       </span>
     </Link>
   );
