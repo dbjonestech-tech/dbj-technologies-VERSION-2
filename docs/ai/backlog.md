@@ -30,6 +30,15 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 - [ ] Verify `/admin/canopy` master-kill toggle round-trips: flip OFF, audit row appears in feed; flip ON, audit row appears.
 - [ ] After committing: `vercel logs --status-code 500 --since 5m` to confirm no RSC boundary failures (per `feedback_rsc_boundary_runtime`).
 
+### Phase 9 done in working tree (uncommitted as of May 1 latest)
+
+- [x] **Phase 9: Pathlight Advanced (gated).** Migration `032_pathlight_advanced.sql` (APPLIED to prod Neon) adds prospect_lists, prospect_candidates, website_change_signals, competitors, attribution_events, attribution_beacon_data. Five new services: `lib/canopy/{prospect-lists,change-monitoring,competitors,attribution-beacon,case-study}.ts`. Two new actions: `lib/actions/{prospect-lists,competitors}.ts` (gated by canFireScan, audit-logged). `canopyChangeMonitoringDaily` cron at 09:30 UTC (HEAD/GET probe of every active-deal contact's site, etag/last-modified/content-hash diff, signals only - never auto-fires scans). `/api/canopy/beacon/[contactId]` POST endpoint for the embedded snippet (CORS *, gated by attribution_beacon_enabled). UI: `/admin/prospecting` + `[id]` (list + candidate scan), `/admin/canopy/beacon` (snippet generator), `/admin/website-changes` (unacked signals with per-row Re-scan link + Acknowledge), dashboard amber banner when unacked signals exist, contact detail Competitors panel (max 5, batch scan), deal detail Case Study tab (won deals only, beacon rollup + 30d series + attribution events). Sidebar "Pathlight Advanced" group with Sprout/Radar/Radio icons, palette lime.
+
+### Phase 9 follow-ups (lower value; not blocking)
+
+- [ ] Pipeline finalize step backfilling `prospect_candidates.pathlight_score` when a prospecting scan completes. Manual workaround: click the candidate's `scan_id` to view the scan directly.
+- [ ] Same for `competitors.last_pathlight_score` after a competitor scan.
+
 ### Phase 8 follow-ups done in working tree (uncommitted as of May 1 latest)
 
 - [x] **Sales-role per-row query scoping for contacts + deals.** Migration `031_owner_scope.sql` (APPLIED to prod Neon) adds contacts.owner_email + partial index. `lib/canopy/rbac.ts` adds `getQueryOwnerFilter`. `getContacts({ownerEmail})` / `getContact(id, ownerFilter)` / `getDealsForKanban(ownerFilter)` honor the filter. createContactAction sets owner_email = admin.email on insert.
@@ -41,9 +50,9 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 
 - [x] **Phase 8: Multi-User Enterprise (core RBAC + tokens + webhooks).** Migration `030_rbac.sql` (APPLIED to prod Neon) widens admin_users.role CHECK and adds api_tokens, webhooks, webhook_deliveries. `lib/canopy/{rbac,api-tokens,webhooks}.ts` services. `lib/actions/{api-tokens,webhooks,team}.ts` audit-logged Server Actions. `app/api/v1/{contacts,deals}/route.ts` Bearer-authenticated REST endpoints. canopyWebhookDispatch Inngest cron (1 min) over canopy_audit_log. `/admin/canopy/team` and `/admin/canopy/api` pages.
 
-### Still deferred (lower value vs cost; not Phase 9 blockers)
+### Still deferred (lower value vs cost)
 
-- [ ] getDealRollups + getContactsDashboardSummary scoping for sales role. Cosmetic discrepancy: rollup tiles show install-wide totals while the per-row list below is scoped.
+- [x] **getDealRollups + getContactsDashboardSummary scoping** - shipped at `03f8f29`. Both rollup queries now accept ownerFilter; dashboard threads it through getDashboardKpis -> relationshipsKpi.
 - [ ] Auto-assign owner_email on Pathlight scan-driven contact ingestion (currently NULL = unassigned).
 - [ ] Mentions parser + read-state UI (Phase 8 spec item).
 - [ ] CSV import wizard with column mapping (Phase 8 spec item).

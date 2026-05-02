@@ -14,6 +14,13 @@ import ActivityFeed from "../../components/ActivityFeed";
 import TagsBar from "../../components/TagsBar";
 import CustomFieldsPanel from "../../components/CustomFieldsPanel";
 import EntityAuditList from "../../components/EntityAuditList";
+import CaseStudyTab from "./CaseStudyTab";
+import {
+  getDealAttributionEvents,
+  getContactBeaconRollup,
+  getContactBeaconSeries,
+} from "@/lib/canopy/case-study";
+import { getCanopySettings } from "@/lib/canopy/settings";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -35,11 +42,24 @@ export default async function DealDetailPage({ params }: Props) {
   const deal = await getDeal(id);
   if (!deal) notFound();
 
-  const [audit, activities, customFieldDefs, extras] = await Promise.all([
+  const [
+    audit,
+    activities,
+    customFieldDefs,
+    extras,
+    attribEvents,
+    beaconRollup,
+    beaconSeries,
+    canopySettings,
+  ] = await Promise.all([
     getEntityAuditTrail("deal", String(id), 30),
     getActivitiesForDeal(id, 50),
     getCustomFieldDefinitions("deal"),
     getEntityExtras("deal", id),
+    getDealAttributionEvents(id),
+    getContactBeaconRollup(deal.contact_id),
+    getContactBeaconSeries(deal.contact_id, 30),
+    getCanopySettings(),
   ]);
 
   return (
@@ -100,6 +120,17 @@ export default async function DealDetailPage({ params }: Props) {
           </header>
           <ActivityFeed activities={activities} />
         </section>
+
+        {deal.won === true ? (
+          <CaseStudyTab
+            dealId={deal.id}
+            contactId={deal.contact_id}
+            events={attribEvents}
+            beacon={beaconRollup}
+            series={beaconSeries}
+            beaconEnabled={canopySettings.attribution_beacon_enabled}
+          />
+        ) : null}
 
         <div className="mt-6">
           <EntityAuditList

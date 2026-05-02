@@ -49,6 +49,8 @@ import LeadScoreBadge from "../../components/LeadScoreBadge";
 import EngagementSparkline from "../../components/EngagementSparkline";
 import NextBestAction from "../../components/NextBestAction";
 import EntityAuditList from "../../components/EntityAuditList";
+import CompetitorsPanel from "./CompetitorsPanel";
+import { listCompetitors } from "@/lib/canopy/competitors";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -87,6 +89,8 @@ export default async function ContactDetailPage({ params }: Props) {
     leadScore,
     analytics,
     audit,
+    competitors,
+    competitiveGate,
   ] = await Promise.all([
     getContactTimeline(contact.email, contact.id, 50),
     getContactNotes(contact.id),
@@ -102,6 +106,8 @@ export default async function ContactDetailPage({ params }: Props) {
     getLatestLeadScore(contact.id),
     getContactAnalytics(contact.id),
     getEntityAuditTrail("contact", String(contact.id), 30),
+    listCompetitors(contact.id),
+    canFireScan("competitive_intel"),
   ]);
   const budgetRemaining = Math.max(
     0,
@@ -236,6 +242,13 @@ export default async function ContactDetailPage({ params }: Props) {
             <ActivityFeed activities={activities} />
           </section>
         ) : null}
+
+        <CompetitorsPanel
+          contactId={contact.id}
+          initial={competitors}
+          gateBlocked={!competitiveGate.allowed}
+          gateReason={competitiveGate.reason ?? null}
+        />
 
         <div className="mt-6">
           <EntityAuditList audit={audit} />

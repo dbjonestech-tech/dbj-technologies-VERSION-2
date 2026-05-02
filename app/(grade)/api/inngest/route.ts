@@ -1,6 +1,7 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/lib/inngest/client";
 import {
+  canopyChangeMonitoringDaily,
   canopyDigestHourly,
   canopySequenceAdvance,
   canopyWebhookDispatch,
@@ -24,5 +25,6 @@ export const { GET, POST, PUT } = serve({
     canopySequenceAdvance,
     canopyWorkflowEvaluate,
     canopyWebhookDispatch,
+    canopyChangeMonitoringDaily,
   ],
 });

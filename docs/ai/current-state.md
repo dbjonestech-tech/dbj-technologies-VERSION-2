@@ -1,6 +1,27 @@
 # Current State
 
-Last updated: May 1, 2026 (latest - Canopy v2 Phase 1 deals architecture staged uncommitted; prior phases live)
+Last updated: May 1, 2026 (latest - Canopy v2 Phase 9 staged uncommitted; Phases 0-8 + follow-ups all shipped to prod Neon)
+
+## Canopy v2 build status
+
+**All nine phases of `docs/ai/canopy-build-plan.md` are now structurally complete in the working tree.** Phases 0-8 + the rollup-scoping follow-up are committed and pushed; Phase 9 (Pathlight Advanced) is staged uncommitted as of this update.
+
+| Phase | Surface | Status | Migration |
+|-------|---------|--------|-----------|
+| 0 | Settings, audit, Pathlight locks | shipped | 024 |
+| 1 | Deals architecture pivot | shipped | 025 |
+| 2 | Activities + tasks | shipped | 026 |
+| 3 | Custom fields, tags, segments | shipped | 027 |
+| 4 | Email integration (Gmail OAuth) | DEFERRED until Joshua provisions Google Cloud OAuth client | - |
+| 5 | Automation: sequences, workflow rules, bulk actions | shipped | 029 |
+| 6 | Pathlight manual integrations (rescan, AI search check, lead score) | shipped | 028 |
+| 7 | Analytics + narrative digest | shipped | (uses 024 fields) |
+| 8 | Multi-user enterprise (RBAC, REST API tokens, webhooks) | shipped | 030 + 031 |
+| 9 | Pathlight Advanced (prospecting, change monitoring, competitive intel, beacon) | staged uncommitted | 032 |
+
+The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
+
+
 
 ## Canopy v2 build (May 1, latest) - Phase 1 deals architecture pivot staged in working tree
 

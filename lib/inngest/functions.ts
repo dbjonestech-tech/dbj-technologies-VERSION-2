@@ -1531,3 +1531,143 @@ export const canopyDigestHourly = inngest.createFunction(
     });
   }
 );
+
+/* Phase 9: change-monitoring cron. Runs daily at 09:30 UTC (offset 30
+ * minutes from lighthouseMonitorDaily so the two crons don't fight for
+ * the same outbound bandwidth window). For every contact with an open
+ * deal and a website on file, GET the site, capture etag /
+ * last-modified / sha256(content), and compare against the most-recent
+ * signal. Write a website_change_signals row only when something
+ * actually changed (or first-time observation, or a fresh error).
+ *
+ * NEVER auto-fires a Pathlight scan. The dashboard renders new signals
+ * with a "Re-scan now" button per row; that button routes through the
+ * existing manual-rescan action and the three-layer Pathlight gate. */
+export const canopyChangeMonitoringDaily = inngest.createFunction(
+  {
+    id: "canopy-change-monitoring-daily",
+    triggers: [{ cron: "30 9 * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    const enabled = await step.run("check-toggle", async () => {
+      const { getCanopySettings } = await import("@/lib/canopy/settings");
+      const s = await getCanopySettings();
+      return s.change_monitoring_enabled === true;
+    });
+
+    if (!enabled) {
+      return { skipped: true, reason: "change_monitoring_enabled is false" };
+    }
+
+    const targets = await step.run("collect-targets", async () => {
+      const { getMonitorTargets } = await import("@/lib/canopy/change-monitoring");
+      return await getMonitorTargets();
+    });
+
+    if (targets.length === 0) {
+      return { checked: 0, signals_written: 0 };
+    }
+
+    return await step.run("probe-and-record", async () => {
+      const { createHash } = await import("node:crypto");
+      const { getLastSignal, recordSignal } = await import(
+        "@/lib/canopy/change-monitoring"
+      );
+
+      let signalsWritten = 0;
+      let errors = 0;
+
+      for (const target of targets) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 8_000);
+          let res: Response | null = null;
+          try {
+            res = await fetch(target.url, {
+              method: "GET",
+              redirect: "follow",
+              signal: controller.signal,
+              headers: { "user-agent": "Canopy-ChangeMonitor/1.0 (+dbjtechnologies.com)" },
+            });
+          } finally {
+            clearTimeout(timer);
+          }
+
+          if (!res || !res.ok) {
+            const last = await getLastSignal(target.contact_id, target.url);
+            const wasErrorAlready = last?.change_kind === "error";
+            if (!wasErrorAlready) {
+              await recordSignal({
+                contactId: target.contact_id,
+                url: target.url,
+                etag: null,
+                lastModified: null,
+                contentHash: null,
+                prev: last,
+                changeKind: "error",
+                statusCode: res?.status ?? null,
+                errorMessage: res ? `HTTP ${res.status}` : "fetch failed",
+              });
+              signalsWritten++;
+            }
+            errors++;
+            continue;
+          }
+
+          const etag = res.headers.get("etag");
+          const lastModified = res.headers.get("last-modified");
+          const text = (await res.text()).slice(0, 262_144);
+          const contentHash = createHash("sha256").update(text).digest("hex");
+
+          const last = await getLastSignal(target.contact_id, target.url);
+          if (!last) {
+            await recordSignal({
+              contactId: target.contact_id,
+              url: target.url,
+              etag,
+              lastModified,
+              contentHash,
+              prev: null,
+              changeKind: "first_seen",
+              statusCode: res.status,
+              errorMessage: null,
+            });
+            signalsWritten++;
+            continue;
+          }
+
+          let changeKind: "etag" | "last_modified" | "content_hash" | null = null;
+          if (etag && last.etag && etag !== last.etag) changeKind = "etag";
+          else if (
+            lastModified &&
+            last.last_modified &&
+            lastModified !== last.last_modified
+          )
+            changeKind = "last_modified";
+          else if (last.content_hash && contentHash !== last.content_hash)
+            changeKind = "content_hash";
+
+          if (changeKind) {
+            await recordSignal({
+              contactId: target.contact_id,
+              url: target.url,
+              etag,
+              lastModified,
+              contentHash,
+              prev: last,
+              changeKind,
+              statusCode: res.status,
+              errorMessage: null,
+            });
+            signalsWritten++;
+          }
+        } catch {
+          errors++;
+        }
+      }
+
+      return { checked: targets.length, signals_written: signalsWritten, errors };
+    });
+  }
+);

@@ -5,6 +5,7 @@ import { getDashboardKpis } from "@/lib/services/dashboard-kpis";
 import { getDealRollups, formatDealValue } from "@/lib/services/deals";
 import { getTodayTasksSummary } from "@/lib/services/tasks";
 import { getSessionRole, getQueryOwnerFilter } from "@/lib/canopy/rbac";
+import { countUnacknowledgedSignals } from "@/lib/canopy/change-monitoring";
 import DashboardCard, { type IconName } from "./DashboardCard";
 import { PALETTES, type PaletteName } from "@/lib/admin/page-themes";
 
@@ -394,11 +395,12 @@ export default async function AdminLanding() {
   const session = await auth();
   const role = await getSessionRole();
   const ownerFilter = getQueryOwnerFilter(role);
-  const [status, kpis, deals, taskSummary] = await Promise.all([
+  const [status, kpis, deals, taskSummary, websiteChangeCount] = await Promise.all([
     getDashboardStatus(),
     getDashboardKpis(ownerFilter),
     getDealRollups(ownerFilter),
     getTodayTasksSummary(session?.user?.email ?? null),
+    countUnacknowledgedSignals(),
   ]);
   const firstName = session?.user?.email?.split("@")[0] ?? "there";
 
@@ -470,6 +472,27 @@ export default async function AdminLanding() {
           dueThisWeek={taskSummary.due_this_week}
           nextDue={taskSummary.next_due}
         />
+
+        {websiteChangeCount > 0 ? (
+          <section className="mb-8 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-amber-800">
+                  Website changes
+                </p>
+                <p className="mt-1 text-sm text-amber-900">
+                  {websiteChangeCount} unacknowledged signal{websiteChangeCount === 1 ? "" : "s"} on tracked active-deal sites. The cron does not auto-fire scans; review and decide whether to re-scan.
+                </p>
+              </div>
+              <Link
+                href="/admin/website-changes"
+                className="inline-flex items-center gap-2 rounded-md bg-amber-700 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-amber-800"
+              >
+                Review signals
+              </Link>
+            </div>
+          </section>
+        ) : null}
 
         {/* Column headers (lg only). Each header carries its column
             family dot. Below lg the columns collapse into a flat

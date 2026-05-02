@@ -5,7 +5,75 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Dashboard hover-intent + bigger sidebar tree shipped at `b7a27c9`, pushed to origin main, working tree clean. Migration 031 applied to prod Neon.)
+## Current state (May 1, 2026 -- Phase 9 Pathlight Advanced staged uncommitted; migration 032 applied to prod Neon)
+
+### Phase 9: Pathlight Advanced (gated) - prospecting + change monitoring + competitive intel + attribution beacon
+
+The final phase of the canopy-build-plan.md roadmap. Four gated Pathlight surfaces ship together because they share migration 032 and the existing three-layer Pathlight gate (master kill, per-feature toggle, monthly budget). Every Pathlight-billable click routes through `canFireScan()`; the change-monitoring cron does NOT auto-fire scans (it only emits actionable signals).
+
+- `lib/db/migrations/032_pathlight_advanced.sql` (APPLIED to prod Neon) - six tables: `prospect_lists`, `prospect_candidates`, `website_change_signals`, `competitors`, `attribution_events`, `attribution_beacon_data`. All idempotent (IF NOT EXISTS) with FKs (CASCADE for child rows, SET NULL for analytics history), CHECK constraints on enums, and partial indexes (e.g. `website_change_signals_unack_idx WHERE acknowledged_at IS NULL`).
+- `lib/canopy/prospect-lists.ts` - ProspectList + ProspectCandidate + VerticalConfidence types; `listProspectLists()` (with candidate / scanned counts via correlated subqueries), `getProspectList(id)`, `getProspectCandidates(listId)`, `inferCandidateVertical()` which calls existing `lookupVertical()` and normalizes "single-source" -> "low".
+- `lib/canopy/change-monitoring.ts` - `getLastSignal()`, `recordSignal()`, `listUnacknowledgedSignals()`, `countUnacknowledgedSignals()`, `acknowledgeSignal()`, `getMonitorTargets()` (DISTINCT contacts with website + open deal).
+- `lib/canopy/competitors.ts` - `listCompetitors()`, `countCompetitors()`, `insertCompetitor()`, `deleteCompetitor()`, `setCompetitorScanResult()`. App-level cap `MAX_COMPETITORS_PER_CONTACT = 5` enforced in actions, not schema.
+- `lib/canopy/attribution-beacon.ts` - `generateBeaconSnippet({contactId, canopyOrigin})` returns a self-contained `<script>` that posts pageview + form_submit via `navigator.sendBeacon` (with fetch fallback). `recordBeaconPing()`, `recordAttributionEvent()`, `isValidMetricKind()` boundary validator.
+- `lib/canopy/case-study.ts` - `getDealAttributionEvents(dealId)`, `getContactBeaconRollup(contactId)`, `getContactBeaconSeries(contactId, days)`, `getContactRecentBeacon()`. Read-only; powers the deal Case Study tab.
+- `lib/actions/prospect-lists.ts` - `createProspectListAction`, `addProspectCandidateAction` (auto-runs `inferCandidateVertical`), `removeProspectCandidateAction`, `scanProspectCandidateAction` (gated by `canFireScan('prospecting')`, increments budget, sends inngest pipeline event), `archiveProspectListAction`, `acknowledgeWebsiteSignalAction`. All audit-logged.
+- `lib/actions/competitors.ts` - `addCompetitorAction` (cap-checked), `removeCompetitorAction`, `scanCompetitorsAction` (gated by `canFireScan('competitive_intel')`, fail-fast if budget < N pending). Per-row scan flow mirrors prospecting.
+- `lib/inngest/functions.ts` - new `canopyChangeMonitoringDaily` cron at `30 9 * * *` (09:30 UTC, offset 30 min from lighthouseMonitorDaily so they don't fight for outbound bandwidth). Three step.runs: check-toggle, collect-targets, probe-and-record. Probes are GET with 8s timeout, body capped at 256 KiB for sha256 hash. Compares etag -> last_modified -> content_hash. Records error signal on fetch failure but only once per consecutive error streak (no spam).
+- `app/(grade)/api/inngest/route.ts` - registers `canopyChangeMonitoringDaily`.
+- `app/api/canopy/beacon/[contactId]/route.ts` - POST endpoint with permissive CORS (snippets fire from arbitrary client origins). Gated by `attribution_beacon_enabled`. Validates contactId + metric_kind, writes to `attribution_beacon_data`. Always returns 204 to keep the client snippet silent on errors. OPTIONS preflight handled.
+- `app/admin/prospecting/page.tsx` + `ProspectingClient.tsx` - lists view with budget pill (shows gate reason if blocked), inline create form, archive button per row.
+- `app/admin/prospecting/[id]/page.tsx` + `CandidateClient.tsx` - candidate table with Add form, vertical confidence badges (high/medium/low/none), per-row Scan button (disabled with reason when gate blocks), per-row delete.
+- `app/admin/canopy/beacon/page.tsx` + `BeaconClient.tsx` - left rail of won-deal clients (filterable), right pane shows the snippet keyed to the selected contact's id with a Copy button. Renders an example snippet when nothing selected.
+- `app/admin/website-changes/page.tsx` + `WebsiteChangesClient.tsx` - unacknowledged signals table with kind tone (etag/last_modified=sky, content_hash=amber, error=red, first_seen=zinc), per-row "Re-scan" link to the contact detail page and Acknowledge button.
+- `app/admin/page.tsx` (dashboard) - wires `getSessionRole()` + `getQueryOwnerFilter()` for the rollup scoping fix shipped at `03f8f29`. Also imports `countUnacknowledgedSignals`, surfaces an amber Website Changes banner above the column grid when there are unacked signals.
+- `app/admin/contacts/[id]/page.tsx` - new `CompetitorsPanel` mounted between activities and the audit log. Loads competitors + competitive-intel gate result in the existing Promise.all.
+- `app/admin/deals/[id]/page.tsx` - new `CaseStudyTab` rendered when `deal.won === true`. Loads attribution events for the deal + beacon rollup + 30-day series for the contact in the existing Promise.all. Shows four metric tiles + last 14 active days timeline + attribution event list. Links to `/admin/canopy/beacon` for snippet generation.
+- `app/admin/contacts/[id]/CompetitorsPanel.tsx` - client component, max-5 cap respected, "Scan all pending" batch button (gate-aware), per-row remove.
+- `app/admin/deals/[id]/CaseStudyTab.tsx` - server component, only mounts when deal won.
+- `app/admin/layout.tsx` - new "Pathlight Advanced" sidebar group above Operations with three items: Prospecting (Sprout icon), Website changes (Radar icon), Beacon (Radio icon). All palette `lime`.
+- `lib/admin/page-themes.ts` - PAGE_PALETTE entries for `/admin/prospecting`, `/admin/canopy/beacon`, `/admin/website-changes` -> `lime`.
+
+### Acceptance signals (per canopy-build-plan.md)
+
+- `npx tsc --noEmit` and `npm run lint` clean.
+- Migration 032 applied to prod Neon successfully (18 statements ok).
+- Master kill ON or `prospecting_enabled` OFF or budget = 0 -> per-row Scan button on prospecting candidate page disabled with the specific reason rendered above the table.
+- Master kill OFF + budget > 0 + prospecting_enabled ON -> Scan button enabled; click writes a `scans` row + sends inngest event + flips candidate to "scanning" + decrements budget.
+- Cron HEAD/GET probe of a tracked site that returns a different etag than last observation -> writes a `website_change_signals` row with `change_kind='etag'`. NEVER auto-fires a Pathlight scan (verified by reading the cron source: only step.run is "probe-and-record" which calls `recordSignal`, not `triggerRescan*`).
+- Beacon endpoint accepts a POST with `metric_kind=pageview` -> writes a row to `attribution_beacon_data`; that row appears on `/admin/deals/<wonDealId>` Case Study tab pageview tile within one revalidation. Endpoint returns 403 when `attribution_beacon_enabled` is false.
+
+### Pre-Phase-9 cleanup also shipped this session at `03f8f29`
+
+Phase 8 follow-up rollup scoping. `getDealRollups(ownerFilter?)` and `getContactsDashboardSummary(ownerFilter?)` now accept an optional owner filter; `getDashboardKpis(ownerFilter?)` threads it to `relationshipsKpi`. Dashboard `app/admin/page.tsx` resolves the filter via `getSessionRole()` + `getQueryOwnerFilter()` so a sales-role user sees only their own pipeline + contacts totals in the rollup tiles.
+
+### Earlier this session
+
+- `e91a65e` - session-handoff for `b536db4` (Phase 8 follow-ups: sales-role per-row scoping, EntityAuditList shared component, sidebar polish)
+- `3a14c55` - canopy admin sidebar logo swap (full tree+wordmark image)
+- `00b2399` - canopy admin sidebar logo split (tree icon + live "Canopy" text)
+- `b7a27c9` - sidebar tree icon h-12 -> h-16 + dashboard hover-intent delay (`HOVER_OPEN_DELAY = 1500ms`)
+- `03f8f29` - sales-role rollup scoping fix
+
+### Next recommended task
+
+Phase 9 is the final entry in `canopy-build-plan.md`. After this commit, every phase 0-9 has shipped and the canonical Canopy at `/admin` is structurally complete. Remaining work is operational, not architectural:
+
+1. Smoke-test the four Phase 9 surfaces in browser: `/admin/prospecting`, `/admin/website-changes`, `/admin/canopy/beacon`, contact detail Competitors panel, won-deal Case Study tab. The runtime hasn't been exercised end-to-end.
+2. Wait for the `canopyChangeMonitoringDaily` cron to fire at 09:30 UTC (or trigger manually via the Inngest dev UI) to verify it writes signals correctly against a real site.
+3. Generate a snippet from `/admin/canopy/beacon`, paste into a test page, verify pageview lands in `attribution_beacon_data`.
+4. Frozen install rebuild: with the canonical Canopy structurally complete, the Star Auto install at `ops.thestarautoservice.com` can be rebuilt from this codebase per the canopy-build-plan.md operational note.
+
+### Phase 9 deferred / out-of-scope for this commit
+
+- **getDealRollups + getContactsDashboardSummary now scoped** (shipped above as 03f8f29) - the cosmetic rollup gap from Phase 8 follow-up is closed.
+- **Auto-assign owner_email on Pathlight scan ingestion** - settings-driven follow-up, lower value.
+- **Mentions parser, CSV import wizard, white-label live preview** - Phase 8 spec items deferred again; Phase 9 ships without them.
+- **Pipeline finalize step does NOT yet backfill `prospect_candidates.pathlight_score` when a prospecting scan completes.** The candidate row currently flips to scanning + holds the scan_id, and an operator can click the linked scan to see the score; a follow-up commit can wire the finalize step to update the candidate row when the scan finishes. Not a blocker; the manual path works.
+
+---
+
+## Prior state (May 1, 2026 -- Dashboard hover-intent + bigger sidebar tree shipped at `b7a27c9`)
 
 ### Dashboard hover-intent + bigger sidebar tree at `b7a27c9`
 

@@ -31,6 +31,9 @@ import {
   BarChart3,
   Send,
   Key,
+  Sprout,
+  Radar,
+  Radio,
 } from "lucide-react";
 import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
 import { getContactsDashboardSummary } from "@/lib/services/contacts";
@@ -108,6 +111,14 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
     items: [
       { label: "Sequences", href: "/admin/sequences", icon: Send, palette: "violet" },
       { label: "Workflow rules", href: "/admin/automations", icon: Zap, palette: "violet" },
+    ],
+  },
+  {
+    label: "Pathlight Advanced",
+    items: [
+      { label: "Prospecting", href: "/admin/prospecting", icon: Sprout, palette: "lime" },
+      { label: "Website changes", href: "/admin/website-changes", icon: Radar, palette: "lime" },
+      { label: "Beacon", href: "/admin/canopy/beacon", icon: Radio, palette: "lime" },
     ],
   },
   {
