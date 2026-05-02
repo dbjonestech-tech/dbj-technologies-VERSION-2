@@ -232,5 +232,3 @@ export async function sendTestDigestNow(input: {
   }
   return { ok: true, subject: result.subject };
 }
-
-export type { CanopySettings };
