@@ -30,9 +30,13 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 - [ ] Verify `/admin/canopy` master-kill toggle round-trips: flip OFF, audit row appears in feed; flip ON, audit row appears.
 - [ ] After committing: `vercel logs --status-code 500 --since 5m` to confirm no RSC boundary failures (per `feedback_rsc_boundary_runtime`).
 
+### Phase 2 done in working tree (uncommitted as of May 1 latest)
+
+- [x] **Phase 2: Activities & Tasks.** Migration `026_activities.sql` (APPLIED to prod Neon: activities table with type discriminator, payload JSONB, due_at/completed_at/priority for tasks, five indexes). `lib/services/activities.ts` (read APIs + title/detail formatters). `lib/services/tasks.ts` (filter-aware getTasks + getTodayTasksSummary). `lib/actions/activities.ts` (eight audit-logged Server Actions). ActivityComposer + ActivityFeed components. /admin/tasks page with scope/status/priority filters. Dashboard Today's Tasks card. Sidebar Tasks item under Operations. Contact and deal detail pages now host the composer + feed.
+
 ### Next phase queued
 
-- [ ] **Phase 2: Activities & Tasks.** Migration `026_activities.sql` extending `contact_notes` into a richer `activities` table (note / call / meeting / email / task types with type-specific JSONB payload, due_at + completed_at for tasks, priority enum). `lib/services/activities.ts` unified timeline reader. `lib/actions/activities.ts` Server Actions per type. `lib/services/tasks.ts` for "today + overdue" dashboard card. `/admin/tasks` standalone page with filters. Dashboard "Today's Tasks" card. Inline composer on contact and deal detail pages. See `docs/ai/canopy-build-plan.md#phase-2`.
+- [ ] **Phase 3: Custom Fields, Tags, Segments.** Migration `027_customization.sql` adding `custom_field_definitions`, `tags TEXT[]` and `custom_fields JSONB` on contacts and deals, `saved_segments` table. `lib/canopy/custom-fields.ts` registry CRUD + validators. `lib/canopy/segments.ts` filter compiler. UI: custom fields editor under /admin/canopy, tag chips and filter sidebar on contact + deal + task list pages, "Save as segment" + segment picker.
 
 ### Net new gaps to port (deferred, lower value than the build phases)
 

@@ -97,6 +97,7 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
   {
     label: "Operations",
     items: [
+      { label: "Tasks", href: "/admin/tasks", icon: ClipboardList, palette: "amber" },
       { label: "Monitor", href: "/admin/monitor", icon: Activity, palette: "cyan" },
       { label: "Costs", href: "/admin/costs", icon: DollarSign, palette: "amber" },
       { label: "Scans", href: "/admin/scans", icon: FileText, palette: "teal" },

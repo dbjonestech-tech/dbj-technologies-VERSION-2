@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getDashboardStatus, type StatusLevel } from "@/lib/services/health-status";
 import { getDashboardKpis } from "@/lib/services/dashboard-kpis";
 import { getDealRollups, formatDealValue } from "@/lib/services/deals";
+import { getTodayTasksSummary } from "@/lib/services/tasks";
 import DashboardCard, { type IconName } from "./DashboardCard";
 import { PALETTES, type PaletteName } from "@/lib/admin/page-themes";
 
@@ -300,6 +301,88 @@ function RollupTile({
   );
 }
 
+function TodayTasksCard({
+  dueToday,
+  overdue,
+  dueThisWeek,
+  nextDue,
+}: {
+  dueToday: number;
+  overdue: number;
+  dueThisWeek: number;
+  nextDue: import("@/lib/services/tasks").TaskRow | null;
+}) {
+  const total = dueToday + overdue;
+  const accent =
+    overdue > 0
+      ? "border-red-200 bg-red-50/40"
+      : dueToday > 0
+        ? "border-amber-200 bg-amber-50/40"
+        : "border-zinc-200 bg-white";
+  const nextTitle =
+    nextDue && typeof nextDue.payload?.title === "string"
+      ? (nextDue.payload.title as string)
+      : null;
+  return (
+    <section className={`mb-8 rounded-xl border p-5 shadow-sm ${accent}`}>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wider text-zinc-500">
+          <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+          Today's Tasks
+        </h2>
+        <Link
+          href="/admin/tasks?scope=mine&status=all_open"
+          className="text-[11px] font-semibold text-amber-700 hover:underline"
+        >
+          Open Tasks board →
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <TaskMiniTile label="Overdue" value={overdue} tone={overdue > 0 ? "danger" : "neutral"} />
+        <TaskMiniTile label="Due today" value={dueToday} tone={dueToday > 0 ? "warning" : "neutral"} />
+        <TaskMiniTile label="Due this week" value={dueThisWeek} tone="neutral" />
+        <TaskMiniTile label="Active total" value={total} tone="neutral" />
+      </div>
+      {nextDue ? (
+        <p className="mt-3 text-xs text-zinc-600">
+          <span className="font-semibold text-zinc-700">Next up:</span>{" "}
+          <Link href="/admin/tasks?scope=mine" className="hover:underline">
+            {nextTitle ?? "Task"}
+          </Link>
+          {nextDue.due_at ? (
+            <span className="ml-2 font-mono text-[11px] text-zinc-500">
+              due {new Date(nextDue.due_at).toLocaleString()}
+            </span>
+          ) : null}
+        </p>
+      ) : (
+        <p className="mt-3 text-xs text-zinc-500">
+          No upcoming tasks. Create one from any contact or deal detail page.
+        </p>
+      )}
+    </section>
+  );
+}
+
+function TaskMiniTile({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "danger" | "warning" | "neutral";
+}) {
+  const valueColor =
+    tone === "danger" ? "text-red-700" : tone === "warning" ? "text-amber-700" : "text-zinc-900";
+  return (
+    <div className="rounded-lg border border-zinc-200 bg-white p-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">{label}</p>
+      <p className={`mt-1 font-mono text-2xl font-semibold ${valueColor}`}>{value}</p>
+    </div>
+  );
+}
+
 function statusBadgeClass(level: StatusLevel): string {
   if (level === "red") return "bg-red-50 text-red-700 border-red-200";
   if (level === "yellow") return "bg-amber-50 text-amber-700 border-amber-200";
@@ -307,11 +390,12 @@ function statusBadgeClass(level: StatusLevel): string {
 }
 
 export default async function AdminLanding() {
-  const [session, status, kpis, deals] = await Promise.all([
-    auth(),
+  const session = await auth();
+  const [status, kpis, deals, taskSummary] = await Promise.all([
     getDashboardStatus(),
     getDashboardKpis(),
     getDealRollups(),
+    getTodayTasksSummary(session?.user?.email ?? null),
   ]);
   const firstName = session?.user?.email?.split("@")[0] ?? "there";
 
@@ -375,6 +459,13 @@ export default async function AdminLanding() {
           closedWon={deals.closed_won_this_month_cents}
           openCount={deals.open_count}
           wonCount={deals.won_this_month_count}
+        />
+
+        <TodayTasksCard
+          dueToday={taskSummary.due_today}
+          overdue={taskSummary.overdue}
+          dueThisWeek={taskSummary.due_this_week}
+          nextDue={taskSummary.next_due}
         />
 
         {/* Column headers (lg only). Each header carries its column

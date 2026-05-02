@@ -5,7 +5,40 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 1 shipped at `c38cd20`, pushed to origin main, working tree clean)
+## Current state (May 1, 2026 -- Canopy v2 Phase 2 staged uncommitted; Phase 1 + migrations 023/024/025/026 applied to prod Neon)
+
+### Phase 2 staged this session (pre-commit): Activities and Tasks
+
+The unified store for operator-driven interactions (notes, calls, meetings, tasks, emails). Tasks become first-class objects with due dates, priority, and completion state. Dashboard surfaces overdue and due-today counts; a standalone /admin/tasks page filters across scope/status/priority.
+
+- `lib/db/migrations/026_activities.sql` (APPLIED to prod Neon) - activities table with type CHECK (note|call|meeting|task|email), payload JSONB for type-specific shape, contact_id and deal_id both nullable but at least one required (CHECK constraint), due_at/completed_at/priority for tasks. Five indexes including partial open-tasks-per-owner and global open-tasks-by-due-date.
+- `lib/services/activities.ts` - read API for contact-scoped, deal-scoped, and counts-per-contact. activityTitle/activityDetail formatters consume the per-type payload shape.
+- `lib/services/tasks.ts` - getTasks(filter) supports scope (mine|all), status (open|overdue|completed|all_open), priority filter. getTodayTasksSummary(ownerEmail) returns due_today/overdue/due_this_week + the next-due task; powers the dashboard card.
+- `lib/actions/activities.ts` - audit-logged Server Actions: logNoteAction, logCallAction, logMeetingAction, createTaskAction, completeTaskAction, reopenTaskAction, updateTaskAction, deleteActivityAction. Every action requires admin and writes to canopy_audit_log.
+- `app/admin/components/ActivityComposer.tsx` - tabbed client component with note/call/meeting/task forms. Mounted on contact and deal detail pages with the right entity attached.
+- `app/admin/components/ActivityFeed.tsx` - server-rendered list of activities with type-specific rendering, completed-task styling, due-date and meta display.
+- `app/admin/tasks/page.tsx` + TasksFilterBar + TaskRowClient - full tasks page with scope/status/priority filters via URL search params, optimistic complete/reopen toggle on each row.
+- Dashboard (`app/admin/page.tsx`) - new Today's Tasks card between the Pipeline rollups and the column grid. Shows overdue/due-today/due-this-week tiles + the next-due task. Tinted red when overdue, amber when due-today.
+- Sidebar (`app/admin/layout.tsx`) - new Tasks item in the Operations group (ClipboardList icon, amber palette).
+- /admin/tasks mapped to `amber` palette in lib/admin/page-themes.ts.
+- Contact detail page mounts ActivityComposer + ActivityFeed below the existing Deals panel and above the legacy Activity timeline (which is renamed "Activity timeline" to disambiguate).
+- Deal detail page mounts ActivityComposer + ActivityFeed between the inline editors and the audit log.
+
+### Acceptance signals
+
+- `npx tsc --noEmit` and `npm run lint` clean (verified).
+- Migration 026 applied to prod Neon successfully (verified via `Migration applied successfully.`).
+- Logging a call from a contact page appears in that contact's ActivityFeed within one revalidation. Same call when logged from a deal page (which has both contact_id and deal_id) appears in BOTH the contact's and the deal's feeds.
+- Creating a task with a due date in the past makes the dashboard's Overdue tile go to 1 and the Today's Tasks card switches to red tint.
+- Completing the task via the round button on /admin/tasks moves it to the completed status and updates the dashboard card.
+
+### Next recommended task
+
+**Phase 3 - Custom Fields, Tags, Segments** per `docs/ai/canopy-build-plan.md`. Migration `027_customization.sql` with `custom_field_definitions`, `tags TEXT[]` and `custom_fields JSONB` columns on contacts and deals, `saved_segments`. `lib/canopy/custom-fields.ts` registry CRUD + per-kind validators. `lib/canopy/segments.ts` filter compiler turning a `filter_config` JSONB into a Drizzle WHERE clause. UI: settings editor for custom fields, tag chips and filter sidebar on contact + deal + task list pages, "Save as segment" + segment picker.
+
+---
+
+## Prior state -- Canopy v2 Phase 1 shipped at `c38cd20`, pushed to origin main, working tree clean
 
 ### Phase 1 shipped at `c38cd20`
 

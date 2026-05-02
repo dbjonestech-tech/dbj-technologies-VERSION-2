@@ -25,9 +25,12 @@ import {
   formatDealValue,
   type DealRow,
 } from "@/lib/services/deals";
+import { getActivitiesForContact } from "@/lib/services/activities";
 import PageHeader from "../../PageHeader";
 import ContactHeader from "./ContactHeader";
 import ContactNotes from "./ContactNotes";
+import ActivityComposer from "../../components/ActivityComposer";
+import ActivityFeed from "../../components/ActivityFeed";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -49,11 +52,12 @@ export default async function ContactDetailPage({ params }: Props) {
   const contact = await getContact(id);
   if (!contact) notFound();
 
-  const [timeline, notes, scanInfo, deals] = await Promise.all([
+  const [timeline, notes, scanInfo, deals, activities] = await Promise.all([
     getContactTimeline(contact.email, contact.id, 50),
     getContactNotes(contact.id),
     getPathlightScansForContact(contact.email),
     getDealsForContact(contact.id),
+    getActivitiesForContact(contact.id, 50),
   ]);
 
   return (
@@ -88,10 +92,28 @@ export default async function ContactDetailPage({ params }: Props) {
 
         <DealsPanel deals={deals} />
 
+        <div className="mt-8">
+          <ActivityComposer contactId={contact.id} />
+        </div>
+
+        {activities.length > 0 ? (
+          <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-6">
+            <header className="mb-4">
+              <h2 className="font-display text-base font-semibold text-zinc-900">
+                Logged activities
+              </h2>
+              <p className="mt-1 text-xs text-zinc-500">
+                Calls, meetings, tasks, and notes you've logged for this contact. Counted in the dashboard's Today's Tasks card and the per-deal audit log.
+              </p>
+            </header>
+            <ActivityFeed activities={activities} />
+          </section>
+        ) : null}
+
         <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-6">
           <header className="mb-4">
             <h2 className="font-display text-base font-semibold text-zinc-900">
-              Activity
+              Activity timeline
             </h2>
             <p className="mt-1 text-xs text-zinc-500">
               {timeline.length} entr{timeline.length === 1 ? "y" : "ies"} from

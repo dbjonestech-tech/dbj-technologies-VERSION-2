@@ -3,9 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { getDeal } from "@/lib/services/deals";
+import { getActivitiesForDeal } from "@/lib/services/activities";
 import { getEntityAuditTrail } from "@/lib/canopy/audit";
 import PageHeader from "../../PageHeader";
 import DealDetailClient from "./DealDetailClient";
+import ActivityComposer from "../../components/ActivityComposer";
+import ActivityFeed from "../../components/ActivityFeed";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -27,7 +30,10 @@ export default async function DealDetailPage({ params }: Props) {
   const deal = await getDeal(id);
   if (!deal) notFound();
 
-  const audit = await getEntityAuditTrail("deal", String(id), 30);
+  const [audit, activities] = await Promise.all([
+    getEntityAuditTrail("deal", String(id), 30),
+    getActivitiesForDeal(id, 50),
+  ]);
 
   return (
     <div className="px-6 py-10 sm:px-10">
@@ -60,7 +66,23 @@ export default async function DealDetailPage({ params }: Props) {
 
         <DealDetailClient deal={deal} />
 
-        <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-6">
+        <div className="mt-8">
+          <ActivityComposer contactId={deal.contact_id} dealId={deal.id} />
+        </div>
+
+        <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-6">
+          <header className="mb-4">
+            <h2 className="font-display text-base font-semibold text-zinc-900">
+              Activity feed
+            </h2>
+            <p className="mt-1 text-xs text-zinc-500">
+              Calls, meetings, tasks, and notes logged against this deal.
+            </p>
+          </header>
+          <ActivityFeed activities={activities} />
+        </section>
+
+        <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-6">
           <header className="mb-3">
             <h2 className="font-display text-base font-semibold text-zinc-900">
               Audit log
