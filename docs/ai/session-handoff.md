@@ -5,13 +5,13 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 build BEGUN, error pipeline + Phase 0 staged uncommitted)
+## Current state (May 1, 2026 -- Canopy v2 build BEGUN, error pipeline + Phase 0 shipped at `9f259de`, pushed to origin main, working tree clean)
 
 ### What just happened (this session)
 
 Joshua decided to flip the source of truth: DBJ `/admin` in this repo is now the canonical Canopy. The starter at `github.com/dbjonestech-tech/canopy` and the live install at `ops.thestarautoservice.com` (working dir `/Users/doulosjones/Desktop/operations-cockpit/`) are **frozen** until the perfected DBJ Canopy is ready to rebuild Star Auto from. Audit of the frozen codebase identified three real deltas worth porting: first-party error capture pipeline, exportable CanopyBeacon snippet, bootstrap/seed scripts. This session ported the first one and laid the foundation for the rest of the CRM build.
 
-### What is in the working tree (not yet committed)
+### What shipped at `9f259de` (pushed to origin main)
 
 **1. First-party error capture pipeline (port from operations-cockpit migration 007).**
 - `lib/db/migrations/023_error_events.sql` - `error_events` table with sha256 fingerprint grouping (message + first stack frame), source/severity CHECK constraints, four indexes
@@ -34,10 +34,10 @@ Joshua decided to flip the source of truth: DBJ `/admin` in this repo is now the
 - `app/admin/layout.tsx` - added "Canopy controls" item (Sliders icon, palette stone) to the Account nav group, above "Audit log"
 - `lib/admin/page-themes.ts` - added `/admin/canopy` → `stone` palette mapping
 
-### What is intentionally NOT in the working tree
+### What is intentionally NOT in this commit
 
 - Deals architecture (Phase 1 of the plan). 7+ file change touching dashboard rollups + contact detail panel + new /admin/deals routes; deferred to next session for a clean focused commit.
-- The `error_events` and `canopy_*` migrations have NOT been applied to prod Neon. `npm run lint` and `npx tsc --noEmit` both clean against the working tree, but until the migrations run, every read returns DEFAULTS / empty (the helpers handle this gracefully) and the Pathlight gate denies all scans (which is the correct safe default).
+- The `error_events` and `canopy_*` migrations have NOT been applied to prod Neon yet (running them is a manual step, see acceptance signals below). `npm run lint` and `npx tsc --noEmit` both clean at `9f259de`, but until the migrations run, every read returns DEFAULTS / empty (the helpers handle this gracefully) and the Pathlight gate denies all scans (which is the correct safe default).
 
 ### Acceptance signals (what the user verifies after committing + applying migrations)
 
