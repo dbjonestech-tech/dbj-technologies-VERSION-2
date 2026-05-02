@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 7 staged uncommitted; no new migration; cron registered)
+## Current state (May 1, 2026 -- Canopy v2 Phase 7 shipped at `439b762`, pushed to origin main, working tree clean. No new migration; cron registered.)
 
-### Phase 7 staged this session (pre-commit): Analytics & Narrative Digest
+### Phase 7 shipped at `439b762`: Analytics & Narrative Digest
 
 The first phase that gives operators a top-down read on the data they've been entering. Pure read-only over deals, activities, contacts, and pathlight_scans_log; no new tables, no new migrations. Phase 0 already provisioned the digest schedule fields on canopy_settings, so this phase only had to wire them up.
 
