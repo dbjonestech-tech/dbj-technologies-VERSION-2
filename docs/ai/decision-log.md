@@ -1,5 +1,21 @@
 # Decision Log
 
+## May 1, 2026 (later) -- Canopy v2 build started: source-of-truth flip + Pathlight lock architecture
+
+Decision: Two coupled decisions taken together. (1) DBJ `/admin` in this repo is now the canonical source of truth for Canopy as a product. The previously productized starter at `github.com/dbjonestech-tech/canopy` and Star Auto's live install at `ops.thestarautoservice.com` (working dir `/Users/doulosjones/Desktop/operations-cockpit/`) are **frozen**: no new features land there until the DBJ Canopy is perfected; Star Auto will then be rebuilt from the perfected source. (2) All future Pathlight automation in Canopy passes through a three-layer lock - feature toggles + manual click-driven trigger + monthly budget cap. Default state on install is locked-shut.
+
+Reason: Two real reasons. First, DBJ `/admin` already has 22+ admin sections versus operations-cockpit's 8; OC was a productized derivative built on a more constrained surface area, and continuing to maintain both forks doubled the work without commensurate value. Auditing OC against DBJ identified three small deltas worth porting back (first-party error capture pipeline, exportable beacon snippet, bootstrap/seed scripts) and confirmed everything else worth keeping was already richer in DBJ. Second, the next phase of Canopy adds Pathlight-driven prospecting, competitive intel, and continuous monitoring - features that have real per-scan API cost. A productized $25K engagement cannot ship with implicit auto-scan behavior; the operator must consciously enable each integration and consciously fund its budget. The three-layer lock makes that consent explicit at three independent gates so a forgotten toggle never compounds into a billing surprise.
+
+Implementation choices:
+- **Source of truth flip is documented but not destructive.** OC and the canopy starter remain on disk and on GitHub. Once perfected DBJ Canopy is ready to rebuild Star Auto from, OC and the canopy starter get archived rather than deleted.
+- **First-party error pipeline is the first port.** Migration 023 + `/api/track/error` + `ErrorBeacon` + a rewritten `/admin/errors` that hybridizes first-party `error_events` (primary) with the existing Sentry view (secondary). This means future Canopy clients can have error monitoring without a paid Sentry seat.
+- **`canopy_audit_log` is a NEW table, not an extension of `admin_audit_log`.** Auth/access events stay in `admin_audit_log` (existing). Entity-change events live in `canopy_audit_log` (new). Different shapes, different query patterns, different consumers. Combining them was tempting but wrong.
+- **Default to BLOCKED, not OPEN.** Migration 024 seeds `canopy_settings` with every Pathlight toggle FALSE and `monthly_scan_budget = 0`. The settings reader falls open to those same DEFAULTS if the table is missing. There is no execution path where a scan can fire without a deliberate operator click into `/admin/canopy` to enable it.
+- **The full plan lives in `docs/ai/canopy-build-plan.md`** as 9 phases (0 - Settings/Audit/Locks, 1 - Deals architecture, 2 - Activities/Tasks, 3 - Custom Fields/Tags/Segments, 4 - Email Integration, 5 - Sequences/Workflow/Bulk, 6 - Pathlight manual integrations, 7 - Analytics/Digest, 8 - Multi-User Enterprise, 9 - Pathlight advanced - prospecting/monitoring/competitive/attribution). Phases 0 + the error pipeline are staged uncommitted; everything else is on the roadmap.
+- **Out of scope, explicitly:** replacing the contact form's Resend send path (do-not-break), optimizing Lighthouse 400/400, touching HeroCinema or ScanStatus or vertical-lookup or Pathlight pipeline order, crossing route-group import boundaries.
+
+The plan respects existing decisions: NO drag-and-drop on the existing `/admin/relationships/pipeline` (the new deals kanban can revisit), NO pipeline-value-sum on the existing contacts kanban (deals layer adds its own weighted/unweighted rollups separately), Server Actions for mutations (matches Phase 2 contacts pattern), LATERAL subqueries for counts where applicable.
+
 ## May 1, 2026 (late) -- Lightweight CRM integrated into Canopy (Phase 2 of two-phase build)
 
 Decision: Phase 2 of the visitors-page-upgrade build adds a lightweight

@@ -27,6 +27,7 @@ import {
   Settings,
   ClipboardList,
   Kanban,
+  Sliders,
 } from "lucide-react";
 import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
 import { getContactsDashboardSummary } from "@/lib/services/contacts";
@@ -111,6 +112,7 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
   {
     label: "Account",
     items: [
+      { label: "Canopy controls", href: "/admin/canopy", icon: Sliders, palette: "stone" },
       { label: "Audit log", href: "/admin/audit", icon: ShieldCheck, palette: "stone" },
       { label: "Users", href: "/admin/users", icon: Users, palette: "zinc" },
       { label: "Config", href: "/admin/config", icon: Settings, palette: "teal" },

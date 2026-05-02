@@ -5,7 +5,54 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Phase 2 shipped + audited at `b9a1833`)
+## Current state (May 1, 2026 -- Canopy v2 build BEGUN, error pipeline + Phase 0 staged uncommitted)
+
+### What just happened (this session)
+
+Joshua decided to flip the source of truth: DBJ `/admin` in this repo is now the canonical Canopy. The starter at `github.com/dbjonestech-tech/canopy` and the live install at `ops.thestarautoservice.com` (working dir `/Users/doulosjones/Desktop/operations-cockpit/`) are **frozen** until the perfected DBJ Canopy is ready to rebuild Star Auto from. Audit of the frozen codebase identified three real deltas worth porting: first-party error capture pipeline, exportable CanopyBeacon snippet, bootstrap/seed scripts. This session ported the first one and laid the foundation for the rest of the CRM build.
+
+### What is in the working tree (not yet committed)
+
+**1. First-party error capture pipeline (port from operations-cockpit migration 007).**
+- `lib/db/migrations/023_error_events.sql` - `error_events` table with sha256 fingerprint grouping (message + first stack frame), source/severity CHECK constraints, four indexes
+- `app/api/track/error/route.ts` - same-origin POST endpoint, fingerprint computed server-side, best-effort insert
+- `components/analytics/ErrorBeacon.tsx` - sibling to `AnalyticsBeacon`. Listens to `window.error` and `unhandledrejection`, posts via `sendBeacon` with keepalive-fetch fallback. Mounted in `app/layout.tsx`
+- `lib/services/errors.ts` - query helpers (loadErrorHeadline, loadErrorHourlyBuckets, loadTopErrorGroups, loadErrorsBySource, relativeTime). Hourly bucketizer is inline (no `lib/services/time-buckets.ts` port needed)
+- `app/admin/errors/page.tsx` - rewritten. First-party error_events events drive 4 stat tiles + hourly volume sparkline + by-source bars + top groups table. Sentry's existing 24h issue list rendered below as "DBJ paid issue tracker (24h)" secondary section. Uses existing `PageHeader` (palette red), `Sparkline` from `@/admin/Sparkline`, and `canopy-table` styling
+
+**2. Canopy build plan saved.**
+- `docs/ai/canopy-build-plan.md` - 9-phase roadmap aware of Phase 2 CRM that already shipped (contacts/contact_notes/relationships pipeline). Documents the three-layer Pathlight lock: master toggle + per-feature toggles + monthly budget cap. Each phase notes Pathlight cost (NONE / GATED), acceptance criteria, blast radius. Operational notes call out frozen codebases.
+
+**3. Phase 0 (Settings, Audit, Pathlight Locks) shipped to working tree.**
+- `lib/db/migrations/024_canopy_settings_and_audit.sql` - three tables. `canopy_settings` is a singleton (`id = 1` CHECK) with the six Pathlight feature toggles, monthly_scan_budget + scans_used + period_resets_at, lead_score_weights JSONB, white-label fields, timezone, digest cadence. `canopy_audit_log` is the entity-change trail (distinct from existing `admin_audit_log` for auth events) with before/after JSONB and four indexes. `canopy_feature_flags` is generic key/value scope JSONB
+- `lib/canopy/settings.ts` - `getCanopySettings` reader. No cache layer; falls open to DEFAULTS when migration is unapplied (DEFAULTS evaluate to "blocked" in the gate so a missing migration cannot accidentally allow a scan)
+- `lib/canopy/pathlight-gate.ts` - `canFireScan(kind)` returns `{ allowed, reason?, remaining? }`. `ScanKind` union: `'rescan' | 'prospecting' | 'competitive_intel'`. `incrementScanUsage(count)` and `resetPeriodIfDue` for post-fire bookkeeping
+- `lib/canopy/audit.ts` - `recordChange`, `getEntityAuditTrail`, `getRecentChanges`. Best-effort writer (DB outage logs to console but does not throw)
+- `lib/actions/canopy-settings.ts` - Server Actions: `setCanopyToggle`, `setMonthlyBudget`, `resetCurrentPeriodCounter`, `setBranding`. Each requires `session.user.isAdmin`, writes to `canopy_audit_log`, and `revalidatePath`s `/admin` + `/admin/canopy` (no `revalidateTag` because Next 16 changed the signature to require a profile arg; matches existing repo pattern in `lib/actions/contacts.ts`)
+- `app/admin/canopy/page.tsx` - Server Component, palette `stone`, reads settings + recent changes. Renders the controls client island and a setting-changes audit feed
+- `app/admin/canopy/CanopyControlsClient.tsx` - Client Component with Pathlight master kill (color-coded pill), per-feature toggles list, monthly budget editor with reset-counter button, notifications toggle, white-label form. Optimistic UI with rollback on Server Action failure
+- `app/admin/layout.tsx` - added "Canopy controls" item (Sliders icon, palette stone) to the Account nav group, above "Audit log"
+- `lib/admin/page-themes.ts` - added `/admin/canopy` → `stone` palette mapping
+
+### What is intentionally NOT in the working tree
+
+- Deals architecture (Phase 1 of the plan). 7+ file change touching dashboard rollups + contact detail panel + new /admin/deals routes; deferred to next session for a clean focused commit.
+- The `error_events` and `canopy_*` migrations have NOT been applied to prod Neon. `npm run lint` and `npx tsc --noEmit` both clean against the working tree, but until the migrations run, every read returns DEFAULTS / empty (the helpers handle this gracefully) and the Pathlight gate denies all scans (which is the correct safe default).
+
+### Acceptance signals (what the user verifies after committing + applying migrations)
+
+- After `node --env-file=.env.local scripts/run-migration.mjs lib/db/migrations/023_error_events.sql`: trigger a runtime error in any browser session (e.g. `throw new Error("test")` from devtools) → row appears in `error_events` and `/admin/errors` shows it within ~15s
+- After `node --env-file=.env.local scripts/run-migration.mjs lib/db/migrations/024_canopy_settings_and_audit.sql`: `/admin/canopy` renders the controls page, master kill toggles flip with audit log rows appearing below
+- `npx tsc --noEmit` and `npm run lint` clean (verified)
+- `git status` shows the diff above
+
+### Next recommended task
+
+**Phase 1 - Deals Architecture pivot.** Per `docs/ai/canopy-build-plan.md`. Migration 025_deals.sql (with idempotent backfill from contacts.status into one open or one closed deal per contact), `lib/services/deals.ts`, `lib/actions/deals.ts`, new `/admin/deals` Kanban + `/admin/deals/[id]` detail page, three rollup tiles on the dashboard (Weighted Pipeline / Unweighted / Closed-Won This Month), Deals panel on contact detail page, banner on `/admin/relationships/pipeline` pointing to the new deal board.
+
+---
+
+## Prior state (preserved below for continuity) -- Phase 2 shipped + audited at `b9a1833`
 
 ### Phase 1 shipped (commit `7f9ea05`, docs `76925b7`)
 

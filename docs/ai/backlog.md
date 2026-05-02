@@ -1,5 +1,33 @@
 # Backlog
 
+## Priority 0: Canopy v2 build (May 1+, source-of-truth flipped to DBJ /admin)
+
+Plan: `docs/ai/canopy-build-plan.md` (9 phases).
+
+### Done in working tree (uncommitted as of May 1 late)
+
+- [x] Source-of-truth decision: DBJ `/admin` is canonical Canopy; `ops.thestarautoservice.com` install + `github.com/dbjonestech-tech/canopy` repo + `/Users/doulosjones/Desktop/operations-cockpit/` working dir are FROZEN.
+- [x] Audit of operations-cockpit identified three real deltas vs DBJ: error capture pipeline (ported), CanopyBeacon export snippet (deferred), bootstrap/seed scripts (deferred).
+- [x] First-party error capture pipeline ported. Migration 023 (`error_events` table with fingerprint grouping), `/api/track/error` endpoint, `ErrorBeacon` component mounted in root layout, `lib/services/errors.ts`, rewritten `/admin/errors` page with first-party + Sentry hybrid view.
+- [x] Phase 0: Settings, Audit, Pathlight Locks. Migration 024 (`canopy_settings`, `canopy_audit_log`, `canopy_feature_flags`), `lib/canopy/{settings,pathlight-gate,audit}.ts`, `lib/actions/canopy-settings.ts`, `/admin/canopy` page with controls + audit feed, sidebar nav entry under Account.
+
+### Manual follow-ups to land working-tree changes
+
+- [ ] Apply migration 023 to prod Neon: `node --env-file=.env.local scripts/run-migration.mjs lib/db/migrations/023_error_events.sql`. Until applied, `/admin/errors` first-party section renders an empty state with a hint card telling Joshua to run the migration.
+- [ ] Apply migration 024 to prod Neon: `node --env-file=.env.local scripts/run-migration.mjs lib/db/migrations/024_canopy_settings_and_audit.sql`. Until applied, `/admin/canopy` renders with default OFF settings (correct safe state) and the audit feed is empty.
+- [ ] Verify `/admin/errors` first-party row count goes up after a deliberate browser-thrown error from devtools.
+- [ ] Verify `/admin/canopy` master-kill toggle round-trips: flip OFF, audit row appears in feed; flip ON, audit row appears.
+- [ ] After committing: `vercel logs --status-code 500 --since 5m` to confirm no RSC boundary failures (per `feedback_rsc_boundary_runtime`).
+
+### Next phase queued
+
+- [ ] **Phase 1: Deals Architecture pivot.** Migration 025_deals.sql (with idempotent backfill from `contacts.status`), `lib/services/deals.ts`, `lib/actions/deals.ts`, `/admin/deals` Kanban, `/admin/deals/[id]` detail, three rollup tiles on dashboard (Weighted / Unweighted / Closed-Won This Month), Deals panel on contact detail page, banner on `/admin/relationships/pipeline` pointing to the new deal board. See `docs/ai/canopy-build-plan.md#phase-1`.
+
+### Net new gaps to port (deferred, lower value than the build phases)
+
+- [ ] Exportable `CanopyBeacon.tsx` snippet (separate from DBJ's `AnalyticsBeacon`). Phase 9 dependency. Configurable endpoint URL prop so client sites can embed pointing at their Canopy install.
+- [ ] Bootstrap + seed scripts (`scripts/bootstrap.ts`, `seed-demo.ts`, `seed-extras.ts`) adapted to DBJ migration set. Required when productization actually starts; not blocking for the build phases.
+
 ## Priority 1: Revenue-Generating Actions (Not Code)
 
 - [ ] Follow up with Tyler on client referrals (he was texted, awaiting response)

@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/layout/JsonLd";
 import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { AnalyticsBeacon } from "@/components/analytics/AnalyticsBeacon";
+import { ErrorBeacon } from "@/components/analytics/ErrorBeacon";
 import "./globals.css";
 
 /* ─── FONTS ─────────────────────────────────────────── */
@@ -170,6 +171,7 @@ export default async function RootLayout({
         <CookieConsent />
         <GoogleAnalytics />
         <AnalyticsBeacon />
+        <ErrorBeacon />
       </body>
     </html>
   );

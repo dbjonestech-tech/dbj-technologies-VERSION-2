@@ -1,6 +1,19 @@
 # Current State
 
-Last updated: April 29, 2026 (late, post-Canopy expansion)
+Last updated: May 1, 2026 (later - Canopy v2 build started, source-of-truth flipped to DBJ /admin)
+
+## Canopy v2 build (May 1, late) - IN PROGRESS, error pipeline + Phase 0 staged uncommitted
+
+DBJ `/admin` in this repo is now the canonical source of truth for Canopy. The starter at `github.com/dbjonestech-tech/canopy`, the `operations-cockpit` working directory, and the live install at `ops.thestarautoservice.com` are **frozen**. See `docs/ai/decision-log.md` for the full reasoning and `docs/ai/canopy-build-plan.md` for the 9-phase roadmap.
+
+**In working tree, uncommitted, both `npx tsc --noEmit` and `npm run lint` clean:**
+
+- **First-party error capture pipeline.** Migration 023 + `/api/track/error` + `components/analytics/ErrorBeacon.tsx` mounted in root layout + `lib/services/errors.ts` query helpers + rewritten `/admin/errors` page that hybridizes first-party `error_events` (primary, fingerprint-grouped, hourly volume sparkline + by-source bars + top groups table) with the existing Sentry view (secondary). Wires `window.error` and `unhandledrejection` to `sendBeacon`/`fetch`.
+- **Phase 0: Settings, Audit, Pathlight Locks.** Migration 024 adds `canopy_settings` (singleton, six Pathlight feature toggles + monthly_scan_budget + scans_used_this_period + period_resets_at + lead_score_weights + brand fields + digest cadence), `canopy_audit_log` (entity-change trail, distinct from existing `admin_audit_log` for auth events), `canopy_feature_flags` (generic key/value scope JSONB). `lib/canopy/{settings,pathlight-gate,audit}.ts` are the runtime helpers; the gate's `canFireScan(kind)` returns `{ allowed, reason?, remaining? }` and is required on every Pathlight entrypoint going forward. `lib/actions/canopy-settings.ts` mutations (admin-gated, audit-logged, revalidatePath). `/admin/canopy` page with master-kill pill, per-feature toggles, monthly budget editor with reset-counter button, white-label form, recent setting changes feed. Sidebar entry under Account.
+
+**Not yet applied to prod Neon:** migrations 023 and 024. Until applied, the corresponding pages render their safe defaults (empty state for /admin/errors first-party section, all-OFF settings on /admin/canopy). Both helpers fall open to defaults if the table is missing, so render paths are robust against an unapplied migration.
+
+**Frozen elsewhere:** `/Users/doulosjones/Desktop/operations-cockpit/` (the productized starter that was source for Star Auto). 8 admin sections vs DBJ's 22+. Audit identified 3 deltas worth porting back: (1) error capture pipeline - DONE this session, (2) exportable CanopyBeacon snippet - deferred, (3) bootstrap/seed scripts - deferred.
 
 ## Canopy (productized engagement, April 28; renamed from Operations Cockpit later same day; expanded to 9-section product April 29)
 
