@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { auth } from "@/auth";
 import { getDashboardStatus, type StatusLevel } from "@/lib/services/health-status";
 import { getDashboardKpis } from "@/lib/services/dashboard-kpis";
+import { getDealRollups, formatDealValue } from "@/lib/services/deals";
 import DashboardCard, { type IconName } from "./DashboardCard";
 import { PALETTES, type PaletteName } from "@/lib/admin/page-themes";
 
@@ -54,6 +56,13 @@ const COLUMNS: Column[] = [
         href: "/admin/contacts",
         iconName: "ClipboardList",
         palette: "pink",
+      },
+      {
+        label: "Deals",
+        description: "Active opportunities, weighted forecast, and won/lost analytics.",
+        href: "/admin/deals",
+        iconName: "Briefcase",
+        palette: "violet",
       },
       {
         label: "Monitor",
@@ -203,6 +212,94 @@ const ACCOUNT_COLUMN: Column = {
   ],
 };
 
+function PipelineRollups({
+  weighted,
+  unweighted,
+  closedWon,
+  openCount,
+  wonCount,
+}: {
+  weighted: number;
+  unweighted: number;
+  closedWon: number;
+  openCount: number;
+  wonCount: number;
+}) {
+  return (
+    <section className="mb-8">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wider text-zinc-500">
+          <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-violet-500" />
+          Pipeline
+        </h2>
+        <Link
+          href="/admin/deals"
+          className="text-[11px] font-semibold text-violet-700 hover:underline"
+        >
+          Open Deals board →
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <RollupTile
+          label="Weighted pipeline"
+          value={formatDealValue(weighted)}
+          sub={`${openCount} open deal${openCount === 1 ? "" : "s"}`}
+          accent="violet"
+        />
+        <RollupTile
+          label="Unweighted pipeline"
+          value={formatDealValue(unweighted)}
+          sub="Sum of all open deal values"
+          accent="zinc"
+        />
+        <RollupTile
+          label="Closed-Won this month"
+          value={formatDealValue(closedWon)}
+          sub={`${wonCount} won this month`}
+          accent="emerald"
+        />
+      </div>
+    </section>
+  );
+}
+
+function RollupTile({
+  label,
+  value,
+  sub,
+  accent,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  accent: "violet" | "emerald" | "zinc";
+}) {
+  const accentText =
+    accent === "violet"
+      ? "text-violet-700"
+      : accent === "emerald"
+        ? "text-emerald-700"
+        : "text-zinc-700";
+  const accentBar =
+    accent === "violet"
+      ? "bg-violet-500"
+      : accent === "emerald"
+        ? "bg-emerald-500"
+        : "bg-zinc-400";
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+      <div className="flex items-center gap-2">
+        <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${accentBar}`} />
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+          {label}
+        </p>
+      </div>
+      <p className={`mt-2 font-mono text-3xl font-semibold ${accentText}`}>{value}</p>
+      <p className="mt-1 text-xs text-zinc-500">{sub}</p>
+    </div>
+  );
+}
+
 function statusBadgeClass(level: StatusLevel): string {
   if (level === "red") return "bg-red-50 text-red-700 border-red-200";
   if (level === "yellow") return "bg-amber-50 text-amber-700 border-amber-200";
@@ -210,10 +307,11 @@ function statusBadgeClass(level: StatusLevel): string {
 }
 
 export default async function AdminLanding() {
-  const [session, status, kpis] = await Promise.all([
+  const [session, status, kpis, deals] = await Promise.all([
     auth(),
     getDashboardStatus(),
     getDashboardKpis(),
+    getDealRollups(),
   ]);
   const firstName = session?.user?.email?.split("@")[0] ?? "there";
 
@@ -270,6 +368,14 @@ export default async function AdminLanding() {
             </ul>
           )}
         </section>
+
+        <PipelineRollups
+          weighted={deals.weighted_pipeline_cents}
+          unweighted={deals.unweighted_pipeline_cents}
+          closedWon={deals.closed_won_this_month_cents}
+          openCount={deals.open_count}
+          wonCount={deals.won_this_month_count}
+        />
 
         {/* Column headers (lg only). Each header carries its column
             family dot. Below lg the columns collapse into a flat

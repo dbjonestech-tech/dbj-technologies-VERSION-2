@@ -1,5 +1,21 @@
 # Decision Log
 
+## May 1, 2026 (latest) -- Canopy v2 Phase 1: deal-centric CRM pivot
+
+Decision: Add a `deals` table alongside `contacts`. The Kanban moves DEALS now, not contacts. One contact can have many deals over time. The legacy `contacts.status` column stays as a denormalized "primary deal stage" mirror so the existing `/admin/relationships/pipeline` kanban keeps working without a hard cutover. A banner on the legacy kanban points operators to `/admin/deals` as the new primary board.
+
+Reason: The Phase 2 lightweight CRM (May 1, earlier) tracked one contact through one stage. Real CRMs track deals through stages with people attached. The single-stage-per-contact model breaks the moment a customer has a closed-won engagement and a new opportunity in flight at the same time. It also makes pipeline value forecasting impossible (you cannot weighted-pipeline-sum a status enum). Phase 1 of the Canopy v2 build is this pivot, the foundation every later phase (sequences, automation, analytics, attribution) builds on.
+
+Implementation choices:
+- **Backfill creates one deal per existing contact** so the new Kanban hydrates with real data on first load. The backfill is idempotent: it skips any contact already having a deal so re-running the migration is safe.
+- **Probability rule on stage change: never decrease.** When operator moves a deal from "qualified" (which they had at 65% custom) to "proposal" (default 70%), the probability raises to 70%. But if they had set qualified at 80% (high confidence) and move to proposal, the probability stays at 80%. Stage changes raise probability to the default if higher; never drop. Won is always 100, Lost is always 0.
+- **Won and Lost are NOT settable from the kanban dropdown.** Closing a deal as won captures a final value (which may differ from the original); closing as lost requires a reason. Both flows live on the deal detail page so the outcome and loss reason are properly captured. The kanban dropdown disables those options with a "use Close button on detail" hint.
+- **Mirror rule:** every stage change updates the linked contact's `contacts.status` to match the contact's most-recently-updated open deal (or the most recent closed deal if no open deals remain). This keeps the legacy contact-stage kanban consistent without forcing a hard cutover.
+- **Owner is denormalized:** schema has `owner_user_id` (TEXT, for Phase 8 RBAC) AND `owner_email`. New deals get `owner_email` from the session; backfilled deals get NULL.
+- **Kanban tinting reuses the contact pipeline's color scheme** (blue/amber/violet/cyan/emerald/zinc) so the visual language is consistent across the two boards. The deals page itself uses `violet` palette.
+- **Audit log on every change.** Create, update, stage change, close, reopen all write to `canopy_audit_log` with before/after JSONB. The deal detail page renders an audit feed so operators see every change to a deal.
+- **No drag-and-drop on the new kanban**, mirroring the existing decision on the contact pipeline. Status dropdown is the right interaction at low deal volumes; revisit at scale.
+
 ## May 1, 2026 (later) -- Canopy v2 build started: source-of-truth flip + Pathlight lock architecture
 
 Decision: Two coupled decisions taken together. (1) DBJ `/admin` in this repo is now the canonical source of truth for Canopy as a product. The previously productized starter at `github.com/dbjonestech-tech/canopy` and Star Auto's live install at `ops.thestarautoservice.com` (working dir `/Users/doulosjones/Desktop/operations-cockpit/`) are **frozen**: no new features land there until the DBJ Canopy is perfected; Star Auto will then be rebuilt from the perfected source. (2) All future Pathlight automation in Canopy passes through a three-layer lock - feature toggles + manual click-driven trigger + monthly budget cap. Default state on install is locked-shut.

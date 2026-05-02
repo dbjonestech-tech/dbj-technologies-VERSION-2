@@ -20,6 +20,11 @@ import {
   type TimelineEntry,
   type TimelineEventType,
 } from "@/lib/services/contacts";
+import {
+  getDealsForContact,
+  formatDealValue,
+  type DealRow,
+} from "@/lib/services/deals";
 import PageHeader from "../../PageHeader";
 import ContactHeader from "./ContactHeader";
 import ContactNotes from "./ContactNotes";
@@ -44,10 +49,11 @@ export default async function ContactDetailPage({ params }: Props) {
   const contact = await getContact(id);
   if (!contact) notFound();
 
-  const [timeline, notes, scanInfo] = await Promise.all([
+  const [timeline, notes, scanInfo, deals] = await Promise.all([
     getContactTimeline(contact.email, contact.id, 50),
     getContactNotes(contact.id),
     getPathlightScansForContact(contact.email),
+    getDealsForContact(contact.id),
   ]);
 
   return (
@@ -80,6 +86,8 @@ export default async function ContactDetailPage({ params }: Props) {
           ) : null}
         </div>
 
+        <DealsPanel deals={deals} />
+
         <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-6">
           <header className="mb-4">
             <h2 className="font-display text-base font-semibold text-zinc-900">
@@ -98,6 +106,75 @@ export default async function ContactDetailPage({ params }: Props) {
         </section>
       </div>
     </div>
+  );
+}
+
+function DealsPanel({ deals }: { deals: DealRow[] }) {
+  const open = deals.filter((d) => d.closed_at === null);
+  const closed = deals.filter((d) => d.closed_at !== null);
+  const openValue = open.reduce((s, d) => s + Number(d.value_cents), 0);
+  const wonValue = closed
+    .filter((d) => d.won === true)
+    .reduce((s, d) => s + Number(d.value_cents), 0);
+
+  return (
+    <section className="mt-8 rounded-xl border border-violet-200 bg-gradient-to-br from-white via-violet-50/40 to-white p-6 shadow-sm">
+      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="font-display text-base font-semibold text-zinc-900">
+            Deals
+          </h2>
+          <p className="mt-0.5 text-xs text-zinc-600">
+            {open.length} open · {closed.length} closed · {formatDealValue(openValue)} open value
+            {wonValue > 0 ? ` · ${formatDealValue(wonValue)} won` : ""}
+          </p>
+        </div>
+        <Link
+          href="/admin/deals"
+          className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 hover:bg-violet-200"
+        >
+          Open Deals board <ExternalLink className="h-3 w-3" aria-hidden="true" />
+        </Link>
+      </header>
+      {deals.length === 0 ? (
+        <p className="text-sm text-zinc-500">
+          No deals yet. Create the first deal from the Deals board (the contact will be linked automatically) or via the API once Phase 8 ships.
+        </p>
+      ) : (
+        <ul className="divide-y divide-violet-100">
+          {deals.map((d) => (
+            <li key={d.id} className="py-3">
+              <Link
+                href={`/admin/deals/${d.id}`}
+                className="flex items-start justify-between gap-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-zinc-900">
+                    {d.name}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-zinc-500">
+                    {d.closed_at
+                      ? `${d.won ? "Won" : "Lost"} on ${new Date(d.closed_at).toLocaleDateString()}`
+                      : `${d.stage} · ${d.probability_pct}% probability`}
+                    {d.expected_close_at && !d.closed_at
+                      ? ` · expected ${d.expected_close_at}`
+                      : ""}
+                  </p>
+                  {d.loss_reason ? (
+                    <p className="mt-1 text-[11px] text-zinc-500">
+                      Loss reason: {d.loss_reason}
+                    </p>
+                  ) : null}
+                </div>
+                <span className="font-mono text-sm font-semibold text-zinc-900">
+                  {formatDealValue(Number(d.value_cents), d.currency)}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

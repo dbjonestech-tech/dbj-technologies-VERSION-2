@@ -5,7 +5,44 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 build BEGUN, error pipeline + Phase 0 shipped at `9f259de`, pushed to origin main, working tree clean)
+## Current state (May 1, 2026 -- Canopy v2 Phase 1 staged uncommitted, prior phases live at `9f259de`/`20d2bf8`)
+
+### Phase 1 staged this session (pre-commit)
+
+**Deals architecture pivot.** The architectural pivot from contact-stage to deal-stage CRM, the foundation every later phase (sequences, automation, analytics, attribution) builds on. One contact can now have multiple deals over time; each deal has its own value, probability, expected close, and won/lost outcome.
+
+- `lib/db/migrations/025_deals.sql` - new `deals` table (id, name, contact_id ON DELETE CASCADE, owner_user_id, owner_email, value_cents BIGINT, currency, stage CHECK new/contacted/qualified/proposal/won/lost, probability_pct CHECK 0-100, expected_close_at, closed_at, won, loss_reason, source, notes, timestamps). Five indexes including a partial closed_at index and a partial open-deals-per-contact index. Idempotent backfill: one deal per contact mirroring the contact's current status, name from COALESCE(company, name, email), probabilities defaulted by stage (new=10, contacted=25, qualified=50, proposal=70, won=100, lost=0). Lost-status backfill records a placeholder loss reason.
+- `lib/services/deals.ts` - read service. `DEAL_STAGES`, `OPEN_STAGES`, `STAGE_PROBABILITY` constants. `getDealsForKanban` returns Record<DealStage, DealRow[]> ordered by stage then value desc. `getDeal`, `getDealsForContact`, `getDealRollups` (weighted=SUM(value*prob/100) for open, unweighted, closed-won-this-month, open count, won/lost monthly counts), `getStageRollups`. `formatDealValue` and `dealsToTotalCents` helpers. All readers fall open to empty/zero on DB error so a missing migration cannot crash a render.
+- `lib/actions/deals.ts` - Server Actions, all admin-gated and audit-logged via `recordChange`. `createDealAction`, `updateDealFieldAction` (name, value_cents, expected_close_at, probability_pct, notes), `changeDealStageAction` (open stages only; won/lost rejected with a message pointing to the close button on detail), `closeDealWonAction` (optional final value), `closeDealLostAction` (loss reason required), `reopenDealAction`. **Probability rule:** stage changes never decrease probability; if the new stage default is higher than current, raise to the default; otherwise leave the operator's custom value alone. **Mirror rule:** every stage change updates the linked contact's denormalized status to match the contact's most-recently-updated open deal, keeping the existing `/admin/relationships/pipeline` consistent without forcing a hard cutover.
+- `app/admin/deals/page.tsx` - Server Component, palette violet, renders three rollup tiles (Weighted, Unweighted, Closed-Won This Month) above the kanban. Empty state hint references migration 025.
+- `app/admin/deals/DealKanbanBoard.tsx` - Client Component. Six columns matching existing PipelineBoard tinting. Per-card stage dropdown (won/lost disabled, force the close-on-detail flow). Card shows name + value + contact + probability + expected close (overdue red). NO drag-and-drop, matching the prior decision-log entry on the contacts kanban.
+- `app/admin/deals/[id]/page.tsx` - Server Component detail with PageHeader, link to contact, audit log of every change to this deal (entity-scoped read against canopy_audit_log).
+- `app/admin/deals/[id]/DealDetailClient.tsx` - Client Component. Inline editors for name, value (in dollars, stored as cents), probability (clamped 0-100), expected close, notes. Stage dropdown for open transitions. "Close as Won" with optional final value, "Close as Lost" with required reason. "Reopen deal" button on closed deals returns them to qualified/50%. All operations use `useTransition` with optimistic state and rollback on failure.
+
+### Integration touchpoints (this commit)
+
+- `app/admin/page.tsx` - new "Pipeline" rollup section above the column grid showing Weighted / Unweighted / Closed-Won This Month tiles, with a link to `/admin/deals`. New "Deals" card added to the Today column (Briefcase icon, violet palette).
+- `app/admin/contacts/[id]/page.tsx` - new Deals panel between the [ContactHeader|PathlightScanCard] grid and the Activity section. Shows open/closed counts + open value + won total, lists every deal with stage, probability, expected close, loss reason. Each entry links to `/admin/deals/[id]`.
+- `app/admin/relationships/pipeline/page.tsx` - banner above the contact-stage kanban pointing operators to `/admin/deals` for deal-level tracking. Description updated to clarify this board moves contacts through their primary stage.
+- `app/admin/layout.tsx` - "Deals" sidebar item (Briefcase, violet) added to the Relationships group between Contacts and Pipeline.
+- `lib/admin/page-themes.ts` - `/admin/deals` mapped to `violet` palette.
+
+### Acceptance signals
+
+- After `node --env-file=.env.local scripts/run-migration.mjs lib/db/migrations/025_deals.sql`: every existing contact has exactly one deal (verify with `SELECT COUNT(*) FROM deals` and `SELECT COUNT(*) FROM contacts`); rerunning the migration creates no new rows.
+- `/admin/deals` renders the kanban with backfilled deals in the correct columns; stage dropdown changes a deal's column and updates contacts.status accordingly.
+- Closing a deal as Won locks all editors, sets value/probability/closed_at, mirrors contacts.status to 'won'. Reopen returns to qualified.
+- Lost requires a reason; submitting empty surfaces an error.
+- Dashboard rollup tiles compute correctly (verify against `SELECT SUM(value_cents * probability_pct / 100.0) FROM deals WHERE closed_at IS NULL`).
+- `npx tsc --noEmit` and `npm run lint` clean (verified pre-commit).
+
+### Next recommended task
+
+**Phase 2 - Activities & Tasks** per `docs/ai/canopy-build-plan.md`. Migration 026_activities.sql extending `contact_notes` into a richer `activities` table (note/call/meeting/email/task with type-specific JSONB payload, due_at/completed_at for tasks, priority enum). `lib/services/activities.ts` unified timeline reader. `lib/actions/activities.ts` Server Actions per type. `lib/services/tasks.ts` for "today + overdue" dashboard card. `/admin/tasks` standalone page with filters. Dashboard "Today's Tasks" card. Inline composer on contact and deal detail pages.
+
+---
+
+## Prior state -- error pipeline + Phase 0 shipped at `9f259de`, pushed to origin main
 
 ### What just happened (this session)
 

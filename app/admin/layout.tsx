@@ -81,6 +81,12 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
         badge: overdueCount > 0 ? { count: overdueCount, tone: "danger" } : null,
       },
       {
+        label: "Deals",
+        href: "/admin/deals",
+        icon: Briefcase,
+        palette: "violet",
+      },
+      {
         label: "Pipeline",
         href: "/admin/relationships/pipeline",
         icon: Kanban,

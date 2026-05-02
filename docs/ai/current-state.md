@@ -1,8 +1,16 @@
 # Current State
 
-Last updated: May 1, 2026 (later - Canopy v2 build started, source-of-truth flipped to DBJ /admin)
+Last updated: May 1, 2026 (latest - Canopy v2 Phase 1 deals architecture staged uncommitted; prior phases live)
 
-## Canopy v2 build (May 1, late) - IN PROGRESS, error pipeline + Phase 0 staged uncommitted
+## Canopy v2 build (May 1, latest) - Phase 1 deals architecture pivot staged in working tree
+
+The architectural pivot from contact-stage to deal-stage CRM. One contact can now have multiple deals over time, each with its own value, probability, expected close, and won/lost outcome. The new `/admin/deals` Kanban becomes the primary deal board; the existing `/admin/relationships/pipeline` (contact-stage kanban) keeps working with a banner pointing to the new board.
+
+**Working tree (uncommitted):** migration `025_deals.sql` with idempotent backfill from contacts.status (one deal per contact), `lib/services/deals.ts` (kanban query, rollups, stage rollups, format helpers), `lib/actions/deals.ts` (six audit-logged Server Actions: create, updateField, changeStage, closeWon, closeLost, reopen with the probability-never-decreases rule and contact-status mirror rule), `/admin/deals` page with three rollup tiles + kanban, `/admin/deals/[id]` detail with inline editors and audit log, contact detail page gains a Deals panel, dashboard gains a Pipeline rollup section + Deals card, sidebar gains a Deals item, relationships pipeline gains a banner.
+
+`npx tsc --noEmit` and `npm run lint` clean. Migration 025 has NOT been applied to prod Neon yet; until applied `/admin/deals` renders an empty state with a hint to run the migration.
+
+## Canopy v2 build (May 1, late) - error pipeline + Phase 0 shipped at `9f259de` + `20d2bf8` (live in production)
 
 DBJ `/admin` in this repo is now the canonical source of truth for Canopy. The starter at `github.com/dbjonestech-tech/canopy`, the `operations-cockpit` working directory, and the live install at `ops.thestarautoservice.com` are **frozen**. See `docs/ai/decision-log.md` for the full reasoning and `docs/ai/canopy-build-plan.md` for the 9-phase roadmap.
 

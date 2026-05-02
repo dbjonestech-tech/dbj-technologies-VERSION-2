@@ -371,6 +371,7 @@ export const PAGE_PALETTE: Record<string, PaletteName> = {
   "/admin/recurring": "pink",
   "/admin/contacts": "pink",
   "/admin/relationships/pipeline": "rose",
+  "/admin/deals": "violet",
   "/admin/costs": "amber",
   "/admin/database": "orange",
   "/admin/clients": "yellow",

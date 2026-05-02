@@ -4,6 +4,17 @@
 
 Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 
+### Phase 1 done in working tree (uncommitted as of May 1 latest)
+
+- [x] **Phase 1: Deals architecture pivot.** Migration `025_deals.sql` (deals table + idempotent backfill from contacts.status), `lib/services/deals.ts` (kanban + rollups), `lib/actions/deals.ts` (six audit-logged Server Actions with the probability-never-decreases rule and contact-status mirror rule), `/admin/deals` page with rollup tiles + kanban, `/admin/deals/[id]` detail with inline editors and per-entity audit log, dashboard gains Pipeline rollup section + Deals card, contact detail gains Deals panel, sidebar gains Deals item, relationships pipeline gains a banner pointing to /admin/deals.
+
+### Manual follow-ups for Phase 1
+
+- [ ] Apply migration 025 to prod Neon: `node --env-file=.env.local scripts/run-migration.mjs lib/db/migrations/025_deals.sql`. The backfill creates one deal per existing contact mirroring its current status; idempotent on re-run.
+- [ ] Open `/admin/deals` and confirm the kanban hydrates with backfilled deals. Move a card; confirm contacts.status mirrors the new stage.
+- [ ] Close a deal as Won with a final value; confirm dashboard "Closed-Won this month" tile updates.
+- [ ] Close another deal as Lost with a reason; confirm reason persists on the deal detail page.
+
 ### Done in working tree (uncommitted as of May 1 late)
 
 - [x] Source-of-truth decision: DBJ `/admin` is canonical Canopy; `ops.thestarautoservice.com` install + `github.com/dbjonestech-tech/canopy` repo + `/Users/doulosjones/Desktop/operations-cockpit/` working dir are FROZEN.
@@ -21,7 +32,7 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 
 ### Next phase queued
 
-- [ ] **Phase 1: Deals Architecture pivot.** Migration 025_deals.sql (with idempotent backfill from `contacts.status`), `lib/services/deals.ts`, `lib/actions/deals.ts`, `/admin/deals` Kanban, `/admin/deals/[id]` detail, three rollup tiles on dashboard (Weighted / Unweighted / Closed-Won This Month), Deals panel on contact detail page, banner on `/admin/relationships/pipeline` pointing to the new deal board. See `docs/ai/canopy-build-plan.md#phase-1`.
+- [ ] **Phase 2: Activities & Tasks.** Migration `026_activities.sql` extending `contact_notes` into a richer `activities` table (note / call / meeting / email / task types with type-specific JSONB payload, due_at + completed_at for tasks, priority enum). `lib/services/activities.ts` unified timeline reader. `lib/actions/activities.ts` Server Actions per type. `lib/services/tasks.ts` for "today + overdue" dashboard card. `/admin/tasks` standalone page with filters. Dashboard "Today's Tasks" card. Inline composer on contact and deal detail pages. See `docs/ai/canopy-build-plan.md#phase-2`.
 
 ### Net new gaps to port (deferred, lower value than the build phases)
 
