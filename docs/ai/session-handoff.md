@@ -5,7 +5,46 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Phase 9 Pathlight Advanced shipped at `86fbf85`, pushed to origin main, working tree clean. Migration 032 applied to prod Neon.)
+## Current state (May 2, 2026 -- admin observability secrets wired in Vercel + Sentry summary filter shipped)
+
+### Vercel env config completed this session
+
+The `/admin/costs`, `/admin/errors`, `/admin/platform`, and `/admin/search` admin pages were code-complete from prior phases but blank in production because the upstream credentials had never been set. All five remaining keys are now in Vercel `production` (sensitive flagged where appropriate):
+
+- `GOOGLE_SC_CREDENTIALS_JSON` -- service account `dbj-search-console@dbj-admin.iam.gserviceaccount.com`. Required GCP org policy `iam.disableServiceAccountKeyCreation` (legacy constraint) to be overridden to "Off" at org level on dbjtechnologies.com to permit JSON key creation. Service account email is authorized on the GSC `dbjtechnologies.com` domain property as a Restricted user.
+- `GOOGLE_SC_SITE_URL` = `sc-domain:dbjtechnologies.com` (domain property, not URL-prefix).
+- `ANTHROPIC_MONTHLY_BUDGET_USD` = `100`. Display reference only -- the `/admin/costs` page renders a "% used" bar but nothing throttles on this value. Real Anthropic spend cap is the prepaid credit balance ($20 currently).
+- `SENTRY_PROJECT_SLUG` = `javascript-nextjs`.
+- `SENTRY_AUTH_TOKEN` re-minted with `org:read project:read event:read` scopes (the prior token only had `event:read` which 403'd the issues summary endpoint). The new token is a **user** token (`sntryu_*` prefix) inheriting Joshua's permissions, NOT an org service token (`sntrys_*`). User tokens lack `event:admin` so resolving issues via the API returns 403; Joshua must resolve issues in the Sentry UI directly. To enable API-driven resolution in a future session, mint a new user token with `event:admin` ticked.
+
+Yesterday's session set `ANTHROPIC_ADMIN_KEY`, `SENTRY_ORG_SLUG` (= `dbj-technologies`), and `VERCEL_API_TOKEN`. Production redeploy `dbj-technologies-3a1pt8xr9` carries all eight admin secrets; the four Vercel-side admin pages should now populate (with one caveat below).
+
+### `/admin/search` remains empty until the cron runs
+
+`searchConsoleDaily` (lib/inngest/functions.ts:1383) is wired to cron `0 6 * * *` (06:00 UTC daily). The 7-day backfill window will not populate the `search_console_daily` table until the next firing. To populate immediately, invoke `search-console-daily` manually from app.inngest.com -> Functions. Until then the page shows the "no data yet" empty state.
+
+### Sentry summary filter optimization
+
+`lib/services/sentry-summary.ts` now excludes operational alert sources from the `/admin/errors` Sentry feed via the Sentry query language: `is:unresolved !source:[lighthouse-monitor,cost-monitor,elevenlabs-circuit-breaker,synthetic-canary]`. Those four sources are intentional `Sentry.captureMessage` calls from `lib/inngest/functions.ts` (Lighthouse regression alerts, cost threshold pings, voice synthesis circuit-breaker trips, synthetic canary check failures). They are already surfaced on dedicated admin pages (`/admin/performance/rum`, `/admin/costs`, `/admin/monitor`) and were polluting the bug feed alongside actual code errors. The named source list is exported as `OPERATIONAL_SOURCES` so any future operational `Sentry.captureMessage` site can be added in one place.
+
+### Dashboard cleanup pending in Sentry UI
+
+The `/admin/errors` Sentry feed currently shows ~10 unresolved issues that are all already fixed in current code or stale (NeonDbErrors against tables that exist now, RSC boundary errors fixed at `a28cd80`, CanopySettings ReferenceError fixed at `398e8e9`, etc.). They keep appearing in the 24h window because Sentry tracks `lastSeen` against any matching event, and stale Vercel function instances from older releases occasionally still emit. They will age out of the 24h window after the next stable day on the new deployment. Joshua can also bulk-mark them resolved in the Sentry UI (Issues -> select all -> Resolve) for an immediate cleanup. The current API token cannot do this (lacks `event:admin`).
+
+### Stale credential cleanup outstanding
+
+The downloaded GCP service account JSON at `/Users/doulosjones/Downloads/dbj-admin-2cad95e72a64.json` should be deleted from Downloads (and Trash emptied) since it carries a working private key and is no longer needed locally. The legacy `iam.disableServiceAccountKeyCreation` org policy override should also be flipped back to "Inherit parent's policy" on GCP to restore the security default; the existing key keeps working since the policy only blocks new key creation.
+
+### Next recommended task
+
+1. Verify each of `/admin/costs`, `/admin/errors`, `/admin/platform`, `/admin/search` populates after the redeploy. `/admin/search` will need a manual Inngest invocation of `search-console-daily` for instant data.
+2. Trigger the GSC import manually via Inngest dashboard if you want today's data in `/admin/search` immediately rather than waiting for 06:00 UTC.
+3. (Optional) Re-mint the Sentry user token with `event:admin` if you want future sessions to be able to resolve issues via API.
+4. (Optional) Bulk-resolve the existing stale Sentry issues in the UI to clean up the `/admin/errors` feed.
+
+---
+
+## Prior state (May 1, 2026 -- Phase 9 Pathlight Advanced shipped at `86fbf85`, pushed to origin main, working tree clean. Migration 032 applied to prod Neon.)
 
 ### Phase 9: Pathlight Advanced (gated) - prospecting + change monitoring + competitive intel + attribution beacon
 

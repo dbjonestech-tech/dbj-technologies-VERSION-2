@@ -62,6 +62,18 @@ type RawSentryIssue = {
   permalink?: string;
 };
 
+/* Operational alert sources tagged via Sentry.captureMessage in
+ * lib/inngest/functions.ts. These are already surfaced on their own
+ * admin pages (Lighthouse on /admin/performance/rum, costs on
+ * /admin/costs, synthetic checks on /admin/monitor) so they should not
+ * pollute the code-bug feed on /admin/errors. */
+const OPERATIONAL_SOURCES = [
+  "lighthouse-monitor",
+  "cost-monitor",
+  "elevenlabs-circuit-breaker",
+  "synthetic-canary",
+];
+
 async function fetchTopIssuesFromSentry(): Promise<SentryIssue[] | null> {
   const token = process.env.SENTRY_AUTH_TOKEN;
   const org = process.env.SENTRY_ORG_SLUG;
@@ -70,7 +82,10 @@ async function fetchTopIssuesFromSentry(): Promise<SentryIssue[] | null> {
 
   try {
     const url = new URL(`/projects/${org}/${project}/issues/`, `${SENTRY_API}/`);
-    url.searchParams.set("query", "is:unresolved");
+    url.searchParams.set(
+      "query",
+      `is:unresolved !source:[${OPERATIONAL_SOURCES.join(",")}]`
+    );
     url.searchParams.set("statsPeriod", "24h");
     url.searchParams.set("sort", "freq");
     url.searchParams.set("limit", "25");
