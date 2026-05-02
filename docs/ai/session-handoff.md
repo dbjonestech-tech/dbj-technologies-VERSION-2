@@ -5,7 +5,23 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy admin logo split shipped at `00b2399`, pushed to origin main, working tree clean. Migration 031 applied to prod Neon.)
+## Current state (May 1, 2026 -- Dashboard hover-intent + bigger sidebar tree shipped at `b7a27c9`, pushed to origin main, working tree clean. Migration 031 applied to prod Neon.)
+
+### Dashboard hover-intent + bigger sidebar tree at `b7a27c9`
+
+Two-part UX pass on the admin shell.
+
+- `app/admin/layout.tsx` `CanopyWordmark` - bumped icon from h-12/w-12 (48px) to h-16/w-16 (64px). The tree now visually leads the brand block while the "Canopy" text-lg + "by DBJ Technologies" attribution stays unchanged. `width`/`height` attrs updated to 64.
+- `app/admin/DashboardCard.tsx` - new `HOVER_OPEN_DELAY` constant (1500ms) and `openTimer` ref. Mouse `onPointerEnter` now calls `scheduleOpen()` instead of `openPreview()`; `onPointerLeave` calls `cancelScheduledOpen()` so quick scroll-past does NOT trigger the popover cascade. Focus (keyboard nav, line 239 `onFocus={openPreview}`) and the touch chevron button (line 332) still call `openPreview()` directly so they bypass the delay - accessibility and explicit-tap UX are unchanged. Pointer-enter on the popover itself still calls `cancelClose` (no scheduleOpen needed there since the popover only mounts when previewOpen is already true).
+
+### Acceptance signals
+
+- `npx tsc --noEmit` and `npm run lint` clean.
+- Mouse-hover a dashboard card briefly (under 1.5s) -> no popover.
+- Mouse-hover a dashboard card and dwell -> popover fades in after 1.5s.
+- Tab into a card -> popover opens immediately (focus bypass).
+- Click chevron on no-hover devices -> popover opens immediately (explicit bypass).
+- Sidebar tree icon now 64x64.
 
 ### Canopy admin sidebar logo split at `00b2399`: icon + live wordmark text
 
