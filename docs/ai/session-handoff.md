@@ -5,7 +5,11 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Phase 8 follow-ups shipped at `b536db4`, pushed to origin main, working tree clean. Migration 031 applied to prod Neon.)
+## Current state (May 1, 2026 -- Canopy admin logo swap shipped at `3a14c55`, pushed to origin main, working tree clean. Migration 031 applied to prod Neon.)
+
+### Canopy admin sidebar logo replaced at `3a14c55`
+
+Replaced `public/canopy-logo.webp` with the new cyan-tree-on-black wordmark provided by Joshua. Source 5828x1199 PNG resampled to 1600x1199 webp (q88, method 6, 7.3 MB -> 311 KB) for retina-sharp rendering at h-10 in the /admin sidebar header. Only consumer is `CanopyWordmark` in `app/admin/layout.tsx`; no code changes. Sidebar is `bg-white` so the black-bg logo renders as a tidy `rounded-md` card in the header.
 
 ### Phase 8 follow-ups shipped at `b536db4`: sales-role scoping + per-entity audit + sidebar polish
 
