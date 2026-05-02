@@ -1552,6 +1552,38 @@ export const canopyDigestHourly = inngest.createFunction(
   }
 );
 
+/* Phase 4: Gmail ingest cron. Runs every 5 minutes. For each connected
+ * admin user, pulls newly-arrived messages since the last History API
+ * checkpoint and writes matched ones to email_messages. Initial run
+ * for a freshly-connected user backfills the trailing 7 days (capped
+ * at 200 messages) and seeds the checkpoint from Gmail's profile.
+ * Unmatched messages (no contact for either side) are silently dropped;
+ * Canopy is a CRM activity surface, not a general inbox tool. */
+export const canopyGmailIngest = inngest.createFunction(
+  {
+    id: "canopy-gmail-ingest",
+    triggers: [{ cron: "*/5 * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("ingest-all", async () => {
+      const { ingestAllConnectedAccounts } = await import(
+        "@/lib/canopy/email/ingest"
+      );
+      const results = await ingestAllConnectedAccounts();
+      const totalInserted = results.reduce((s, r) => s + r.inserted, 0);
+      const totalScanned = results.reduce((s, r) => s + r.scanned, 0);
+      const errored = results.filter((r) => r.errors.length > 0).length;
+      return {
+        accounts: results.length,
+        scanned: totalScanned,
+        inserted: totalInserted,
+        errored,
+      };
+    });
+  }
+);
+
 /* Phase 9: change-monitoring cron. Runs daily at 09:30 UTC (offset 30
  * minutes from lighthouseMonitorDaily so the two crons don't fight for
  * the same outbound bandwidth window). For every contact with an open

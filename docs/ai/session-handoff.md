@@ -5,9 +5,30 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- Phase 4 foundation staged uncommitted; admin observability secrets + Sentry filter + scan-pipeline correctness/cost fix + screenshot reliability refactor previously shipped this session)
+## Current state (May 2, 2026 -- Phase 4 foundation shipped at f4bc84f; ingest cron + tracking endpoints staged uncommitted; admin observability secrets + Sentry filter + scan-pipeline correctness/cost fix + screenshot reliability refactor previously shipped this session)
 
-### Phase 4 foundation in working tree (uncommitted)
+### Phase 4 ingest + tracking in working tree (uncommitted)
+
+Gmail ingest cron + open/click tracking endpoints. Working tree, both `npx tsc --noEmit` and `npm run lint` clean, no em dashes.
+
+Files added:
+
+- `lib/integrations/gmail-api.ts` -- narrow Gmail REST client. `getProfile`, `listRecentMessageIds` (initial backfill: trailing 7 days, capped at 200), `listMessageIdsSinceHistory` (Gmail History API; falls back to recent-messages backfill on 404 history-expired), `getMessage` (format=full), `findHeader`, `parseAddressList` (handles quoted display names with embedded commas), `extractBody` (recurses MIME parts; prefers text/plain then text/html), `sendMessage` (RFC 2822 raw-MIME builder with multipart/alternative for HTML+text, RFC 2047 encoded-word subject for non-ASCII, inserts a Message-ID header so In-Reply-To threading works on inbound replies).
+- `lib/canopy/email/messages.ts` -- DB CRUD over email_messages. `insertEmailMessage` is the idempotent ingest write (ON CONFLICT (gmail_message_id) DO NOTHING). `findContactIdByEmail` lowercases the lookup. `findMostRecentOpenDealForContact` powers deal attachment. `recordEmailOpen` and `recordEmailClick` append to opened_at array and clicked_links JSONB respectively. `listConnectedAdminEmails` powers the cron's user iteration.
+- `lib/canopy/email/ingest.ts` -- `ingestForUser` and `ingestAllConnectedAccounts`. Per user: pulls fresh access token (auto-refresh), uses History API if a checkpoint exists otherwise initial backfill, fetches full message, parses headers, determines direction (out if From matches connected_email else in), picks the "other party" address (To/Cc minus connected for outbound; From for inbound), looks up contact by email, attaches to most recent open deal if any, inserts row. Updates the History checkpoint at the end.
+- `lib/inngest/functions.ts` -- new `canopyGmailIngest` cron at `*/5 * * * *` (every 5 min, retries: 1).
+- `app/(grade)/api/inngest/route.ts` -- registers `canopyGmailIngest`.
+- `app/api/email/pixel/[messageId]/route.ts` -- 1x1 transparent gif open-tracking pixel. Always returns the gif (even on lookup failure) so a tracking miss never produces a broken-image icon. Cache-Control: no-store so Gmail's image proxy fetches every open.
+- `app/api/email/click/[messageId]/route.ts` -- click-tracking 302 redirector. Validates destination is http(s) so the endpoint cannot be repurposed as an open redirector to javascript:/data: schemes; falls back to "/" on invalid destination.
+
+### Phase 4 still to ship (final commit)
+
+- Compose modal on contact + deal detail pages (server actions for send, template picker, live merge-field preview).
+- Email Templates editor page + actions.
+- `lib/email/render.ts` merge-field substitution.
+- Inbound emails wired into the contact timeline as a new activity type.
+
+### Phase 4 foundation shipped at f4bc84f
 
 OAuth + at-rest encryption + connect/disconnect routes + Connected Accounts panel under `/admin/canopy`. Working tree, both `npx tsc --noEmit` and `npm run lint` clean, no em dashes.
 
