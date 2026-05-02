@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 6 staged uncommitted; migrations 023-028 all applied to prod Neon)
+## Current state (May 1, 2026 -- Canopy v2 Phase 6 shipped at `f2160f2`, pushed to origin main, working tree clean. Migrations 023-028 all applied to prod Neon.)
 
-### Phase 6 staged this session (pre-commit): Pathlight Manual Integrations
+### Phase 6 shipped at `f2160f2`: Pathlight Manual Integrations
 
 The first phase that gives the Phase 0 lock infrastructure something to gate. Operators can trigger fresh Pathlight scans on contacts (gated by master kill, manual_rescan_enabled toggle, and monthly budget cap), record AI search visibility checks, and compute a 0-100 lead score with weighted components. All scan triggers are admin-only, audit-logged, and increment the budget counter.
 
