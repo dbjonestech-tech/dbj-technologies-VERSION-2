@@ -5,14 +5,16 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- admin observability secrets wired in Vercel + Sentry summary filter shipped at `9ad2d76`, pushed to origin main)
+## Current state (May 2, 2026 -- admin observability secrets + Sentry filter + scan-pipeline correctness/cost fix + screenshot reliability refactor all shipped, working tree clean, pushed to origin main)
 
-**Working tree NOT clean.** Two unrelated files carry pre-existing uncommitted changes from prior work that are NOT this commit:
+Four commits this session, in order:
 
-- `lib/inngest/functions.ts` -- two pending fixes: (1) wraps `track("scan.started")` in `step.run("track-start")` so it fires once per scan rather than re-executing on every Inngest replay (was producing 7 duplicate `scan.started` rows in `monitoring_events` per scan), and (2) adds an a3 benchmark-research short-circuit when vision did not succeed, since the downstream consumers (revenue, score, report UI) all already short-circuit when vision fails -- the unconditional benchmark call was costing ~$0.20 of orphaned Sonnet tokens on every partial scan. Both are real, valuable fixes worth their own commit.
-- `lib/services/browserless.ts` -- substantial screenshot reliability refactor: bumps `SCREENSHOT_TIMEOUT_MS` 45->55s, adds `SCREENSHOT_RETRY_DELAY_MS`, introduces a layered "primary"/"fallback" capture strategy, and blocks ~30 third-party hosts (GTM, GA, Intercom, Drift, Hotjar, FullStory, Segment, Mixpanel, Amplitude, Tawk, Crisp, Zendesk, Clarity, etc.) at the request-interception layer because they keep `networkidle2` from ever settling. Real fix worth its own commit.
+1. `9ad2d76` `fix(admin/errors): exclude operational alert sources from Sentry feed` -- adds `OPERATIONAL_SOURCES` exclusion list (`lighthouse-monitor`, `cost-monitor`, `elevenlabs-circuit-breaker`, `synthetic-canary`) to the Sentry summary query so the `/admin/errors` bug feed stops getting polluted by intentional ops alerts already surfaced on `/admin/performance/rum`, `/admin/costs`, `/admin/monitor`.
+2. `a8593a2` `docs: update session-handoff with 9ad2d76 commit hash + working tree state` -- standalone doc commit (force-push to main is blocked, so amending was not an option).
+3. `814c878` `fix(scan-pipeline): idempotent scan.started event + skip benchmark when vision fails` -- (a) wraps `track("scan.started")` in `step.run("track-start")` so it fires once per scan instead of re-executing on every Inngest replay (was producing 7 duplicate `monitoring_events` rows per scan, polluting funnel views and the live tail). (b) Adds an a3 benchmark-research short-circuit when `visionStep.ok === false` to match the existing a2/a4/s5 guard pattern; saves ~$0.20 in Sonnet tokens per partial scan since downstream consumers already discard the orphaned benchmark output.
+4. `bd45447` `fix(pathlight/screenshot): block heavy third-party origins + primary/fallback strategy` -- three layered fixes for screenshots timing out on real-world business sites: (a) request interception inside the Browserless `/function` blocks ~30 known third-party hosts (GTM, GA, GoogleAdServices, DoubleClick, Facebook, Intercom, Drift, Hotjar, FullStory, Segment, Mixpanel, Amplitude, Tawk, Crisp, Zendesk, LinkedIn Insight, Bing UET, Microsoft Clarity) and aborts all media-type requests; (b) dual capture strategy where `captureScreenshot` tries primary (`networkidle2` + 35s timeout + 2.5s settle) first and falls back to (`domcontentloaded` + 25s + 5s settle) on any non-permanent error after a 3s pause; (c) `isPermanentBrowserlessError` matches 401/403/404 responses and skips the fallback so misconfigured-auth scans don't burn 60s before failing. Per-attempt timeout bumped 45s -> 55s. The api_usage_events log now records `"retry"` instead of `"fail"` when the primary attempt fails but a fallback is about to run, so cost reports can distinguish "scan paid twice" from "scan paid once and lost the screenshot".
 
-Joshua should review and commit these separately. They are unrelated to today's admin-observability work and were not part of the diff I read or wrote.
+Working tree clean as of this entry.
 
 ### Vercel env config completed this session
 
@@ -34,20 +36,22 @@ Yesterday's session set `ANTHROPIC_ADMIN_KEY`, `SENTRY_ORG_SLUG` (= `dbj-technol
 
 `lib/services/sentry-summary.ts` now excludes operational alert sources from the `/admin/errors` Sentry feed via the Sentry query language: `is:unresolved !source:[lighthouse-monitor,cost-monitor,elevenlabs-circuit-breaker,synthetic-canary]`. Those four sources are intentional `Sentry.captureMessage` calls from `lib/inngest/functions.ts` (Lighthouse regression alerts, cost threshold pings, voice synthesis circuit-breaker trips, synthetic canary check failures). They are already surfaced on dedicated admin pages (`/admin/performance/rum`, `/admin/costs`, `/admin/monitor`) and were polluting the bug feed alongside actual code errors. The named source list is exported as `OPERATIONAL_SOURCES` so any future operational `Sentry.captureMessage` site can be added in one place.
 
-### Dashboard cleanup pending in Sentry UI
+### Sentry stale-issue cleanup
 
-The `/admin/errors` Sentry feed currently shows ~10 unresolved issues that are all already fixed in current code or stale (NeonDbErrors against tables that exist now, RSC boundary errors fixed at `a28cd80`, CanopySettings ReferenceError fixed at `398e8e9`, etc.). They keep appearing in the 24h window because Sentry tracks `lastSeen` against any matching event, and stale Vercel function instances from older releases occasionally still emit. They will age out of the 24h window after the next stable day on the new deployment. Joshua can also bulk-mark them resolved in the Sentry UI (Issues -> select all -> Resolve) for an immediate cleanup. The current API token cannot do this (lacks `event:admin`).
+Joshua bulk-resolved the ~10 stale unresolved issues in the Sentry UI this session. Combined with the operational-source filter from `9ad2d76`, the `/admin/errors` Sentry feed should now reflect only actual code bugs in current releases. The current API token still lacks `event:admin`; minting a fresh user token with that scope ticked would let future sessions auto-resolve via API.
 
-### Stale credential cleanup outstanding
+### Stale credential cleanup
 
-The downloaded GCP service account JSON at `/Users/doulosjones/Downloads/dbj-admin-2cad95e72a64.json` should be deleted from Downloads (and Trash emptied) since it carries a working private key and is no longer needed locally. The legacy `iam.disableServiceAccountKeyCreation` org policy override should also be flipped back to "Inherit parent's policy" on GCP to restore the security default; the existing key keeps working since the policy only blocks new key creation.
+The downloaded GCP service account JSON at `/Users/doulosjones/Downloads/dbj-admin-2cad95e72a64.json` was deleted from disk this session. Trash should still be emptied to fully purge the private key. The legacy `iam.disableServiceAccountKeyCreation` org policy override remains "Off" on GCP -- this needs to be flipped back to "Inherit parent's policy" manually in the console to restore the security default. The existing key keeps working either way; the policy only blocks new key creation.
 
 ### Next recommended task
 
-1. Verify each of `/admin/costs`, `/admin/errors`, `/admin/platform`, `/admin/search` populates after the redeploy. `/admin/search` will need a manual Inngest invocation of `search-console-daily` for instant data.
-2. Trigger the GSC import manually via Inngest dashboard if you want today's data in `/admin/search` immediately rather than waiting for 06:00 UTC.
-3. (Optional) Re-mint the Sentry user token with `event:admin` if you want future sessions to be able to resolve issues via API.
-4. (Optional) Bulk-resolve the existing stale Sentry issues in the UI to clean up the `/admin/errors` feed.
+1. Verify each of `/admin/costs`, `/admin/errors`, `/admin/platform`, `/admin/search` populates after the redeploy. `/admin/search` will need a manual Inngest invocation of `search-console-daily` for instant data, otherwise it backfills at the 06:00 UTC cron.
+2. Smoke-test a Pathlight scan to verify both pipeline fixes from `814c878` are working: (a) `monitoring_events` should show exactly one `scan.started` row per `scanId`, not seven; (b) when vision fails, the scan should skip benchmark research instead of paying for it -- check `api_usage_events` for the absence of an a3 spend on partial scans.
+3. Smoke-test a screenshot of a heavy commercial site (one with a chat widget like Intercom or Drift, plus video embeds) to verify the new browserless layered strategy from `bd45447` succeeds where the prior 25s networkidle0 wait would have timed out. The api_usage_events row will tag `status=retry` if the primary attempt failed and the fallback succeeded.
+4. Flip the GCP `iam.disableServiceAccountKeyCreation` legacy constraint back to "Inherit parent's policy" in the org policies console (security default restoration; the existing key stays valid).
+5. Empty Trash to fully purge the deleted GCP service account JSON.
+6. (Optional) Re-mint the Sentry user token with `event:admin` ticked if you want future sessions to be able to resolve issues via API.
 
 ---
 
