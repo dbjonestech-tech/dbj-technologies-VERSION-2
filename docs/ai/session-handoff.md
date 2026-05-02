@@ -24,9 +24,9 @@ The `/admin/costs`, `/admin/errors`, `/admin/platform`, and `/admin/search` admi
 - `GOOGLE_SC_SITE_URL` = `sc-domain:dbjtechnologies.com` (domain property, not URL-prefix).
 - `ANTHROPIC_MONTHLY_BUDGET_USD` = `100`. Display reference only -- the `/admin/costs` page renders a "% used" bar but nothing throttles on this value. Real Anthropic spend cap is the prepaid credit balance ($20 currently).
 - `SENTRY_PROJECT_SLUG` = `javascript-nextjs`.
-- `SENTRY_AUTH_TOKEN` re-minted with `org:read project:read event:read` scopes (the prior token only had `event:read` which 403'd the issues summary endpoint). The new token is a **user** token (`sntryu_*` prefix) inheriting Joshua's permissions, NOT an org service token (`sntrys_*`). User tokens lack `event:admin` so resolving issues via the API returns 403; Joshua must resolve issues in the Sentry UI directly. To enable API-driven resolution in a future session, mint a new user token with `event:admin` ticked.
+- `SENTRY_AUTH_TOKEN` is now an `sntryu_*` user token with the full required scope set: `org:read`, `project:read`, `event:read`, `event:write`, `event:admin`. Verified live by issuing a write PUT against an already-resolved issue (HTTP 200). The original token (event:read only) and the second token (org:read + project:read + event:read but no admin) have both been removed from Vercel; the third token is the live one. Future sessions can resolve Sentry issues via API.
 
-Yesterday's session set `ANTHROPIC_ADMIN_KEY`, `SENTRY_ORG_SLUG` (= `dbj-technologies`), and `VERCEL_API_TOKEN`. Production redeploy `dbj-technologies-3a1pt8xr9` carries all eight admin secrets; the four Vercel-side admin pages should now populate (with one caveat below).
+Yesterday's session set `ANTHROPIC_ADMIN_KEY`, `SENTRY_ORG_SLUG` (= `dbj-technologies`), and `VERCEL_API_TOKEN`. Production redeploy `dbj-technologies-hhr3svjxk` carries all eight admin secrets including the upgraded Sentry token; the four Vercel-side admin pages should now populate (with one caveat below).
 
 ### `/admin/search` remains empty until the cron runs
 
@@ -38,7 +38,7 @@ Yesterday's session set `ANTHROPIC_ADMIN_KEY`, `SENTRY_ORG_SLUG` (= `dbj-technol
 
 ### Sentry stale-issue cleanup
 
-Joshua bulk-resolved the ~10 stale unresolved issues in the Sentry UI this session. Combined with the operational-source filter from `9ad2d76`, the `/admin/errors` Sentry feed should now reflect only actual code bugs in current releases. The current API token still lacks `event:admin`; minting a fresh user token with that scope ticked would let future sessions auto-resolve via API.
+Joshua bulk-resolved the ~10 stale unresolved issues in the Sentry UI this session. Combined with the operational-source filter from `9ad2d76`, the `/admin/errors` Sentry feed should now reflect only actual code bugs in current releases. The new API token (see env config above) carries `event:admin` so future sessions can also resolve issues via API.
 
 ### Stale credential cleanup
 
@@ -51,7 +51,6 @@ The downloaded GCP service account JSON at `/Users/doulosjones/Downloads/dbj-adm
 3. Smoke-test a screenshot of a heavy commercial site (one with a chat widget like Intercom or Drift, plus video embeds) to verify the new browserless layered strategy from `bd45447` succeeds where the prior 25s networkidle0 wait would have timed out. The api_usage_events row will tag `status=retry` if the primary attempt failed and the fallback succeeded.
 4. Flip the GCP `iam.disableServiceAccountKeyCreation` legacy constraint back to "Inherit parent's policy" in the org policies console (security default restoration; the existing key stays valid).
 5. Empty Trash to fully purge the deleted GCP service account JSON.
-6. (Optional) Re-mint the Sentry user token with `event:admin` ticked if you want future sessions to be able to resolve issues via API.
 
 ---
 
