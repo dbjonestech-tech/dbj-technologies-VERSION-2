@@ -91,7 +91,13 @@ export const scanRequested = inngest.createFunction(
     const { scanId } = event.data as { scanId: string };
     const startedAt = Date.now();
 
-    await track("scan.started", {}, { scanId });
+    /* Wrapped in step.run so it fires once per scan. Inngest replays the
+     * function handler after each step completes; anything outside step.run
+     * re-executes on every replay, which is what produced 7 duplicate
+     * "scan.started" rows in monitoring_events for a single scan. */
+    await step.run("track-start", () =>
+      track("scan.started", {}, { scanId })
+    );
 
     try {
       const { resolvedUrl } = await step.run("s1", async () => {
@@ -254,6 +260,20 @@ export const scanRequested = inngest.createFunction(
         outOfScope?: boolean;
         error?: string;
       } = await step.run("a3", async () => {
+        /* Guard parity with a2/a4/s5: if vision did not succeed, every
+         * downstream consumer of the benchmark (revenue, score, the
+         * report UI) is already short-circuited. Running web-search-
+         * augmented benchmark research without vision context produces
+         * a generic, orphaned benchmark for the wrong vertical that no
+         * surface can use, while still billing ~$0.20 in Sonnet tokens.
+         * This is the single largest source of waste on partial scans. */
+        if (!visionStep.ok) {
+          return {
+            ok: false,
+            error: "skipped: vision audit did not succeed",
+            benchmark: null as IndustryBenchmark | null,
+          };
+        }
         try {
           const ctx = await getScanPipelineContext(scanId);
           if (!ctx)
