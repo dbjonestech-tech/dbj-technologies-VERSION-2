@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 5 staged uncommitted; migration 029 applied to prod Neon)
+## Current state (May 1, 2026 -- Canopy v2 Phase 5 shipped at `0ceffa2`, pushed to origin main, working tree clean. Migration 029 applied to prod Neon.)
 
-### Phase 5 staged this session (pre-commit): Automation - Sequences, Workflow Rules, Bulk Actions
+### Phase 5 shipped at `0ceffa2`: Automation - Sequences, Workflow Rules, Bulk Actions
 
 The orchestration layer. Two new Inngest crons turn the data Canopy already collects into actions that run themselves: a sequence advancer that drains active enrollments every 5 minutes, and a workflow rule evaluator that polls canopy_audit_log every 2 minutes and fires matching rules. Action library is the single point of execution for both, so a new action automatically becomes available to both engines. Email steps are stubbed cleanly until Phase 4 (Gmail OAuth) ships.
 
