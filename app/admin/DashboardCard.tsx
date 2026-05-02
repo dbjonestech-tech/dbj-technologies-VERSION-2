@@ -86,6 +86,13 @@ export type DashboardCardProps = {
  * cursor across the gap; short enough to feel responsive. */
 const HOVER_LEAVE_GRACE = 140;
 
+/* Hover-intent delay (ms) before the popover opens on mouse hover.
+ * Long enough that scrolling past a card does NOT trigger the popover
+ * cascade; short enough to feel like a deliberate dwell. Touch
+ * (explicit click on the chevron affordance) and focus (keyboard nav)
+ * bypass this delay and open instantly. */
+const HOVER_OPEN_DELAY = 1500;
+
 export default function DashboardCard({
   label,
   description,
@@ -100,6 +107,7 @@ export default function DashboardCard({
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const Icon = ICONS[iconName];
   const tokens = PALETTES[palette];
@@ -112,6 +120,10 @@ export default function DashboardCard({
    * cycle re-fired (e.g. brief pointer-leave events near card edges).
    * The popover's own useLayoutEffect handles scroll/resize updates. */
   function openPreview() {
+    if (openTimer.current) {
+      clearTimeout(openTimer.current);
+      openTimer.current = null;
+    }
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
       closeTimer.current = null;
@@ -120,6 +132,28 @@ export default function DashboardCard({
       setAnchorRect(cardRef.current.getBoundingClientRect());
     }
     setPreviewOpen(true);
+  }
+
+  /* Schedule a delayed open. Used by mouse hover so casually scrolling
+   * past cards does NOT cascade popovers. If the cursor leaves before
+   * the timer fires, cancelScheduledOpen() aborts. */
+  function scheduleOpen() {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    if (previewOpen || openTimer.current) return;
+    openTimer.current = setTimeout(() => {
+      openTimer.current = null;
+      openPreview();
+    }, HOVER_OPEN_DELAY);
+  }
+
+  function cancelScheduledOpen() {
+    if (openTimer.current) {
+      clearTimeout(openTimer.current);
+      openTimer.current = null;
+    }
   }
 
   function scheduleClose() {
@@ -134,11 +168,12 @@ export default function DashboardCard({
     }
   }
 
-  /* Cleanup any pending close timer on unmount so we don't update
-   * state after the component is gone. */
+  /* Cleanup any pending timers on unmount so we don't update state
+   * after the component is gone. */
   useEffect(() => {
     return () => {
       if (closeTimer.current) clearTimeout(closeTimer.current);
+      if (openTimer.current) clearTimeout(openTimer.current);
     };
   }, []);
 
@@ -149,10 +184,11 @@ export default function DashboardCard({
         data-card-id={href}
         onPointerEnter={() => {
           setHovered(true);
-          openPreview();
+          scheduleOpen();
         }}
         onPointerLeave={(e) => {
           setHovered(false);
+          cancelScheduledOpen();
           /* Only skip the close if the cursor moved into THIS card's
            * own popover. Matching any popover (not just our own) was
            * the cause of multiple popovers staying open simultaneously

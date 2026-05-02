@@ -285,10 +285,10 @@ function CanopyWordmark() {
         src="/canopy-icon.webp"
         alt=""
         aria-hidden
-        width={48}
-        height={48}
+        width={64}
+        height={64}
         priority
-        className="h-12 w-12 shrink-0"
+        className="h-16 w-16 shrink-0"
       />
       <span className="flex flex-col leading-tight">
         <span className="text-lg font-semibold tracking-tight text-zinc-900">
