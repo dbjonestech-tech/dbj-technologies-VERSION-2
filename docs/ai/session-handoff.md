@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 3 staged uncommitted; migrations 023/024/025/026/027 all applied to prod Neon)
+## Current state (May 1, 2026 -- Canopy v2 Phase 3 shipped at `6d809c8`, pushed to origin main, working tree clean. Migrations 023/024/025/026/027 all applied to prod Neon.)
 
-### Phase 3 staged this session (pre-commit): Custom Fields, Tags, Segments
+### Phase 3 shipped at `6d809c8`: Custom Fields, Tags, Segments
 
 The per-vertical adaptability layer. Operators define their own fields (vehicle VIN for an auto shop, insurance provider for a dentist, statute date for a law firm) without per-install schema changes. Free-form tags and saved segment infrastructure round out the customization surface.
 
