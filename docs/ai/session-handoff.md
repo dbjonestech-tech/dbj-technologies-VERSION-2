@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Phase 8 follow-ups staged uncommitted; migration 031 applied to prod Neon)
+## Current state (May 1, 2026 -- Phase 8 follow-ups shipped at `b536db4`, pushed to origin main, working tree clean. Migration 031 applied to prod Neon.)
 
-### Phase 8 follow-ups staged this session (pre-commit): sales-role scoping + per-entity audit + sidebar polish
+### Phase 8 follow-ups shipped at `b536db4`: sales-role scoping + per-entity audit + sidebar polish
 
 Pre-Phase-9 cleanup pass. Closes the highest-value Phase 8 deferred item (sales-role per-row query scoping for contacts + deals) and brings contact detail to feature parity with deal detail (per-entity audit log viewer). Plus minor sidebar disambiguation and a plan-doc note so future sessions don't trip on the migration numbering drift.
 
