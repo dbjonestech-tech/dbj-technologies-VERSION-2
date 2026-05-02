@@ -30,6 +30,11 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 - [ ] Verify `/admin/canopy` master-kill toggle round-trips: flip OFF, audit row appears in feed; flip ON, audit row appears.
 - [ ] After committing: `vercel logs --status-code 500 --since 5m` to confirm no RSC boundary failures (per `feedback_rsc_boundary_runtime`).
 
+### Phase 8 done in working tree (uncommitted as of May 1 latest)
+
+- [x] **Phase 8: Multi-User Enterprise (partial - core RBAC + tokens + webhooks).** Migration `030_rbac.sql` (APPLIED to prod Neon) widens admin_users.role CHECK and adds api_tokens, webhooks, webhook_deliveries. `lib/canopy/{rbac,api-tokens,webhooks}.ts` services. `lib/actions/{api-tokens,webhooks,team}.ts` audit-logged Server Actions. `app/api/v1/{contacts,deals}/route.ts` Bearer-authenticated REST endpoints. canopyWebhookDispatch Inngest cron (1 min) over canopy_audit_log. `/admin/canopy/team` and `/admin/canopy/api` pages.
+- [ ] **Phase 8 follow-ups (deferred from this session):** sales-role query scoping (touch every contacts/deals service for per-row owner filter), mentions parser + read-state UI, CSV import wizard, white-label live preview, per-entity audit log viewer.
+
 ### Phase 5 done in working tree (uncommitted as of May 1 latest)
 
 - [x] **Phase 5: Automation - Sequences, Workflow Rules, Bulk Actions.** Migration `029_automation.sql` (APPLIED to prod Neon) adds sequences, sequence_steps, sequence_enrollments, workflow_rules, workflow_evaluations. `lib/canopy/automation/{sequences,workflow-rules,actions,engine}.ts` services. Two Inngest crons: canopySequenceAdvance (5 min) and canopyWorkflowEvaluate (2 min, polls audit log). `lib/actions/{sequences,workflow-rules,bulk-contacts}.ts` audit-logged Server Actions. `/admin/sequences` + `/admin/sequences/[id]` step editor. `/admin/automations` rule list + create form. BulkActionsBar on /admin/contacts list (tag, untag, enroll, export CSV, delete). Email steps + send_email action are stubbed cleanly until Phase 4 Gmail OAuth ships.

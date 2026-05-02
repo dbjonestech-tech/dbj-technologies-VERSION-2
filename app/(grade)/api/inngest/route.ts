@@ -3,6 +3,7 @@ import { inngest } from "@/lib/inngest/client";
 import {
   canopyDigestHourly,
   canopySequenceAdvance,
+  canopyWebhookDispatch,
   canopyWorkflowEvaluate,
   costAlertDaily,
   lighthouseMonitorDaily,
@@ -22,5 +23,6 @@ export const { GET, POST, PUT } = serve({
     canopyDigestHourly,
     canopySequenceAdvance,
     canopyWorkflowEvaluate,
+    canopyWebhookDispatch,
   ],
 });

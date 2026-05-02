@@ -5,9 +5,60 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 5 shipped at `0ceffa2`, pushed to origin main, working tree clean. Migration 029 applied to prod Neon.)
+## Current state (May 1, 2026 -- Canopy v2 Phase 8 staged uncommitted; migration 030 applied to prod Neon)
 
-### Phase 5 shipped at `0ceffa2`: Automation - Sequences, Workflow Rules, Bulk Actions
+### Phase 8 staged this session (pre-commit): Multi-User Enterprise - RBAC, API tokens, webhooks
+
+The enterprise-readiness pass. Three independent surfaces ship together because they share the same admin_users table extension and audit-log polling pattern: role widening on admin_users (admin / manager / sales / viewer), Bearer-token authenticated REST API at /api/v1/*, and outbound HMAC-signed webhooks driven by a 1-minute Inngest cron over canopy_audit_log.
+
+- `lib/db/migrations/030_rbac.sql` (APPLIED to prod Neon) - widens admin_users.role CHECK from 'admin' only to all four roles. Adds api_tokens (user_email FK to admin_users, hashed_token UNIQUE, prefix for UI display, scopes TEXT[], expires_at, revoked_at). Adds webhooks (events TEXT[], secret, last_audit_log_id checkpoint, fire_count, fail_count) and webhook_deliveries ledger (UNIQUE on (webhook_id, audit_log_id) so cron retries never re-deliver the same event). Five indexes including partial indexes on enabled-only webhooks and non-revoked tokens.
+- `lib/canopy/rbac.ts` - Role + roleAtLeast (rank-based capability check), getSessionRole (env-allowlist admins return source='env' without DB lookup; everyone else hits admin_users; unmatched authenticated users fall through to 'viewer' so the UI renders read-only rather than crashing), requireRole (throws "requires X role; have Y" on insufficient role), listAdminUsers.
+- `lib/canopy/api-tokens.ts` - `cnpy_<24-byte-base64url>` token format with stable prefix for spotting leaks. SHA-256 hashed in the DB; plaintext returned only at creation. verifyBearer parses `Authorization: Bearer ...`, hashes via SHA-256, looks up the row, constant-time compares the hash, checks revoked_at + expires_at, touches last_used_at best-effort.
+- `lib/canopy/webhooks.ts` - WEBHOOK_EVENTS curated list with '*' for everything. HMAC SHA-256 signature in `Canopy-Signature: t=<unix_ts>,v1=<hex>` format over `<ts>.<body>`. dispatchWebhooks polls canopy_audit_log per webhook past last_audit_log_id, POSTs with 8s timeout via AbortController, records every attempt in webhook_deliveries (status_code, response_body capped at 2KB, error_message), advances the checkpoint, increments fire_count/fail_count.
+- `lib/inngest/functions.ts` - canopyWebhookDispatch cron `* * * * *` (every minute). Registered in `app/(grade)/api/inngest/route.ts`.
+- `lib/actions/api-tokens.ts` - createApiTokenAction returns `{plaintext, prefix}` once; revokeApiTokenAction sets revoked_at. Both audit-logged. Auto-upserts the current user into admin_users so env-only admins satisfy the FK before creating their first token.
+- `lib/actions/webhooks.ts` - createWebhookAction (URL validation + initial last_audit_log_id set to current MAX so webhooks fire forward, not retroactively), updateWebhookAction with field-level COALESCE, deleteWebhookAction.
+- `lib/actions/team.ts` - setUserRoleAction + setUserStatusAction. Both refuse to act on the calling user (no self-demotion, no self-disable). Admin-only via requireRole('admin').
+- `app/api/v1/contacts/route.ts` - GET with cursor pagination (?limit, ?before). Token-authenticated via verifyBearer; requires 'read' scope.
+- `app/api/v1/deals/route.ts` - GET with stage filter and ?open=1 for open-only.
+- `/admin/canopy/team` page + TeamClient: role dropdown + status dropdown per user. Self-row is highlighted and locked.
+- `/admin/canopy/api` page + ApiTokensClient + WebhooksClient: create + revoke tokens with one-time plaintext display, create + toggle + delete webhooks with one-time secret display. Subscribed events as toggle pills with '*' as a single-select shortcut.
+- Sidebar nav: Team and API & webhooks added to the Account group between Canopy controls and Audit log.
+
+### Acceptance signals
+
+- `npx tsc --noEmit` and `npm run lint` clean (verified).
+- Migration 030 applied to prod Neon successfully.
+- A POST to /api/v1/contacts without an Authorization header returns 401. With a valid `Bearer cnpy_...` token it returns paginated JSON.
+- Revoking a token from /admin/canopy/api makes subsequent requests with that token return 401 immediately (next request - the touch-last-used SQL update fires before the auth check, but revoked_at is checked after the lookup).
+- Creating a webhook with events=['*'] and pointing at https://webhook.site/<your-uuid> + then triggering any audit-log-emitting action (toggle a setting, change a deal stage, etc.) results in a POST landing at webhook.site with the right Canopy-Signature header within 60 seconds.
+- Setting a teammate's role to 'sales' on /admin/canopy/team writes a canopy_audit_log row with action='team.role.change' and before/after JSON.
+
+### What's deferred (Phase 8 spec items not in this commit)
+
+- **Sales-role query scoping**: the spec says "Sales role queries scoped to owner_user_id = self" - this requires touching every contacts/deals service to add a per-row owner filter. Skipped as a follow-up because rolling it in would touch ~10 service files. The role exists in the schema and requireRole works; enforcement is the gap.
+- **Mentions in note bodies**: complex parser + read-state UI; deferred.
+- **CSV import wizard**: parser + column-mapping UI + preview; deferred. Phase 5's bulkExportContactsAction already handles export-as-CSV.
+- **White-label live preview**: Phase 0 has the editor; the live-preview pane is a small follow-up.
+- **Per-entity audit log viewer**: Phase 0 has the global audit feed under /admin/audit. Per-entity collapsible viewer on contact/deal detail pages is a small follow-up.
+
+### Next recommended task
+
+**Phase 9 - Pathlight Advanced (gated)** per `docs/ai/canopy-build-plan.md`. Most expensive surface; gated rigorously through Phase 0 locks. Migration `031_pathlight_advanced.sql` for prospect_lists, prospect_candidates, website_change_signals, competitors, attribution_events, attribution_beacon_data. Prospecting Server Actions, change-monitoring daily HEAD-request cron, competitive intel scans (per-row gated), attribution beacon JS snippet. **High blast radius**: every new surface counts against the monthly Pathlight budget. The Phase 0 locks already gate each one individually.
+
+Or **Phase 4 - Email Integration** if Google Cloud Console is now set up. Phase 4 unblocks the Phase 5 send_email stub and adds 1:1 Gmail send/receive.
+
+### Migration numbering note
+
+- 028 = Phase 6 (Pathlight integrations), shipped earlier
+- 029 = Phase 5 (Automation), shipped earlier
+- 030 = Phase 8 (RBAC), this commit
+- 031 = Phase 9 (Pathlight advanced) when shipped
+- Phase 4 (email) will need to take the next available number when it ships, likely 032
+
+---
+
+## Prior state -- Phase 5 shipped at `0ceffa2`: Automation - Sequences, Workflow Rules, Bulk Actions
 
 The orchestration layer. Two new Inngest crons turn the data Canopy already collects into actions that run themselves: a sequence advancer that drains active enrollments every 5 minutes, and a workflow rule evaluator that polls canopy_audit_log every 2 minutes and fires matching rules. Action library is the single point of execution for both, so a new action automatically becomes available to both engines. Email steps are stubbed cleanly until Phase 4 (Gmail OAuth) ships.
 

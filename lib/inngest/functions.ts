@@ -1452,6 +1452,32 @@ export const canopyWorkflowEvaluate = inngest.createFunction(
 );
 
 /**
+ * Canopy webhook dispatcher. Fires every minute, polls
+ * canopy_audit_log for entries matching each enabled webhook's
+ * subscribed events past its last_audit_log_id checkpoint, and
+ * delivers HMAC-signed POSTs. webhook_deliveries UNIQUE constraint
+ * on (webhook_id, audit_log_id) prevents double-delivery on retry.
+ */
+export const canopyWebhookDispatch = inngest.createFunction(
+  {
+    id: "canopy-webhook-dispatch",
+    triggers: [{ cron: "* * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("dispatch", async () => {
+      const { dispatchWebhooks } = await import("@/lib/canopy/webhooks");
+      const results = await dispatchWebhooks(50);
+      return {
+        processed: results.length,
+        delivered: results.reduce((s, r) => s + r.delivered, 0),
+        failed: results.reduce((s, r) => s + r.failed, 0),
+      };
+    });
+  }
+);
+
+/**
  * Canopy weekly digest. Fires hourly and only sends when the
  * operator's chosen day-of-week + local-hour matches the current
  * timezone-converted clock. Read-only over existing data; never

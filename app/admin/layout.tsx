@@ -30,6 +30,7 @@ import {
   Sliders,
   BarChart3,
   Send,
+  Key,
 } from "lucide-react";
 import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
 import { getContactsDashboardSummary } from "@/lib/services/contacts";
@@ -135,6 +136,8 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
     label: "Account",
     items: [
       { label: "Canopy controls", href: "/admin/canopy", icon: Sliders, palette: "stone" },
+      { label: "Team", href: "/admin/canopy/team", icon: Users, palette: "zinc" },
+      { label: "API & webhooks", href: "/admin/canopy/api", icon: Key, palette: "stone" },
       { label: "Audit log", href: "/admin/audit", icon: ShieldCheck, palette: "stone" },
       { label: "Users", href: "/admin/users", icon: Users, palette: "zinc" },
       { label: "Config", href: "/admin/config", icon: Settings, palette: "teal" },
