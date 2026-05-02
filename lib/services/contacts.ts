@@ -149,7 +149,9 @@ type ContactRowDb = {
   owner_email?: string | null;
 };
 
-export async function getContactsDashboardSummary(): Promise<ContactsDashboardSummary> {
+export async function getContactsDashboardSummary(
+  ownerFilter: string | null = null
+): Promise<ContactsDashboardSummary> {
   try {
     const sql = getDb();
     const rows = (await sql`
@@ -166,6 +168,7 @@ export async function getContactsDashboardSummary(): Promise<ContactsDashboardSu
         COUNT(*) FILTER (WHERE status = 'won')::int AS s_won,
         COUNT(*) FILTER (WHERE status = 'lost')::int AS s_lost
       FROM contacts
+      WHERE (${ownerFilter}::text IS NULL OR owner_email = ${ownerFilter}::text)
     `) as Array<{
       total: number;
       new_this_week: number;

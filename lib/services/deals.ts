@@ -181,7 +181,9 @@ export async function getDealsForContact(contactId: number): Promise<DealRow[]> 
   }
 }
 
-export async function getDealRollups(): Promise<DealRollups> {
+export async function getDealRollups(
+  ownerFilter: string | null = null
+): Promise<DealRollups> {
   const fallback: DealRollups = {
     weighted_pipeline_cents: 0,
     unweighted_pipeline_cents: 0,
@@ -201,6 +203,7 @@ export async function getDealRollups(): Promise<DealRollups> {
         COUNT(*) FILTER (WHERE won = TRUE  AND closed_at >= date_trunc('month', NOW()))::int                                              AS won_this_month_count,
         COUNT(*) FILTER (WHERE won = FALSE AND closed_at >= date_trunc('month', NOW()))::int                                              AS lost_this_month_count
       FROM deals
+      WHERE (${ownerFilter}::text IS NULL OR owner_email = ${ownerFilter}::text)
     `) as DealRollups[];
     return rows[0] ?? fallback;
   } catch {

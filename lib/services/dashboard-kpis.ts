@@ -1335,10 +1335,10 @@ async function usersKpi(): Promise<CardKpi> {
   };
 }
 
-async function relationshipsKpi(): Promise<CardKpi> {
+async function relationshipsKpi(ownerFilter: string | null = null): Promise<CardKpi> {
   const [summary, daily, recent] = await Promise.all([
     safe(
-      () => getContactsDashboardSummary(),
+      () => getContactsDashboardSummary(ownerFilter),
       { total: 0, newThisWeek: 0, overdue: 0, byStatus: { new: 0, contacted: 0, qualified: 0, proposal: 0, won: 0, lost: 0 } },
       "relationships.summary"
     ),
@@ -1419,7 +1419,9 @@ async function relationshipsKpi(): Promise<CardKpi> {
  * card's href so the dashboard page can look up KPIs by Card.href
  * without an extra index lookup.
  */
-export async function getDashboardKpis(): Promise<DashboardKpiMap> {
+export async function getDashboardKpis(
+  ownerFilter: string | null = null
+): Promise<DashboardKpiMap> {
   const [
     visitors,
     monitor,
@@ -1450,7 +1452,7 @@ export async function getDashboardKpis(): Promise<DashboardKpiMap> {
     rumKpi(),
     emailKpi(),
     recurringKpi(),
-    relationshipsKpi(),
+    relationshipsKpi(ownerFilter),
     costsKpi(),
     databaseKpi(),
     clientsKpi(),

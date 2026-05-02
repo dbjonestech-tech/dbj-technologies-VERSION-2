@@ -4,6 +4,7 @@ import { getDashboardStatus, type StatusLevel } from "@/lib/services/health-stat
 import { getDashboardKpis } from "@/lib/services/dashboard-kpis";
 import { getDealRollups, formatDealValue } from "@/lib/services/deals";
 import { getTodayTasksSummary } from "@/lib/services/tasks";
+import { getSessionRole, getQueryOwnerFilter } from "@/lib/canopy/rbac";
 import DashboardCard, { type IconName } from "./DashboardCard";
 import { PALETTES, type PaletteName } from "@/lib/admin/page-themes";
 
@@ -391,10 +392,12 @@ function statusBadgeClass(level: StatusLevel): string {
 
 export default async function AdminLanding() {
   const session = await auth();
+  const role = await getSessionRole();
+  const ownerFilter = getQueryOwnerFilter(role);
   const [status, kpis, deals, taskSummary] = await Promise.all([
     getDashboardStatus(),
-    getDashboardKpis(),
-    getDealRollups(),
+    getDashboardKpis(ownerFilter),
+    getDealRollups(ownerFilter),
     getTodayTasksSummary(session?.user?.email ?? null),
   ]);
   const firstName = session?.user?.email?.split("@")[0] ?? "there";
