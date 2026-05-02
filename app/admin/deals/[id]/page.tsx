@@ -5,10 +5,14 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { getDeal } from "@/lib/services/deals";
 import { getActivitiesForDeal } from "@/lib/services/activities";
 import { getEntityAuditTrail } from "@/lib/canopy/audit";
+import { getCustomFieldDefinitions } from "@/lib/canopy/custom-fields";
+import { getEntityExtras } from "@/lib/canopy/entity-extras";
 import PageHeader from "../../PageHeader";
 import DealDetailClient from "./DealDetailClient";
 import ActivityComposer from "../../components/ActivityComposer";
 import ActivityFeed from "../../components/ActivityFeed";
+import TagsBar from "../../components/TagsBar";
+import CustomFieldsPanel from "../../components/CustomFieldsPanel";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -30,9 +34,11 @@ export default async function DealDetailPage({ params }: Props) {
   const deal = await getDeal(id);
   if (!deal) notFound();
 
-  const [audit, activities] = await Promise.all([
+  const [audit, activities, customFieldDefs, extras] = await Promise.all([
     getEntityAuditTrail("deal", String(id), 30),
     getActivitiesForDeal(id, 50),
+    getCustomFieldDefinitions("deal"),
+    getEntityExtras("deal", id),
   ]);
 
   return (
@@ -65,6 +71,18 @@ export default async function DealDetailPage({ params }: Props) {
         </PageHeader>
 
         <DealDetailClient deal={deal} />
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <TagsBar entityType="deal" entityId={deal.id} initialTags={extras.tags} />
+          <div>
+            <CustomFieldsPanel
+              entityType="deal"
+              entityId={deal.id}
+              definitions={customFieldDefs}
+              values={extras.custom_fields}
+            />
+          </div>
+        </div>
 
         <div className="mt-8">
           <ActivityComposer contactId={deal.contact_id} dealId={deal.id} />

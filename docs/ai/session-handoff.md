@@ -5,9 +5,42 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 2 shipped at `f73d116`, pushed to origin main, working tree clean. Migrations 023/024/025/026 all applied to prod Neon.)
+## Current state (May 1, 2026 -- Canopy v2 Phase 3 staged uncommitted; migrations 023/024/025/026/027 all applied to prod Neon)
 
-### Phase 2 shipped at `f73d116`: Activities and Tasks
+### Phase 3 staged this session (pre-commit): Custom Fields, Tags, Segments
+
+The per-vertical adaptability layer. Operators define their own fields (vehicle VIN for an auto shop, insurance provider for a dentist, statute date for a law firm) without per-install schema changes. Free-form tags and saved segment infrastructure round out the customization surface.
+
+- `lib/db/migrations/027_customization.sql` (APPLIED to prod Neon) - custom_field_definitions table (entity_type CHECK contact|deal, kind CHECK text|number|date|select|multi_select|checkbox|url, options JSONB for select kinds, display_order, required, description, UNIQUE per (entity_type, key)). Adds custom_fields JSONB and tags TEXT[] columns to contacts and deals, both with sensible defaults. GIN indexes on tags arrays. saved_segments table with filter_config JSONB, owner-scoped + is_shared flag.
+- `lib/canopy/custom-fields.ts` - read APIs and per-kind validators (text/url, number, date, select, multi_select, checkbox). validateCustomFieldValue returns canonical form; formatCustomFieldValue renders for display.
+- `lib/canopy/tags.ts` - canonicalizeTag (lowercase, dash-join multi-word, strip non-alphanumeric) so "Hot Lead" and "hot-lead" don't fragment the tag set.
+- `lib/canopy/segments.ts` - SavedSegment type, filterConfigToSearchParams + searchParamsToFilterConfig roundtrippers. Filter shape v1: search/status/source/tags_any/tags_all/custom_fields. The contacts and deals list pages can read these directly; richer compiler arrives in Phase 5.
+- `lib/canopy/entity-extras.ts` - getEntityExtras(entityType, entityId) helper returning {tags, custom_fields} so the existing contacts/deals services don't need to change shape.
+- `lib/actions/custom-fields.ts` - createCustomFieldDefinitionAction (auto-canonicalizes key from label), updateCustomFieldDefinitionAction, deleteCustomFieldDefinitionAction (also strips field's stored values from contacts/deals via JSONB minus operator), setEntityCustomFieldAction (per-kind validation + JSONB merge or remove).
+- `lib/actions/tags.ts` - addTagAction + removeTagAction with array dedupe via DISTINCT unnest, audit-logged.
+- `lib/actions/segments.ts` - saveSegmentAction (create or update), deleteSegmentAction.
+- `app/admin/components/TagsBar.tsx` - chip row with inline add (Enter to commit), remove via X button. Mounted on contact and deal detail pages.
+- `app/admin/components/CustomFieldsPanel.tsx` - dynamic field renderer with kind-aware inputs (TextInput, NumberInput, DateInput, SelectInput, MultiSelectInput as toggle pills, CheckboxInput). Inline edit with optimistic save indicator.
+- `app/admin/canopy/CustomFieldsManagerClient.tsx` - per-entity definition editor on /admin/canopy. Add new field form (label + kind + options + required + description), per-row inline edit, delete with confirmation that warns about data loss.
+- `/admin/canopy/page.tsx` - new Custom Fields section between Canopy controls and Recent setting changes.
+- `/admin/contacts/[id]/page.tsx` - TagsBar + CustomFieldsPanel grid above ActivityComposer.
+- `/admin/deals/[id]/page.tsx` - TagsBar + CustomFieldsPanel grid above ActivityComposer.
+
+### Acceptance signals
+
+- `npx tsc --noEmit` and `npm run lint` clean (verified).
+- Migration 027 applied to prod Neon successfully.
+- Adding a "vehicle_vin" custom field of kind text on /admin/canopy makes that field appear on every contact detail page; setting a value persists across navigation; deleting the definition strips the value from all contacts.
+- Tagging a contact with "Hot Lead" stores it as "hot-lead"; same with "hot-lead", "HOT LEAD" - all canonicalize to one tag, never duplicated.
+- Adding a select field with options ["Sedan","SUV","Truck"] only accepts those values via the dropdown; trying to set an invalid value via the API returns a validation error.
+
+### Next recommended task
+
+**Phase 4 - Email Integration** per `docs/ai/canopy-build-plan.md`. Migration `028_email_sync.sql` (email_messages, email_templates, oauth_tokens), Gmail OAuth flow with send + readonly + modify scopes, Inngest cron for inbound message ingestion every 5 min, compose modal on contact and deal pages with merge field substitution + live preview, open and click tracking via /api/email/pixel/[messageId] and /api/email/click/[messageId]. **Out of scope:** the contact form's Resend send path stays untouched (do-not-break rule).
+
+---
+
+## Prior state -- Phase 2 shipped at `f73d116`: Activities and Tasks
 
 The unified store for operator-driven interactions (notes, calls, meetings, tasks, emails). Tasks become first-class objects with due dates, priority, and completion state. Dashboard surfaces overdue and due-today counts; a standalone /admin/tasks page filters across scope/status/priority.
 

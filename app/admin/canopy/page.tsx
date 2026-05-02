@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import PageHeader from "../PageHeader";
 import { getCanopySettings } from "@/lib/canopy/settings";
 import { getRecentChanges } from "@/lib/canopy/audit";
+import { getCustomFieldDefinitions } from "@/lib/canopy/custom-fields";
 import CanopyControlsClient from "./CanopyControlsClient";
+import CustomFieldsManagerClient from "./CustomFieldsManagerClient";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -13,9 +15,11 @@ export const metadata: Metadata = {
 };
 
 export default async function CanopyControlsPage() {
-  const [settings, recent] = await Promise.all([
+  const [settings, recent, contactDefs, dealDefs] = await Promise.all([
     getCanopySettings(),
     getRecentChanges(20),
+    getCustomFieldDefinitions("contact"),
+    getCustomFieldDefinitions("deal"),
   ]);
 
   return (
@@ -29,6 +33,10 @@ export default async function CanopyControlsPage() {
         />
 
         <CanopyControlsClient initial={settings} />
+
+        <div className="mt-8">
+          <CustomFieldsManagerClient contactDefs={contactDefs} dealDefs={dealDefs} />
+        </div>
 
         <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-6">
           <h2 className="mb-4 font-display text-base font-semibold text-zinc-900">

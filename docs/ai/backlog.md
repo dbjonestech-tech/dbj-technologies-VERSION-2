@@ -30,13 +30,17 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 - [ ] Verify `/admin/canopy` master-kill toggle round-trips: flip OFF, audit row appears in feed; flip ON, audit row appears.
 - [ ] After committing: `vercel logs --status-code 500 --since 5m` to confirm no RSC boundary failures (per `feedback_rsc_boundary_runtime`).
 
+### Phase 3 done in working tree (uncommitted as of May 1 latest)
+
+- [x] **Phase 3: Custom Fields, Tags, Segments.** Migration `027_customization.sql` (APPLIED to prod Neon) adds custom_field_definitions, custom_fields JSONB and tags TEXT[] columns on contacts/deals (with GIN tag indexes), saved_segments. `lib/canopy/{custom-fields,tags,segments,entity-extras}.ts` services. `lib/actions/{custom-fields,tags,segments}.ts` audit-logged Server Actions. UI: Custom Fields manager on /admin/canopy, TagsBar + CustomFieldsPanel on contact and deal detail pages.
+
 ### Phase 2 done in working tree (uncommitted as of May 1 latest)
 
 - [x] **Phase 2: Activities & Tasks.** Migration `026_activities.sql` (APPLIED to prod Neon: activities table with type discriminator, payload JSONB, due_at/completed_at/priority for tasks, five indexes). `lib/services/activities.ts` (read APIs + title/detail formatters). `lib/services/tasks.ts` (filter-aware getTasks + getTodayTasksSummary). `lib/actions/activities.ts` (eight audit-logged Server Actions). ActivityComposer + ActivityFeed components. /admin/tasks page with scope/status/priority filters. Dashboard Today's Tasks card. Sidebar Tasks item under Operations. Contact and deal detail pages now host the composer + feed.
 
 ### Next phase queued
 
-- [ ] **Phase 3: Custom Fields, Tags, Segments.** Migration `027_customization.sql` adding `custom_field_definitions`, `tags TEXT[]` and `custom_fields JSONB` on contacts and deals, `saved_segments` table. `lib/canopy/custom-fields.ts` registry CRUD + validators. `lib/canopy/segments.ts` filter compiler. UI: custom fields editor under /admin/canopy, tag chips and filter sidebar on contact + deal + task list pages, "Save as segment" + segment picker.
+- [ ] **Phase 4: Email Integration.** Migration `028_email_sync.sql` (email_messages, email_templates, oauth_tokens), Google OAuth flow with send + readonly + modify scopes, Inngest cron pulling inbound Gmail messages every 5 min, compose modal on contact and deal pages with merge-field substitution and live preview, open + click tracking via `/api/email/pixel/[messageId]` and `/api/email/click/[messageId]`. **Out of scope (do-not-break rule):** the contact form's Resend send path remains untouched.
 
 ### Net new gaps to port (deferred, lower value than the build phases)
 

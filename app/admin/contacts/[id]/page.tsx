@@ -26,11 +26,15 @@ import {
   type DealRow,
 } from "@/lib/services/deals";
 import { getActivitiesForContact } from "@/lib/services/activities";
+import { getCustomFieldDefinitions } from "@/lib/canopy/custom-fields";
+import { getEntityExtras } from "@/lib/canopy/entity-extras";
 import PageHeader from "../../PageHeader";
 import ContactHeader from "./ContactHeader";
 import ContactNotes from "./ContactNotes";
 import ActivityComposer from "../../components/ActivityComposer";
 import ActivityFeed from "../../components/ActivityFeed";
+import TagsBar from "../../components/TagsBar";
+import CustomFieldsPanel from "../../components/CustomFieldsPanel";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -52,12 +56,14 @@ export default async function ContactDetailPage({ params }: Props) {
   const contact = await getContact(id);
   if (!contact) notFound();
 
-  const [timeline, notes, scanInfo, deals, activities] = await Promise.all([
+  const [timeline, notes, scanInfo, deals, activities, customFieldDefs, extras] = await Promise.all([
     getContactTimeline(contact.email, contact.id, 50),
     getContactNotes(contact.id),
     getPathlightScansForContact(contact.email),
     getDealsForContact(contact.id),
     getActivitiesForContact(contact.id, 50),
+    getCustomFieldDefinitions("contact"),
+    getEntityExtras("contact", contact.id),
   ]);
 
   return (
@@ -91,6 +97,18 @@ export default async function ContactDetailPage({ params }: Props) {
         </div>
 
         <DealsPanel deals={deals} />
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <TagsBar entityType="contact" entityId={contact.id} initialTags={extras.tags} />
+          <div>
+            <CustomFieldsPanel
+              entityType="contact"
+              entityId={contact.id}
+              definitions={customFieldDefs}
+              values={extras.custom_fields}
+            />
+          </div>
+        </div>
 
         <div className="mt-8">
           <ActivityComposer contactId={contact.id} />
