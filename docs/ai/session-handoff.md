@@ -5,9 +5,49 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 7 shipped at `439b762`, pushed to origin main, working tree clean. No new migration; cron registered.)
+## Current state (May 1, 2026 -- Canopy v2 Phase 5 staged uncommitted; migration 029 applied to prod Neon)
 
-### Phase 7 shipped at `439b762`: Analytics & Narrative Digest
+### Phase 5 staged this session (pre-commit): Automation - Sequences, Workflow Rules, Bulk Actions
+
+The orchestration layer. Two new Inngest crons turn the data Canopy already collects into actions that run themselves: a sequence advancer that drains active enrollments every 5 minutes, and a workflow rule evaluator that polls canopy_audit_log every 2 minutes and fires matching rules. Action library is the single point of execution for both, so a new action automatically becomes available to both engines. Email steps are stubbed cleanly until Phase 4 (Gmail OAuth) ships.
+
+- `lib/db/migrations/029_automation.sql` (APPLIED to prod Neon) - five tables: sequences (name, status, enrollment_filter, exit_conditions), sequence_steps (step_order, kind email|task|wait|tag|stage_change, payload JSONB, delay_seconds), sequence_enrollments (per-(sequence, contact) state row with current_step_order + next_run_at + status active|paused|completed|exited), workflow_rules (trigger_event from a CHECK list of supported events, conditions JSONB, actions JSONB array, last_audit_log_id checkpoint, fire_count), workflow_evaluations (rule_id + audit_log_id ledger with UNIQUE constraint so cron retries never double-fire).
+- `lib/canopy/automation/sequences.ts` - read APIs (listSequences, getSequence, getStepsForSequence, getEnrollmentsForSequence/Contact) plus describeStep + formatDelay helpers. SequenceRow includes denormalized step_count and active_enrollments via subqueries.
+- `lib/canopy/automation/workflow-rules.ts` - read APIs (listWorkflowRules, getWorkflowRule, getRuleEvaluations) plus the evaluateConditions helper which interprets `{match: {field: value, ...}}` against an audit row's after / before payload (with `before.field` and `after.field` prefixes for explicit JSON pointer).
+- `lib/canopy/automation/actions.ts` - the action library. Seven actions: createTask, sendEmail (Phase 4 stub), enrollInSequence, changeStage (deal-targeted with stage validation), addTag, removeTag, triggerPathlightScan (gated through canFireScan + triggerRescanForContact). Each action writes its own canopy_audit_log row tagged with action="automation.*" and metadata.source identifying the originating rule or sequence.
+- `lib/canopy/automation/engine.ts` - advanceDueEnrollments(limit) drains active enrollments where next_run_at <= NOW(), executes the current step's action, schedules the next step (or marks completed when out of steps). evaluateWorkflowRules(maxPerRule) loads each enabled rule, scans canopy_audit_log for entries with id > last_audit_log_id matching trigger_event, evaluates conditions, executes actions for matching rows, advances last_audit_log_id, writes a workflow_evaluations row for every evaluation (UNIQUE prevents double-fire).
+- `lib/inngest/functions.ts` - canopySequenceAdvance cron `*/5 * * * *` and canopyWorkflowEvaluate cron `*/2 * * * *`. Registered in `app/(grade)/api/inngest/route.ts`.
+- `lib/actions/sequences.ts` - createSequenceAction, updateSequenceAction (name + description + status), deleteSequenceAction (CASCADE drops steps + enrollments), addSequenceStepAction (auto-numbers step_order from MAX+1), deleteSequenceStepAction, enrollContactsAction (bulk insert with ON CONFLICT DO NOTHING + first-step delay calc), pauseEnrollmentAction, exitEnrollmentAction. All audit-logged.
+- `lib/actions/workflow-rules.ts` - createWorkflowRuleAction (sets last_audit_log_id to current MAX so the rule starts firing forward, not retroactively), updateWorkflowRuleAction with field-level COALESCE for partial updates, toggleWorkflowRuleAction (thin wrapper), deleteWorkflowRuleAction. Includes validateActions guard against unknown action kinds.
+- `lib/actions/bulk-contacts.ts` - bulkAddTagAction + bulkRemoveTagAction (ARRAY DISTINCT unnest pattern, canonicalized via canonicalizeTag), bulkEnrollInSequenceAction, bulkDeleteContactsAction (CASCADE drops linked deals + activities + enrollments), bulkExportContactsAction (returns CSV string + filename for client-side blob download).
+- `/admin/sequences` - SequencesListClient with create + delete + status dropdown (draft/active/paused/archived). Step delay reference card at the bottom shows seconds -> human format mapping.
+- `/admin/sequences/[id]` - SequenceStepsEditor: ordered list with delete-per-row, add-step form with kind selector (task / email / wait / tag / stage_change), preset delay dropdown (immediately / 1h / 1d / 3d / 7d / 14d), kind-specific payload inputs. Enrollments list below shows current_step_order + status + next_run_at for the 50 most recent.
+- `/admin/automations` - AutomationsClient with rule cards, per-rule enable toggle, per-rule fire_count, expandable Conditions and Actions JSON pretty-printed. CreateRuleForm: name + description + trigger event dropdown + single condition match field/value + single action with kind-specific payload inputs (multi-action rules can be wired via direct DB edit for now).
+- `/admin/contacts` ContactsList: row checkbox column + select-all header checkbox with indeterminate state. BulkActionsBar appears when at least one row selected, with Add tag, Remove tag, Enroll in sequence, Export CSV (client-side blob download via document.createElement('a')), Delete (with confirm for blast radius warning).
+- Sidebar nav: new Automation group with Sequences (Send icon) and Workflow rules (Zap icon) under the Analytics group.
+
+### Acceptance signals
+
+- `npx tsc --noEmit` and `npm run lint` clean (verified).
+- Migration 029 applied to prod Neon successfully.
+- Acceptance test 1 (sequence engine): create a 3-step sequence with delays 0/3d/7d (use type=task instead of email since email is deferred). Enroll a contact via the bulk toolbar. Step 1 fires immediately on the next cron tick (within 5 min); step 2 schedules for 3 days out; step 3 for 10 days out. Pause the enrollment and step 3 stops scheduling.
+- Acceptance test 2 (workflow rule): create a rule "trigger=deal.stage_change, condition={match: {stage: 'qualified'}}, action=create_task with title 'Send proposal' due in 2 days". Move any open deal to stage='qualified'. Within 2 minutes, a task appears on the deal's contact with the right title and due date.
+- Bulk delete on a contact CASCADE-drops their deals, activities, notes, and sequence enrollments cleanly.
+- A workflow rule whose trigger_event matches a row but conditions don't match writes a workflow_evaluations row with fired=FALSE and reason="...not in [...]".
+
+### Next recommended task
+
+**Phase 4 - Email Integration**, which unblocks Phase 5's email steps + workflow rule send_email action + sequence.exit-on-reply detection. Requires Google Cloud Console setup (GOOGLE_OAUTH_CLIENT_ID + GOOGLE_OAUTH_CLIENT_SECRET) before testing end-to-end.
+
+Or **Phase 8 - Multi-User Enterprise** (RBAC, mentions, webhooks, REST API, CSV import, white-label theming) if multi-user is on the near horizon. Phase 9 (Pathlight Advanced - prospecting + change monitoring + competitor scans + attribution beacon) depends on Phase 8 for invite-flow mechanics.
+
+### Migration numbering note
+
+Build plan reserved `028 = email`, `029 = automation`, `030 = pathlight integrations`. Because Phases 4 + 5 were initially deferred to ship Phases 6 + 7 first, Phase 6 took `028`. Phase 7 shipped without a migration. Phase 5 now takes `029` (next sequential). When Phase 4 ships, its migration should be `030_email_sync.sql`.
+
+---
+
+## Prior state -- Phase 7 shipped at `439b762`: Analytics & Narrative Digest
 
 The first phase that gives operators a top-down read on the data they've been entering. Pure read-only over deals, activities, contacts, and pathlight_scans_log; no new tables, no new migrations. Phase 0 already provisioned the digest schedule fields on canopy_settings, so this phase only had to wire them up.
 

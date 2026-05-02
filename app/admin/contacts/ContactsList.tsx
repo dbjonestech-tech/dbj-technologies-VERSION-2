@@ -22,6 +22,8 @@ import {
   createContactAction,
   syncContactsAction,
 } from "@/lib/actions/contacts";
+import type { SequenceRow } from "@/lib/canopy/automation/sequences";
+import BulkActionsBar from "./BulkActionsBar";
 
 type Props = {
   rows: ContactListRow[];
@@ -29,6 +31,7 @@ type Props = {
   activeSource: ContactSource | "all";
   activeSearch: string;
   activeOverdue: boolean;
+  sequences: SequenceRow[];
 };
 
 const STATUS_LABEL: Record<ContactStatus, string> = {
@@ -92,12 +95,29 @@ export default function ContactsList({
   activeSource,
   activeSearch,
   activeOverdue,
+  sequences,
 }: Props) {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState(activeSearch);
   const [showNewForm, setShowNewForm] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
+  function toggleOne(id: number) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+  function toggleAll() {
+    setSelectedIds((prev) => {
+      if (prev.size === rows.length) return new Set();
+      return new Set(rows.map((r) => r.id));
+    });
+  }
 
   /* Debounced search: rewrite the URL after 300ms idle so the server
    * can re-query without flooding navigation events. */
@@ -244,6 +264,15 @@ export default function ContactsList({
         </div>
       </section>
 
+      {selectedIds.size > 0 ? (
+        <BulkActionsBar
+          selectedIds={Array.from(selectedIds)}
+          sequences={sequences}
+          onClear={() => setSelectedIds(new Set())}
+          onMutated={() => router.refresh()}
+        />
+      ) : null}
+
       <section className="rounded-xl border border-zinc-200 bg-white p-4">
         {rows.length === 0 ? (
           <p className="px-2 py-6 text-center text-sm text-zinc-500">
@@ -256,6 +285,17 @@ export default function ContactsList({
             <table className="canopy-table w-full min-w-[760px] text-sm">
               <thead>
                 <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+                  <th className="px-2 py-2 font-semibold">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all"
+                      checked={rows.length > 0 && selectedIds.size === rows.length}
+                      ref={(el) => {
+                        if (el) el.indeterminate = selectedIds.size > 0 && selectedIds.size < rows.length;
+                      }}
+                      onChange={toggleAll}
+                    />
+                  </th>
                   <th className="px-3 py-2 font-semibold">Contact</th>
                   <th className="px-3 py-2 font-semibold">Status</th>
                   <th className="px-3 py-2 font-semibold">Source</th>
@@ -266,7 +306,12 @@ export default function ContactsList({
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <ContactRow key={r.id} row={r} />
+                  <ContactRow
+                    key={r.id}
+                    row={r}
+                    selected={selectedIds.has(r.id)}
+                    onToggle={() => toggleOne(r.id)}
+                  />
                 ))}
               </tbody>
             </table>
@@ -305,7 +350,15 @@ function Chip({
   );
 }
 
-function ContactRow({ row }: { row: ContactListRow }) {
+function ContactRow({
+  row,
+  selected,
+  onToggle,
+}: {
+  row: ContactListRow;
+  selected: boolean;
+  onToggle: () => void;
+}) {
   const followUp = formatFollowUp(row.followUpDate);
   const followUpClass =
     followUp.tone === "overdue"
@@ -316,7 +369,15 @@ function ContactRow({ row }: { row: ContactListRow }) {
           ? "text-zinc-700"
           : "text-zinc-400";
   return (
-    <tr className="border-t border-zinc-100 transition-colors even:bg-zinc-100/70 hover:bg-pink-50">
+    <tr className={`border-t border-zinc-100 transition-colors even:bg-zinc-100/70 hover:bg-pink-50 ${selected ? "!bg-pink-100" : ""}`}>
+      <td className="px-2 py-2 align-middle">
+        <input
+          type="checkbox"
+          aria-label={`Select ${row.email}`}
+          checked={selected}
+          onChange={onToggle}
+        />
+      </td>
       <td className="px-3 py-2">
         <Link
           href={`/admin/contacts/${row.id}`}

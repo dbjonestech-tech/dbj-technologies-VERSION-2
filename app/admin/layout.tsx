@@ -29,6 +29,7 @@ import {
   Kanban,
   Sliders,
   BarChart3,
+  Send,
 } from "lucide-react";
 import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
 import { getContactsDashboardSummary } from "@/lib/services/contacts";
@@ -99,6 +100,13 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
     label: "Analytics",
     items: [
       { label: "Pipeline", href: "/admin/analytics/pipeline", icon: BarChart3, palette: "emerald" },
+    ],
+  },
+  {
+    label: "Automation",
+    items: [
+      { label: "Sequences", href: "/admin/sequences", icon: Send, palette: "violet" },
+      { label: "Workflow rules", href: "/admin/automations", icon: Zap, palette: "violet" },
     ],
   },
   {

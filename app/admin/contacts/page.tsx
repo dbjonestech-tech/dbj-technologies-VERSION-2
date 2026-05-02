@@ -7,6 +7,7 @@ import {
   type ContactStatus,
   type ContactSource,
 } from "@/lib/services/contacts";
+import { listSequences } from "@/lib/canopy/automation/sequences";
 import PageHeader from "../PageHeader";
 import ContactsList from "./ContactsList";
 
@@ -44,7 +45,7 @@ export default async function ContactsPage({ searchParams }: Props) {
   const search = parseString(params["q"]);
   const overdueOnly = params["overdue"] === "1";
 
-  const [contacts, summary] = await Promise.all([
+  const [contacts, summary, sequences] = await Promise.all([
     getContacts({
       status,
       source,
@@ -52,6 +53,7 @@ export default async function ContactsPage({ searchParams }: Props) {
       overdueOnly,
     }),
     getContactsDashboardSummary(),
+    listSequences(),
   ]);
 
   return (
@@ -72,6 +74,7 @@ export default async function ContactsPage({ searchParams }: Props) {
           activeSource={source}
           activeSearch={search}
           activeOverdue={overdueOnly}
+          sequences={sequences}
         />
       </div>
     </div>

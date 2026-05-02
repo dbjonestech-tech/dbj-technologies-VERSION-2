@@ -2,6 +2,8 @@ import { serve } from "inngest/next";
 import { inngest } from "@/lib/inngest/client";
 import {
   canopyDigestHourly,
+  canopySequenceAdvance,
+  canopyWorkflowEvaluate,
   costAlertDaily,
   lighthouseMonitorDaily,
   monitoringPurgeDaily,
@@ -18,5 +20,7 @@ export const { GET, POST, PUT } = serve({
     pathlightSyntheticCheck,
     monitoringPurgeDaily,
     canopyDigestHourly,
+    canopySequenceAdvance,
+    canopyWorkflowEvaluate,
   ],
 });

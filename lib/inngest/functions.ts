@@ -1411,6 +1411,47 @@ export const emailKpiRefreshHourly = inngest.createFunction(
 );
 
 /**
+ * Canopy sequence advancer. Drains active enrollments whose
+ * next_run_at <= NOW() every 5 minutes. Each enrollment runs at most
+ * one step per fire so a cron retry never double-fires the same step.
+ */
+export const canopySequenceAdvance = inngest.createFunction(
+  {
+    id: "canopy-sequence-advance",
+    triggers: [{ cron: "*/5 * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("advance", async () => {
+      const { advanceDueEnrollments } = await import("@/lib/canopy/automation/engine");
+      const results = await advanceDueEnrollments(100);
+      return { processed: results.length, executed: results.filter((r) => r.outcome === "executed").length, completed: results.filter((r) => r.outcome === "completed").length };
+    });
+  }
+);
+
+/**
+ * Canopy workflow rule evaluator. Polls canopy_audit_log every 2
+ * minutes for entries newer than each enabled rule's
+ * last_audit_log_id checkpoint and fires matching rules. The
+ * workflow_evaluations ledger guarantees idempotence on retry.
+ */
+export const canopyWorkflowEvaluate = inngest.createFunction(
+  {
+    id: "canopy-workflow-evaluate",
+    triggers: [{ cron: "*/2 * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    return await step.run("evaluate", async () => {
+      const { evaluateWorkflowRules } = await import("@/lib/canopy/automation/engine");
+      const results = await evaluateWorkflowRules(200);
+      return { evaluations: results.length, fired: results.filter((r) => r.fired).length };
+    });
+  }
+);
+
+/**
  * Canopy weekly digest. Fires hourly and only sends when the
  * operator's chosen day-of-week + local-hour matches the current
  * timezone-converted clock. Read-only over existing data; never
