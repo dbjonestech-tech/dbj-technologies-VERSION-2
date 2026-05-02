@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 1 staged uncommitted, prior phases live at `9f259de`/`20d2bf8`)
+## Current state (May 1, 2026 -- Canopy v2 Phase 1 shipped at `c38cd20`, pushed to origin main, working tree clean)
 
-### Phase 1 staged this session (pre-commit)
+### Phase 1 shipped at `c38cd20`
 
 **Deals architecture pivot.** The architectural pivot from contact-stage to deal-stage CRM, the foundation every later phase (sequences, automation, analytics, attribution) builds on. One contact can now have multiple deals over time; each deal has its own value, probability, expected close, and won/lost outcome.
 
