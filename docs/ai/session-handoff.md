@@ -5,7 +5,14 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- admin observability secrets wired in Vercel + Sentry summary filter shipped)
+## Current state (May 2, 2026 -- admin observability secrets wired in Vercel + Sentry summary filter shipped at `9ad2d76`, pushed to origin main)
+
+**Working tree NOT clean.** Two unrelated files carry pre-existing uncommitted changes from prior work that are NOT this commit:
+
+- `lib/inngest/functions.ts` -- two pending fixes: (1) wraps `track("scan.started")` in `step.run("track-start")` so it fires once per scan rather than re-executing on every Inngest replay (was producing 7 duplicate `scan.started` rows in `monitoring_events` per scan), and (2) adds an a3 benchmark-research short-circuit when vision did not succeed, since the downstream consumers (revenue, score, report UI) all already short-circuit when vision fails -- the unconditional benchmark call was costing ~$0.20 of orphaned Sonnet tokens on every partial scan. Both are real, valuable fixes worth their own commit.
+- `lib/services/browserless.ts` -- substantial screenshot reliability refactor: bumps `SCREENSHOT_TIMEOUT_MS` 45->55s, adds `SCREENSHOT_RETRY_DELAY_MS`, introduces a layered "primary"/"fallback" capture strategy, and blocks ~30 third-party hosts (GTM, GA, Intercom, Drift, Hotjar, FullStory, Segment, Mixpanel, Amplitude, Tawk, Crisp, Zendesk, Clarity, etc.) at the request-interception layer because they keep `networkidle2` from ever settling. Real fix worth its own commit.
+
+Joshua should review and commit these separately. They are unrelated to today's admin-observability work and were not part of the diff I read or wrote.
 
 ### Vercel env config completed this session
 
