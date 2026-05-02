@@ -30,6 +30,10 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 - [ ] Verify `/admin/canopy` master-kill toggle round-trips: flip OFF, audit row appears in feed; flip ON, audit row appears.
 - [ ] After committing: `vercel logs --status-code 500 --since 5m` to confirm no RSC boundary failures (per `feedback_rsc_boundary_runtime`).
 
+### Phase 6 done in working tree (uncommitted as of May 1 latest)
+
+- [x] **Phase 6: Pathlight Manual Integrations.** Migration `028_pathlight_integrations.sql` (APPLIED to prod Neon) adds pathlight_scans_log, ai_search_checks, lead_scores. `lib/canopy/{pathlight-client,lead-scoring}.ts` services. `lib/actions/{pathlight-rescan,ai-search-checks,lead-scoring}.ts` audit-logged Server Actions. Per-contact UI: RescanButton (gate-aware), AISearchCheckPanel, LeadScoreBadge with component breakdown. Phase 0's three-layer Pathlight lock now gates real functionality.
+
 ### Phase 3 done in working tree (uncommitted as of May 1 latest)
 
 - [x] **Phase 3: Custom Fields, Tags, Segments.** Migration `027_customization.sql` (APPLIED to prod Neon) adds custom_field_definitions, custom_fields JSONB and tags TEXT[] columns on contacts/deals (with GIN tag indexes), saved_segments. `lib/canopy/{custom-fields,tags,segments,entity-extras}.ts` services. `lib/actions/{custom-fields,tags,segments}.ts` audit-logged Server Actions. UI: Custom Fields manager on /admin/canopy, TagsBar + CustomFieldsPanel on contact and deal detail pages.
@@ -40,7 +44,11 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 
 ### Next phase queued
 
-- [ ] **Phase 4: Email Integration.** Migration `028_email_sync.sql` (email_messages, email_templates, oauth_tokens), Google OAuth flow with send + readonly + modify scopes, Inngest cron pulling inbound Gmail messages every 5 min, compose modal on contact and deal pages with merge-field substitution and live preview, open + click tracking via `/api/email/pixel/[messageId]` and `/api/email/click/[messageId]`. **Out of scope (do-not-break rule):** the contact form's Resend send path remains untouched.
+- [ ] **Phase 7: Analytics & Narrative Digest.** `lib/analytics/{pipeline,contact}.ts` (conversion-by-stage funnel, win rate, avg deal size, source attribution, loss reason aggregation, contact engagement sparkline, response time, next-best-action heuristic). `/admin/analytics/pipeline` page with Recharts. Inngest weekly cron `digest.compose` HTML email summarizing new contacts, overdue follow-ups, deal movement, pipeline value change, notable visitor sessions, Pathlight score changes. Digest cadence editor on /admin/canopy.
+
+- [ ] **Phase 4: Email Integration (deferred from earlier session).** Migration for email_messages, email_templates, oauth_tokens. Google OAuth flow with send + readonly + modify scopes (requires GOOGLE_OAUTH_CLIENT_ID + GOOGLE_OAUTH_CLIENT_SECRET provisioned in Google Cloud Console). Inngest cron pulling inbound Gmail messages every 5 min. Compose modal on contact and deal pages with merge-field substitution and live preview. Open + click tracking via `/api/email/pixel/[messageId]` and `/api/email/click/[messageId]`. **Out of scope:** the contact form's Resend send path remains untouched.
+
+- [ ] **Phase 5: Automation - Sequences, Workflow Rules, Bulk Actions.** Depends on Phase 4 for sequence email send. `sequences`, `sequence_steps`, `sequence_enrollments`, `workflow_rules` tables. Inngest functions for sequence advance + exit-on-reply + workflow evaluate. Action library (createTask, sendEmail, enrollInSequence, changeStage, addTag, triggerPathlightScan via gate). Bulk action server endpoints + checkbox column + toolbar on list pages.
 
 ### Net new gaps to port (deferred, lower value than the build phases)
 

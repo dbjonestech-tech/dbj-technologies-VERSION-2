@@ -28,6 +28,11 @@ import {
 import { getActivitiesForContact } from "@/lib/services/activities";
 import { getCustomFieldDefinitions } from "@/lib/canopy/custom-fields";
 import { getEntityExtras } from "@/lib/canopy/entity-extras";
+import { getCanopySettings } from "@/lib/canopy/settings";
+import { canFireScan } from "@/lib/canopy/pathlight-gate";
+import { getRescansForContact } from "@/lib/services/pathlight-rescan";
+import { getAiSearchChecksForContact } from "@/lib/services/ai-search-checks";
+import { getLatestLeadScore } from "@/lib/canopy/lead-scoring";
 import PageHeader from "../../PageHeader";
 import ContactHeader from "./ContactHeader";
 import ContactNotes from "./ContactNotes";
@@ -35,6 +40,9 @@ import ActivityComposer from "../../components/ActivityComposer";
 import ActivityFeed from "../../components/ActivityFeed";
 import TagsBar from "../../components/TagsBar";
 import CustomFieldsPanel from "../../components/CustomFieldsPanel";
+import RescanButton from "../../components/RescanButton";
+import AISearchCheckPanel from "../../components/AISearchCheckPanel";
+import LeadScoreBadge from "../../components/LeadScoreBadge";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -56,7 +64,20 @@ export default async function ContactDetailPage({ params }: Props) {
   const contact = await getContact(id);
   if (!contact) notFound();
 
-  const [timeline, notes, scanInfo, deals, activities, customFieldDefs, extras] = await Promise.all([
+  const [
+    timeline,
+    notes,
+    scanInfo,
+    deals,
+    activities,
+    customFieldDefs,
+    extras,
+    canopySettings,
+    gate,
+    rescans,
+    aiChecks,
+    leadScore,
+  ] = await Promise.all([
     getContactTimeline(contact.email, contact.id, 50),
     getContactNotes(contact.id),
     getPathlightScansForContact(contact.email),
@@ -64,7 +85,16 @@ export default async function ContactDetailPage({ params }: Props) {
     getActivitiesForContact(contact.id, 50),
     getCustomFieldDefinitions("contact"),
     getEntityExtras("contact", contact.id),
+    getCanopySettings(),
+    canFireScan("rescan"),
+    getRescansForContact(contact.id, 10),
+    getAiSearchChecksForContact(contact.id, 30),
+    getLatestLeadScore(contact.id),
   ]);
+  const budgetRemaining = Math.max(
+    0,
+    canopySettings.monthly_scan_budget - canopySettings.scans_used_this_period
+  );
 
   return (
     <div className="px-6 py-10 sm:px-10">
@@ -110,6 +140,64 @@ export default async function ContactDetailPage({ params }: Props) {
           </div>
         </div>
 
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <LeadScoreBadge
+            contactId={contact.id}
+            initialScore={leadScore?.score ?? null}
+            initialComponents={leadScore?.components ?? null}
+            computedAt={leadScore?.computed_at ?? null}
+          />
+          <RescanButton
+            contactId={contact.id}
+            gateAllowed={gate.allowed}
+            gateReason={gate.reason}
+            budgetRemaining={budgetRemaining}
+          />
+        </div>
+
+        {rescans.length > 0 ? (
+          <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <header className="mb-3">
+              <h3 className="font-display text-base font-semibold text-zinc-900">
+                Pathlight rescan history
+              </h3>
+              <p className="mt-0.5 text-xs text-zinc-600">
+                Every operator-triggered rescan from Canopy. Score deltas appear once the scan pipeline finishes.
+              </p>
+            </header>
+            <ul className="divide-y divide-zinc-100">
+              {rescans.map((r) => (
+                <li key={r.id} className="py-2 text-xs">
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <span className="font-mono text-zinc-700">
+                      {r.scan_status ?? "queued"}
+                    </span>
+                    {r.scan_score !== null ? (
+                      <span className="font-mono text-zinc-900">score {r.scan_score}</span>
+                    ) : null}
+                    {r.previous_score !== null ? (
+                      <span className="text-zinc-500">prev {r.previous_score}</span>
+                    ) : null}
+                    {r.scan_score !== null && r.previous_score !== null ? (
+                      <DeltaBadge delta={r.scan_score - r.previous_score} />
+                    ) : null}
+                    <span className="ml-auto font-mono text-zinc-400">
+                      {new Date(r.scanned_at).toLocaleString()}
+                    </span>
+                  </div>
+                  {r.triggered_reason ? (
+                    <p className="mt-0.5 text-zinc-500">{r.triggered_reason}</p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        <div className="mt-6">
+          <AISearchCheckPanel contactId={contact.id} initialChecks={aiChecks} />
+        </div>
+
         <div className="mt-8">
           <ActivityComposer contactId={contact.id} />
         </div>
@@ -146,6 +234,21 @@ export default async function ContactDetailPage({ params }: Props) {
         </section>
       </div>
     </div>
+  );
+}
+
+function DeltaBadge({ delta }: { delta: number }) {
+  const tone =
+    delta > 0
+      ? "bg-emerald-100 text-emerald-700"
+      : delta < 0
+        ? "bg-rose-100 text-rose-700"
+        : "bg-zinc-100 text-zinc-700";
+  const symbol = delta > 0 ? "+" : delta < 0 ? "" : "+/-";
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${tone}`}>
+      {symbol}{Math.abs(delta) === 0 ? "0" : delta}
+    </span>
   );
 }
 

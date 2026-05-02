@@ -5,9 +5,41 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 3 shipped at `6d809c8`, pushed to origin main, working tree clean. Migrations 023/024/025/026/027 all applied to prod Neon.)
+## Current state (May 1, 2026 -- Canopy v2 Phase 6 staged uncommitted; migrations 023-028 all applied to prod Neon)
 
-### Phase 3 shipped at `6d809c8`: Custom Fields, Tags, Segments
+### Phase 6 staged this session (pre-commit): Pathlight Manual Integrations
+
+The first phase that gives the Phase 0 lock infrastructure something to gate. Operators can trigger fresh Pathlight scans on contacts (gated by master kill, manual_rescan_enabled toggle, and monthly budget cap), record AI search visibility checks, and compute a 0-100 lead score with weighted components. All scan triggers are admin-only, audit-logged, and increment the budget counter.
+
+- `lib/db/migrations/028_pathlight_integrations.sql` (APPLIED to prod Neon) - three tables: pathlight_scans_log (operator-triggered rescan ledger with score delta tracking), ai_search_checks (manual AI search visibility log with engine/sentiment/mentioned), lead_scores (point-in-time score snapshots with component breakdown JSONB).
+- `lib/canopy/pathlight-client.ts` - triggerRescanForContact: gate check first, resolve URL (override -> latest scan -> contact.website), insert scans row, send pathlight/scan.requested Inngest event (matches existing app/(grade)/api/scan/route.ts pattern but skips Turnstile + rate limits since admin-triggered behind canFireScan), log to pathlight_scans_log, increment budget.
+- `lib/canopy/lead-scoring.ts` - computeLeadScore with six weighted components (pathlight from latest scan, engagement via page_views in last 30d, recency via days since last_activity, touchpoints via scans+forms+emails, deal_value from open deals, source via per-source base score). Weights live in canopy_settings.lead_score_weights JSONB. persistLeadScore writes a snapshot row.
+- `lib/services/pathlight-rescan.ts` - getRescansForContact joins pathlight_scans_log with scans + scan_results to surface live scan_status + scan_score (so the UI can render "queued / running / score 78" inline as the pipeline progresses).
+- `lib/services/ai-search-checks.ts` - read APIs: getAiSearchChecksForContact, getAiSearchCheckSummary (mentioned/positive counts by engine).
+- `lib/actions/pathlight-rescan.ts` - triggerRescanAction wrapping the client helper, audit-logged.
+- `lib/actions/ai-search-checks.ts` - recordAiSearchCheckAction with engine/sentiment validation.
+- `lib/actions/lead-scoring.ts` - recomputeLeadScoreAction.
+- `app/admin/components/RescanButton.tsx` - per-contact button that respects gate result. When gate denies, shows the reason and links to /admin/canopy. When allowed, shows a budget pill (X scans left) and an optional reason field.
+- `app/admin/components/AISearchCheckPanel.tsx` - form + history. Operator picks engine, types query, pastes result, marks mentioned/sentiment.
+- `app/admin/components/LeadScoreBadge.tsx` - colored score circle (red < 50 / amber 50-74 / emerald 75+) with six component bars. Recompute button refreshes from current data.
+- Contact detail page (/admin/contacts/[id]) now hosts: TagsBar + CustomFieldsPanel grid (Phase 3), LeadScoreBadge + RescanButton grid (Phase 6), Pathlight rescan history list, AISearchCheckPanel.
+
+### Acceptance signals
+
+- `npx tsc --noEmit` and `npm run lint` clean (verified).
+- Migration 028 applied to prod Neon successfully.
+- With Pathlight master kill ON in /admin/canopy and budget > 0, RescanButton on a contact page is enabled and a click queues a real scan via the existing pipeline. Budget counter decrements; pathlight_scans_log row appears.
+- With master kill OFF, the button is disabled with a "Pathlight is paused in Settings" reason and a link to /admin/canopy.
+- LeadScoreBadge shows "-" until first compute; clicking Recompute fills in the score with component bars (Pathlight, Engagement, Recency, Touchpoints, Deal value, Source).
+- Recording an AI search check stores the engine/query/mentioned/sentiment and renders in the recent checks list.
+
+### Next recommended task
+
+**Phase 7 - Analytics & Narrative Digest** per `docs/ai/canopy-build-plan.md`. lib/analytics/{pipeline,contact}.ts (conversion by stage, win rate, avg deal size, source attribution, loss reason aggregation, engagement sparkline, response time, next-best-action heuristic). /admin/analytics/pipeline page with Recharts. Inngest weekly cron `digest.compose` that builds an HTML email with new contacts, overdue follow-ups, deal movement, pipeline value change, notable visitor sessions, Pathlight score changes. Settings -> Digest cadence editor on /admin/canopy.
+
+---
+
+## Prior state -- Phase 3 shipped at `6d809c8`
 
 The per-vertical adaptability layer. Operators define their own fields (vehicle VIN for an auto shop, insurance provider for a dentist, statute date for a law firm) without per-install schema changes. Free-form tags and saved segment infrastructure round out the customization surface.
 
