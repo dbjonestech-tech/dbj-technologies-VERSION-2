@@ -5,11 +5,18 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy admin logo swap shipped at `3a14c55`, pushed to origin main, working tree clean. Migration 031 applied to prod Neon.)
+## Current state (May 1, 2026 -- Canopy admin logo split shipped at `00b2399`, pushed to origin main, working tree clean. Migration 031 applied to prod Neon.)
 
-### Canopy admin sidebar logo replaced at `3a14c55`
+### Canopy admin sidebar logo split at `00b2399`: icon + live wordmark text
 
-Replaced `public/canopy-logo.webp` with the new cyan-tree-on-black wordmark provided by Joshua. Source 5828x1199 PNG resampled to 1600x1199 webp (q88, method 6, 7.3 MB -> 311 KB) for retina-sharp rendering at h-10 in the /admin sidebar header. Only consumer is `CanopyWordmark` in `app/admin/layout.tsx`; no code changes. Sidebar is `bg-white` so the black-bg logo renders as a tidy `rounded-md` card in the header.
+Second pass on the Canopy mark. The previous swap (`3a14c55`) replaced `canopy-logo.webp` with the full tree+wordmark PNG, but at sidebar scale (h-10) the embedded "CANOPY" text was unreadable - users saw a tree, then "by DBJ Technologies", and the product name never registered. An interim bump to h-20 made the wordmark legible but ate sidebar header room and looked busy.
+
+Final split:
+- `public/canopy-icon.webp` (NEW, 81 KB, 512x484, transparent bg) - the simplified square tree silhouette without embedded wordmark. Source: `Untitled design (14).png` (6400x6400 PNG, alpha). Trimmed of transparent margins, resized, q92 webp.
+- `public/canopy-logo.webp` (UNCHANGED at `3a14c55`) - the full tree+CANOPY wordmark image. Reserved for marketing surfaces (about page hero, OG previews, anywhere it can render at 200px+ so the embedded wordmark is legible). Currently has no consumer in code; staged for future use.
+- `app/admin/layout.tsx` `CanopyWordmark` - now renders the icon at h-12/w-12 alongside live styled text: "Canopy" (text-lg, semibold, tracking-tight, zinc-900) stacked over "by DBJ Technologies" (text-[10px], uppercase, tracking-[0.16em], zinc-500). Full typographic control, predictable layout, crisp at any size.
+
+The /admin shell is the design prototype for the Canopy product per `project_canopy_brand` memory. The icon-plus-live-wordmark pattern should propagate to any future marketing/footer/email surface where the brand needs to render below ~150px tall.
 
 ### Phase 8 follow-ups shipped at `b536db4`: sales-role scoping + per-entity audit + sidebar polish
 
