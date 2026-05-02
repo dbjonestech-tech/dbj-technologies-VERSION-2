@@ -1,6 +1,14 @@
 import { createHmac, randomBytes } from "crypto";
 import { getDb } from "@/lib/db";
 
+export {
+  WEBHOOK_EVENTS,
+  type WebhookRow,
+  type WebhookDeliveryRow,
+} from "./webhooks-types";
+
+import type { WebhookRow, WebhookDeliveryRow } from "./webhooks-types";
+
 /* Outbound webhooks. A webhook subscribes to one or more named
  * events from canopy_audit_log.action. The dispatcher cron polls
  * the audit log per-webhook against last_audit_log_id and POSTs
@@ -8,54 +16,7 @@ import { getDb } from "@/lib/db";
  *
  * webhook_deliveries is the ledger: one row per (webhook, audit_log)
  * with UNIQUE so retries never re-send the same event. Status code
- * + response body recorded for /admin/canopy/api debugging.
- *
- * Subscribable events list is pulled from the canopy_audit_log
- * action namespace. We curate a sensible default set here; an
- * operator can subscribe to '*' for everything. */
-
-export const WEBHOOK_EVENTS: readonly string[] = [
-  "*",
-  "contact.created",
-  "deal.create",
-  "deal.stage_change",
-  "deal.close.won",
-  "deal.close.lost",
-  "activity.task.complete",
-  "activity.note.create",
-  "tag.add",
-  "pathlight.rescan.trigger",
-  "automation.create_task",
-  "automation.add_tag",
-  "automation.change_stage",
-  "automation.trigger_pathlight_scan",
-];
-
-export interface WebhookRow {
-  id: number;
-  name: string;
-  url: string;
-  events: string[];
-  enabled: boolean;
-  last_audit_log_id: number;
-  fire_count: number;
-  fail_count: number;
-  created_by_email: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface WebhookDeliveryRow {
-  id: number;
-  webhook_id: number;
-  audit_log_id: number;
-  event_name: string;
-  status_code: number | null;
-  response_body: string | null;
-  error_message: string | null;
-  attempt: number;
-  delivered_at: string;
-}
+ * + response body recorded for /admin/canopy/api debugging. */
 
 export function generateWebhookSecret(): string {
   return `whsec_${randomBytes(24).toString("base64url")}`;

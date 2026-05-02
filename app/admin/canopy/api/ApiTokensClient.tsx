@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Copy, Loader2, Plus, Trash2 } from "lucide-react";
 import { createApiTokenAction, revokeApiTokenAction } from "@/lib/actions/api-tokens";
-import { type ApiTokenRow, SCOPES, type Scope } from "@/lib/canopy/api-tokens";
+import { type ApiTokenRow, SCOPES, type Scope } from "@/lib/canopy/api-tokens-types";
 
 interface Props {
   initialTokens: ApiTokenRow[];

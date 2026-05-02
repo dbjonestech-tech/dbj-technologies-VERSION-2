@@ -1,5 +1,8 @@
 import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { getDb } from "@/lib/db";
+import { type Scope, type ApiTokenRow } from "./api-tokens-types";
+
+export { SCOPES, type Scope, type ApiTokenRow } from "./api-tokens-types";
 
 /* API tokens for /api/v1/* Bearer auth.
  *
@@ -14,21 +17,6 @@ import { getDb } from "@/lib/db";
  * recognition without leaking the full secret. */
 
 const TOKEN_PREFIX = "cnpy_";
-
-export type Scope = "read" | "write";
-export const SCOPES: readonly Scope[] = ["read", "write"];
-
-export interface ApiTokenRow {
-  id: number;
-  user_email: string;
-  name: string;
-  prefix: string;
-  scopes: Scope[];
-  last_used_at: string | null;
-  expires_at: string | null;
-  created_at: string;
-  revoked_at: string | null;
-}
 
 export function generatePlaintextToken(): { plaintext: string; hashed: string; prefix: string } {
   const raw = randomBytes(24).toString("base64url");

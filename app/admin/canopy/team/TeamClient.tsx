@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { setUserRoleAction, setUserStatusAction } from "@/lib/actions/team";
-import { ROLES, ROLE_LABELS, type Role } from "@/lib/canopy/rbac";
+import { ROLES, ROLE_LABELS, type Role } from "@/lib/canopy/rbac-types";
 
 interface UserRow {
   email: string;

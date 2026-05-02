@@ -7,7 +7,7 @@ import {
   deleteWebhookAction,
   updateWebhookAction,
 } from "@/lib/actions/webhooks";
-import { type WebhookRow, WEBHOOK_EVENTS } from "@/lib/canopy/webhooks";
+import { type WebhookRow, WEBHOOK_EVENTS } from "@/lib/canopy/webhooks-types";
 
 interface Props {
   initialWebhooks: WebhookRow[];

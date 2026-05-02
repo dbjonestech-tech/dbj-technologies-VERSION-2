@@ -100,7 +100,7 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
   {
     label: "Analytics",
     items: [
-      { label: "Pipeline", href: "/admin/analytics/pipeline", icon: BarChart3, palette: "emerald" },
+      { label: "Sales analytics", href: "/admin/analytics/pipeline", icon: BarChart3, palette: "emerald" },
     ],
   },
   {

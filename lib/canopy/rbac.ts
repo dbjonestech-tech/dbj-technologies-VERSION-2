@@ -1,31 +1,14 @@
 import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import { isAdminEmail } from "@/lib/auth/allowlist";
+import { ROLES, type Role, roleAtLeast } from "./rbac-types";
 
-export type Role = "admin" | "manager" | "sales" | "viewer";
-
-export const ROLES: readonly Role[] = ["admin", "manager", "sales", "viewer"];
-
-export const ROLE_LABELS: Record<Role, string> = {
-  admin: "Admin",
-  manager: "Manager",
-  sales: "Sales",
-  viewer: "Viewer",
-};
-
-/* Capability ranking: a role allows everything its position in the
- * order or higher allows. admin > manager > sales > viewer. The
- * canonical "is at least" check uses the indexes below. */
-const ROLE_RANK: Record<Role, number> = {
-  admin: 3,
-  manager: 2,
-  sales: 1,
-  viewer: 0,
-};
-
-export function roleAtLeast(actual: Role, required: Role): boolean {
-  return ROLE_RANK[actual] >= ROLE_RANK[required];
-}
+export {
+  ROLES,
+  ROLE_LABELS,
+  roleAtLeast,
+  type Role,
+} from "./rbac-types";
 
 export interface SessionRole {
   email: string;
