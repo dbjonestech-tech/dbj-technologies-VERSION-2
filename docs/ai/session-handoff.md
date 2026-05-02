@@ -5,9 +5,47 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 6 shipped at `f2160f2`, pushed to origin main, working tree clean. Migrations 023-028 all applied to prod Neon.)
+## Current state (May 1, 2026 -- Canopy v2 Phase 7 staged uncommitted; no new migration; cron registered)
 
-### Phase 6 shipped at `f2160f2`: Pathlight Manual Integrations
+### Phase 7 staged this session (pre-commit): Analytics & Narrative Digest
+
+The first phase that gives operators a top-down read on the data they've been entering. Pure read-only over deals, activities, contacts, and pathlight_scans_log; no new tables, no new migrations. Phase 0 already provisioned the digest schedule fields on canopy_settings, so this phase only had to wire them up.
+
+- `lib/analytics/pipeline.ts` - aggregations: `getStageFunnel` (open vs closed counts per stage), `getWinRate(periodDays)` (won / (won + lost) over rolling window), `getAvgDealSize(periodDays)` (won deals only), `getAvgSalesCycleDays(periodDays)` (created -> closed for won), `getApproxTimeInStage` (created-to-now or to-close, with explicit caveat in the UI that without a stage history table this is a residence approximation, not a true Markovian dwell time), `getRevenueByMonth(monthsBack)` with generate_series so empty months still appear, `getSourceAttribution(periodDays)` joining contacts to deals.won, `getLossReasons(periodDays)` aggregating by `loss_reason`, `getPipelineSummary` composite for the four stat cards.
+- `lib/analytics/contact.ts` - per-contact: `getEngagementSparkline(contactId, days)` 30-day daily activity series via generate_series LEFT JOIN, `getActivityTotals30d` breakdown by type plus scan count from the scans table joined on email, `getMedianResponseMinutes` PERCENTILE_CONT over inbound/outbound activity gaps (treats `email` activities with `payload->>'direction' = 'inbound'` as inbound; everything else outbound), `getNextBestAction` priority cascade (overdue task -> stuck proposal >= 7d -> Pathlight regression -> stale contact 14d+ with open deal -> dormant 30d+ no deal -> fresh lead < 24h with no outreach -> stay the course). The NBA returns a typed signal for UI tone-coloring.
+- `lib/analytics/digest.ts` - composer + sender: `collectDigestData(asOf)` runs eight queries (new contacts, overdue tasks, deals won/lost, pipeline value now/prior, score changes, visitor sessions). `sendCanopyDigest({recipients, dryRun})` builds the email via the template helper, sends through Resend with `category=canopy_digest` tag. `shouldFireDigest(...)` decides per cron tick whether the local clock matches the operator's chosen day-of-week + hour after timezone conversion, so the cron can run hourly and self-gate.
+- `lib/email-templates/canopy-digest.ts` - HTML + text variants with branded accent stripe, headline summary line, sections for pipeline value, new contacts, won, lost, overdue tasks, and Pathlight score movement. Inlined styles only (Gmail-safe). No em dashes.
+- `lib/inngest/functions.ts` - new `canopyDigestHourly` cron fires `30 * * * *`. Step 1 reads canopy_settings + applies `shouldFireDigest`; step 2 (only if step 1 says fire) loads admin_users with status='active' as recipients (falls back to CONTACT_EMAIL env), calls sendCanopyDigest. Registered in `app/(grade)/api/inngest/route.ts`.
+- `lib/actions/canopy-settings.ts` - new actions: `setDigestSchedule({day_of_week, hour_local, timezone})` with bounds check and audit log, `sendTestDigestNow({to, dry_run})` with admin guard so the test can be triggered from /admin/canopy.
+- `app/admin/analytics/pipeline/page.tsx` + `PipelineDashboard.tsx` - server page loads aggregations; client renders Recharts: stage funnel (per-stage colors matching kanban), approx time-in-pipeline bars, revenue line (12-month), source attribution donut, loss reason horizontal bars. Four stat cards above (open pipeline value, win rate 30d, avg deal size 90d, avg sales cycle 180d).
+- `app/admin/components/EngagementSparkline.tsx` - 30-day area sparkline + 6 totals (notes/calls/meetings/emails/tasks done/scans) + median response time pill.
+- `app/admin/components/NextBestAction.tsx` - signal-toned callout (rose for urgent, amber for warning, emerald for fresh-lead, neutral for stay-course). Optional deep-link.
+- `/admin/contacts/[id]/page.tsx` - new EngagementSparkline + NextBestAction grid above the existing Tags + Custom fields row.
+- `/admin/canopy` Notifications section replaced with a full DigestSection: enable toggle, day-of-week + hour + timezone inputs with Save schedule, plus a Preview-only and Send-now button pair for testing without waiting for Monday.
+- Sidebar nav: new Analytics group between Relationships and Operations with a Pipeline link (BarChart3 icon, emerald palette).
+
+### Acceptance signals
+
+- `npx tsc --noEmit` and `npm run lint` clean (verified).
+- No new migration; no Neon writes required to ship.
+- /admin/analytics/pipeline renders the four stat cards + funnel + time-in-stage + revenue line + source donut + loss bars without runtime errors. Empty data sets render "no data" placeholders rather than crashing.
+- Toggling Weekly digest in /admin/canopy and clicking Preview-only returns a built subject line. Clicking Send now delivers a real email via Resend (requires RESEND_API_KEY + RESEND_FROM_EMAIL in Vercel; missing keys surface a clear error rather than silently failing).
+- The hourly cron self-gates on `shouldFireDigest`; firing it manually via the Inngest UI on a non-matching day returns `{sent: false, reason: 'schedule mismatch or disabled'}`.
+- On a contact with an overdue task, NextBestAction renders "Complete overdue task" with a deep-link to /admin/tasks. With no signals, it falls through to "Stay the course".
+
+### Next recommended task
+
+**Phase 4 - Email Integration** per `docs/ai/canopy-build-plan.md`. Migration `029_email_sync.sql` (email_messages, email_templates, oauth_tokens), Google OAuth flow with send + readonly + modify scopes (requires GOOGLE_OAUTH_CLIENT_ID + GOOGLE_OAUTH_CLIENT_SECRET in Google Cloud Console + Vercel), Inngest cron pulling inbound Gmail messages every 5 min, compose modal on contact and deal pages with merge-field substitution and live preview, open + click tracking via `/api/email/pixel/[messageId]` and `/api/email/click/[messageId]`. **Out of scope (do-not-break rule):** the contact form's Resend send path stays untouched. **Note:** the digest cron uses Resend, not Gmail; Phase 4's Gmail integration is for per-contact 1:1 send/receive, not bulk.
+
+Or **Phase 5 - Automation: Sequences, Workflow Rules, Bulk Actions** if you'd rather defer the OAuth provisioning step. Phase 5's sequence sender depends on Phase 4 for actual email delivery, but the workflow rule engine + bulk actions can ship without it.
+
+### Migration numbering note
+
+The build plan in `docs/ai/canopy-build-plan.md` numbered Phase 6's migration `030_pathlight_integrations.sql` and reserved `028` for Phase 4 + `029` for Phase 5. Because Phases 4 and 5 were skipped to ship Phase 6 + 7 first, the actual filesystem now has Phase 6's migration as `028`. When Phase 4 ships, its migration should be `029_email_sync.sql` and Phase 5's should be `030_automation.sql`. Phase 7 in this session shipped without a new migration, preserving the freed-up sequential numbering.
+
+---
+
+## Prior state -- Phase 6 shipped at `f2160f2`: Pathlight Manual Integrations
 
 The first phase that gives the Phase 0 lock infrastructure something to gate. Operators can trigger fresh Pathlight scans on contacts (gated by master kill, manual_rescan_enabled toggle, and monthly budget cap), record AI search visibility checks, and compute a 0-100 lead score with weighted components. All scan triggers are admin-only, audit-logged, and increment the budget counter.
 

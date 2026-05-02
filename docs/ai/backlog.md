@@ -30,6 +30,10 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 - [ ] Verify `/admin/canopy` master-kill toggle round-trips: flip OFF, audit row appears in feed; flip ON, audit row appears.
 - [ ] After committing: `vercel logs --status-code 500 --since 5m` to confirm no RSC boundary failures (per `feedback_rsc_boundary_runtime`).
 
+### Phase 7 done in working tree (uncommitted as of May 1 latest)
+
+- [x] **Phase 7: Analytics & Narrative Digest.** No new migration; Phase 0 already provisioned the digest schedule fields on canopy_settings. `lib/analytics/{pipeline,contact,digest}.ts` read-only aggregations. `lib/email-templates/canopy-digest.ts` Gmail-safe HTML + text template. `canopyDigestHourly` Inngest cron self-gates on `shouldFireDigest` against settings.timezone. `lib/actions/canopy-settings.ts` adds `setDigestSchedule` + `sendTestDigestNow` audit-logged actions. `/admin/analytics/pipeline` page with Recharts. EngagementSparkline + NextBestAction on contact detail. DigestSection (day/hour/timezone editor + preview + send-now buttons) on /admin/canopy. Sidebar Analytics group with Pipeline link.
+
 ### Phase 6 done in working tree (uncommitted as of May 1 latest)
 
 - [x] **Phase 6: Pathlight Manual Integrations.** Migration `028_pathlight_integrations.sql` (APPLIED to prod Neon) adds pathlight_scans_log, ai_search_checks, lead_scores. `lib/canopy/{pathlight-client,lead-scoring}.ts` services. `lib/actions/{pathlight-rescan,ai-search-checks,lead-scoring}.ts` audit-logged Server Actions. Per-contact UI: RescanButton (gate-aware), AISearchCheckPanel, LeadScoreBadge with component breakdown. Phase 0's three-layer Pathlight lock now gates real functionality.
@@ -44,11 +48,11 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 
 ### Next phase queued
 
-- [ ] **Phase 7: Analytics & Narrative Digest.** `lib/analytics/{pipeline,contact}.ts` (conversion-by-stage funnel, win rate, avg deal size, source attribution, loss reason aggregation, contact engagement sparkline, response time, next-best-action heuristic). `/admin/analytics/pipeline` page with Recharts. Inngest weekly cron `digest.compose` HTML email summarizing new contacts, overdue follow-ups, deal movement, pipeline value change, notable visitor sessions, Pathlight score changes. Digest cadence editor on /admin/canopy.
+- [ ] **Phase 4: Email Integration (deferred).** Migration `029_email_sync.sql` for email_messages, email_templates, oauth_tokens. Google OAuth flow with send + readonly + modify scopes (requires GOOGLE_OAUTH_CLIENT_ID + GOOGLE_OAUTH_CLIENT_SECRET provisioned in Google Cloud Console + Vercel env). Inngest cron pulling inbound Gmail messages every 5 min. Compose modal on contact and deal pages with merge-field substitution and live preview. Open + click tracking via `/api/email/pixel/[messageId]` and `/api/email/click/[messageId]`. **Out of scope:** the contact form's Resend send path remains untouched. **Note:** Phase 7's weekly digest already uses Resend; this is the per-contact 1:1 send/receive layer.
 
-- [ ] **Phase 4: Email Integration (deferred from earlier session).** Migration for email_messages, email_templates, oauth_tokens. Google OAuth flow with send + readonly + modify scopes (requires GOOGLE_OAUTH_CLIENT_ID + GOOGLE_OAUTH_CLIENT_SECRET provisioned in Google Cloud Console). Inngest cron pulling inbound Gmail messages every 5 min. Compose modal on contact and deal pages with merge-field substitution and live preview. Open + click tracking via `/api/email/pixel/[messageId]` and `/api/email/click/[messageId]`. **Out of scope:** the contact form's Resend send path remains untouched.
+- [ ] **Phase 5: Automation - Sequences, Workflow Rules, Bulk Actions.** Depends on Phase 4 for sequence email send. Migration `030_automation.sql` for `sequences`, `sequence_steps`, `sequence_enrollments`, `workflow_rules`. Inngest functions for sequence advance + exit-on-reply + workflow evaluate. Action library (createTask, sendEmail, enrollInSequence, changeStage, addTag, triggerPathlightScan via gate). Bulk action server endpoints + checkbox column + toolbar on list pages.
 
-- [ ] **Phase 5: Automation - Sequences, Workflow Rules, Bulk Actions.** Depends on Phase 4 for sequence email send. `sequences`, `sequence_steps`, `sequence_enrollments`, `workflow_rules` tables. Inngest functions for sequence advance + exit-on-reply + workflow evaluate. Action library (createTask, sendEmail, enrollInSequence, changeStage, addTag, triggerPathlightScan via gate). Bulk action server endpoints + checkbox column + toolbar on list pages.
+- [ ] **Stage history table (refinement).** The current Phase 7 `getApproxTimeInStage` is a created-to-now or to-close approximation because no `deal_stage_history` table exists. A small migration adding `deal_stage_history (id, deal_id, stage, entered_at, exited_at)` plus a trigger or Server-Action hook on stage changes would let us compute true Markovian dwell time per stage. Low priority but worth doing before pitching the analytics page externally.
 
 ### Net new gaps to port (deferred, lower value than the build phases)
 

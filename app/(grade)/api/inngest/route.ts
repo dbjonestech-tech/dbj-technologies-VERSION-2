@@ -1,6 +1,7 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/lib/inngest/client";
 import {
+  canopyDigestHourly,
   costAlertDaily,
   lighthouseMonitorDaily,
   monitoringPurgeDaily,
@@ -16,5 +17,6 @@ export const { GET, POST, PUT } = serve({
     lighthouseMonitorDaily,
     pathlightSyntheticCheck,
     monitoringPurgeDaily,
+    canopyDigestHourly,
   ],
 });

@@ -164,4 +164,73 @@ export async function setBranding(input: {
   return { ok: true };
 }
 
+export async function setDigestSchedule(input: {
+  day_of_week: number;
+  hour_local: number;
+  timezone?: string | null;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  await requireAdmin();
+  if (!Number.isInteger(input.day_of_week) || input.day_of_week < 0 || input.day_of_week > 6) {
+    return { ok: false, error: "day_of_week must be 0-6" };
+  }
+  if (!Number.isInteger(input.hour_local) || input.hour_local < 0 || input.hour_local > 23) {
+    return { ok: false, error: "hour_local must be 0-23" };
+  }
+  const before = await getCanopySettings();
+  const sql = getDb();
+  const tz = input.timezone && input.timezone.trim().length > 0 ? input.timezone : before.timezone;
+  await sql`
+    UPDATE canopy_settings
+    SET digest_day_of_week = ${input.day_of_week},
+        digest_hour_local  = ${input.hour_local},
+        timezone           = ${tz},
+        updated_at         = NOW()
+    WHERE id = 1
+  `;
+  for (const p of CANOPY_SETTINGS_PATHS) revalidatePath(p);
+  await recordChange({
+    entityType: "canopy_settings",
+    entityId: "1",
+    action: "setting.digest_schedule",
+    before: {
+      digest_day_of_week: before.digest_day_of_week,
+      digest_hour_local: before.digest_hour_local,
+      timezone: before.timezone,
+    },
+    after: {
+      digest_day_of_week: input.day_of_week,
+      digest_hour_local: input.hour_local,
+      timezone: tz,
+    },
+  });
+  return { ok: true };
+}
+
+export async function sendTestDigestNow(input: {
+  to: string;
+  dry_run?: boolean;
+}): Promise<{ ok: true; subject?: string } | { ok: false; error: string }> {
+  await requireAdmin();
+  const session = await auth();
+  const recipient = (input.to || session?.user?.email || "").trim();
+  if (!/.+@.+\..+/.test(recipient)) {
+    return { ok: false, error: "invalid recipient email" };
+  }
+  const { sendCanopyDigest } = await import("@/lib/analytics/digest");
+  const result = await sendCanopyDigest({
+    recipients: [recipient],
+    dryRun: input.dry_run === true,
+  });
+  await recordChange({
+    entityType: "canopy_settings",
+    entityId: "1",
+    action: input.dry_run ? "digest.preview" : "digest.send_now",
+    after: { recipient, ok: result.ok, reason: result.reason ?? null },
+  });
+  if (!result.ok) {
+    return { ok: false, error: result.reason ?? "send failed" };
+  }
+  return { ok: true, subject: result.subject };
+}
+
 export type { CanopySettings };

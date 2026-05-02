@@ -1409,3 +1409,58 @@ export const emailKpiRefreshHourly = inngest.createFunction(
     });
   }
 );
+
+/**
+ * Canopy weekly digest. Fires hourly and only sends when the
+ * operator's chosen day-of-week + local-hour matches the current
+ * timezone-converted clock. Read-only over existing data; never
+ * triggers a Pathlight scan.
+ */
+export const canopyDigestHourly = inngest.createFunction(
+  {
+    id: "canopy-digest-hourly",
+    triggers: [{ cron: "30 * * * *" }],
+    retries: 1,
+  },
+  async ({ step }) => {
+    const decision = await step.run("decide", async () => {
+      const { getCanopySettings } = await import("@/lib/canopy/settings");
+      const { shouldFireDigest } = await import("@/lib/analytics/digest");
+      const settings = await getCanopySettings();
+      const fire = shouldFireDigest({
+        now: new Date(),
+        digestEnabled: settings.digest_enabled,
+        digestDayOfWeek: settings.digest_day_of_week,
+        digestHourLocal: settings.digest_hour_local,
+        timezone: settings.timezone,
+      });
+      return { fire, settings };
+    });
+
+    if (!decision.fire) {
+      return { sent: false, reason: "schedule mismatch or disabled" };
+    }
+
+    return await step.run("send-digest", async () => {
+      const { sendCanopyDigest } = await import("@/lib/analytics/digest");
+      const sql = getDb();
+      const recipientRows = (await sql`
+        SELECT email FROM admin_users WHERE status = 'active'
+      `.catch(() => [])) as Array<{ email: string }>;
+      const fallback = process.env.CONTACT_EMAIL ? [process.env.CONTACT_EMAIL] : [];
+      const recipients = recipientRows.length > 0
+        ? recipientRows.map((r) => r.email)
+        : fallback;
+      if (recipients.length === 0) {
+        return { sent: false, reason: "no recipients" };
+      }
+      const result = await sendCanopyDigest({ recipients });
+      return {
+        sent: result.ok,
+        reason: result.reason,
+        recipients: result.recipients,
+        subject: result.subject,
+      };
+    });
+  }
+);

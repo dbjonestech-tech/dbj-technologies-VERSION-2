@@ -33,6 +33,7 @@ import { canFireScan } from "@/lib/canopy/pathlight-gate";
 import { getRescansForContact } from "@/lib/services/pathlight-rescan";
 import { getAiSearchChecksForContact } from "@/lib/services/ai-search-checks";
 import { getLatestLeadScore } from "@/lib/canopy/lead-scoring";
+import { getContactAnalytics } from "@/lib/analytics/contact";
 import PageHeader from "../../PageHeader";
 import ContactHeader from "./ContactHeader";
 import ContactNotes from "./ContactNotes";
@@ -43,6 +44,8 @@ import CustomFieldsPanel from "../../components/CustomFieldsPanel";
 import RescanButton from "../../components/RescanButton";
 import AISearchCheckPanel from "../../components/AISearchCheckPanel";
 import LeadScoreBadge from "../../components/LeadScoreBadge";
+import EngagementSparkline from "../../components/EngagementSparkline";
+import NextBestAction from "../../components/NextBestAction";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -77,6 +80,7 @@ export default async function ContactDetailPage({ params }: Props) {
     rescans,
     aiChecks,
     leadScore,
+    analytics,
   ] = await Promise.all([
     getContactTimeline(contact.email, contact.id, 50),
     getContactNotes(contact.id),
@@ -90,6 +94,7 @@ export default async function ContactDetailPage({ params }: Props) {
     getRescansForContact(contact.id, 10),
     getAiSearchChecksForContact(contact.id, 30),
     getLatestLeadScore(contact.id),
+    getContactAnalytics(contact.id),
   ]);
   const budgetRemaining = Math.max(
     0,
@@ -127,6 +132,15 @@ export default async function ContactDetailPage({ params }: Props) {
         </div>
 
         <DealsPanel deals={deals} />
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+          <EngagementSparkline
+            data={analytics.sparkline}
+            totals={analytics.totals_30d}
+            medianResponseMinutes={analytics.median_response_minutes}
+          />
+          <NextBestAction nba={analytics.next_best_action} />
+        </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <TagsBar entityType="contact" entityId={contact.id} initialTags={extras.tags} />

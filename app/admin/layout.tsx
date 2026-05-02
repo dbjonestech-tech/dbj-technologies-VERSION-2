@@ -28,6 +28,7 @@ import {
   ClipboardList,
   Kanban,
   Sliders,
+  BarChart3,
 } from "lucide-react";
 import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
 import { getContactsDashboardSummary } from "@/lib/services/contacts";
@@ -92,6 +93,12 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
         icon: Kanban,
         palette: "rose",
       },
+    ],
+  },
+  {
+    label: "Analytics",
+    items: [
+      { label: "Pipeline", href: "/admin/analytics/pipeline", icon: BarChart3, palette: "emerald" },
     ],
   },
   {
