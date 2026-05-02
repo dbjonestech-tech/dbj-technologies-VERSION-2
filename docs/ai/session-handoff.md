@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 1, 2026 -- Canopy v2 Phase 8 staged uncommitted; migration 030 applied to prod Neon)
+## Current state (May 1, 2026 -- Canopy v2 Phase 8 shipped at `6d7d7f1`, pushed to origin main, working tree clean. Migration 030 applied to prod Neon.)
 
-### Phase 8 staged this session (pre-commit): Multi-User Enterprise - RBAC, API tokens, webhooks
+### Phase 8 shipped at `6d7d7f1`: Multi-User Enterprise - RBAC, API tokens, webhooks
 
 The enterprise-readiness pass. Three independent surfaces ship together because they share the same admin_users table extension and audit-log polling pattern: role widening on admin_users (admin / manager / sales / viewer), Bearer-token authenticated REST API at /api/v1/*, and outbound HMAC-signed webhooks driven by a 1-minute Inngest cron over canopy_audit_log.
 
