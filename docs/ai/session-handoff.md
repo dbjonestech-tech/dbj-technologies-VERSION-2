@@ -5,7 +5,36 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- **iOS-grade UX polish pass shipped at `a0f5051`** on top of all 9 Canopy phases. Toast system + Cmd+K command palette + dashboard skeleton + 11 microinteraction tunings. Tree clean, pushed to origin main.)
+## Current state (May 2, 2026 -- **deferred polish punch list closed at `6edc8c0`** on top of `a0f5051`. Mobile sidebar drawer, contacts table keyboard nav, tablet email tabs, audit log relative-time + key-by-key diff. Tree clean, pushed to origin main.)
+
+### Deferred polish punch list closed at `6edc8c0`
+
+The four items in the prior session's "Deferred polish" list (mobile drawer, table keyboard nav, tablet email layout, audit log diff) are now shipped. Verified `npx tsc --noEmit` clean, `npm run lint` clean, em-dash count 0 across all 8 changed/new files.
+
+**Mobile sidebar drawer:**
+
+- `lib/admin/nav-config.ts` -- new shared module that owns the sidebar nav data + lucide icon refs. Both the desktop aside in `layout.tsx` and the new mobile drawer pull from `buildAdminNavGroups(overdueCount)` so adding a new sidebar entry happens in exactly one place.
+- `app/admin/components/MobileSidebar.tsx` -- hamburger trigger + spring slide-in drawer. Mirrors the desktop aside (same groups, same overdue badge, same palette tokens, same sign-out form). Auto-closes on route change (`usePathname` effect), Esc, backdrop click. Body scroll lock while open so iOS does not rubber-band the underlying page. Focus moves to the first nav link on open. `useReducedMotion` swap to plain fade. Highlights the current pathname.
+- `app/admin/layout.tsx` -- drops the inline `buildNavGroups` (now in nav-config), drops the duplicated mobile Sign-out button (now lives in the drawer), wires `<MobileSidebar overdueCount signedInEmail />` into the `lg:hidden` header. Phones can finally reach the nav.
+
+**Contacts table keyboard navigation:**
+
+- `app/admin/contacts/ContactsList.tsx` -- roving-tabindex on `<tr>` rows. `focusedIndex` state + `rowRefs` array; ArrowUp/Down moves focus, Home/End jump to first/last, Enter opens `/admin/contacts/{id}`, Space toggles row selection. Inner `<Link>` and checkbox set `tabIndex={-1}` so keyboard users see clean per-row tab stops, not three per row. `aria-label` on each row announces the contact, selection state, and the Enter/Space affordance for screen-reader users. Visible focus ring (`ring-2 ring-pink-400`) on the focused row. Mouse path unchanged: clicking the link still navigates, clicking the checkbox still selects.
+
+**Tablet email pair layout:**
+
+- `app/admin/contacts/[id]/EmailPair.tsx` -- new client wrapper that picks between three layouts based on `window.innerWidth`:
+    - `< sm` (< 640px) -- stack vertically (default mobile behavior).
+    - `sm-xl` (640-1280px) -- tabs ("Compose" | "Conversation"). Both panels stay mounted (`hidden` on inactive) so compose drafts and the EmailThreadPanel server-fetch state survive a tab swap.
+    - `xl+` (>= 1280px) -- side-by-side (`grid-cols-[1fr_1fr]`).
+- `contacts/[id]/page.tsx` -- swaps the bare `lg:grid-cols-[1fr_1fr]` for `<EmailPair compose={<EmailComposePanel ... />} thread={<EmailThreadPanel ... />} />`. Tablet sessions stop scrolling through 25 thread messages before reaching the compose form.
+
+**Audit log relative time + key-by-key diff:**
+
+- `app/admin/audit/page.tsx` (admin_audit_log auth events) -- "When" column shows relative time (`12m ago`, `3h ago`, etc.), absolute timestamp on hover via `title`. Metadata cell now renders as a tidy `<dl>` of key:value pairs (no JSON braces, no quotes). `<= 3` keys render inline; heavy payloads collapse into a `<details>` block so row heights stay predictable.
+- `app/admin/components/EntityAuditList.tsx` (per-contact / per-deal audit) -- relative time with absolute on hover. Replaces the `JSON.stringify(before) -> JSON.stringify(after)` blob with a real key-by-key diff: `+` green for additions, `-` red strikethrough for removals, `~` amber for changes (rendering `before -> after` on the same line). Unchanged keys are skipped to keep signal-to-noise high. Single-sided payloads (creation / deletion) render as a colored key:value list of all present fields.
+
+### Prior commit on top of `a0f5051` -- iOS-grade UX polish pass
 
 ### iOS-grade polish pass shipped at `a0f5051`
 
@@ -52,13 +81,10 @@ The "make Canopy a sexy cousin of Apple" pass. Twelve coordinated changes that m
 
 The shape of the product is unchanged. The feel is materially different.
 
-### Deferred polish (audit identified, not shipped this commit)
+### Deferred polish (audit identified, not shipped through `6edc8c0`)
 
-- **Mobile sidebar drawer** -- `layout.tsx:177` is `hidden lg:flex`; on phones the entire sidebar is unreachable. Needs a hamburger button + slide-over drawer component. Real work, scoped for a follow-up.
-- **Tables: arrow-key + Enter navigation** -- `/admin/scans`, `/admin/leads`, `/admin/contacts` rows have no `tabindex` or arrow handlers. Power-user feature; substantial.
-- **Email compose + thread side-by-side breaks at tablet width** -- `lg:grid-cols-[1fr_1fr]` on contact + deal detail. Below `lg`, both panels stack tall. Should switch to a tabbed interface or a sheet/drawer.
-- **Audit log: relative timestamps + diff viewer** -- `EntityAuditList.tsx` dumps raw JSON before/after. A two-column field-by-field diff would read 10x faster.
-- **Bulk select + bulk actions** -- check checkboxes on contacts/deals lists, archive/tag/assign in bulk.
+- **Tables: arrow-key + Enter navigation on /admin/scans and /admin/leads** -- shipped on `/admin/contacts` at `6edc8c0`; the same roving-tabindex pattern is worth applying to the scans and leads tables next.
+- **Bulk select + bulk actions on deals** -- contacts already has `BulkActionsBar.tsx` (Phase 5 / `0ceffa2`). Deals use a kanban board, so this would require either adding a list-view toggle to deals or scoping the feature elsewhere.
 - **Pre-existing canopy v2 phase 4 follow-ups already documented below.**
 
 ### Earlier in this session (chronological)
