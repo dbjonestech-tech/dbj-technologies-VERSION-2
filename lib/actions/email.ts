@@ -11,6 +11,7 @@ import {
 } from "@/lib/email/render";
 import {
   archiveTemplate,
+  restoreTemplate,
   createTemplate,
   updateTemplate,
 } from "@/lib/canopy/email/templates";
@@ -270,6 +271,25 @@ export async function archiveTemplateAction(
     entityType: "email_templates",
     entityId: String(id),
     action: "template.archived",
+  });
+  revalidatePath("/admin/canopy/templates");
+  return { ok: true };
+}
+
+/* Reverse archive within the Undo window. Idempotent against an
+ * already-published template (returns ok:false with a clear message
+ * so the toast can decide whether to surface the failure). */
+export async function restoreTemplateAction(
+  id: number
+): Promise<{ ok: boolean; error?: string }> {
+  const session = await getSessionRole();
+  if (!session) return { ok: false, error: "not authenticated" };
+  const ok = await restoreTemplate(id, session.email);
+  if (!ok) return { ok: false, error: "template not found or not archived" };
+  await recordChange({
+    entityType: "email_templates",
+    entityId: String(id),
+    action: "template.restored",
   });
   revalidatePath("/admin/canopy/templates");
   return { ok: true };

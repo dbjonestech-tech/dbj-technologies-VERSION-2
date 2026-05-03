@@ -5,6 +5,7 @@ import { Loader2, Plus, Save, Trash2 } from "lucide-react";
 import {
   archiveTemplateAction,
   createTemplateAction,
+  restoreTemplateAction,
   updateTemplateAction,
 } from "@/lib/actions/email";
 import { KNOWN_MERGE_FIELDS } from "@/lib/email/render";
@@ -130,8 +131,36 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
         toast.show({ tone: "error", message: r.error ?? "Could not archive template." });
         return;
       }
+      const archived = rows.find((p) => p.id === id);
       setRows((prev) => prev.filter((p) => p.id !== id));
-      toast.show({ tone: "info", message: `Template "${name}" archived.` });
+      toast.show({
+        tone: "info",
+        message: `Template "${name}" archived.`,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            const restored = await restoreTemplateAction(id);
+            if (!restored.ok) {
+              toast.show({
+                tone: "error",
+                message: restored.error ?? "Could not restore template.",
+              });
+              return;
+            }
+            if (archived) {
+              /* Splice the row back into local state at the same
+               * spot so the editor list does not flash a re-order. */
+              setRows((prev) => {
+                if (prev.some((p) => p.id === id)) return prev;
+                return [archived, ...prev].sort((a, b) =>
+                  a.name.localeCompare(b.name)
+                );
+              });
+            }
+            toast.show({ tone: "success", message: `Template "${name}" restored.` });
+          },
+        },
+      });
       if (editing?.id === id) reset();
     });
   }

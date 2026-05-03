@@ -70,13 +70,36 @@ export default function CompetitorsPanel({
   function handleRemove(id: number, name: string) {
     if (!confirm(`Remove ${name} from this contact's competitors?`)) return;
     start(async () => {
+      const removed = rows.find((c) => c.id === id);
       const r = await removeCompetitorAction({ competitorId: id, contactId });
       if (!r.ok) {
         toast.show({ tone: "error", message: r.error });
         return;
       }
       setRows((s) => s.filter((c) => c.id !== id));
-      toast.show({ tone: "info", message: `${name} removed.` });
+      toast.show({
+        tone: "info",
+        message: `${name} removed.`,
+        action: removed
+          ? {
+              label: "Undo",
+              onClick: async () => {
+                const restored = await addCompetitorAction({
+                  contactId,
+                  competitorName: removed.competitor_name,
+                  websiteUrl: removed.website_url,
+                  notes: removed.notes ?? undefined,
+                });
+                if (!restored.ok) {
+                  toast.show({ tone: "error", message: restored.error });
+                  return;
+                }
+                router.refresh();
+                toast.show({ tone: "success", message: `${name} restored.` });
+              },
+            }
+          : undefined,
+      });
     });
   }
 

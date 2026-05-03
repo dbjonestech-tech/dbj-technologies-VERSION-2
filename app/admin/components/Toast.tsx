@@ -26,11 +26,22 @@ import { CheckCircle2, Info, X, XCircle } from "lucide-react";
 
 type Tone = "success" | "error" | "info";
 
+/** Optional inline action button next to the dismiss control. Most
+ *  often used for "Undo" affordances on destructive operations: the
+ *  toast confirms the action while still giving the operator one
+ *  cheap way out before the toast dismisses. The callback is awaited
+ *  so the button can show a brief disabled state during async work. */
+interface ToastAction {
+  label: string;
+  onClick: () => void | Promise<void>;
+}
+
 interface ToastInput {
   tone?: Tone;
   message: string;
   /** Optional ms override; defaults to 4000. Pass 0 for sticky. */
   durationMs?: number;
+  action?: ToastAction;
 }
 
 interface ToastRecord extends ToastInput {
@@ -170,6 +181,7 @@ function ToastCard({
   const tone: Tone = record.tone ?? "info";
   const tones = TONE_STYLES[tone];
   const Icon = tones.icon;
+  const [actionPending, setActionPending] = useState(false);
   return (
     <div
       role={tone === "error" ? "alert" : "status"}
@@ -177,6 +189,25 @@ function ToastCard({
     >
       <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${tones.icon_color}`} aria-hidden="true" />
       <p className={`flex-1 text-sm leading-snug ${tones.text}`}>{record.message}</p>
+      {record.action ? (
+        <button
+          type="button"
+          disabled={actionPending}
+          onClick={async () => {
+            if (!record.action) return;
+            setActionPending(true);
+            try {
+              await record.action.onClick();
+            } finally {
+              setActionPending(false);
+              onDismiss();
+            }
+          }}
+          className={`shrink-0 rounded-md border border-current/30 px-2 py-0.5 text-xs font-semibold transition-colors hover:bg-black/5 disabled:opacity-60 ${tones.text}`}
+        >
+          {actionPending ? "..." : record.action.label}
+        </button>
+      ) : null}
       <button
         type="button"
         onClick={onDismiss}

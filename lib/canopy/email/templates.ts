@@ -89,6 +89,24 @@ export async function archiveTemplate(
   return rows.length > 0;
 }
 
+/* Inverse of archiveTemplate. Used by the Undo toast on the
+ * templates editor: re-publishes a freshly-archived template within
+ * the toast lifetime, reversing the operator's misclick without a
+ * fresh "create template" round-trip. */
+export async function restoreTemplate(
+  id: number,
+  ownerEmail: string
+): Promise<boolean> {
+  const sql = getDb();
+  const rows = (await sql`
+    UPDATE email_templates
+    SET archived_at = NULL, updated_at = NOW()
+    WHERE id = ${id} AND owner_email = ${ownerEmail} AND archived_at IS NOT NULL
+    RETURNING id
+  `) as Array<{ id: number }>;
+  return rows.length > 0;
+}
+
 function mergeFieldUnion(subject: string, body: string): string[] {
   const set = new Set<string>([
     ...detectMergeFields(subject),

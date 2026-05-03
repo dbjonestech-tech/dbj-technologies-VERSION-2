@@ -11,9 +11,16 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
+  Briefcase,
   CornerDownLeft,
+  Loader2,
   Search,
+  User,
 } from "lucide-react";
+import {
+  searchCommandPalette,
+  type CmdkSearchResult,
+} from "@/lib/actions/cmdk";
 
 /* Cmd+K command palette.
  *
@@ -161,11 +168,20 @@ interface ScoredCommand {
   score: number;
 }
 
+/* Flattened palette row: either a page jump (CommandTarget) or a
+ * record search hit (CmdkSearchResult). Active-index navigation
+ * walks across the union; selecting a row routes to its href. */
+type PaletteRow =
+  | { kind: "page"; command: CommandTarget; isRecent: boolean }
+  | { kind: "record"; record: CmdkSearchResult };
+
 export default function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const [recentIds, setRecentIds] = useState<string[]>([]);
+  const [records, setRecords] = useState<CmdkSearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const reduced = useReducedMotion();
@@ -195,22 +211,53 @@ export default function CommandPalette() {
       setQuery("");
       setActive(0);
       setRecentIds(loadRecents());
+      setRecords([]);
+      setSearching(false);
       /* Slight delay so framer-motion mounts the input first. */
       const t = setTimeout(() => inputRef.current?.focus(), 30);
       return () => clearTimeout(t);
     }
   }, [open]);
 
-  const results = useMemo<ScoredCommand[]>(() => {
+  /* Debounced record search. Fires 250ms after the last keystroke,
+   * skips when the query is too short, and races-out on stale calls
+   * via a request token so a fast typer never sees results from a
+   * cancelled query land on top of newer ones. */
+  useEffect(() => {
+    if (!open) return;
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setRecords([]);
+      setSearching(false);
+      return;
+    }
+    let cancelled = false;
+    setSearching(true);
+    const t = setTimeout(async () => {
+      try {
+        const { results } = await searchCommandPalette(trimmed);
+        if (!cancelled) setRecords(results);
+      } catch {
+        if (!cancelled) setRecords([]);
+      } finally {
+        if (!cancelled) setSearching(false);
+      }
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [query, open]);
+
+  const pageScored = useMemo<ScoredCommand[]>(() => {
     if (!query.trim()) {
       const recents = recentIds
         .map((id) => COMMANDS.find((c) => c.id === id))
         .filter((c): c is CommandTarget => Boolean(c))
         .map((command) => ({ command, score: 0 }));
-      const others = COMMANDS.filter((c) => !recentIds.includes(c.id)).map((command) => ({
-        command,
-        score: 1,
-      }));
+      const others = COMMANDS.filter((c) => !recentIds.includes(c.id)).map(
+        (command) => ({ command, score: 1 })
+      );
       return [...recents, ...others];
     }
     const scored: ScoredCommand[] = [];
@@ -222,16 +269,39 @@ export default function CommandPalette() {
     return scored;
   }, [query, recentIds]);
 
+  const rows = useMemo<PaletteRow[]>(() => {
+    const out: PaletteRow[] = [];
+    /* Records always rank above pages when the query is non-empty;
+     * jumping to a record is almost always more specific than
+     * jumping to a section index. */
+    for (const record of records) {
+      out.push({ kind: "record", record });
+    }
+    for (const sc of pageScored) {
+      out.push({
+        kind: "page",
+        command: sc.command,
+        isRecent: !query.trim() && recentIds.includes(sc.command.id),
+      });
+    }
+    return out;
+  }, [records, pageScored, query, recentIds]);
+
   /* Keep active index inside bounds. */
   useEffect(() => {
-    if (active >= results.length) setActive(Math.max(0, results.length - 1));
-  }, [results.length, active]);
+    if (active >= rows.length) setActive(Math.max(0, rows.length - 1));
+  }, [rows.length, active]);
 
-  const navigateTo = useCallback(
-    (command: CommandTarget) => {
-      pushRecent(command.id);
-      setOpen(false);
-      router.push(command.href);
+  const navigateToRow = useCallback(
+    (row: PaletteRow) => {
+      if (row.kind === "page") {
+        pushRecent(row.command.id);
+        setOpen(false);
+        router.push(row.command.href);
+      } else {
+        setOpen(false);
+        router.push(row.record.href);
+      }
     },
     [router]
   );
@@ -239,14 +309,14 @@ export default function CommandPalette() {
   function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActive((prev) => Math.min(results.length - 1, prev + 1));
+      setActive((prev) => Math.min(rows.length - 1, prev + 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActive((prev) => Math.max(0, prev - 1));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const target = results[active];
-      if (target) navigateTo(target.command);
+      const target = rows[active];
+      if (target) navigateToRow(target);
     }
   }
 
@@ -303,12 +373,18 @@ export default function CommandPalette() {
                   setActive(0);
                 }}
                 onKeyDown={onInputKeyDown}
-                placeholder="Jump to a page or action..."
+                placeholder="Jump to a page, contact, or deal..."
                 className="flex-1 border-0 bg-transparent text-sm outline-none placeholder:text-zinc-400 focus:outline-none focus:ring-0"
                 autoComplete="off"
                 spellCheck={false}
                 aria-controls="cmdk-results"
               />
+              {searching ? (
+                <Loader2
+                  className="h-3.5 w-3.5 animate-spin text-zinc-400"
+                  aria-label="Searching"
+                />
+              ) : null}
               <kbd className="hidden rounded border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 font-mono text-[10px] text-zinc-500 sm:inline">
                 Esc
               </kbd>
@@ -320,9 +396,9 @@ export default function CommandPalette() {
               aria-label="Results"
               className="max-h-[60vh] overflow-y-auto py-1.5"
             >
-              {results.length === 0 ? (
+              {rows.length === 0 ? (
                 <li className="px-4 py-6 text-center text-sm text-zinc-500">
-                  No matches.
+                  {query.trim() && searching ? "Searching..." : "No matches."}
                 </li>
               ) : (
                 <>
@@ -334,21 +410,49 @@ export default function CommandPalette() {
                       Recent
                     </li>
                   )}
-                  {results.map((row, idx) => {
-                    const isRecent =
-                      !query.trim() && recentIds.includes(row.command.id);
+                  {records.length > 0 && (
+                    <li
+                      role="presentation"
+                      className="px-4 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400"
+                    >
+                      Records
+                    </li>
+                  )}
+                  {rows.map((row, idx) => {
+                    /* Two divider rules:
+                     * 1. Recents -> All pages: only when no query.
+                     * 2. Records -> Pages: only when query is non-empty
+                     *    AND we have at least one record. */
                     const showRecentsDivider =
                       !query.trim() &&
                       recentIds.length > 0 &&
+                      row.kind === "page" &&
                       idx === recentIds.length;
+                    const showRecordToPageDivider =
+                      Boolean(query.trim()) &&
+                      records.length > 0 &&
+                      row.kind === "page" &&
+                      idx === records.length;
+                    if (row.kind === "record") {
+                      return (
+                        <RecordResultRow
+                          key={row.record.id}
+                          record={row.record}
+                          active={idx === active}
+                          onSelect={() => navigateToRow(row)}
+                          onHover={() => setActive(idx)}
+                        />
+                      );
+                    }
                     return (
                       <CommandRow
                         key={row.command.id}
                         showDividerLabel={showRecentsDivider}
+                        showPagesDividerLabel={showRecordToPageDivider}
                         command={row.command}
                         active={idx === active}
-                        isRecent={isRecent}
-                        onSelect={() => navigateTo(row.command)}
+                        isRecent={row.isRecent}
+                        onSelect={() => navigateToRow(row)}
                         onHover={() => setActive(idx)}
                       />
                     );
@@ -386,6 +490,7 @@ function CommandRow({
   active,
   isRecent,
   showDividerLabel,
+  showPagesDividerLabel,
   onSelect,
   onHover,
 }: {
@@ -393,6 +498,7 @@ function CommandRow({
   active: boolean;
   isRecent: boolean;
   showDividerLabel: boolean;
+  showPagesDividerLabel?: boolean;
   onSelect: () => void;
   onHover: () => void;
 }) {
@@ -404,6 +510,14 @@ function CommandRow({
           className="mt-1 px-4 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400"
         >
           All pages
+        </li>
+      )}
+      {showPagesDividerLabel && (
+        <li
+          role="presentation"
+          className="mt-1 px-4 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400"
+        >
+          Pages
         </li>
       )}
       <li
@@ -432,5 +546,51 @@ function CommandRow({
         />
       </li>
     </>
+  );
+}
+
+function RecordResultRow({
+  record,
+  active,
+  onSelect,
+  onHover,
+}: {
+  record: CmdkSearchResult;
+  active: boolean;
+  onSelect: () => void;
+  onHover: () => void;
+}) {
+  const Icon = record.kind === "deal" ? Briefcase : User;
+  const tone =
+    record.kind === "deal"
+      ? "bg-violet-100 text-violet-700"
+      : "bg-pink-100 text-pink-700";
+  return (
+    <li
+      role="option"
+      aria-selected={active}
+      onMouseEnter={onHover}
+      onClick={onSelect}
+      className={`mx-2 flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+        active ? "bg-zinc-100" : "hover:bg-zinc-50"
+      }`}
+    >
+      <span
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${tone}`}
+        aria-hidden="true"
+      >
+        <Icon className="h-3.5 w-3.5" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-zinc-900">{record.label}</p>
+        <p className="truncate text-[11px] text-zinc-500">{record.sublabel}</p>
+      </div>
+      <ArrowRight
+        className={`h-3.5 w-3.5 shrink-0 transition-opacity ${
+          active ? "opacity-100 text-zinc-700" : "opacity-0"
+        }`}
+        aria-hidden="true"
+      />
+    </li>
   );
 }
