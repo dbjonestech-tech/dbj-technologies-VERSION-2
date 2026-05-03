@@ -5,7 +5,48 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- **public Canopy showcase at `/showcase/canopy/*` shipped at `c8a3150`** on top of the canopy-table standardization at `66247b8` and the three follow-on upgrades at `9686b3a`. Tree clean, pushed to origin main. Next collaborative step: the Work-page Canopy section overhaul.)
+## Current state (May 2, 2026 -- **Pathlight health dashboard shipped at `84dead2`** on top of `8f3a773`. Per-stage partial breakdown, top-error clustering, provider success rates, partial-rate sparkline, one-click re-scan. Tree clean, pushed to origin main.)
+
+### Pathlight health dashboard at `84dead2`
+
+Adds the missing observability layer on top of `/admin/monitor` so the answer to "is Pathlight healthy right now, and if not, what is broken?" sits on a single page without leaving Canopy. All four sections are read-only aggregations against tables we already write to (`scans`, `api_usage_events`, `monitoring_events`); no schema changes.
+
+**`lib/services/pathlight-health.ts`** -- new service:
+
+- `getPartialStageBreakdown(interval)` parses `scans.error_message` into its semicolon-separated sub-errors and attributes each partial scan to the FIRST stage that actually broke, ignoring the cascade of "skipped: X did not succeed" entries downstream. Stages: screenshot, audit, vision, remediation, revenue, score, audio, email.
+- `getTopErrorPatterns(interval, limit)` clusters error sub-messages by a normalized signature (URLs collapsed, hex tokens / UUIDs / large numbers replaced with placeholders) so the same root cause groups across runs. Returns top N with hit counts and a sample message.
+- `getProviderHealth(interval)` per-provider, per-operation total / ok / retry / fail / successPct / avg duration sourced from `api_usage_events`. Retries tracked separately from fails so a noisy retry pattern is visible without being lumped in with terminal failures.
+- `getPartialRateBuckets(hours)` hourly bucket of (partial + failed) / requested over the last N hours. Uses `generate_series` so empty hours plot as 0 rather than gaps.
+
+**Four new sections wired into `/admin/monitor/page.tsx`** between the Funnel and Severity panels:
+
+1. **Partial-and-failed rate (24h)** -- sparkline + headline percentage, green under 10%, amber 10-20%, red above 20%.
+2. **Partial scans by stage (7d)** -- which stage is breaking most often, total + share for each.
+3. **Top error patterns (7d)** -- clustered signatures with sample messages on hover.
+4. **Provider health (7d)** -- browserless / pagespeed / anthropic / elevenlabs / resend success rates, retry counts, average durations. Success% color-graded: green >=99%, amber 95-99%, red <95%.
+
+**One-click re-scan from `/admin/monitor/scan/[scanId]`:**
+
+- New `rescanByScanIdAction` in `lib/actions/pathlight-rescan.ts`. Loads the original scan, inserts a fresh row carrying its url / email / business_name / city, fires `pathlight/scan.requested`, logs the trigger to `monitoring_events`, audits the action, returns the new scan id. Original row is preserved untouched so the partial diagnosis stays available for comparison.
+- `RescanButton` client component on the scan drilldown header. Routes to the new scan id on success, surfaces toast errors on failure.
+
+**Why now:** the earlier `3371138` investigation needed all four of these aggregations and required a one-off diagnostic script to get them. With the dashboard in place, the next time partial rate spikes Joshua sees on first glance which stage broke and what error pattern dominates, instead of waiting for me to query the DB.
+
+**What this does NOT yet have (deliberately deferred):**
+
+- **Auto-retry-on-partial cron.** Hourly Inngest cron that finds <60min-old partials and re-runs the failed stages. Genuine architectural improvement worth its own session. Defer until we have a week of dashboard data showing whether it is needed.
+- **URL pre-classification.** Tag known-heavy enterprise sites (Fortune 500, lots of widgets) so the pipeline picks aggressive timeouts/strategies up front instead of discovering the hard way. Same deferral logic.
+
+### Verification at commit time
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- 0 em dashes added across all 5 files (`pathlight-health.ts`, `pathlight-rescan.ts`, `monitor/page.tsx`, `monitor/scan/[scanId]/page.tsx`, `RescanButton.tsx`).
+- 0 `dbjonestech@gmail.com` references.
+- Working tree clean post-push.
+- Runtime not yet verified (memory: tsc + lint clean does not validate the Server -> Client RSC boundary). Visit `/admin/monitor` after deploy and confirm the 4 new sections render with real data, plus drill into a partial scan and use the Re-scan button.
+
+### Public Canopy showcase route at `c8a3150` (prior session)
 
 ### Public Canopy showcase route at `c8a3150`
 
