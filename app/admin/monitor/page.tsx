@@ -9,8 +9,20 @@ import {
   type LighthouseRow,
   type MonitoringEventRow,
 } from "@/lib/services/monitoring";
+import {
+  getPartialStageBreakdown,
+  getTopErrorPatterns,
+  getProviderHealth,
+  getPartialRateBuckets,
+  type PartialStageBreakdown,
+  type ErrorPatternRow,
+  type ProviderHealthRow,
+  type PartialRatePoint,
+} from "@/lib/services/pathlight-health";
+import type { SparkPoint } from "@/lib/services/dashboard-kpis";
 import { MONITORED_PAGES, STRATEGIES } from "@/lib/services/lighthouse-monitor";
 import PageHeader from "../PageHeader";
+import Sparkline from "../Sparkline";
 import MonitorLive from "./MonitorLive";
 
 export const dynamic = "force-dynamic";
@@ -50,16 +62,31 @@ export default async function AdminMonitor() {
   /* Auth is enforced by middleware.ts + the admin layout (defense in
    * depth, both require a valid admin session). */
 
-  const [funnel24, funnel7, funnel30, levels24, canary, lighthouse, recent] =
-    await Promise.all([
-      getFunnelCounts("1 day"),
-      getFunnelCounts("7 days"),
-      getFunnelCounts("30 days"),
-      getLevelSummary("1 day"),
-      getCanaryStatus(),
-      getLatestLighthousePerPage(),
-      getRecentEvents(50),
-    ]);
+  const [
+    funnel24,
+    funnel7,
+    funnel30,
+    levels24,
+    canary,
+    lighthouse,
+    recent,
+    partialStage7d,
+    errorPatterns7d,
+    providerHealth7d,
+    partialBuckets24h,
+  ] = await Promise.all([
+    getFunnelCounts("1 day"),
+    getFunnelCounts("7 days"),
+    getFunnelCounts("30 days"),
+    getLevelSummary("1 day"),
+    getCanaryStatus(),
+    getLatestLighthousePerPage(),
+    getRecentEvents(50),
+    getPartialStageBreakdown("7 days"),
+    getTopErrorPatterns("7 days", 8),
+    getProviderHealth("7 days"),
+    getPartialRateBuckets(24),
+  ]);
 
   return (
     <div className="px-6 py-10 sm:px-10">
@@ -80,6 +107,17 @@ export default async function AdminMonitor() {
             { label: "30d", counts: funnel30 },
           ]}
         />
+
+        <PartialRateTrendSection buckets={partialBuckets24h} />
+
+        <PartialStageSection
+          breakdown={partialStage7d.rows}
+          total={partialStage7d.total}
+        />
+
+        <ErrorPatternsSection rows={errorPatterns7d} />
+
+        <ProviderHealthSection rows={providerHealth7d} />
 
         <LevelsSection levels={levels24} />
 
@@ -388,6 +426,263 @@ function RecentEventsSection({
         auto-reconnects every 5 minutes.
       </p>
       <MonitorLive seed={seed} />
+    </Section>
+  );
+}
+
+function PartialRateTrendSection({
+  buckets,
+}: {
+  buckets: PartialRatePoint[];
+}) {
+  // Sparkline expects SparkPoint[] (label + value). We plot the
+  // partial+failed ratio per hour. Hours with zero scans plot as 0
+  // rather than gaps so the line stays continuous.
+  const points: SparkPoint[] = buckets.map((b) => {
+    const ratio =
+      b.requested > 0 ? (b.partial + b.failed) / b.requested : 0;
+    const hour = new Date(b.hourIso);
+    return {
+      label: `${hour.getHours().toString().padStart(2, "0")}:00`,
+      value: Math.round(ratio * 100),
+    };
+  });
+
+  const totals = buckets.reduce(
+    (acc, b) => {
+      acc.requested += b.requested;
+      acc.partial += b.partial;
+      acc.failed += b.failed;
+      return acc;
+    },
+    { requested: 0, partial: 0, failed: 0 },
+  );
+  const overall =
+    totals.requested > 0
+      ? ((totals.partial + totals.failed) / totals.requested) * 100
+      : 0;
+
+  const colorClass =
+    overall >= 20
+      ? "text-red-500"
+      : overall >= 10
+        ? "text-amber-500"
+        : "text-emerald-500";
+
+  return (
+    <Section title="Partial-and-failed rate (24h)">
+      <div className="mb-3 flex items-baseline justify-between">
+        <span className="font-mono text-base text-zinc-900">
+          {overall.toFixed(1)}%
+          <span className="ml-2 text-xs text-zinc-500">
+            of {formatNumber(totals.requested)} requested
+          </span>
+        </span>
+        <span className="text-xs text-zinc-500">
+          {totals.partial} partial, {totals.failed} failed
+        </span>
+      </div>
+      <Sparkline
+        points={points}
+        colorClass={colorClass}
+        height={56}
+        ariaLabel="Hourly partial+failed rate, last 24 hours"
+      />
+      <p className="mt-3 text-xs text-zinc-500">
+        Hourly bucket of (partial + failed) / requested. Green under 10%,
+        amber 10-20%, red above 20%.
+      </p>
+    </Section>
+  );
+}
+
+function PartialStageSection({
+  breakdown,
+  total,
+}: {
+  breakdown: PartialStageBreakdown[];
+  total: number;
+}) {
+  if (total === 0) {
+    return (
+      <Section title="Partial scans by stage (7d)">
+        <p className="text-sm text-emerald-600">
+          ● No partial scans in the last 7 days. Pipeline is clean.
+        </p>
+      </Section>
+    );
+  }
+  return (
+    <Section title="Partial scans by stage (7d)">
+      <p className="mb-3 text-xs text-zinc-500">
+        {formatNumber(total)} partial scan{total === 1 ? "" : "s"}, attributed
+        to the first stage that actually broke (skipped-cascade stages excluded).
+      </p>
+      <div className="overflow-x-auto">
+        <table className="canopy-table w-full min-w-[400px] text-sm">
+          <thead>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-2 font-semibold">Stage</th>
+              <th className="px-3 py-2 text-right font-semibold">Partials</th>
+              <th className="px-3 py-2 text-right font-semibold">Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            {breakdown.map((row) => (
+              <tr key={row.stage} className="border-t border-zinc-100">
+                <td className="px-3 py-2 font-mono text-xs text-zinc-900">
+                  {row.stage}
+                </td>
+                <td className="px-3 py-2 text-right font-mono text-zinc-900">
+                  {formatNumber(row.count)}
+                </td>
+                <td className="px-3 py-2 text-right font-mono text-zinc-500">
+                  {formatPct(row.count, total)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Section>
+  );
+}
+
+function ErrorPatternsSection({ rows }: { rows: ErrorPatternRow[] }) {
+  if (rows.length === 0) {
+    return (
+      <Section title="Top error patterns (7d)">
+        <p className="text-sm text-emerald-600">
+          ● No partial or failed scans in the last 7 days.
+        </p>
+      </Section>
+    );
+  }
+  return (
+    <Section title="Top error patterns (7d)">
+      <p className="mb-3 text-xs text-zinc-500">
+        Clustered by signature so the same root cause groups across runs.
+        Hover a row for the full sample message.
+      </p>
+      <div className="overflow-x-auto">
+        <table className="canopy-table w-full min-w-[700px] text-sm">
+          <thead>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-2 font-semibold">Stage</th>
+              <th className="px-3 py-2 font-semibold">Signature</th>
+              <th className="px-3 py-2 text-right font-semibold">Hits</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr
+                key={`${r.stage}::${r.signature}`}
+                className="border-t border-zinc-100"
+                title={r.sampleMessage}
+              >
+                <td className="px-3 py-2 font-mono text-xs text-zinc-900">
+                  {r.stage}
+                </td>
+                <td className="px-3 py-2 font-mono text-[11px] text-zinc-700">
+                  {r.signature}
+                </td>
+                <td className="px-3 py-2 text-right font-mono text-zinc-900">
+                  {formatNumber(r.count)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Section>
+  );
+}
+
+function ProviderHealthSection({ rows }: { rows: ProviderHealthRow[] }) {
+  if (rows.length === 0) {
+    return (
+      <Section title="Provider health (7d)">
+        <p className="text-sm text-zinc-500">
+          No outbound API calls recorded in the last 7 days.
+        </p>
+      </Section>
+    );
+  }
+  return (
+    <Section title="Provider health (7d)">
+      <p className="mb-3 text-xs text-zinc-500">
+        Per-provider, per-operation success rate sourced from{" "}
+        <code className="font-mono text-[11px]">api_usage_events</code>.
+        Retries indicate transient failures that recovered; fails are terminal.
+      </p>
+      <div className="overflow-x-auto">
+        <table className="canopy-table w-full min-w-[700px] text-sm">
+          <thead>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-2 font-semibold">Provider</th>
+              <th className="px-3 py-2 font-semibold">Operation</th>
+              <th className="px-3 py-2 text-right font-semibold">Total</th>
+              <th className="px-3 py-2 text-right font-semibold">OK</th>
+              <th className="px-3 py-2 text-right font-semibold">Retry</th>
+              <th className="px-3 py-2 text-right font-semibold">Fail</th>
+              <th className="px-3 py-2 text-right font-semibold">Success%</th>
+              <th className="px-3 py-2 text-right font-semibold">Avg dur</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => {
+              const successColor =
+                r.successPct >= 99
+                  ? "text-emerald-600"
+                  : r.successPct >= 95
+                    ? "text-amber-600"
+                    : "text-red-600";
+              const failColor = r.fail > 0 ? "text-red-600" : "text-zinc-500";
+              const retryColor =
+                r.retry > 0 ? "text-amber-600" : "text-zinc-500";
+              return (
+                <tr
+                  key={`${r.provider}::${r.operation}`}
+                  className="border-t border-zinc-100"
+                >
+                  <td className="px-3 py-2 font-mono text-xs text-zinc-900">
+                    {r.provider}
+                  </td>
+                  <td className="px-3 py-2 font-mono text-xs text-zinc-700">
+                    {r.operation}
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono text-zinc-700">
+                    {formatNumber(r.total)}
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono text-zinc-700">
+                    {formatNumber(r.ok)}
+                  </td>
+                  <td
+                    className={`px-3 py-2 text-right font-mono ${retryColor}`}
+                  >
+                    {formatNumber(r.retry)}
+                  </td>
+                  <td
+                    className={`px-3 py-2 text-right font-mono ${failColor}`}
+                  >
+                    {formatNumber(r.fail)}
+                  </td>
+                  <td
+                    className={`px-3 py-2 text-right font-mono ${successColor}`}
+                  >
+                    {r.successPct.toFixed(1)}%
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono text-xs text-zinc-500">
+                    {r.avgDurationMs !== null
+                      ? `${r.avgDurationMs}ms`
+                      : "-"}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </Section>
   );
 }

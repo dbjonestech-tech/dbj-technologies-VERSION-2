@@ -6,6 +6,7 @@ import {
   getEventsForScan,
   type MonitoringEventRow,
 } from "@/lib/services/monitoring";
+import RescanButton from "./RescanButton";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -101,13 +102,18 @@ export default async function ScanDrilldown({
           ← back to monitor
         </Link>
         <header className="mb-8 mt-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
-            Scan
-          </p>
-          <h1 className="mt-2 break-all font-mono text-lg text-zinc-900 sm:text-xl">
-            {scan.id}
-          </h1>
-          <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
+                Scan
+              </p>
+              <h1 className="mt-2 break-all font-mono text-lg text-zinc-900 sm:text-xl">
+                {scan.id}
+              </h1>
+            </div>
+            <RescanButton scanId={scan.id} />
+          </div>
+          <dl className="mt-6 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <Field label="URL" value={scan.url} mono />
             <Field label="Status" value={scan.status} />
             <Field label="Email" value={scan.email} mono />
