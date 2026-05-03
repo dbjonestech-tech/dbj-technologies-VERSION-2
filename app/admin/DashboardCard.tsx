@@ -87,11 +87,13 @@ export type DashboardCardProps = {
 const HOVER_LEAVE_GRACE = 140;
 
 /* Hover-intent delay (ms) before the popover opens on mouse hover.
- * Long enough that scrolling past a card does NOT trigger the popover
- * cascade; short enough to feel like a deliberate dwell. Touch
- * (explicit click on the chevron affordance) and focus (keyboard nav)
- * bypass this delay and open instantly. */
-const HOVER_OPEN_DELAY = 1500;
+ * 500ms is the iOS hover-intent sweet spot: long enough that
+ * scrolling past a card does NOT trigger the popover cascade, short
+ * enough to feel like the system is responding to deliberate dwell
+ * rather than lagging. Touch (explicit click on the chevron
+ * affordance) and focus (keyboard nav) still bypass this delay
+ * entirely and open instantly. */
+const HOVER_OPEN_DELAY = 500;
 
 export default function DashboardCard({
   label,

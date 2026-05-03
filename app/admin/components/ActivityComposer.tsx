@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { CalendarPlus, MessageSquare, Phone, PenLine, ListPlus, Loader2 } from "lucide-react";
 import {
   logCallAction,
@@ -9,6 +9,7 @@ import {
   createTaskAction,
 } from "@/lib/actions/activities";
 import { TASK_PRIORITIES, type TaskPriority } from "@/lib/services/activities";
+import { useToast } from "./Toast";
 
 type Mode = "note" | "call" | "meeting" | "task";
 
@@ -23,10 +24,18 @@ export default function ActivityComposer({ contactId, dealId, initialMode = "not
   const [mode, setMode] = useState<Mode>(initialMode);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const toast = useToast();
 
   function reset() {
     setError(null);
   }
+
+  const onSuccess = useCallback(
+    (message: string) => {
+      toast.show({ tone: "success", message });
+    },
+    [toast]
+  );
 
   return (
     <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
@@ -55,6 +64,7 @@ export default function ActivityComposer({ contactId, dealId, initialMode = "not
           pending={pending}
           start={start}
           setError={setError}
+          onSuccess={onSuccess}
         />
       )}
       {mode === "call" && (
@@ -64,6 +74,7 @@ export default function ActivityComposer({ contactId, dealId, initialMode = "not
           pending={pending}
           start={start}
           setError={setError}
+          onSuccess={onSuccess}
         />
       )}
       {mode === "meeting" && (
@@ -73,6 +84,7 @@ export default function ActivityComposer({ contactId, dealId, initialMode = "not
           pending={pending}
           start={start}
           setError={setError}
+          onSuccess={onSuccess}
         />
       )}
       {mode === "task" && (
@@ -82,6 +94,7 @@ export default function ActivityComposer({ contactId, dealId, initialMode = "not
           pending={pending}
           start={start}
           setError={setError}
+          onSuccess={onSuccess}
         />
       )}
     </section>
@@ -124,12 +137,14 @@ function NoteForm({
   pending,
   start,
   setError,
+  onSuccess,
 }: {
   contactId?: number | null;
   dealId?: number | null;
   pending: boolean;
   start: (cb: () => void) => void;
   setError: (e: string | null) => void;
+  onSuccess: (message: string) => void;
 }) {
   const [body, setBody] = useState("");
   function submit() {
@@ -144,6 +159,7 @@ function NoteForm({
         setError(r.error);
       } else {
         setBody("");
+        onSuccess("Note added.");
       }
     });
   }
@@ -168,12 +184,14 @@ function CallForm({
   pending,
   start,
   setError,
+  onSuccess,
 }: {
   contactId?: number | null;
   dealId?: number | null;
   pending: boolean;
   start: (cb: () => void) => void;
   setError: (e: string | null) => void;
+  onSuccess: (message: string) => void;
 }) {
   const [direction, setDirection] = useState<"in" | "out">("out");
   const [duration, setDuration] = useState<string>("");
@@ -197,6 +215,7 @@ function CallForm({
         setDuration("");
         setOutcome("");
         setBody("");
+        onSuccess("Call logged.");
       }
     });
   }
@@ -255,12 +274,14 @@ function MeetingForm({
   pending,
   start,
   setError,
+  onSuccess,
 }: {
   contactId?: number | null;
   dealId?: number | null;
   pending: boolean;
   start: (cb: () => void) => void;
   setError: (e: string | null) => void;
+  onSuccess: (message: string) => void;
 }) {
   const [scheduledAt, setScheduledAt] = useState("");
   const [attendees, setAttendees] = useState("");
@@ -288,6 +309,7 @@ function MeetingForm({
         setAttendees("");
         setLocation("");
         setBody("");
+        onSuccess("Meeting scheduled.");
       }
     });
   }
@@ -343,12 +365,14 @@ function TaskForm({
   pending,
   start,
   setError,
+  onSuccess,
 }: {
   contactId?: number | null;
   dealId?: number | null;
   pending: boolean;
   start: (cb: () => void) => void;
   setError: (e: string | null) => void;
+  onSuccess: (message: string) => void;
 }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -372,10 +396,12 @@ function TaskForm({
       if (!r.ok) {
         setError(r.error);
       } else {
+        const t = title.trim();
         setTitle("");
         setBody("");
         setDueAt("");
         setPriority("medium");
+        onSuccess(`Task "${t}" created.`);
       }
     });
   }

@@ -391,6 +391,19 @@ function statusBadgeClass(level: StatusLevel): string {
   return "bg-emerald-50 text-emerald-700 border-emerald-200";
 }
 
+/* Server-side time-of-day picker. Runs at request time on Vercel
+ * (UTC), so the greeting is approximate for the operator's local hour
+ * but always close enough that it never says "Good evening" at noon.
+ * For a single-operator install this is fine; multi-tz teams would
+ * want a client component reading new Date() in the browser. */
+function greetingForHour(hour: number): string {
+  if (hour < 5) return "Working late";
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  if (hour < 22) return "Good evening";
+  return "Working late";
+}
+
 export default async function AdminLanding() {
   const session = await auth();
   const role = await getSessionRole();
@@ -403,6 +416,7 @@ export default async function AdminLanding() {
     countUnacknowledgedSignals(),
   ]);
   const firstName = session?.user?.email?.split("@")[0] ?? "there";
+  const greeting = greetingForHour(new Date().getHours());
 
   return (
     <div className="px-6 py-10 sm:px-10">
@@ -412,7 +426,7 @@ export default async function AdminLanding() {
             Canopy Admin
           </p>
           <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Welcome back, {firstName}.
+            {greeting}, {firstName}.
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
             One cockpit for visitors, conversions, Pathlight, costs,

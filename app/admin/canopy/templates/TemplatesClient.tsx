@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Loader2, Plus, Save, Trash2 } from "lucide-react";
 import {
   archiveTemplateAction,
@@ -8,6 +8,7 @@ import {
   updateTemplateAction,
 } from "@/lib/actions/email";
 import { KNOWN_MERGE_FIELDS } from "@/lib/email/render";
+import { useToast } from "../../components/Toast";
 
 interface TemplateRow {
   id: number;
@@ -29,8 +30,18 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState({ name: "", subject: "", bodyMarkdown: "" });
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
+
+  /* Auto-focus the name input whenever the form opens (create or edit).
+   * useEffect runs after the form mounts so the ref is bound. */
+  useEffect(() => {
+    if (creating || editing) {
+      const t = setTimeout(() => nameInputRef.current?.focus(), 30);
+      return () => clearTimeout(t);
+    }
+  }, [creating, editing]);
 
   function reset() {
     setEditing(null);
@@ -43,7 +54,6 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
     setCreating(true);
     setDraft({ name: "", subject: "", bodyMarkdown: "" });
     setError(null);
-    setInfo(null);
   }
 
   function startEdit(row: TemplateRow) {
@@ -55,7 +65,6 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
       bodyMarkdown: row.bodyMarkdown,
     });
     setError(null);
-    setInfo(null);
   }
 
   function save() {
@@ -64,12 +73,11 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
       return;
     }
     setError(null);
-    setInfo(null);
     start(async () => {
       if (creating) {
         const r = await createTemplateAction(draft);
         if (!r.ok) {
-          setError(r.error ?? "Create failed.");
+          toast.show({ tone: "error", message: r.error ?? "Could not create template." });
           return;
         }
         setRows((prev) => [
@@ -83,7 +91,7 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
           },
           ...prev,
         ]);
-        setInfo("Template created.");
+        toast.show({ tone: "success", message: `Template "${draft.name.trim()}" created.` });
         reset();
       } else if (editing) {
         const r = await updateTemplateAction({
@@ -91,7 +99,7 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
           ...draft,
         });
         if (!r.ok) {
-          setError(r.error ?? "Update failed.");
+          toast.show({ tone: "error", message: r.error ?? "Could not update template." });
           return;
         }
         setRows((prev) =>
@@ -108,22 +116,22 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
               : p
           )
         );
-        setInfo("Template updated.");
+        toast.show({ tone: "success", message: `Template "${draft.name.trim()}" updated.` });
         reset();
       }
     });
   }
 
-  function archive(id: number) {
-    if (!confirm("Archive this template? It will be hidden from the compose picker.")) return;
+  function archive(id: number, name: string) {
+    if (!confirm(`Archive "${name}"? It will be hidden from the compose picker.`)) return;
     start(async () => {
       const r = await archiveTemplateAction(id);
       if (!r.ok) {
-        setError(r.error ?? "Archive failed.");
+        toast.show({ tone: "error", message: r.error ?? "Could not archive template." });
         return;
       }
       setRows((prev) => prev.filter((p) => p.id !== id));
-      setInfo("Template archived.");
+      toast.show({ tone: "info", message: `Template "${name}" archived.` });
       if (editing?.id === id) reset();
     });
   }
@@ -154,6 +162,7 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
                 Name
               </label>
               <input
+                ref={nameInputRef}
                 type="text"
                 value={draft.name}
                 onChange={(e) =>
@@ -228,12 +237,6 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
         </div>
       )}
 
-      {info && !error && (
-        <p className="rounded-md border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-900">
-          {info}
-        </p>
-      )}
-
       <div className="rounded-xl border border-zinc-200 bg-white">
         <header className="border-b border-zinc-100 px-5 py-3">
           <h2 className="font-display text-sm font-semibold text-zinc-900">
@@ -244,9 +247,21 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
           </p>
         </header>
         {rows.length === 0 ? (
-          <p className="px-5 py-8 text-center text-sm text-zinc-500">
-            No templates yet. Click <strong>New template</strong> above to add one.
-          </p>
+          <div className="px-5 py-10 text-center">
+            <p className="text-sm text-zinc-500">
+              No templates yet.
+            </p>
+            <p className="mt-1 text-xs text-zinc-400">
+              Save common copy as a template to reuse it from the compose modal on every contact and deal.
+            </p>
+            <button
+              type="button"
+              onClick={startCreate}
+              className="mt-4 inline-flex items-center gap-1 rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800"
+            >
+              <Plus className="h-3 w-3" /> Create your first template
+            </button>
+          </div>
         ) : (
           <ul className="divide-y divide-zinc-100">
             {rows.map((t) => (
@@ -282,7 +297,7 @@ export default function TemplatesClient({ ownerEmail, initial }: Props) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => archive(t.id)}
+                    onClick={() => archive(t.id, t.name)}
                     className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-white px-2.5 py-1 text-xs font-medium text-rose-700 hover:bg-rose-50"
                   >
                     <Trash2 className="h-3 w-3" /> Archive

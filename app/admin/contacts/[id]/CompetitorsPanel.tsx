@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, Plus, Search, Swords, Trash2 } from "lucide-react";
 import {
   addCompetitorAction,
@@ -12,6 +13,7 @@ import {
   type CompetitorScanStatus,
   MAX_COMPETITORS_PER_CONTACT,
 } from "@/lib/canopy/competitors";
+import { useToast } from "../../components/Toast";
 
 interface Props {
   contactId: number;
@@ -35,16 +37,16 @@ export default function CompetitorsPanel({
 }: Props) {
   const [rows, setRows] = useState<Competitor[]>(initial);
   const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [draft, setDraft] = useState({ competitorName: "", websiteUrl: "" });
+  const router = useRouter();
+  const toast = useToast();
 
   const atCap = rows.length >= MAX_COMPETITORS_PER_CONTACT;
 
   function handleAdd() {
     if (!draft.competitorName.trim() || !draft.websiteUrl.trim()) return;
-    setError(null);
+    const name = draft.competitorName.trim();
     start(async () => {
       const r = await addCompetitorAction({
         contactId,
@@ -52,35 +54,37 @@ export default function CompetitorsPanel({
         websiteUrl: draft.websiteUrl,
       });
       if (!r.ok) {
-        setError(r.error);
+        toast.show({ tone: "error", message: r.error });
         return;
       }
       setShowAdd(false);
       setDraft({ competitorName: "", websiteUrl: "" });
-      window.location.reload();
+      toast.show({ tone: "success", message: `${name} added.` });
+      /* Soft refresh: re-runs server components to pull the new row
+       * (with its db-assigned id and default scan_status) without a
+       * full page reload. Preserves scroll position and feels instant. */
+      router.refresh();
     });
   }
 
-  function handleRemove(id: number) {
-    if (!confirm("Remove this competitor?")) return;
-    setError(null);
+  function handleRemove(id: number, name: string) {
+    if (!confirm(`Remove ${name} from this contact's competitors?`)) return;
     start(async () => {
       const r = await removeCompetitorAction({ competitorId: id, contactId });
       if (!r.ok) {
-        setError(r.error);
+        toast.show({ tone: "error", message: r.error });
         return;
       }
       setRows((s) => s.filter((c) => c.id !== id));
+      toast.show({ tone: "info", message: `${name} removed.` });
     });
   }
 
   function handleScanAll() {
-    setError(null);
-    setInfo(null);
     start(async () => {
       const r = await scanCompetitorsAction({ contactId });
       if (!r.ok) {
-        setError(r.reason ?? r.error);
+        toast.show({ tone: "error", message: r.reason ?? r.error });
         return;
       }
       setRows((s) =>
@@ -90,9 +94,10 @@ export default function CompetitorsPanel({
             : c
         )
       );
-      setInfo(
-        `Queued ${r.data.scanned} competitor scan${r.data.scanned === 1 ? "" : "s"}. ${r.data.remaining ?? 0} budget remaining.`
-      );
+      toast.show({
+        tone: "success",
+        message: `Queued ${r.data.scanned} competitor scan${r.data.scanned === 1 ? "" : "s"}. ${r.data.remaining ?? 0} budget remaining.`,
+      });
     });
   }
 
@@ -184,15 +189,15 @@ export default function CompetitorsPanel({
         </div>
       ) : null}
 
-      {error ? (
-        <p className="mb-3 text-xs text-red-700">{error}</p>
-      ) : null}
-      {info ? <p className="mb-3 text-xs text-emerald-700">{info}</p> : null}
-
       {rows.length === 0 ? (
-        <p className="rounded-md border border-dashed border-zinc-200 p-6 text-center text-xs text-zinc-500">
-          No competitors yet.
-        </p>
+        <div className="rounded-md border border-dashed border-zinc-200 p-6 text-center">
+          <p className="text-xs text-zinc-500">
+            No competitors tracked yet.
+          </p>
+          <p className="mt-1 text-[11px] text-zinc-400">
+            Add up to {MAX_COMPETITORS_PER_CONTACT} sites to benchmark this contact's market against.
+          </p>
+        </div>
       ) : (
         <ul className="space-y-2">
           {rows.map((c) => (
@@ -224,7 +229,7 @@ export default function CompetitorsPanel({
                 </span>
                 <button
                   type="button"
-                  onClick={() => handleRemove(c.id)}
+                  onClick={() => handleRemove(c.id, c.competitor_name)}
                   className="rounded-md p-1 text-xs text-zinc-400 hover:text-red-700"
                   aria-label="Remove competitor"
                 >

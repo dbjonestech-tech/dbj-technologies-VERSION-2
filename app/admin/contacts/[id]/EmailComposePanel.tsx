@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Loader2, Mail, Sparkles, X } from "lucide-react";
 import { sendEmailAction } from "@/lib/actions/email";
 import { renderTemplate, type RenderContext } from "@/lib/email/render";
+import { useToast } from "../../components/Toast";
 
 interface TemplateOption {
   id: number;
@@ -39,9 +40,19 @@ export default function EmailComposePanel({
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [templateId, setTemplateId] = useState<number | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const subjectInputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
+
+  /* Auto-focus the subject field when the compose panel opens, so the
+   * operator can start typing immediately without an extra click. */
+  useEffect(() => {
+    if (open && ableToSend) {
+      const t = setTimeout(() => subjectInputRef.current?.focus(), 30);
+      return () => clearTimeout(t);
+    }
+  }, [open, ableToSend]);
 
   const previewCtx: RenderContext = useMemo(
     () => ({
@@ -84,7 +95,6 @@ export default function EmailComposePanel({
       return;
     }
     setError(null);
-    setInfo(null);
     start(async () => {
       const r = await sendEmailAction({
         contactId,
@@ -94,16 +104,28 @@ export default function EmailComposePanel({
         bodyMarkdown: body,
       });
       if (!r.ok) {
-        setError(r.error ?? "Send failed.");
+        toast.show({ tone: "error", message: r.error ?? "Could not send email." });
         return;
       }
-      setInfo(`Sent. Tracking pixel + click rewrites are live.`);
+      toast.show({
+        tone: "success",
+        message: `Email sent to ${contactEmail}. Open + click tracking is live.`,
+      });
       setSubject("");
       setBody("");
       setTemplateId(null);
       setOpen(false);
     });
   }
+
+  /* The compose button is always rendered so the affordance is
+   * predictable regardless of Gmail connection state. When the operator
+   * cannot send, the button is disabled with a tooltip explaining why
+   * (rather than disappearing the affordance entirely). */
+  const composeBtnLabel = open ? "Close compose" : "Compose";
+  const composeBtnTitle = ableToSend
+    ? "Open the compose panel"
+    : unavailableReason ?? "Connect Gmail in /admin/canopy first.";
 
   return (
     <section className="rounded-xl border border-zinc-200 bg-white">
@@ -114,20 +136,27 @@ export default function EmailComposePanel({
             Email
           </h2>
         </div>
-        {ableToSend ? (
-          <button
-            type="button"
-            onClick={() => setOpen((prev) => !prev)}
-            className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800"
-          >
-            {open ? "Close compose" : "Compose"}
-          </button>
-        ) : (
-          <span className="text-xs text-zinc-500">
-            {unavailableReason ?? "Connect Gmail in /admin/canopy first."}
-          </span>
-        )}
+        <button
+          type="button"
+          onClick={() => ableToSend && setOpen((prev) => !prev)}
+          disabled={!ableToSend}
+          title={composeBtnTitle}
+          aria-disabled={!ableToSend}
+          className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+            ableToSend
+              ? "bg-zinc-900 text-white hover:bg-zinc-800"
+              : "cursor-not-allowed border border-zinc-200 bg-zinc-50 text-zinc-400"
+          }`}
+        >
+          {composeBtnLabel}
+        </button>
       </header>
+
+      {!ableToSend && (
+        <p className="border-b border-zinc-100 px-5 py-2.5 text-xs text-zinc-500">
+          {unavailableReason ?? "Connect Gmail in /admin/canopy first."}
+        </p>
+      )}
 
       {open && ableToSend && (
         <div className="space-y-3 px-5 py-4 text-sm">
@@ -181,6 +210,7 @@ export default function EmailComposePanel({
               Subject
             </label>
             <input
+              ref={subjectInputRef}
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
@@ -221,11 +251,6 @@ export default function EmailComposePanel({
           {error && (
             <p className="rounded-md border border-rose-200 bg-rose-50 p-2 text-xs text-rose-900">
               {error}
-            </p>
-          )}
-          {info && (
-            <p className="rounded-md border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-900">
-              {info}
             </p>
           )}
 

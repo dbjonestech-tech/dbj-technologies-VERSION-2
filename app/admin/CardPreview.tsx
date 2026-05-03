@@ -310,8 +310,11 @@ export default function CardPreview({
           </div>
         ) : null}
 
-        {/* Sparkline panel. */}
-        {kpi?.spark && kpi.spark.points.length > 0 ? (
+        {/* Sparkline panel. When the spark exists but the points array
+            is empty, render a faint placeholder so the layout stays
+            consistent and the operator does not wonder if a request
+            failed. */}
+        {kpi?.spark ? (
           <div className="mb-4">
             <div className="mb-1.5 flex items-center justify-between">
               <span className="text-[10px] uppercase tracking-wider text-zinc-500">
@@ -323,13 +326,22 @@ export default function CardPreview({
                 </span>
               ) : null}
             </div>
-            <div className={tokens.iconColor}>
-              <Sparkline
-                points={kpi.spark.points}
-                colorClass={tokens.iconColor}
-                height={56}
-              />
-            </div>
+            {kpi.spark.points.length > 0 ? (
+              <div className={tokens.iconColor}>
+                <Sparkline
+                  points={kpi.spark.points}
+                  colorClass={tokens.iconColor}
+                  height={56}
+                />
+              </div>
+            ) : (
+              <div
+                className="flex h-14 items-center justify-center rounded-md border border-dashed border-zinc-200 bg-zinc-50/40 text-[11px] text-zinc-400"
+                aria-hidden="true"
+              >
+                Not enough data yet
+              </div>
+            )}
           </div>
         ) : null}
 

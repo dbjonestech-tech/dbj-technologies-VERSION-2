@@ -38,6 +38,8 @@ import {
 } from "lucide-react";
 import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
 import { getContactsDashboardSummary } from "@/lib/services/contacts";
+import { ToastProvider } from "./components/Toast";
+import CommandPalette from "./components/CommandPalette";
 
 export const metadata: Metadata = {
   title: { default: "Admin", template: "%s | DBJ Admin" },
@@ -172,12 +174,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const navGroups = buildNavGroups(summary.overdue);
 
   return (
-    <div className="min-h-screen w-full" style={{ backgroundColor: "#FAFAFA" }}>
-      <div className="flex min-h-screen">
-        <aside className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
-          <div className="flex items-center border-b border-zinc-200 px-5 py-5">
-            <CanopyWordmark />
-          </div>
+    <ToastProvider>
+      <div className="min-h-screen w-full" style={{ backgroundColor: "#FAFAFA" }}>
+        <div className="flex min-h-screen">
+          <aside className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
+            <div className="flex items-center border-b border-zinc-200 px-5 py-5">
+              <CanopyWordmark />
+            </div>
           <nav className="flex-1 overflow-y-auto px-3 py-4">
             {navGroups.map((group) => (
               <div key={group.label} className="mb-6">
@@ -190,8 +193,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                     if (item.disabled) {
                       return (
                         <li key={item.label}>
-                          <span className="flex cursor-not-allowed items-center gap-2.5 rounded-md px-3 py-2 text-sm text-zinc-400">
-                            <Icon className="h-4 w-4" aria-hidden="true" />
+                          <span className="flex cursor-not-allowed items-center gap-2.5 rounded-md px-3 py-2 text-sm text-zinc-400 opacity-60">
+                            <Icon className="h-4 w-4 opacity-60" aria-hidden="true" />
                             <span>{item.label}</span>
                             <span className="ml-auto text-[10px] uppercase tracking-wider text-zinc-300">
                               soon
@@ -239,11 +242,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             ))}
           </nav>
           <div className="border-t border-zinc-200 px-3 py-4">
-            <div className="mb-3 px-3">
-              <p className="text-xs text-zinc-500">Signed in as</p>
-              <p className="truncate text-sm font-medium text-zinc-900">
-                {session.user.email}
-              </p>
+            <div className="mb-3 flex items-center justify-between px-3">
+              <div className="min-w-0">
+                <p className="text-xs text-zinc-500">Signed in as</p>
+                <p className="truncate text-sm font-medium text-zinc-900">
+                  {session.user.email}
+                </p>
+              </div>
+              <kbd
+                title="Open command palette"
+                className="ml-2 hidden rounded border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 font-mono text-[10px] text-zinc-500 lg:inline"
+              >
+                ⌘K
+              </kbd>
             </div>
             <form action={signOutAction}>
               <button
@@ -274,7 +285,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="flex-1 overflow-x-hidden">{children}</div>
         </main>
       </div>
-    </div>
+      </div>
+      <CommandPalette />
+    </ToastProvider>
   );
 }
 

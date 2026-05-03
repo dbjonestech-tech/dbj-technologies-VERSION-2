@@ -85,7 +85,11 @@ export async function createContactAction(
     }
     revalidatePath("/admin/contacts");
     revalidatePath("/admin/relationships/pipeline");
-    revalidatePath("/admin");
+    /* Revalidate the entire admin layout (not just the page) so the
+     * sidebar overdue badge picks up the new contact's follow-up
+     * state on the very next render rather than at the next full
+     * navigation. */
+    revalidatePath("/admin", "layout");
     return { ok: true, data: created };
   } catch (err) {
     return {
@@ -143,7 +147,9 @@ export async function updateContactAction(
     revalidatePath("/admin/contacts");
     revalidatePath(`/admin/contacts/${id}`);
     revalidatePath("/admin/relationships/pipeline");
-    revalidatePath("/admin");
+    /* Layout-level revalidation refreshes the sidebar overdue badge
+     * after follow-up date changes, status changes, etc. */
+    revalidatePath("/admin", "layout");
     return { ok: true, data: updated };
   } catch (err) {
     return {

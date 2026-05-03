@@ -26,12 +26,24 @@ input, select, textarea, [contenteditable="true"] { cursor: text !important; }
 
 html {
   scroll-behavior: smooth;
+  /* Anchor jumps land below a virtual top inset rather than against
+     the very edge of the viewport, so an in-page link never lands
+     behind a sticky header. Generous on desktop; tighter on mobile
+     where vertical real estate is precious. */
+  scroll-padding-top: 1.5rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* Base background lives on the html element so an inline
      style override (set by the anti-flicker script in layout.tsx)
      is visible immediately, before body parses. */
   background-color: var(--bg-primary);
+}
+
+/* Kill the persistent blue tap-highlight rectangle iOS Safari draws on
+   buttons/links. Replaced with our own focus-visible / hover treatments
+   so taps feel responsive without flashing semi-transparent blue. */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
