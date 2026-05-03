@@ -5,7 +5,32 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- **three follow-on Canopy upgrades shipped at `9686b3a`** on top of `3371138`: ⌘K record search (contacts + deals), Undo affordance on destructive actions, route-level loading skeletons for /contacts /deals /audit. Working tree clean, pushed to origin main.)
+## Current state (May 2, 2026 -- **public Canopy showcase at `/showcase/canopy/*` shipped at `c8a3150`** on top of the canopy-table standardization at `66247b8` and the three follow-on upgrades at `9686b3a`. Tree clean, pushed to origin main. Next collaborative step: the Work-page Canopy section overhaul.)
+
+### Public Canopy showcase route at `c8a3150`
+
+Joshua wants to put Canopy on display via screenshots / screen recordings / a Work-page section. Screenshotting the live `/admin` instance leaks real client names, deal values, audit rows, email subjects. This commit creates a safe-to-share, safe-to-screenshot, fixture-only mirror of the product so the marketing surface can show the real chrome against invented data.
+
+- `lib/demo/fixtures.ts` -- single source of truth for demo data. 8 contacts (Northwood Plumbing, Riverbend Dental, Acme HVAC, Lakeshore CPA, Cottonwood Veterinary, Beacon Hill Realty, Harborline Logistics, Summit Auto Glass), 8 deals across all six stages including a closed-won and a closed-lost, 8 audit rows covering stage changes / follow-up sets / email sends / tag adds / scan completions / template creates / value changes / closed-won, plus pipeline rollups, dashboard KPI cards, and tasks summary. Every record is invented; no real client appears. Time math anchored to a fixed `NOW` so the rendered "12m ago" / "3h ago" stay realistic.
+- `app/showcase/canopy/layout.tsx` -- public shell mirroring `/admin`: same Canopy wordmark, same sidebar dimensions, same sign-in panel placement (showing a demo session string), same `getPalette` tokens. Adds a slim violet banner up top labeling the page as a fictional-data showcase with a back-link to `/work/canopy`. No auth gate.
+- `app/showcase/canopy/page.tsx` -- dashboard view: greeting + status bar + pipeline rollups + Today's Tasks + 8-card KPI grid. Uses the same PALETTES tokens and card shape as the live dashboard so visual language matches one-to-one.
+- `app/showcase/canopy/contacts/page.tsx` -- contacts list with the canopy-table 8-hue rotation, status pills, follow-up tone coding, touchpoint counts, full filter-chip header (visually present, not wired).
+- `app/showcase/canopy/deals/page.tsx` -- 6-column kanban with per-stage tints, value totals, probability per card, plus weighted/unweighted/closed-won rollups above.
+- `app/showcase/canopy/audit/page.tsx` -- key-by-key diff visual identical to `EntityAuditList`: `+` green adds, `-` red strike removes, `~` amber changes; relative timestamps with absolute on hover.
+
+Routing: lives at top-level (`/showcase/canopy`) outside both `(marketing)` and `(grade)` groups so it carries its own admin-style shell instead of inheriting the marketing nav. SEO permissive (index/follow) since the showcase IS the marketing surface.
+
+### Prior commit -- canopy-table standardization at `66247b8`
+
+The `.canopy-table` CSS system in globals.css already implements an 8-hue column rotation (sky/violet/emerald/amber/fuchsia/teal/orange/indigo) plus Excel-style row striping plus palette-aware hover plus on-hover column separators. 22 of 26 admin tables were using it; 4 were not. This commit closed that gap.
+
+- `app/admin/costs/page.tsx` -- "By provider" + "By operation" tables now carry `canopy-table`. OK/Retry/Fail status numbers wrapped in `bg-emerald-50` / `bg-amber-50` / `bg-red-50` pills so they short-circuit the rotation rule (the `:not([class*="bg-"])` selector preserves meaningful tints).
+- `app/admin/sequences/SequencesListClient.tsx` -- canopy-table on the sequences list; Delete button promoted to a tinted bg-rose-50 pill so it stays meaningfully red after the rotation.
+- `app/admin/canopy/team/TeamClient.tsx` -- canopy-table on the team roster; "(you)" inline tag promoted to a tinted emerald pill so it does not get swept by the column hue.
+
+Verified post-edit: every `<table>` in `app/admin/` now carries `canopy-table` (26 of 26).
+
+### Prior commit on top of `3371138` -- three follow-on UX upgrades at `9686b3a`
 
 ### Three follow-on UX upgrades at `9686b3a`
 
