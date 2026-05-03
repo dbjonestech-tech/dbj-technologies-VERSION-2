@@ -156,7 +156,7 @@ export function PathlightForm() {
               <Field
                 label="Business Name (optional)"
                 type="text"
-                placeholder="Acme Plumbing"
+                placeholder="Mockingbird Optical"
                 value={form.businessName}
                 onChange={(v) => update("businessName", v)}
                 disabled={submitting}

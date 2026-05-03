@@ -4,20 +4,25 @@ Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`). The most recent archive is
 [`history/2026-05-02.md`](history/2026-05-02.md).
 
-## Current state (May 3, 2026 -- Stage 1 page critique shipped end-to-end on top of Stage 2)
+## Current state (May 3, 2026 -- Stage 1 page critique shipped end-to-end on top of Stage 2; placeholder copy refresh on top)
 
 ### Anchor block
 
-HEAD: `688ec27` (Stage 1 implementation: page critique side-step, CTA inventory, headline alternatives, hero observation). The hash above reflects the published commit; one prior amend shifted the hash by a byte to fill in this line. `git log -1` is the authoritative source.
+HEAD: `f84971c` (Pathlight scan form business-name placeholder updated from "Acme Plumbing" to "Mockingbird Optical"). The hash above reflects the published commit; one prior amend shifted the hash by a byte to fill in this line. `git log -1` is the authoritative source.
 
 Recent commits (newest first):
-- Stage 1 code + docs (this commit, hash above)
+- Placeholder refresh on Pathlight form (this commit, hash above)
+- `688ec27` -- Stage 1 implementation: page critique side-step, CTA inventory, headline alternatives, hero observation
 - `0efae8e` -- migration 035 (page_critique JSONB column), shipped independently and applied to prod Neon before the code commit
 - `a755793` -- Stage 2 cleanup (hoist f1 dynamic imports to static)
 - `1027ca3` -- Stage 2 (HTML capture, full-page screenshots, forms audit)
 - `5ad1a0a` -- migration 034
 
 Working tree: clean.
+
+### Post-Stage 1 micro-edits
+
+- `app/(grade)/pathlight/PathlightForm.tsx:159` -- Business Name field placeholder: `Acme Plumbing` -> `Mockingbird Optical`. Joshua-picked refinement; the City placeholder ("Dallas") still pairs naturally. `lib/demo/fixtures.ts` left untouched (internal seed data, not user-facing).
 
 ### What shipped this session
 
