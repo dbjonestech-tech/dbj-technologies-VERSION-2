@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { getDb } from "../db";
 import {
   getExistingAudioSummary,
+  getFormsAuditInput,
   getFullScanReport,
   getScanPipelineContext,
   markScanComplete,
@@ -20,6 +21,7 @@ import {
   updateScanScreenshots,
   updateScanStatus,
 } from "../db/queries";
+import { runFormsAudit } from "../services/forms-audit";
 import { generateVoiceSummary } from "../services/voice";
 import { getProviderSpendUsd } from "../services/api-usage";
 import { track } from "../services/monitoring";
@@ -733,12 +735,10 @@ export const scanRequested = inngest.createFunction(
           if (screenshots.forms.length === 0) {
             return { ok: true, skipped: "no-forms" };
           }
-          const { getFormsAuditInput } = await import("../db/queries");
           const input = await getFormsAuditInput(scanId);
           if (!input || input.forms.length === 0) {
             return { ok: true, skipped: "no-forms-on-read" };
           }
-          const { runFormsAudit } = await import("../services/forms-audit");
           const analysis = await runFormsAudit({
             scanId,
             forms: input.forms,
