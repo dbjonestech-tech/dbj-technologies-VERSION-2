@@ -5,7 +5,67 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- **Phase 4 COMPLETE end-to-end**. Foundation `f4bc84f`, pipeline `18f85dc`, server-side actions earlier this commit chain, UI surfaces staged uncommitted in this commit. Migration 033 applied to prod Neon. `OAUTH_TOKEN_ENCRYPTION_KEY` set in Vercel production. **All 9 Canopy phases now structurally complete.**)
+## Current state (May 2, 2026 -- **iOS-grade UX polish pass shipped at `a0f5051`** on top of all 9 Canopy phases. Toast system + Cmd+K command palette + dashboard skeleton + 11 microinteraction tunings. Tree clean, pushed to origin main.)
+
+### iOS-grade polish pass shipped at `a0f5051`
+
+The "make Canopy a sexy cousin of Apple" pass. Twelve coordinated changes that move the product from "polished" to "silky" without changing what any feature does. Verified `npx tsc --noEmit` clean, `npm run lint` clean, em-dash count 0 on every changed/new file.
+
+**New shared infrastructure:**
+
+- `app/admin/components/Toast.tsx` -- shared `<ToastProvider>` mounted at the layout level. Spring slide-in from bottom-right, auto-dismiss at 4s, stack newest-on-top with a 5-toast cap, tone-coded (success/error/info), `useReducedMotion` swap to plain fade. Built on framer-motion (already in); no new deps. `useToast()` hook fails open so misuse outside the provider does not crash. The single source of truth for transient feedback going forward.
+- `app/admin/components/CommandPalette.tsx` -- Cmd+K / Ctrl+K global command palette. Searches every sidebar destination by fuzzy subsequence + initials + keyword fallback (so "et" lands on Email templates, "edt" works too). Recent jumps remembered in `localStorage` and surfaced when the input is empty. Apple-style glass backdrop (`bg-zinc-900/30 backdrop-blur-sm`), spring scale-in panel, arrow-key navigation with always-visible focus ring, Enter to navigate, Esc to close. Discoverable via a small `⌘K` kbd hint in the sidebar footer next to "Signed in as".
+- `app/admin/loading.tsx` -- cold-load skeleton mirroring the dashboard layout shape. Renders during the initial Promise.all in `page.tsx` and gets streamed-out by Next.js when real content is ready. Pure server component, zero JS shipped to the client.
+
+**Toasts wired into 4 surfaces:**
+
+- `canopy/templates/TemplatesClient.tsx` -- replaces inline emerald/rose banners with toasts on create / update / archive. Empty-state CTA button on the templates list. Auto-focuses the name input when the create or edit form opens.
+- `contacts/[id]/EmailComposePanel.tsx` -- success / error toasts on send. Auto-focuses the subject input when compose opens. Compose button is now ALWAYS rendered: when Gmail is not connected the button is visibly disabled with a tooltip explaining why, plus a clarifying banner under the header. Affordance never disappears (replaces the prior "swap button for grey text" pattern).
+- `contacts/[id]/CompetitorsPanel.tsx` -- replaces `window.location.reload()` with `router.refresh()` (preserves scroll, no page flash) plus a success toast on add. Scan-all and remove also toast. Empty state now explains what the panel is for.
+- `components/ActivityComposer.tsx` -- success toast for note / call / meeting / task additions. Validation errors stay inline next to the field (where they belong); transient confirmations move to toasts.
+
+**Perceived speed + affordance tuning:**
+
+- `DashboardCard.tsx` `HOVER_OPEN_DELAY` 1500ms -> 500ms. Touch + focus paths still bypass entirely.
+- `CardPreview.tsx` -- sparkline shows a faint "Not enough data yet" placeholder when the points array is empty. Layout shape stays consistent so the popover never jumps when KPIs are partial.
+- `layout.tsx` -- disabled nav items get `opacity-60` on the row + icon so they read as visually inert rather than mistakenly clickable.
+
+**Delight:**
+
+- `page.tsx` -- dashboard greeting is now time-of-day aware. "Good morning / afternoon / evening" based on the request hour, with "Working late" before 5am and after 10pm. Server-rendered, request-time hour (UTC).
+
+**Invalidation + globals:**
+
+- `lib/actions/contacts.ts` -- `createContactAction` and `updateContactAction` now call `revalidatePath("/admin", "layout")` so the sidebar overdue badge served by `getContactsDashboardSummary` at the layout level refreshes on the next render rather than going stale.
+- `globals.css` -- `scroll-padding-top: 1.5rem` on html so anchor jumps land below a virtual top inset (no more landing behind a sticky header). Plus `-webkit-tap-highlight-color: transparent` on every element so iOS Safari stops flashing semi-transparent blue rectangles on every button tap; hover/focus treatments do the work instead.
+
+### What this changes about Canopy in operator-visible terms
+
+| Pre | Post |
+|---|---|
+| Every action either silent or inline message that piles up | Every action confirms with a dismissible toast |
+| Hover a dashboard card, wait 1.5s, get a popover | Hover a card, wait half a second, get a popover |
+| `⌘K` does nothing | `⌘K` opens a fuzzy-matched palette over every page in the app with localStorage-backed recents |
+| Dashboard flashes blank on cold load | Dashboard renders a layout-shaped skeleton in <100ms that swaps into real content via streaming |
+| Compose button vanishes when Gmail not connected; operator wonders if the feature exists | Compose button always visible, disabled state explains itself |
+| Tap a button on iOS, get a blue rectangle flash | Tap a button on iOS, get the hover/focus state we designed |
+
+The shape of the product is unchanged. The feel is materially different.
+
+### Deferred polish (audit identified, not shipped this commit)
+
+- **Mobile sidebar drawer** -- `layout.tsx:177` is `hidden lg:flex`; on phones the entire sidebar is unreachable. Needs a hamburger button + slide-over drawer component. Real work, scoped for a follow-up.
+- **Tables: arrow-key + Enter navigation** -- `/admin/scans`, `/admin/leads`, `/admin/contacts` rows have no `tabindex` or arrow handlers. Power-user feature; substantial.
+- **Email compose + thread side-by-side breaks at tablet width** -- `lg:grid-cols-[1fr_1fr]` on contact + deal detail. Below `lg`, both panels stack tall. Should switch to a tabbed interface or a sheet/drawer.
+- **Audit log: relative timestamps + diff viewer** -- `EntityAuditList.tsx` dumps raw JSON before/after. A two-column field-by-field diff would read 10x faster.
+- **Bulk select + bulk actions** -- check checkboxes on contacts/deals lists, archive/tag/assign in bulk.
+- **Pre-existing canopy v2 phase 4 follow-ups already documented below.**
+
+### Earlier in this session (chronological)
+
+---
+
+## Prior state (May 2, 2026 -- Phase 4 Canopy Email Integration COMPLETE end-to-end. Foundation `f4bc84f`, pipeline `18f85dc`, server actions + UI shipped this session. Migration 033 applied to prod Neon. `OAUTH_TOKEN_ENCRYPTION_KEY` set in Vercel production sensitive store.)
 
 ### Phase 4 UI shipped this commit (compose, templates editor, thread display)
 
