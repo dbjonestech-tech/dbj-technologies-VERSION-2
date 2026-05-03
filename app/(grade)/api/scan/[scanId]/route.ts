@@ -109,6 +109,11 @@ export async function GET(
        * data for downstream text-side analyses. */
       screenshotsFullPage: report.screenshotsFullPage,
       formsAudit: report.formsAudit,
+      /* Stage 1 field. Same posture as Stage 2's screenshotsFullPage and
+       * formsAudit: the rendered output is public-OK (CTA list, headline
+       * alternatives, hero observation) and shows up late on a fresh scan
+       * because the underlying call runs post-email. */
+      pageCritique: report.pageCritique,
       isOutOfScope,
       outOfScopeLabel: isOutOfScope
         ? report.businessScale === "global"

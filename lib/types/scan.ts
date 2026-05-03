@@ -92,6 +92,41 @@ export type FormsAuditResult = {
   analysis: FormsAuditAnalysis | null;
 };
 
+/* Stage 1: page critique (CTA inventory + headline alternatives + hero
+ * observation). Produced by a new post-finalize side-step that runs after
+ * the report email ships. Stage 1 deliberately leaves the existing vision
+ * audit schema untouched; this is a separate artifact with its own schema. */
+
+export type PageCtaLocation =
+  | "above-the-fold-hero"
+  | "above-the-fold-secondary"
+  | "navigation"
+  | "later-on-page";
+
+export type PageCta = {
+  text: string;
+  location: PageCtaLocation;
+  visibility: number;
+  observation: string;
+  nextAction: string;
+};
+
+export type PageHeadlineAlternative = {
+  text: string;
+  rationale: string;
+};
+
+export type PageHeadline = {
+  current: string;
+  alternatives: PageHeadlineAlternative[];
+};
+
+export type PageCritiqueResult = {
+  heroObservation: string;
+  headline: PageHeadline;
+  ctas: PageCta[];
+};
+
 export type DesignMetric = {
   score: number;
   observation: string;
@@ -240,6 +275,10 @@ export type PathlightReport = {
   htmlSnapshot: HtmlSnapshot | null;
   screenshotsFullPage: FullPageScreenshotPair | null;
   formsAudit: FormsAuditResult | null;
+  /* Stage 1 field. Optional: pre-Stage-1 scans load with this as null and
+   * the HeroCritiqueSection returns null gracefully. Late-arriving on a
+   * fresh scan because the underlying call runs post-email. */
+  pageCritique: PageCritiqueResult | null;
   businessModel?: "B2B" | "B2C" | "mixed";
   inferredVertical?: string;
   inferredVerticalParent?: string;

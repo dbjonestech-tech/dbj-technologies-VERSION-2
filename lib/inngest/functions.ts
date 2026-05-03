@@ -4,6 +4,7 @@ import {
   getExistingAudioSummary,
   getFormsAuditInput,
   getFullScanReport,
+  getPageCritiqueInput,
   getScanPipelineContext,
   markScanComplete,
   updatePathlightScore,
@@ -14,6 +15,7 @@ import {
   updateScanFullPageScreenshots,
   updateScanHtmlSnapshot,
   updateScanIndustryBenchmark,
+  updateScanPageCritique,
   updateScanRemediation,
   updateScanResolvedUrl,
   updateScanResults,
@@ -22,6 +24,7 @@ import {
   updateScanStatus,
 } from "../db/queries";
 import { runFormsAudit } from "../services/forms-audit";
+import { runPageCritique } from "../services/page-critique";
 import { generateVoiceSummary } from "../services/voice";
 import { getProviderSpendUsd } from "../services/api-usage";
 import { track } from "../services/monitoring";
@@ -787,6 +790,63 @@ export const scanRequested = inngest.createFunction(
             { error: message.slice(0, 500) },
             { scanId, level: "error" }
           );
+        }
+      });
+
+      /* c1: Stage 1 page critique. Runs AFTER the report email ships and
+       * BEFORE the first follow-up sleep so a critique failure (or its
+       * retry cascade) can never block email delivery. Gated on a
+       * successful design audit and a desktop screenshot; without those
+       * the model has nothing to ground a critique in. Failure is
+       * swallowed: matches the a5/f1 side-step posture, never marks a
+       * scan partial. The renderer falls back to no-section when this is
+       * absent; the chat agent does not depend on it. */
+      await step.run("c1", async () => {
+        try {
+          if (!visionStep.ok) {
+            return { ok: true, skipped: "vision-not-ok" };
+          }
+          if (!screenshots.desktop) {
+            return { ok: true, skipped: "no-desktop-screenshot" };
+          }
+          const input = await getPageCritiqueInput(scanId);
+          if (!input || !input.desktopScreenshot) {
+            return { ok: true, skipped: "no-input" };
+          }
+          const critique = await runPageCritique({
+            scanId,
+            desktopScreenshot: input.desktopScreenshot,
+            url: input.resolvedUrl ?? input.url,
+            businessName: input.businessName,
+            industry: input.industry,
+            city: input.city,
+            designScores: input.designScores,
+            positioningScores: input.positioningScores,
+            performanceScores: input.performanceScores,
+          });
+          await updateScanPageCritique(scanId, critique);
+          await track(
+            "page-critique.generated",
+            {
+              ctas: critique.ctas.length,
+              alternatives: critique.headline.alternatives.length,
+              heroChars: critique.heroObservation.length,
+            },
+            { scanId },
+          );
+          return { ok: true, ctas: critique.ctas.length };
+        } catch (err) {
+          const message = describeError(err);
+          console.warn(
+            "[c1] page-critique failed (scan still ships):",
+            message,
+          );
+          await track(
+            "page-critique.failed",
+            { error: message.slice(0, 500) },
+            { scanId, level: "warn" },
+          );
+          return { ok: false, error: message };
         }
       });
 

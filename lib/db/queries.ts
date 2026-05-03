@@ -8,6 +8,9 @@ import type {
   HtmlSnapshot,
   IndustryBenchmark,
   LighthouseCategoryScores,
+  PageCritiqueResult,
+  PageCta,
+  PageHeadlineAlternative,
   PathlightReport,
   PerformanceScores,
   PillarScores,
@@ -51,6 +54,9 @@ type ScanResultsRow = {
   html_snapshot: unknown;
   screenshots_fullpage: FullPageScreenshotPair | null;
   forms_audit: unknown;
+  /* Stage 1 column (added in migration 035). Nullable; pre-Stage-1 scans
+   * coerce to null and HeroCritiqueSection returns null gracefully. */
+  page_critique: unknown;
 };
 
 export async function updateScanStatus(
@@ -240,6 +246,19 @@ export async function updateScanFormsExtracted(
       ${JSON.stringify({ forms })}::jsonb,
       true
     )
+  `;
+}
+
+export async function updateScanPageCritique(
+  scanId: string,
+  critique: PageCritiqueResult,
+): Promise<void> {
+  const sql = getDb();
+  await sql`
+    INSERT INTO scan_results (scan_id, page_critique)
+    VALUES (${scanId}, ${JSON.stringify(critique)}::jsonb)
+    ON CONFLICT (scan_id) DO UPDATE
+    SET page_critique = EXCLUDED.page_critique
   `;
 }
 
@@ -538,6 +557,78 @@ function coerceFormDescriptor(v: unknown): FormDescriptor | null {
   };
 }
 
+function coercePageCta(v: unknown): PageCta | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  if (typeof o.text !== "string" || o.text.length === 0) return null;
+  const location =
+    o.location === "above-the-fold-hero" ||
+    o.location === "above-the-fold-secondary" ||
+    o.location === "navigation" ||
+    o.location === "later-on-page"
+      ? o.location
+      : "above-the-fold-hero";
+  const visibility =
+    typeof o.visibility === "number" && Number.isFinite(o.visibility)
+      ? Math.max(1, Math.min(10, Math.round(o.visibility)))
+      : 5;
+  return {
+    text: o.text,
+    location,
+    visibility,
+    observation: typeof o.observation === "string" ? o.observation : "",
+    nextAction: typeof o.nextAction === "string" ? o.nextAction : "",
+  };
+}
+
+function coerceHeadlineAlternative(v: unknown): PageHeadlineAlternative | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  if (typeof o.text !== "string" || o.text.length === 0) return null;
+  return {
+    text: o.text,
+    rationale: typeof o.rationale === "string" ? o.rationale : "",
+  };
+}
+
+function coercePageCritique(v: unknown): PageCritiqueResult | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  const heroObservation =
+    typeof o.heroObservation === "string" ? o.heroObservation : "";
+  const headlineRaw = o.headline as
+    | { current?: unknown; alternatives?: unknown[] }
+    | undefined;
+  const current =
+    typeof headlineRaw?.current === "string" ? headlineRaw.current : "";
+  const alternativesRaw = Array.isArray(headlineRaw?.alternatives)
+    ? headlineRaw.alternatives
+    : [];
+  const alternatives: PageHeadlineAlternative[] = [];
+  for (const a of alternativesRaw) {
+    const coerced = coerceHeadlineAlternative(a);
+    if (coerced) alternatives.push(coerced);
+  }
+  const ctasRaw = Array.isArray(o.ctas) ? o.ctas : [];
+  const ctas: PageCta[] = [];
+  for (const c of ctasRaw) {
+    const coerced = coercePageCta(c);
+    if (coerced) ctas.push(coerced);
+  }
+  if (
+    heroObservation.length === 0 &&
+    alternatives.length === 0 &&
+    ctas.length === 0
+  ) {
+    return null;
+  }
+  return {
+    heroObservation,
+    headline: { current, alternatives },
+    ctas,
+  };
+}
+
 function coerceFormsAudit(v: unknown): FormsAuditResult | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Record<string, unknown>;
@@ -603,7 +694,7 @@ async function loadScanWithResults(scanId: string): Promise<{
     SELECT lighthouse_data, screenshots, ai_analysis, pathlight_score,
            pillar_scores, remediation_items, revenue_impact, industry_benchmark,
            audio_summary_url, audio_summary_script,
-           html_snapshot, screenshots_fullpage, forms_audit
+           html_snapshot, screenshots_fullpage, forms_audit, page_critique
     FROM scan_results
     WHERE scan_id = ${scanId}
     ORDER BY created_at DESC
@@ -670,6 +761,55 @@ export async function getScanPipelineContext(scanId: string): Promise<{
     screenshots: result?.screenshots ?? null,
     visionAudit: coerceVisionAudit(result?.ai_analysis),
     remediation: coerceRemediation(result?.remediation_items),
+  };
+}
+
+/* Stage 1 read helper for the post-finalize page-critique step. Pulls only
+ * the columns it needs (desktop AtF data URI + design/positioning sub-scores
+ * for "do not redundantly call out the same issues" prompt context + business
+ * context) to keep the row payload small. */
+export async function getPageCritiqueInput(scanId: string): Promise<{
+  desktopScreenshot: string | null;
+  url: string;
+  resolvedUrl: string | null;
+  businessName: string | null;
+  industry: string | null;
+  city: string | null;
+  designScores: DesignScores | null;
+  positioningScores: PositioningScores | null;
+  performanceScores: PerformanceScores | null;
+} | null> {
+  const sql = getDb();
+  const rows = (await sql`
+    SELECT s.url, s.resolved_url, s.business_name, s.industry, s.city,
+           sr.screenshots, sr.ai_analysis, sr.lighthouse_data
+    FROM scans s
+    LEFT JOIN scan_results sr ON sr.scan_id = s.id
+    WHERE s.id = ${scanId}
+    LIMIT 1
+  `) as Array<{
+    url: string;
+    resolved_url: string | null;
+    business_name: string | null;
+    industry: string | null;
+    city: string | null;
+    screenshots: ScreenshotPair | null;
+    ai_analysis: Record<string, unknown> | null;
+    lighthouse_data: unknown;
+  }>;
+  const row = rows[0];
+  if (!row) return null;
+  const vision = coerceVisionAudit(row.ai_analysis);
+  return {
+    desktopScreenshot: row.screenshots?.desktop ?? null,
+    url: row.url,
+    resolvedUrl: row.resolved_url,
+    businessName: row.business_name,
+    industry: row.industry,
+    city: row.city,
+    designScores: vision?.design ?? null,
+    positioningScores: vision?.positioning ?? null,
+    performanceScores: extractPerformanceScoresFromLighthouse(row.lighthouse_data),
   };
 }
 
@@ -762,6 +902,7 @@ export async function getFullScanReport(
     htmlSnapshot: coerceHtmlSnapshot(result?.html_snapshot),
     screenshotsFullPage: coerceFullPageScreenshots(result?.screenshots_fullpage),
     formsAudit: coerceFormsAudit(result?.forms_audit),
+    pageCritique: coercePageCritique(result?.page_critique),
     businessModel: vision?.businessModel,
     inferredVertical: vision?.inferredVertical,
     inferredVerticalParent: vision?.inferredVerticalParent,

@@ -22,6 +22,7 @@ export const PATHLIGHT_STAGES = [
   "audio",
   "forms-audit",
   "email",
+  "page-critique",
 ] as const;
 
 export type PathlightStage = (typeof PATHLIGHT_STAGES)[number];
@@ -30,11 +31,12 @@ export type PathlightStage = (typeof PATHLIGHT_STAGES)[number];
  * belongs to. The pipeline writes labels like "desktop:" and "mobile:"
  * for the two screenshot calls, "audit:" for Lighthouse, and so on.
  *
- * The forms-audit step (Stage 2) runs as a post-finalize side-step
- * whose failures are swallowed and never written into error_message,
- * so this entry is forward-compatibility scaffolding: if a future
- * change ever does promote forms-audit failures into the partial
- * cascade, the stage attribution already has a slot for it. */
+ * The forms-audit (Stage 2, f1) and page-critique (Stage 1, c1) steps
+ * run as post-finalize side-steps whose failures are swallowed and
+ * never written into error_message, so these entries are forward-
+ * compatibility scaffolding: if a future change ever does promote
+ * either failure into the partial cascade, the stage attribution
+ * already has a slot for it. */
 const LABEL_TO_STAGE: Record<string, PathlightStage> = {
   desktop: "screenshot",
   mobile: "screenshot",
@@ -46,6 +48,7 @@ const LABEL_TO_STAGE: Record<string, PathlightStage> = {
   audio: "audio",
   "forms-audit": "forms-audit",
   email: "email",
+  "page-critique": "page-critique",
 };
 
 export type PartialStageBreakdown = {

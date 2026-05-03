@@ -1,5 +1,31 @@
 # Decision Log
 
+## May 3, 2026 -- Pathlight Stage 1 shipped as a SPLIT-call, not a bundled call
+
+Decision: Ship Stage 1 (page critique: CTAs, headline alternatives, hero observation) as a SEPARATE post-finalize side-step with its own Zod schema, not as an extension of the existing vision-audit call. The existing visionAuditSchema and the existing vision-audit call are untouched.
+
+Reason: The Stage 0 audit identified schema extension on the existing design-audit output as the single largest do-not-break risk in the entire enhancement project. The schema is read by three downstream pipeline steps (remediation, benchmark research, revenue impact) and the chat agent. Bundling new findings into the same call would have:
+- forced the existing call's schema to absorb new optional fields with safe defaults across every downstream consumer plus the report rendering layer
+- pushed the call's structured output past the size at which model coherence reliably holds (the prompt asked for design + positioning + classification + screenshotHealth + new CTA inventory + headline alternatives + trust inventory + 5-second framing + scannability in one shot)
+- coupled one call's schema-validation failure to all other findings (binary fail-all on validation today)
+
+Splitting into two calls inverts these risks: each call gets its own schema, its own retry, its own surface; one's failure does not poison the other; the existing call's contract with downstream consumers stays exactly as today.
+
+Implementation choices:
+- **Side-step posture matches Stage 2's f1 forms-audit step.** Step ID `c1`, inserted AFTER `e1` (report email) and BEFORE `w1` (first follow-up sleep). Email always ships before the critique runs; a critique failure or its retry cascade therefore cannot block delivery.
+- **Desktop screenshot only.** The existing vision-audit call already captures and analyzes both viewports. The page critique is grounded in the desktop above-the-fold; mobile-specific concerns are already covered by the existing call's `mobile_experience` design metric. Single-image input saves roughly half the vision tokens vs two-image input.
+- **Text context provided to the model summarizes the existing sub-scores.** This stops the model from redundantly calling out issues the existing call already named. The summary is structural (numeric scores + observation labels), not the verbatim observations, to keep the prompt small.
+- **Output schema is structured for direct render.** CTAs carry verbatim text + location + visibility 1-10 + observation + nextAction. Headline carries verbatim current + exactly two-to-three alternatives with rationale. Hero observation is a single paragraph. The renderer pairs CTAs with the hero block under one section heading "Above the fold" without inventing the leakage-prone "first 5 seconds" framing.
+- **Polling contract extended to wait for c1.** The pre-Stage-2 polling stopped after audio landed or 36s. The new stop condition waits for audio + formsAudit + pageCritique to all settle, capped at 60s (20 polls). Out-of-scope scans skip audio gracefully (existing behavior); scans without forms or without a viable critique hit the cap and stop.
+- **Chat suggested chips become finding-aware.** A low-visibility CTA surfaces "Which CTA should I rewrite first?". A landed headline rewrite surfaces "Walk me through the headline alternatives". A high-impact forms-audit finding surfaces "What is wrong with my form?". Capped at 5 chips total so the strip stays scannable.
+
+What this stage explicitly does NOT do:
+- Item 15 (per-vertical trust signal inventory). Better delivered in Stage 3 with the per-vertical checklist file.
+- Item 16 (read-time / scannability). Text-side analysis better delivered in Stage 3 reading the captured HTML body.
+- Item 18 explicit "first 5 seconds simulation" framing. The substance lives in `heroObservation`; the dramatized framing was dropped per the Stage 0 leakage concern.
+- A `.claude/rules/pathlight-enhancements.md` file. Now that two enhancement stages have shipped, the file should be authored before Stage 3 (which adds vertical-specific copy that benefits from explicit public-presentation rules). Deferred.
+- Modifications to `do-not-break.md`. Wait for at least one real scan to confirm the Stage 1 pieces work end-to-end before declaring them load-bearing.
+
 ## May 3, 2026 -- Pathlight Stage 2 shipped: HTML capture as the foundation, forms audit as the proof
 
 Decision: Ship Stage 2 of the Pathlight enhancement project (HTML body capture, full-page screenshots, form audit) BEFORE Stage 1 (the bundled richer design audit). Stage 0's audit recommended this ordering and this session implements it end-to-end.

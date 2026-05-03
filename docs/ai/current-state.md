@@ -180,6 +180,37 @@ Contact form persistence: `app/(marketing)/api/contact/route.ts` writes to `cont
 
 ## Pathlight
 
+### Stage 1 enhancements (May 3, 2026): page critique (CTAs, headline alternatives, hero observation)
+
+Stage 1 of the Pathlight enhancement project shipped after Stage 2, deliberately re-architected from the original "richer single vision call" plan into a SPLIT-call architecture per the Stage 0 audit's recommendation. The existing vision call and its `visionAuditSchema` are unchanged; the page critique is a separate, parallel artifact with its own Zod schema.
+
+What runs on every scan now (in addition to the existing pipeline):
+- **Page critique side-step (`c1`).** Inserted AFTER the report email (`e1`) and BEFORE the first follow-up sleep (`w1`). Sends the desktop above-the-fold screenshot only (saving roughly half the vision tokens versus a two-viewport call) plus a small text context summarizing the existing design and positioning sub-scores so the model does not redundantly call out the same issues. Output is per-scan `{ heroObservation, headline { current, alternatives[3] }, ctas[1-5] }`. Persisted to `scan_results.page_critique`. Failure is swallowed (mirrors the audio + forms-audit posture); a scan never goes partial because the critique failed.
+- **Per-call timeout** kept at the standard 90s for this step; the prompt asks for ~2KB of structured output against one image, comparable in shape to the existing vision-audit call which routinely lands in 15-25s. Sequencing post-email means a retry cascade cannot block report delivery.
+
+What changed in the public scan API (`/api/scan/[scanId]`):
+- New surfaced field: `pageCritique` ({ heroObservation, headline, ctas } or null). The `htmlSnapshot` from Stage 2 remains server-side-only.
+
+What changed in the report rendering (`app/(grade)/pathlight/[scanId]/ScanStatus.tsx`):
+- New `HeroCritiqueSection` component inserted between `LighthouseBreakdown` and `FormsAuditSection`. Renders three sub-blocks: hero observation paragraph, headline rewrite block (current + 3 alternatives), CTA cards (each with location label, visibility tone, observation, "Try this" callout). Renders nothing when `pageCritique` is null.
+- `ScoreHero`, `PillarBreakdown`, `RevenueImpactBlock` continue untouched.
+
+What changed in the post-complete polling:
+- Old behavior: stop polling as soon as `audioSummaryUrl` lands or after 36s.
+- New behavior: stop polling once every expected post-finalize artifact has settled (`audioSummaryUrl`, `formsAudit`, `pageCritique`) or after 60s. Out-of-scope scans skip audio gracefully (already-existing behavior); scans without forms hit the cap and stop on time.
+
+What changed in the chat suggested-prompts surface (`lib/prompts/pathlight-chips.ts`):
+- New finding-aware chips. When at least one CTA scored low visibility, surface "Which CTA should I rewrite first?". When the headline rewrite landed, surface "Walk me through the headline alternatives". When the forms audit flagged a high-impact item, surface "What is wrong with my form?". The chip strip is capped at 5 entries so it stays scannable.
+
+What changed in the Pathlight Health dashboard (`/admin/monitor`):
+- `PATHLIGHT_STAGES` extended with `page-critique`. `LABEL_TO_STAGE` extended likewise. Forward-compat scaffolding only; failures are swallowed today.
+
+What was deliberately NOT shipped in Stage 1:
+- Modifications to the existing `visionAuditSchema`. The Stage 0 audit identified schema modification as the single largest risk in the project; the split-call architecture lets Stage 1 ship value without taking that risk. Three downstream pipeline steps and the chat agent continue to read the existing schema unchanged.
+- Item 15 (per-vertical trust signal inventory): better delivered via Stage 3's per-vertical checklist file where vertical-specific knowledge can be curated.
+- Item 16 (read-time / scannability): text-side analysis better delivered via Stage 3 reading the captured HTML body.
+- Item 18 (literal "first 5 seconds simulation"): the substantive content lives in `heroObservation` already, with the dramatized framing dropped per the Stage 0 leakage concern.
+
 ### Stage 2 enhancements (May 3, 2026): HTML capture, full-page screenshots, forms audit
 
 Stage 2 of the Pathlight enhancement project ships in working tree as of this session. Migration 034 (applied to prod Neon, three additive nullable JSONB columns) and the wired pipeline + render changes commit together.

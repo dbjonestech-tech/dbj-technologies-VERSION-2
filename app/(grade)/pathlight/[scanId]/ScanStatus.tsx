@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AskPathlightLoader from "./AskPathlightLoader";
 import { FormsAuditSection } from "./FormsAuditSection";
+import { HeroCritiqueSection } from "./HeroCritiqueSection";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
   DesignScores,
   FormsAuditResult,
   FullPageScreenshotPair,
   LighthouseCategoryScores,
+  PageCritiqueResult,
   PerformanceScores,
   PillarScores,
   PositioningScores,
@@ -55,6 +57,9 @@ type ApiReport = {
    * to complete). */
   screenshotsFullPage: FullPageScreenshotPair | null;
   formsAudit: FormsAuditResult | null;
+  /* Stage 1 (May 3 2026): page critique. Lands AFTER the report email
+   * ships, so this is the latest field to populate on a fresh scan. */
+  pageCritique: PageCritiqueResult | null;
   isOutOfScope: boolean;
   outOfScopeLabel: string | null;
   screenshotNotice: string | null;
@@ -62,11 +67,31 @@ type ApiReport = {
 
 const ACTIVE_STATUSES = new Set<string>(["pending", "scanning", "analyzing"]);
 const POLL_INTERVAL_MS = 3000;
-// Audio summary (`a5`) and report email (`e1`) run AFTER `s6` flips
-// status to complete, so the URL lands a few seconds late. Keep
-// polling for up to ~36s past complete while audioSummaryUrl is still
-// null so the player on the live page picks it up without a refresh.
-const POST_COMPLETE_AUDIO_POLLS = 12;
+// Several side-steps run AFTER status flips to complete:
+//   a5 (audio summary) -> f1 (forms-audit) -> e1 (email) -> c1 (page critique)
+// All four populate fields the report renders. Keep polling past complete
+// until every expected post-finalize artifact is present or the cap is
+// hit. Cap is 20 polls (~60s) which covers the typical path-to-c1 with
+// margin; pathologically slow side-steps fall back to a manual refresh.
+const POST_COMPLETE_POLLS_MAX = 20;
+
+function postFinalizeFieldsLanded(report: ApiReport): boolean {
+  // Audio: skipped intentionally on out-of-scope brands or empty
+  // remediation, so an isOutOfScope scan never has audioSummaryUrl. Treat
+  // the absence as "settled" in those cases so we stop polling.
+  const audioSettled = report.isOutOfScope ? true : !!report.audioSummaryUrl;
+  // Forms audit: only generated when the page actually has forms. The
+  // absence of formsAudit can mean "no forms on page" (settled) OR
+  // "still running" (not settled). We cannot distinguish them client-
+  // side, so treat any non-null formsAudit (even with empty extracted)
+  // as settled, and rely on the poll cap to stop the loop when no forms
+  // exist on the page.
+  const formsSettled = !!report.formsAudit;
+  // Page critique: only runs when the design audit succeeded AND a
+  // desktop screenshot was captured. Same client-side ambiguity as forms.
+  const critiqueSettled = !!report.pageCritique;
+  return audioSettled && formsSettled && critiqueSettled;
+}
 
 const PHASE_LABELS = [
   "Capturing screenshots…",
@@ -106,13 +131,13 @@ export function ScanStatus({
         setStatusState(data.status);
 
         if (!ACTIVE_STATUSES.has(data.status) && intervalRef.current) {
-          if (data.audioSummaryUrl) {
+          if (postFinalizeFieldsLanded(data)) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
             return;
           }
           postCompletePollsRef.current += 1;
-          if (postCompletePollsRef.current >= POST_COMPLETE_AUDIO_POLLS) {
+          if (postCompletePollsRef.current >= POST_COMPLETE_POLLS_MAX) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
           }
@@ -617,6 +642,8 @@ function Report({
       {report.lighthouseScores ? (
         <LighthouseBreakdown scores={report.lighthouseScores} />
       ) : null}
+
+      <HeroCritiqueSection pageCritique={report.pageCritique} />
 
       <FormsAuditSection formsAudit={report.formsAudit} />
 
