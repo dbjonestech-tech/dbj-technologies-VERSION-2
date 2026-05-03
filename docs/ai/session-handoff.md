@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- **Pathlight pipeline robustness pass + Canopy nav rename + scans table fit, awaiting user approval to commit** on top of `6edc8c0`. Four files modified, tsc + lint clean.)
+## Current state (May 2, 2026 -- **Pathlight pipeline robustness pass + Canopy nav rename + scans table fit shipped at `3371138`** on top of `6edc8c0`. Five files committed (4 code + this doc), pushed to origin main, working tree carries pre-existing untouched WIP from a prior session.)
 
-### Pathlight robustness pass (uncommitted)
+### Pathlight robustness pass at `3371138`
 
 Diagnosed 12 most recent partial scans against production Neon. Two failure classes traced to deterministic bugs in our retry/fallback logic, not external flakiness:
 
@@ -27,12 +27,15 @@ What this should fix on the next scan of mbusa.com / wingertrealestate.com / sim
 
 What this does **not** address: PSI/Lighthouse upstream failures (Google's), Anthropic 529 capacity events (transient and already retried), and the one-off vision 400 "Could not process image" (would need investigation of which screenshot encoding tripped Anthropic). Revisit if those reappear.
 
-### Verification before commit
+### Verification at commit time
 
 - `npx tsc --noEmit` clean.
 - `npm run lint` clean.
+- 0 em dashes added in the diff (the 11 pre-existing in `claude-analysis.ts` are inside Claude prompt strings, untouched).
+- 0 `dbjonestech@gmail.com` references in production code (only in archived history docs).
 - Diagnostic script (`scripts/_tmp_scan_errors_query.mjs`) used during investigation has been removed.
-- Runtime not yet verified (memory: tsc + lint clean does not validate the Server -> Client RSC boundary; check `vercel logs --status-code 500` after deploy and re-scan one of the previously-failing sites to confirm the screenshot fallback works in practice).
+- Working tree at commit time was NOT clean: pre-existing unstaged modifications in `app/admin/canopy/templates/TemplatesClient.tsx`, `app/admin/components/CommandPalette.tsx`, `app/admin/components/Toast.tsx`, `app/admin/contacts/[id]/CompetitorsPanel.tsx`, `lib/actions/email.ts`, `lib/canopy/email/templates.ts`, plus untracked `app/admin/contacts/loading.tsx` and `lib/actions/cmdk.ts`. None of these were touched by this pass; they are leftover WIP from a prior session and were deliberately not staged.
+- Runtime not yet verified (memory: tsc + lint clean does not validate the Server -> Client RSC boundary or Browserless function execution). Next step is to re-scan mbusa.com / wingertrealestate.com / a similar heavy corporate site after Vercel finishes deploying `3371138` and watch `vercel logs --status-code 500` plus the `/admin/scans` row for that scan.
 
 
 
