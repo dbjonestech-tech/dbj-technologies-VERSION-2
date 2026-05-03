@@ -99,6 +99,36 @@ export async function updateLastSignin(email: string): Promise<void> {
   }
 }
 
+/* Env-allowlist (ADMIN_EMAILS) admins historically lived only in
+ * process.env and had no row in admin_users. Phase 4 introduced FKs
+ * from oauth_tokens / email_messages / email_templates to
+ * admin_users(email), which the env-admin path violates the first
+ * time the operator tries to send email or save a template.
+ *
+ * On every successful sign-in for an env-admin we upsert a row here
+ * so the FK references work for the rest of the session. ON CONFLICT
+ * DO NOTHING keeps the original accepted_at if the row already exists,
+ * but bumps last_signin_at via a follow-up UPDATE on the existing
+ * code path (auth.ts already calls updateLastSignin separately).
+ *
+ * The env allowlist remains the source of truth for env-admin
+ * authentication. disableAdminUser on this row would not block
+ * sign-in, since isAdminEmail (env) is checked first in
+ * lib/auth/access.ts. */
+export async function ensureEnvAdminBootstrap(email: string): Promise<void> {
+  try {
+    const sql = getDb();
+    const e = normalizeEmail(email);
+    await sql`
+      INSERT INTO admin_users (email, role, accepted_at, last_signin_at, status)
+      VALUES (${e}, 'admin', now(), now(), 'active')
+      ON CONFLICT (email) DO NOTHING
+    `;
+  } catch (err) {
+    console.warn("[admin-users] ensureEnvAdminBootstrap failed:", err);
+  }
+}
+
 export async function disableAdminUser(email: string): Promise<void> {
   const sql = getDb();
   const e = normalizeEmail(email);

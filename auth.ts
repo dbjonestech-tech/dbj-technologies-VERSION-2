@@ -7,6 +7,7 @@ import { sendNewDeviceEmail } from "@/lib/auth/notify";
 import { isAdminEmail } from "@/lib/auth/allowlist";
 import {
   acceptInvitationFor,
+  ensureEnvAdminBootstrap,
   isAdminUser,
   updateLastSignin,
 } from "@/lib/auth/users";
@@ -63,6 +64,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         let acceptedInvitation: "admin" | "client" | null = null;
         if (isAdminEmail(email)) {
           resolvedRole = "env";
+          /* Env-admins now also get a row in admin_users so FK
+           * references from oauth_tokens / email_messages /
+           * email_templates resolve. The env allowlist remains the
+           * source of truth for sign-in; this row is only used as a
+           * referential anchor. */
+          await ensureEnvAdminBootstrap(email);
         } else if (await isAdminUser(email)) {
           await updateLastSignin(email);
           resolvedRole = "admin";
