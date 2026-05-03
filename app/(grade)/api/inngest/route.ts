@@ -16,6 +16,7 @@ import {
   monitoringPurgeDaily,
   pathlightSyntheticCheck,
   scanRequested,
+  searchConsoleDaily,
   vercelTelemetryHourly,
 } from "@/lib/inngest/functions";
 
@@ -32,6 +33,7 @@ export const { GET, POST, PUT } = serve({
     inngestHealthHourly,
     vercelTelemetryHourly,
     anthropicBudgetHourly,
+    searchConsoleDaily,
     canopyDigestHourly,
     canopySequenceAdvance,
     canopyWorkflowEvaluate,

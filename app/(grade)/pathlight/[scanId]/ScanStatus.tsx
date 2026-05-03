@@ -1127,7 +1127,11 @@ function ScreenshotsSection({
           <div
             className={`mt-4 grid gap-4 md:grid-cols-2 print-grid-expand${open ? "" : " hidden"}`}
           >
-            <FullPagePanel label="Desktop, full page" src={fullPage!.desktop} />
+            <FullPagePanel
+              label="Desktop, full page"
+              src={fullPage!.desktop}
+              printBreakBefore
+            />
             <FullPagePanel
               label="Mobile, full page"
               src={fullPage!.mobile}

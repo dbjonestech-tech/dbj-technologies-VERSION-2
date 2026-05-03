@@ -871,6 +871,7 @@ select:focus-visible {
 
   .print-break-before img {
     max-height: 80vh !important;
+    max-width: 100% !important;
     width: auto !important;
     height: auto !important;
     object-fit: contain !important;
