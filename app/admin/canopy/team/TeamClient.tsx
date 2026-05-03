@@ -54,8 +54,8 @@ export default function TeamClient({ users: initial, myEmail }: Props) {
         </p>
       ) : (
         <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="bg-zinc-50 text-left font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+          <table className="canopy-table w-full text-sm">
+            <thead className="bg-zinc-50 text-left font-mono text-[10px] uppercase tracking-[0.16em]">
               <tr>
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">Role</th>
@@ -71,8 +71,8 @@ export default function TeamClient({ users: initial, myEmail }: Props) {
                 return (
                   <tr key={u.email} className={isMe ? "bg-emerald-50/40" : ""}>
                     <td className="px-4 py-3">
-                      <span className="font-mono text-xs text-zinc-900">{u.email}</span>
-                      {isMe ? <span className="ml-2 text-[10px] font-semibold text-emerald-700">(you)</span> : null}
+                      <span className="font-mono text-xs">{u.email}</span>
+                      {isMe ? <span className="ml-2 inline-block rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">you</span> : null}
                     </td>
                     <td className="px-4 py-3">
                       <select
@@ -101,13 +101,13 @@ export default function TeamClient({ users: initial, myEmail }: Props) {
                         <option value="disabled">disabled</option>
                       </select>
                     </td>
-                    <td className="px-4 py-3 font-mono text-[11px] text-zinc-500">
+                    <td className="px-4 py-3 font-mono text-[11px]">
                       {u.invited_by ?? "-"}
                     </td>
-                    <td className="px-4 py-3 font-mono text-[11px] text-zinc-500">
+                    <td className="px-4 py-3 font-mono text-[11px]">
                       {u.last_signin_at ? new Date(u.last_signin_at).toLocaleDateString() : "-"}
                     </td>
-                    <td className="px-4 py-3 font-mono text-[11px] text-zinc-500">
+                    <td className="px-4 py-3 font-mono text-[11px]">
                       {new Date(u.created_at).toLocaleDateString()}
                     </td>
                   </tr>

@@ -186,9 +186,9 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
         By provider
       </h3>
       <div className="overflow-x-auto">
-        <table className="mb-6 w-full min-w-[600px] text-sm">
+        <table className="canopy-table mb-6 w-full min-w-[600px] text-sm">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+            <tr className="text-left text-[11px] uppercase tracking-wider">
               <th className="px-3 py-2 font-semibold">Provider</th>
               <th className="px-3 py-2 text-right font-semibold">Calls</th>
               <th className="px-3 py-2 text-right font-semibold">
@@ -215,29 +215,29 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
             ) : (
               w.byProvider.map((row) => (
                 <tr key={row.provider} className="border-t border-zinc-100">
-                  <td className="px-3 py-2 font-mono text-zinc-900">
+                  <td className="px-3 py-2 font-mono">
                     {row.provider}
                   </td>
-                  <td className="px-3 py-2 text-right text-zinc-900">
+                  <td className="px-3 py-2 text-right">
                     {formatNumber(Number(row.calls))}
                   </td>
                   <td className="px-3 py-2 text-right text-xs">
-                    <span className="text-emerald-600">
+                    <span className="rounded bg-emerald-50 px-1 text-emerald-700">
                       {Number(row.ok_calls)}
                     </span>
                     {" / "}
-                    <span className="text-amber-600">
+                    <span className="rounded bg-amber-50 px-1 text-amber-700">
                       {Number(row.retry_calls)}
                     </span>
                     {" / "}
-                    <span className="text-red-600">
+                    <span className="rounded bg-red-50 px-1 text-red-700">
                       {Number(row.fail_calls)}
                     </span>
                   </td>
-                  <td className="px-3 py-2 text-right text-zinc-500">
+                  <td className="px-3 py-2 text-right">
                     {formatMs(Number(row.avg_duration_ms))}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono text-zinc-900">
+                  <td className="px-3 py-2 text-right font-mono">
                     {formatUsd(Number(row.total_usd))}
                   </td>
                 </tr>
@@ -251,9 +251,9 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
         By operation (top 20)
       </h3>
       <div className="overflow-x-auto">
-        <table className="mb-6 w-full min-w-[500px] text-sm">
+        <table className="canopy-table mb-6 w-full min-w-[500px] text-sm">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+            <tr className="text-left text-[11px] uppercase tracking-wider">
               <th className="px-3 py-2 font-semibold">Provider</th>
               <th className="px-3 py-2 font-semibold">Operation</th>
               <th className="px-3 py-2 text-right font-semibold">Calls</th>
@@ -278,16 +278,16 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
                   key={`${row.provider}:${row.operation}`}
                   className="border-t border-zinc-100"
                 >
-                  <td className="px-3 py-2 font-mono text-xs text-zinc-500">
+                  <td className="px-3 py-2 font-mono text-xs">
                     {row.provider}
                   </td>
-                  <td className="px-3 py-2 font-mono text-zinc-900">
+                  <td className="px-3 py-2 font-mono">
                     {row.operation}
                   </td>
-                  <td className="px-3 py-2 text-right text-zinc-900">
+                  <td className="px-3 py-2 text-right">
                     {formatNumber(Number(row.calls))}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono text-zinc-900">
+                  <td className="px-3 py-2 text-right font-mono">
                     {formatUsd(Number(row.total_usd))}
                   </td>
                 </tr>
@@ -303,7 +303,7 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
       <div className="overflow-x-auto">
         <table className="canopy-table w-full min-w-[400px] text-sm">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-zinc-500">
+            <tr className="text-left text-[11px] uppercase tracking-wider">
               <th className="px-3 py-2 font-semibold">Scan ID</th>
               <th className="px-3 py-2 text-right font-semibold">Calls</th>
               <th className="px-3 py-2 text-right font-semibold">
@@ -327,13 +327,13 @@ function WindowSection({ window: w }: { window: WindowSummary }) {
                   key={row.scan_id ?? "null"}
                   className="border-t border-zinc-100"
                 >
-                  <td className="px-3 py-2 font-mono text-xs text-zinc-900">
+                  <td className="px-3 py-2 font-mono text-xs">
                     {row.scan_id ?? "(unattributed)"}
                   </td>
-                  <td className="px-3 py-2 text-right text-zinc-900">
+                  <td className="px-3 py-2 text-right">
                     {formatNumber(Number(row.calls))}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono text-zinc-900">
+                  <td className="px-3 py-2 text-right font-mono">
                     {formatUsd(Number(row.total_usd))}
                   </td>
                 </tr>

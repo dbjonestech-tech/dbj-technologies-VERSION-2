@@ -115,8 +115,8 @@ export default function SequencesListClient({ initial }: Props) {
 
       {sequences.length > 0 ? (
         <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="bg-zinc-50 text-left font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+          <table className="canopy-table w-full text-sm">
+            <thead className="bg-zinc-50 text-left font-mono text-[10px] uppercase tracking-[0.16em]">
               <tr>
                 <th className="px-4 py-2">Name</th>
                 <th className="px-4 py-2">Status</th>
@@ -128,12 +128,12 @@ export default function SequencesListClient({ initial }: Props) {
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {sequences.map((s) => (
-                <tr key={s.id} className="hover:bg-zinc-50">
+                <tr key={s.id}>
                   <td className="px-4 py-3">
-                    <Link href={`/admin/sequences/${s.id}`} className="font-medium text-zinc-900 hover:underline">
+                    <Link href={`/admin/sequences/${s.id}`} className="font-medium hover:underline">
                       {s.name}
                     </Link>
-                    {s.description ? <p className="mt-0.5 text-xs text-zinc-500">{s.description}</p> : null}
+                    {s.description ? <p className="mt-0.5 text-xs">{s.description}</p> : null}
                   </td>
                   <td className="px-4 py-3">
                     <select
@@ -150,14 +150,14 @@ export default function SequencesListClient({ initial }: Props) {
                   </td>
                   <td className="px-4 py-3 font-mono text-xs">{s.step_count}</td>
                   <td className="px-4 py-3 font-mono text-xs">{s.active_enrollments}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-zinc-500">
+                  <td className="px-4 py-3 font-mono text-xs">
                     {new Date(s.updated_at).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       type="button"
                       onClick={() => handleDelete(s.id)}
-                      className="inline-flex items-center gap-1 text-xs text-rose-600 hover:text-rose-800"
+                      className="inline-flex items-center gap-1 rounded bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-700 hover:bg-rose-100"
                     >
                       <Trash2 className="h-3 w-3" />
                       Delete
