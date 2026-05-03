@@ -69,6 +69,13 @@ Triggered by a real production failure on `wingertrealestate.com` (scan id `43c0
 - 0 internals leaked in any user-facing string (no model names, no step IDs, no provider names in held-email copy)
 - Migration 036 applied to prod Neon successfully (`Migration applied successfully.`)
 
+### Post-reliability-hardening micro-edits (May 3 evening)
+
+- **Print/PDF stylesheet fix (shipped inside HEAD `77583c5`, the Commit D cron commit).** The wingert PDF showed a blank page 3 followed by a giant overflowing full-page screenshot bleeding across pages 4 and 5. The fix files were in the working tree when Joshua ran `git add` for Commit D, so two unrelated changes landed in that commit alongside the search-console-daily registration; the print fix is live in production regardless. Two changes:
+  - `app/(grade)/pathlight/[scanId]/ScanStatus.tsx` -- the Desktop full-page panel now sets `printBreakBefore` (Mobile already did). Each full-page capture now starts on its own print page deliberately.
+  - `app/globals.css` -- added `max-width: 100% !important` to the `.print-break-before img` rule. Without it, an oversized full-page screenshot rendered at its natural intrinsic width (1440px) and overflowed Letter page width (8.5in @ 96dpi = 816px), defeating the existing 80vh height cap.
+  - Net effect: full-page captures now scale to the page (max 80vh tall, max 100% wide) and start on dedicated pages, eliminating the blank-page artifact.
+
 ### What still needs to happen
 
 1. **Re-scan `wingertrealestate.com` via /admin/monitor "Re-scan this URL" button.** The bad scan (`43c0cf06-d6e9-46c0-a0d8-e731d09cb61b`) is currently stored with null score and null revenue. After the new code deploys (~3 min), the rescan should produce a complete report and the original prospect (`emeraldoilean@gmail.com`) gets a clean email instead of the broken one. The 48h/5d/8d followup chain for the OLD scan ID will hit the new send-time gate when its sleeps fire and be held automatically (no bad emails will ship from that scan).
