@@ -1,6 +1,7 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/lib/inngest/client";
 import {
+  anthropicBudgetHourly,
   canopyChangeMonitoringDaily,
   canopyDigestHourly,
   canopyGmailIngest,
@@ -30,6 +31,7 @@ export const { GET, POST, PUT } = serve({
     funnelRefreshHourly,
     inngestHealthHourly,
     vercelTelemetryHourly,
+    anthropicBudgetHourly,
     canopyDigestHourly,
     canopySequenceAdvance,
     canopyWorkflowEvaluate,
