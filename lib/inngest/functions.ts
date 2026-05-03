@@ -277,10 +277,16 @@ export const scanRequested = inngest.createFunction(
           if (!audit.ok || !audit.scores) {
             return { ok: false, error: "skipped: performance audit failed" };
           }
-          if (!screenshots.desktop || !screenshots.mobile) {
+          /* Vision now runs when EITHER desktop OR mobile screenshot is
+           * present. Previously hard-required both, which meant a single
+           * transient browserless 429 on one viewport wiped out the entire
+           * AI pipeline (vision -> remediation -> revenue -> score) even
+           * though the other viewport was sitting right there. The runVisionAudit
+           * prompt degrades gracefully when one side is null. */
+          if (!screenshots.desktop && !screenshots.mobile) {
             return {
               ok: false,
-              error: "skipped: one or both screenshots are missing",
+              error: "skipped: both screenshots are missing",
             };
           }
           try {
@@ -775,8 +781,15 @@ export const scanRequested = inngest.createFunction(
 
       await step.run("e1", async () => {
         try {
-          await sendPathlightReport(scanId);
-          await track("email.report.sent", {}, { scanId });
+          const result = await sendPathlightReport(scanId);
+          /* The send-time integrity gate (lib/services/email.ts) returns
+           * "held" when score or revenue are null. The gate already logged
+           * to email_events and fired Sentry; this branch keeps the
+           * monitoring-events stream consistent (no "email.report.sent"
+           * track when we deliberately held). */
+          if (result.status === "sent") {
+            await track("email.report.sent", {}, { scanId });
+          }
         } catch (err) {
           const message = describeError(err);
           await logEmailEvent({

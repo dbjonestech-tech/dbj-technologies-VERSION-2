@@ -935,8 +935,8 @@ function summarizePageText(content: PageTextContent): string {
 }
 
 export async function runVisionAudit(
-  desktopScreenshot: string,
-  mobileScreenshot: string,
+  desktopScreenshot: string | null,
+  mobileScreenshot: string | null,
   industry: string | null,
   city: string | null,
   performanceScores: PerformanceScores,
@@ -946,61 +946,83 @@ export async function runVisionAudit(
   lighthouseData: unknown,
   scanId: string | null = null
 ): Promise<VisionAuditResult> {
-  const desktop = stripDataUriPrefix(desktopScreenshot);
-  const mobile = stripDataUriPrefix(mobileScreenshot);
+  /* At least one viewport is required; the inngest a1 gate enforces this
+   * but defend in depth in case a future caller skips the check. */
+  if (!desktopScreenshot && !mobileScreenshot) {
+    throw new Error(
+      "runVisionAudit requires at least one screenshot (desktop or mobile)."
+    );
+  }
+  const desktop = desktopScreenshot ? stripDataUriPrefix(desktopScreenshot) : null;
+  const mobile = mobileScreenshot ? stripDataUriPrefix(mobileScreenshot) : null;
   const lighthouseDetails = extractLighthouseAuditDetails(lighthouseData);
 
-  const userBlocks: MessageBlock[] = [
-    {
+  const userBlocks: MessageBlock[] = [];
+  if (desktop) {
+    userBlocks.push({
       type: "text",
       text: `DESKTOP SCREENSHOT (viewport 1440×900):`,
-    },
-    {
+    });
+    userBlocks.push({
       type: "image",
       source: {
         type: "base64",
         media_type: desktop.mediaType,
         data: desktop.base64,
       },
-    },
-    {
+    });
+  } else {
+    userBlocks.push({
+      type: "text",
+      text:
+        `DESKTOP SCREENSHOT: unavailable for this scan. Score design.mobile_experience and other viewport-specific findings from responsive cues in the mobile screenshot and the Lighthouse signals below; do not penalize design for the missing image.`,
+    });
+  }
+  if (mobile) {
+    userBlocks.push({
       type: "text",
       text: `MOBILE SCREENSHOT (viewport 375×812):`,
-    },
-    {
+    });
+    userBlocks.push({
       type: "image",
       source: {
         type: "base64",
         media_type: mobile.mediaType,
         data: mobile.base64,
       },
-    },
-    {
+    });
+  } else {
+    userBlocks.push({
       type: "text",
-      text: [
-        renderSiteInformation(url, businessName),
-        ``,
-        `BUSINESS CONTEXT`,
-        `industry: ${industryLabel(industry)}`,
-        `city: ${(city ?? "").trim() || "(unspecified)"}`,
-        ``,
-        `LIGHTHOUSE PERFORMANCE SCORES`,
-        `overall: ${performanceScores.overall}/100`,
-        `LCP: ${performanceScores.lcp}ms`,
-        `CLS: ${performanceScores.cls}`,
-        `INP: ${performanceScores.inp}ms`,
-        `TBT: ${performanceScores.tbt}ms`,
-        `Speed Index: ${performanceScores.si}ms`,
-        ``,
-        renderLighthouseDetails(lighthouseDetails),
-        ``,
-        `EXTRACTED PAGE TEXT`,
-        summarizePageText(pageTextContent),
-        ``,
-        `Respond with ONLY a valid JSON object matching the schema above. No backticks, no markdown, no explanation.`,
-      ].join("\n"),
-    },
-  ];
+      text:
+        `MOBILE SCREENSHOT: unavailable for this scan. Score design.mobile_experience from responsive design cues visible in the desktop screenshot (breakpoints, fluid layout, touch-target sizing) plus the Lighthouse mobile performance signals below; do not penalize design for the missing image.`,
+    });
+  }
+  userBlocks.push({
+    type: "text",
+    text: [
+      renderSiteInformation(url, businessName),
+      ``,
+      `BUSINESS CONTEXT`,
+      `industry: ${industryLabel(industry)}`,
+      `city: ${(city ?? "").trim() || "(unspecified)"}`,
+      ``,
+      `LIGHTHOUSE PERFORMANCE SCORES`,
+      `overall: ${performanceScores.overall}/100`,
+      `LCP: ${performanceScores.lcp}ms`,
+      `CLS: ${performanceScores.cls}`,
+      `INP: ${performanceScores.inp}ms`,
+      `TBT: ${performanceScores.tbt}ms`,
+      `Speed Index: ${performanceScores.si}ms`,
+      ``,
+      renderLighthouseDetails(lighthouseDetails),
+      ``,
+      `EXTRACTED PAGE TEXT`,
+      summarizePageText(pageTextContent),
+      ``,
+      `Respond with ONLY a valid JSON object matching the schema above. No backticks, no markdown, no explanation.`,
+    ].join("\n"),
+  });
 
   return callClaudeWithJsonSchema(
     "vision-audit",

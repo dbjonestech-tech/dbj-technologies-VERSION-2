@@ -669,7 +669,13 @@ function Report({
         <RevenueImpactBlock impact={report.revenueImpact!} />
       ) : null}
 
-      <FinalCta calendlyUrl={calendlyUrl} />
+      {/* Suppress the closing CTA when the AI side of the pipeline did not
+       * produce real findings. The CTA copy ("Ready to fix these?") refers
+       * to specific items above it; without remediation or an out-of-scope
+       * notice it is selling against nothing. The send-time email gate
+       * already prevents users from landing here from email when the data
+       * is incomplete; this guards the bookmark / admin-link path. */}
+      {hasFixes || isOutOfScope ? <FinalCta calendlyUrl={calendlyUrl} /> : null}
 
       <AskPathlightLoader
         scanId={report.scanId}

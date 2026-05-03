@@ -4,25 +4,69 @@ Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`). The most recent archive is
 [`history/2026-05-02.md`](history/2026-05-02.md).
 
-## Current state (May 3, 2026 -- Stage 1 page critique shipped end-to-end on top of Stage 2; placeholder copy refresh on top)
+## Current state (May 3, 2026 -- Pathlight reliability hardening shipped on top of Stage 1)
 
 ### Anchor block
 
-HEAD: `f84971c` (Pathlight scan form business-name placeholder updated from "Acme Plumbing" to "Mockingbird Optical"). The hash above reflects the published commit; one prior amend shifted the hash by a byte to fill in this line. `git log -1` is the authoritative source.
+HEAD: `acc2bce` (Pathlight reliability hardening: send-time email integrity gate, vision desktop-only support, Browserless 429 exponential backoff, report CTA gate, migration 036). The hash above reflects the published commit; one prior amend shifted the hash by a byte to fill in this line. `git log -1` is the authoritative source.
 
 Recent commits (newest first):
-- Placeholder refresh on Pathlight form (this commit, hash above)
+- Pathlight reliability hardening (this commit, hash above)
+- `ffd760a` -- Pathlight scan form business-name placeholder refreshed to "Mockingbird Optical"
 - `688ec27` -- Stage 1 implementation: page critique side-step, CTA inventory, headline alternatives, hero observation
-- `0efae8e` -- migration 035 (page_critique JSONB column), shipped independently and applied to prod Neon before the code commit
+- `0efae8e` -- migration 035 (page_critique JSONB column)
 - `a755793` -- Stage 2 cleanup (hoist f1 dynamic imports to static)
 - `1027ca3` -- Stage 2 (HTML capture, full-page screenshots, forms audit)
 - `5ad1a0a` -- migration 034
 
 Working tree: clean.
 
-### Post-Stage 1 micro-edits
+### What shipped this session: Pathlight reliability hardening (Phase 1 + Phase 2)
 
-- `app/(grade)/pathlight/PathlightForm.tsx:159` -- Business Name field placeholder: `Acme Plumbing` -> `Mockingbird Optical`. Joshua-picked refinement; the City placeholder ("Dallas") still pairs naturally. `lib/demo/fixtures.ts` left untouched (internal seed data, not user-facing).
+Triggered by a real production failure on `wingertrealestate.com` (scan id `43c0cf06-d6e9-46c0-a0d8-e731d09cb61b`, May 3 ~23:09 UTC) where a single Browserless 429 on the mobile screenshot cascaded into vision/remediation/revenue/score all skipping, and the report email then dispatched anyway with `PATHLIGHT SCORE: n/a/100` and `EST. MONTHLY REVENUE LOSS: a meaningful amount`. Fix is layered defense + structural decoupling.
+
+**Migration:**
+- `036_email_events_held_status.sql` -- extends `email_events_status_check` to allow the new `held` terminal status. Applied to prod Neon before the code commit.
+
+**Phase 1 -- email integrity gate:**
+- `lib/email-templates/pathlight.ts`:
+  - `formatMoney(null)` now THROWS rather than returning the placeholder string `"a meaningful amount"`. Defense in depth: if the send-time gate ever leaks, the loud failure beats a customer email with placeholder copy.
+  - `greeting()` always returns `Hi there,`. The Business Name field is a company name; "Hi {Company}," reads like a mail-merge bug.
+- `lib/services/email.ts`:
+  - New `held` status added to `EmailStatus` union.
+  - `sendPathlightReport`: if `pathlightScore === null || revenueLoss === null`, log `held`, fire `track("email.report.held", ...)` and a Sentry warning, return without dispatch. The customer never gets the broken email; Joshua sees the held event and triggers a manual rescan.
+  - `sendFollowUp`: same gate (uniform across the 48h/5d/8d chain even though only 48h and 8d embed revenue, because if the original report was held the followups should not arrive out of sequence).
+- `lib/inngest/functions.ts` (e1 step): unchanged behavior on success; recognizes the new `held` return so the `email.report.sent` track event no longer fires for held emails.
+- `app/(grade)/pathlight/[scanId]/ScanStatus.tsx` (FinalCta): suppresses the closing "Ready to fix these?" CTA when the page has no remediation findings and is not out-of-scope. The CTA copy refers to specific items above it; without them it was selling against nothing.
+
+**Phase 2 -- pipeline resilience:**
+- `lib/services/browserless.ts`:
+  - New `isRateLimitError` helper detects `(429)` response codes.
+  - New `callWithRateLimitRetry` wrapper: exponential backoff `[1000ms, 2000ms, 4000ms]` (4 attempts total) on 429 specifically, no-op on other errors. Fits inside the per-attempt 55s `SCREENSHOT_TIMEOUT_MS` envelope.
+  - `captureScreenshot` and `captureFullPageScreenshot` both wrap their primary AND fallback strategy attempts in `callWithRateLimitRetry`. The wingert incident's rate limit cleared in ~4s, so even the first 1s/2s tier would have saved that scan.
+- `lib/inngest/functions.ts` (a1 vision step): vision now runs when EITHER desktop OR mobile screenshot is present. Previously hard-required both; a single transient browserless failure on one viewport wiped the entire AI pipeline.
+- `lib/services/claude-analysis.ts` (`runVisionAudit`):
+  - Signature widened from `string` to `string | null` for both `desktopScreenshot` and `mobileScreenshot`.
+  - Throws if BOTH are null (defense in depth; the inngest gate enforces this).
+  - User-message blocks are built conditionally: when one viewport is missing, an explicit text block tells the model to score `mobile_experience` (or the desktop-side findings) from the available image plus Lighthouse signals, rather than penalizing for the missing image.
+
+### Verification gates passed
+
+- `npx tsc --noEmit` clean
+- `npm run lint` clean
+- 0 em dashes added in new lines across all 6 changed files
+- 0 internals leaked in any user-facing string (no model names, no step IDs, no provider names in held-email copy)
+- Migration 036 applied to prod Neon successfully (`Migration applied successfully.`)
+
+### What still needs to happen
+
+1. **Re-scan `wingertrealestate.com` via /admin/monitor "Re-scan this URL" button.** The bad scan (`43c0cf06-d6e9-46c0-a0d8-e731d09cb61b`) is currently stored with null score and null revenue. After the new code deploys (~3 min), the rescan should produce a complete report and the original prospect (`emeraldoilean@gmail.com`) gets a clean email instead of the broken one. The 48h/5d/8d followup chain for the OLD scan ID will hit the new send-time gate when its sleeps fire and be held automatically (no bad emails will ship from that scan).
+2. **Verify the gates with a fresh scan against any healthy site.** Confirm the report email lands with real numbers (no n/a, no placeholder revenue copy), the report page renders FinalCta correctly when remediation is present, and `/admin/monitor` shows no `email.report.held` events for normal scans.
+3. **Phase 3 (deferred):** auto-rescan on transient browserless-attributable partial failures. Inngest `step.sleep(60s)` then re-run the pipeline; if the second pass succeeds, overwrite scan_results and let the (now-passing) gate ship the email. Discussed in this session, deliberately deferred to keep this commit's blast radius contained.
+
+### do-not-break.md update posture
+
+Per the standing bake-in discipline, hold do-not-break.md updates until at least one fresh real scan confirms the new gates fire correctly on a complete scan and stay quiet on a clean scan. Add entries after that for: the send-time email integrity gate, the vision desktop-only fallback path, and the Browserless 429 retry envelope.
 
 ### What shipped this session
 

@@ -25,6 +25,7 @@ export type EmailStatus =
   | "sent"
   | "skipped"
   | "failed"
+  | "held"
   | "delivered"
   | "delivery_delayed"
   | "bounced"
@@ -230,6 +231,41 @@ export async function sendPathlightReport(
     });
     return { status: "failed", resendId: null, error: msg };
   }
+
+  /* Send-time integrity gate. The pipeline marks scans "partial" when AI
+   * steps skip (e.g. browserless 429 wiping out vision audit), but the email
+   * step used to fire regardless, producing "PATHLIGHT SCORE: n/a/100" and
+   * placeholder revenue copy. Refuse to dispatch when either headline number
+   * is missing -- the user gets nothing rather than a broken first
+   * impression, and Joshua sees a "held" event in admin/monitor to
+   * trigger a manual rescan. */
+  if (merge.pathlightScore === null || merge.revenueLoss === null) {
+    const reason =
+      merge.pathlightScore === null && merge.revenueLoss === null
+        ? "score and revenue both null"
+        : merge.pathlightScore === null
+          ? "score null"
+          : "revenue null";
+    const msg = `Held report email for ${scanId}: ${reason}. Manual rescan required.`;
+    await logEmailEvent({
+      scanId,
+      emailType,
+      status: "held",
+      errorMessage: msg,
+    });
+    await track(
+      "email.report.held",
+      { reason, pathlightScore: merge.pathlightScore, revenueLoss: merge.revenueLoss },
+      { scanId, level: "warn" }
+    );
+    Sentry.captureMessage(`Pathlight report email held: ${reason}`, {
+      level: "warning",
+      tags: { source: "email-integrity-gate", emailType },
+      extra: { scanId, url: merge.url, email: merge.email },
+    });
+    return { status: "held", resendId: null, error: msg };
+  }
+
   const built = buildReportEmail(merge);
   return dispatch(scanId, emailType, built, merge.email);
 }
@@ -259,6 +295,35 @@ export async function sendFollowUp(
       status: "skipped",
     });
     return { status: "skipped", resendId: null, error: null };
+  }
+
+  /* Send-time integrity gate, mirror of sendPathlightReport above. The 48h
+   * and 8d templates embed revenueDisplay verbatim ("your estimated $X/mo
+   * in lost revenue"); without a real number the copy decays into the
+   * placeholder leak we just removed. The 5d email does not reference
+   * revenue, but if the report email itself was held this scan never
+   * reached the prospect, so a follow-up arriving now would be out of
+   * sequence -- gate all follow-ups uniformly. */
+  if (merge.pathlightScore === null || merge.revenueLoss === null) {
+    const reason =
+      merge.pathlightScore === null && merge.revenueLoss === null
+        ? "score and revenue both null"
+        : merge.pathlightScore === null
+          ? "score null"
+          : "revenue null";
+    const msg = `Held ${emailType} for ${scanId}: ${reason}.`;
+    await logEmailEvent({
+      scanId,
+      emailType,
+      status: "held",
+      errorMessage: msg,
+    });
+    await track(
+      `email.${emailType}.held`,
+      { reason, pathlightScore: merge.pathlightScore, revenueLoss: merge.revenueLoss },
+      { scanId, level: "warn" }
+    );
+    return { status: "held", resendId: null, error: msg };
   }
 
   const built =

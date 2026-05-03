@@ -384,6 +384,45 @@ function isPermanentBrowserlessError(message: string): boolean {
   return false;
 }
 
+function isRateLimitError(message: string): boolean {
+  // 429 from Browserless = "Too Many Requests". Their plan-tier rate limit
+  // is bursty and clears in a few seconds. Worth backing off and retrying.
+  return /\(429\)/.test(message);
+}
+
+/* Exponential backoff schedule for 429 retries on the SAME strategy. Total
+ * worst-case extra wait is 1+2+4 = 7s, well inside the per-attempt 55s
+ * SCREENSHOT_TIMEOUT_MS envelope. The wingertrealestate.com 2026-05-03
+ * incident proved the rate limit clears within ~4s; the first 1s/2s tier
+ * is what would have saved that scan. */
+const RATE_LIMIT_BACKOFF_MS: ReadonlyArray<number> = [1000, 2000, 4000];
+
+async function callWithRateLimitRetry<T>(
+  attempt: () => Promise<T>,
+  context: string
+): Promise<T> {
+  let lastErr: unknown;
+  for (let i = 0; i <= RATE_LIMIT_BACKOFF_MS.length; i++) {
+    try {
+      return await attempt();
+    } catch (err) {
+      lastErr = err;
+      const message = err instanceof Error ? err.message : String(err);
+      if (!isRateLimitError(message) || i === RATE_LIMIT_BACKOFF_MS.length) {
+        throw err;
+      }
+      const delay = RATE_LIMIT_BACKOFF_MS[i];
+      console.warn(
+        `[browserless] 429 on ${context} (attempt ${i + 1}/${RATE_LIMIT_BACKOFF_MS.length + 1}); backing off ${delay}ms before retry`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastErr instanceof Error
+    ? lastErr
+    : new Error(`Browserless rate-limit retries exhausted on ${context}`);
+}
+
 async function captureScreenshotAttempt(
   url: string,
   viewport: Viewport,
@@ -479,8 +518,12 @@ export async function captureScreenshot(
   viewport: Viewport,
   scanId: string | null = null
 ): Promise<AtfCaptureResult> {
+  const ctx = `screenshot ${viewport.width}x${viewport.height}`;
   try {
-    return await captureScreenshotAttempt(url, viewport, "primary", scanId);
+    return await callWithRateLimitRetry(
+      () => captureScreenshotAttempt(url, viewport, "primary", scanId),
+      `${ctx} (primary)`
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     if (isPermanentBrowserlessError(message)) {
@@ -492,7 +535,10 @@ export async function captureScreenshot(
     await new Promise((resolve) =>
       setTimeout(resolve, SCREENSHOT_RETRY_DELAY_MS)
     );
-    return await captureScreenshotAttempt(url, viewport, "fallback", scanId);
+    return await callWithRateLimitRetry(
+      () => captureScreenshotAttempt(url, viewport, "fallback", scanId),
+      `${ctx} (fallback)`
+    );
   }
 }
 
@@ -585,8 +631,12 @@ export async function captureFullPageScreenshot(
   viewport: Viewport,
   scanId: string | null = null
 ): Promise<Buffer> {
+  const ctx = `full-page ${viewport.width}x${viewport.height}`;
   try {
-    return await captureFullPageAttempt(url, viewport, "primary", scanId);
+    return await callWithRateLimitRetry(
+      () => captureFullPageAttempt(url, viewport, "primary", scanId),
+      `${ctx} (primary)`
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     if (isPermanentBrowserlessError(message)) {
@@ -598,7 +648,10 @@ export async function captureFullPageScreenshot(
     await new Promise((resolve) =>
       setTimeout(resolve, SCREENSHOT_RETRY_DELAY_MS)
     );
-    return await captureFullPageAttempt(url, viewport, "fallback", scanId);
+    return await callWithRateLimitRetry(
+      () => captureFullPageAttempt(url, viewport, "fallback", scanId),
+      `${ctx} (fallback)`
+    );
   }
 }
 

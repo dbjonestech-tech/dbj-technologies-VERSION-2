@@ -31,12 +31,24 @@ const CARD_BG = "#ffffff";
 const BORDER_COLOR = "#e4e4e7";
 
 function formatMoney(n: number | null): string {
-  if (n === null || !Number.isFinite(n)) return "a meaningful amount";
+  /* Hard refusal on null. The send-time gate in lib/services/email.ts must
+   * already have skipped dispatch when revenueLoss is unavailable. If this
+   * throws, a customer email almost shipped with placeholder copy and the
+   * stack trace is the loud signal we need. */
+  if (n === null || !Number.isFinite(n)) {
+    throw new Error(
+      "formatMoney called with null/non-finite revenue; caller must gate send before reaching this template"
+    );
+  }
   return `$${Math.round(n).toLocaleString("en-US")}`;
 }
 
-function greeting(businessName: string | null): string {
-  return businessName ? `Hi ${businessName},` : "Hi there,";
+function greeting(): string {
+  /* Always "Hi there,". The Business Name field on the form is a company
+   * name (e.g. "Wingert Real Estate"), and "Hi {Company}," reads like a
+   * mail-merge bug. The company name belongs in the subject and body, not
+   * in the salutation slot. */
+  return "Hi there,";
 }
 
 function displayName(businessName: string | null): string {
@@ -102,7 +114,7 @@ function buildReportEmail(data: EmailMergeData): BuiltEmail {
   const body = `
     <tr>
       <td style="padding: 8px 32px 0; font-family: ${FONT_STACK}; font-size: 16px; line-height: 24px; color: ${TEXT_COLOR};">
-        <p style="margin: 16px 0;">${greeting(data.businessName)}</p>
+        <p style="margin: 16px 0;">${greeting()}</p>
         <p style="margin: 16px 0;">Your Pathlight scan of <a href="${data.url}" style="color: ${ACCENT_COLOR};">${data.url}</a> is complete.</p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0;">
           <tr>
@@ -133,7 +145,7 @@ function buildReportEmail(data: EmailMergeData): BuiltEmail {
   `;
 
   const text = [
-    greeting(data.businessName),
+    greeting(),
     "",
     `Your Pathlight scan of ${data.url} is complete.`,
     "",
@@ -176,7 +188,7 @@ function buildFollowUp48h(data: EmailMergeData): BuiltEmail {
   const body = `
     <tr>
       <td style="padding: 8px 32px 0; font-family: ${FONT_STACK}; font-size: 16px; line-height: 24px; color: ${TEXT_COLOR};">
-        <p style="margin: 16px 0;">${greeting(data.businessName)}</p>
+        <p style="margin: 16px 0;">${greeting()}</p>
         <p style="margin: 16px 0;">Two days ago you ran ${data.url} through Pathlight. I've been thinking about your results.</p>
         <p style="margin: 16px 0;"><strong>One issue stands out above the rest:</strong></p>
         <div style="margin: 16px 0; padding: 20px; background-color: ${WRAPPER_BG}; border-left: 4px solid ${ACCENT_COLOR}; border-radius: 4px;">
@@ -193,7 +205,7 @@ function buildFollowUp48h(data: EmailMergeData): BuiltEmail {
   `;
 
   const text = [
-    greeting(data.businessName),
+    greeting(),
     "",
     `Two days ago you ran ${data.url} through Pathlight. I've been thinking about your results.`,
     "",
@@ -226,7 +238,7 @@ function buildFollowUp5d(data: EmailMergeData): BuiltEmail {
   const body = `
     <tr>
       <td style="padding: 8px 32px 0; font-family: ${FONT_STACK}; font-size: 16px; line-height: 24px; color: ${TEXT_COLOR};">
-        <p style="margin: 16px 0;">${greeting(data.businessName)}</p>
+        <p style="margin: 16px 0;">${greeting()}</p>
         <p style="margin: 16px 0;">Quick story that matches what Pathlight showed on ${data.url}.</p>
         <p style="margin: 16px 0;">A Richardson auto repair shop (Star Auto Service) ran their site through Pathlight. Same gaps I found on yours. I rebuilt the entire site from scratch in one 6-hour session.</p>
         <p style="margin: 16px 0;"><strong>Result:</strong> perfect Lighthouse 100s on desktop and mobile, stronger trust signals, and a clear path to more customers.</p>
@@ -238,7 +250,7 @@ function buildFollowUp5d(data: EmailMergeData): BuiltEmail {
   `;
 
   const text = [
-    greeting(data.businessName),
+    greeting(),
     "",
     `Quick story that matches what Pathlight showed on ${data.url}.`,
     "",
@@ -268,7 +280,7 @@ function buildBreakup8d(data: EmailMergeData): BuiltEmail {
   const body = `
     <tr>
       <td style="padding: 8px 32px 0; font-family: ${FONT_STACK}; font-size: 16px; line-height: 24px; color: ${TEXT_COLOR};">
-        <p style="margin: 16px 0;">${greeting(data.businessName)}</p>
+        <p style="margin: 16px 0;">${greeting()}</p>
         <p style="margin: 16px 0;">Just closing the loop on your Pathlight scan of ${data.url}.</p>
         <p style="margin: 16px 0;">Pathlight estimated roughly <strong style="color: ${ACCENT_COLOR};">${revenueDisplay}/mo</strong> in revenue leaking out of your site. If that number sits heavier the longer it stays on the page, 15 minutes on the calendar is the fastest way to stop it.</p>
         ${button("Book Your Discovery Call", data.calendlyUrl)}
@@ -279,7 +291,7 @@ function buildBreakup8d(data: EmailMergeData): BuiltEmail {
   `;
 
   const text = [
-    greeting(data.businessName),
+    greeting(),
     "",
     `Just closing the loop on your Pathlight scan of ${data.url}.`,
     "",
