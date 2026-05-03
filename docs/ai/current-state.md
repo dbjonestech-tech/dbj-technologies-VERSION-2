@@ -1,10 +1,10 @@
 # Current State
 
-Last updated: May 2, 2026 (Phase 4 complete end-to-end. **All 9 Canopy phases shipped.**)
+Last updated: May 3, 2026 (doc corrections: sidebar labels, unwired-cron acknowledgment, phase count). **All 10 Canopy phases shipped (0 through 9 inclusive).**
 
 ## Canopy v2 build status
 
-**All nine phases of `docs/ai/canopy-build-plan.md` are now COMPLETE end-to-end.** Phases 0-9 are committed, pushed, and migrations applied to prod Neon. Phase 4 (Gmail integration) shipped May 2 across three commits + a final UI commit.
+**All ten phases of `docs/ai/canopy-build-plan.md` are now COMPLETE end-to-end** (phases 0 through 9 inclusive). Phases 0-9 are committed, pushed, and migrations applied to prod Neon. Phase 4 (Gmail integration) shipped May 2 across three commits + a final UI commit.
 
 | Phase | Surface | Status | Migration |
 |-------|---------|--------|-----------|
@@ -66,7 +66,7 @@ All routes under `/admin/*`, gated by Auth.js Google sign-in + `ADMIN_EMAILS` al
 - `/admin/errors`: grouped-by-fingerprint with affected user counts, by-source breakdown, 24h hourly volume
 - `/admin/audit`: signin/signout/denied log with top actors and recent activity feed
 
-Sidebar grouped Today / Acquisition / Health / Engagement / Security with section icons + Canopy logomark chip + signed-in chip.
+Sidebar grouped Overview / Acquisition / Relationships / Analytics / Automation / Pathlight Advanced / Operations / Health / Account with section icons + Canopy logomark chip + signed-in chip. (Source of truth: `lib/admin/nav-config.ts` `buildAdminNavGroups()`. Earlier "Today / Acquisition / Health / Engagement / Security" labels predate the May 1 expansion and were corrected May 3.)
 
 ### Canopy DBJ marketing surfaces (unchanged from earlier session)
 
@@ -143,6 +143,8 @@ Health surface:
 First-party analytics layer: `AnalyticsBeacon` mounted in the root layout posts page-view + engagement (CWV via PerformanceObserver, scroll depth, dwell) to `/api/track/{view,engage}`. Cookies `dbj_vid` (13-month) and `dbj_sid` (30-min idle) stitch sessions. `attachScanToSession` and `attachContactToSession` are called from the scan and contact endpoints so funnel cohort math joins cleanly. Raw IP is never persisted; only sha256(ip || daily_salt) and the request-derived geo. Bot filtering layered (UA pattern + length + Accept-Language fallback). Tracking exclusions match the existing GA exclusions: /admin, /portal, /signin, /api, /pathlight/[scanId].
 
 Inngest crons added: funnelRefreshHourly, vercelTelemetryHourly, inngestHealthHourly, infrastructureCheckDaily (08:00 UTC), anthropicBudgetHourly, searchConsoleDaily (06:00 UTC), emailKpiRefreshHourly. The existing monitoringPurgeDaily was extended to drop page_views >90d and sessions/visitors >395d.
+
+**Unwired as of May 3, 2026:** the seven function exports above (Inngest IDs `funnel-refresh-hourly`, `vercel-telemetry-hourly`, `inngest-health-hourly`, `infrastructure-check-daily`, `anthropic-budget-hourly`, `search-console-daily`, `email-kpi-refresh-hourly`) are defined in `lib/inngest/functions.ts` but are NOT registered in the serve handler at `app/(grade)/api/inngest/route.ts`, so Inngest cannot discover or schedule them. Verified absent from the production Inngest dashboard. Operationally this means `/admin/funnel`, `/admin/platform`, `/admin/infrastructure`, the budget tile on `/admin/costs`, `/admin/search`, the KPI rollup on `/admin/email`, and the catch-up Inngest self-monitoring on `/admin/pipeline` render stale or empty data. Most operationally severe: `infrastructure-check-daily` is the only TLS / WHOIS / DNS-auth expiry warning channel and is currently silent. Staged registration in flight in five risk-tiered commits (Commit A: internal-Postgres-only crons; B: Vercel; C: Anthropic budget; D: Search Console; E: Infrastructure). Each commit deploys, waits for first scheduled fire (or manual Inngest invoke for the daily ones), verifies success, and only then proceeds to the next.
 
 Contact form persistence: `app/(marketing)/api/contact/route.ts` writes to `contact_submissions` (migration 011) on every path and now also returns the inserted id so the route can attach it to the originating session for funnel attribution.
 

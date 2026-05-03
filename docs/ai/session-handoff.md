@@ -5,9 +5,17 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-02.md`](history/2026-05-02.md), which holds the verbatim
 record of every May 2 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- session closed at `5cc71c4`. Tree clean, pushed to origin main.)
+## Current state (May 3, 2026 -- doc-only commit shipped. Tree clean, pushed to origin main.)
 
-HEAD: `5cc71c4 chore(docs): archive May 2 session-handoff, reset live handoff to compact summary`
+### Anchor block
+
+Phase 0 Canopy site-wide-rewrite sweep ran at `d570a57`. This commit is **doc-only** (sidebar label correction, unwired-cron acknowledgment in `current-state.md`, phase-count fix from "nine" to "ten", session-handoff hash bump). No code changes, no marketing-surface changes, no Inngest registry changes, no `canopy.md` commit, no Phase 1 work.
+
+HEAD: `452dbff docs(ai): correct sidebar labels, ack unwired crons, fix phase count, bump session handoff hash` (this commit, pre-amend hash; the post-amend hash that ships to `origin/main` will differ by one byte-content amend that fills in this very line; the actual published hash is in `git log -1` after this commit lands)
+
+Prior chore: `d570a57 docs: update session-handoff with 5cc71c4 hash, tree clean`
+
+Older head before the May 3 doc-only commit: `5cc71c4 chore(docs): archive May 2 session-handoff, reset live handoff to compact summary`
 
 Prior chore: `ce7f57e chore(hooks): forcing function for end-of-session memory discipline`
 
