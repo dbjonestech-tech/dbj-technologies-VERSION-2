@@ -5,9 +5,9 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-02.md`](history/2026-05-02.md), which holds the verbatim
 record of every May 2 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- session closed at `5d98cf5`. Tree clean, pushed to origin main.)
+## Current state (May 2, 2026 -- session closed at `5cc71c4`. Tree clean, pushed to origin main.)
 
-HEAD: `5d98cf5 chore(docs): archive May 2 session-handoff, reset live handoff to compact summary`
+HEAD: `5cc71c4 chore(docs): archive May 2 session-handoff, reset live handoff to compact summary`
 
 Prior chore: `ce7f57e chore(hooks): forcing function for end-of-session memory discipline`
 
