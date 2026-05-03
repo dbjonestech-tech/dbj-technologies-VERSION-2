@@ -38,6 +38,60 @@ export type ScreenshotPair = {
   mobile: string | null;
 };
 
+/* Stage 2: parallel full-page captures (in addition to the AtF pair).
+ * Same data-URI shape; rendered in a collapsible accordion below the AtF
+ * hero. Optional everywhere so historical scans without these still load. */
+export type FullPageScreenshotPair = {
+  desktop: string | null;
+  mobile: string | null;
+};
+
+/* Stage 2: HTML body captured by the Browserless function alongside the
+ * desktop AtF screenshot. Truncated at 256KB at the Browserless boundary. */
+export type HtmlSnapshot = {
+  html: string;
+  capturedAt: string;
+  viewport: "desktop" | "mobile";
+  truncatedAt: number | null;
+};
+
+/* Stage 2: per-<form> descriptor returned by the in-browser DOM walk. The
+ * forms-audit step grounds its critique on this shape; the report renders
+ * directly from it when the analysis call is skipped or fails. */
+export type FormDescriptor = {
+  formIndex: number;
+  fieldCount: number;
+  fieldTypes: Record<string, number>;
+  requiredCount: number;
+  optionalCount: number;
+  hiddenCount: number;
+  unlabeledCount: number;
+  buttonCopy: string | null;
+  action: string | null;
+  method: string | null;
+  hasLabels: boolean;
+  ariaLabel: string | null;
+};
+
+/* Stage 2: model-generated, per-form critique. Each item ties back to a
+ * descriptor by formIndex so the renderer can pair them visually. */
+export type FormsAuditItem = {
+  formIndex: number;
+  headline: string;
+  observation: string;
+  nextAction: string;
+  impact: "high" | "medium" | "low";
+};
+
+export type FormsAuditAnalysis = {
+  items: FormsAuditItem[];
+};
+
+export type FormsAuditResult = {
+  extracted: { forms: FormDescriptor[] };
+  analysis: FormsAuditAnalysis | null;
+};
+
 export type DesignMetric = {
   score: number;
   observation: string;
@@ -180,6 +234,12 @@ export type PathlightReport = {
   industryBenchmark: IndustryBenchmark | null;
   audioSummaryUrl: string | null;
   audioSummaryScript: string | null;
+  /* Stage 2 fields. Optional everywhere; pre-Stage-2 scans (and any new
+   * scan whose Browserless capture fails partway) load with these as null
+   * and the report renders without the corresponding sections. */
+  htmlSnapshot: HtmlSnapshot | null;
+  screenshotsFullPage: FullPageScreenshotPair | null;
+  formsAudit: FormsAuditResult | null;
   businessModel?: "B2B" | "B2C" | "mixed";
   inferredVertical?: string;
   inferredVerticalParent?: string;

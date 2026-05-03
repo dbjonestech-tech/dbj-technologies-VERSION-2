@@ -34,6 +34,11 @@ const CALL_TIMEOUT_MS = 90_000;
 // AbortController on this stage, so it gets a longer budget. Inngest's
 // per-step ceiling is well above 120s.
 const REVENUE_CALL_TIMEOUT_MS = 120_000;
+// Stage 2 forms-audit is a small text-only call (~3KB input, ~1.5KB
+// output) that runs as a post-finalize side-step. Capping it at 30s
+// keeps the worst-case retry cascade well under the function-level
+// 420s ceiling so a stuck forms-audit cannot block the report email.
+const FORMS_AUDIT_CALL_TIMEOUT_MS = 30_000;
 const MAX_HEADINGS = 40;
 const MAX_LINK_TEXTS = 40;
 const MAX_TEXT_CHARS = 160;
@@ -277,7 +282,11 @@ async function callClaude(
   const operation = meta?.operation ?? "claude-call";
   const scanId = meta?.scanId ?? null;
   const callTimeoutMs =
-    operation === "revenue-impact" ? REVENUE_CALL_TIMEOUT_MS : CALL_TIMEOUT_MS;
+    operation === "revenue-impact"
+      ? REVENUE_CALL_TIMEOUT_MS
+      : operation === "forms-audit"
+        ? FORMS_AUDIT_CALL_TIMEOUT_MS
+        : CALL_TIMEOUT_MS;
   let attempt = 0;
 
   try {
@@ -368,7 +377,7 @@ async function callClaude(
   }
 }
 
-async function callClaudeWithJsonSchema<T>(
+export async function callClaudeWithJsonSchema<T>(
   label: string,
   system: string,
   initialUserContent: string | MessageBlock[],

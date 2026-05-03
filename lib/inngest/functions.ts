@@ -8,6 +8,10 @@ import {
   updatePathlightScore,
   updateScanAiAnalysis,
   updateScanAudioSummary,
+  updateScanFormsAudit,
+  updateScanFormsExtracted,
+  updateScanFullPageScreenshots,
+  updateScanHtmlSnapshot,
   updateScanIndustryBenchmark,
   updateScanRemediation,
   updateScanResolvedUrl,
@@ -34,7 +38,10 @@ import {
   getRollingMedians,
 } from "../services/lighthouse-monitor";
 import type { IndustryBenchmark, PerformanceScores } from "@/lib/types/scan";
-import { captureScreenshot } from "../services/browserless";
+import {
+  captureFullPageScreenshot,
+  captureScreenshot,
+} from "../services/browserless";
 import {
   extractPageTextContent,
   researchIndustryBenchmark,
@@ -66,6 +73,17 @@ class ScanValidationError extends Error {}
 type ScreenshotOutcome = {
   desktop: string | null;
   mobile: string | null;
+  /* Stage 2: full-page captures, optional. Same data-URI shape as the AtF
+   * pair. Failure here is silent (these render in a collapsed accordion
+   * and absence is benign). */
+  desktopFullPage: string | null;
+  mobileFullPage: string | null;
+  /* Stage 2: HTML body + form descriptors captured alongside the desktop
+   * AtF screenshot. Source for the post-finalize forms-audit step and the
+   * future tone-of-voice / NAP / OG-preview features. */
+  html: string | null;
+  htmlTruncatedAt: number | null;
+  forms: import("@/lib/types/scan").FormDescriptor[];
   errors: string[];
 };
 
@@ -134,16 +152,41 @@ export const scanRequested = inngest.createFunction(
           const outcome: ScreenshotOutcome = {
             desktop: null,
             mobile: null,
+            desktopFullPage: null,
+            mobileFullPage: null,
+            html: null,
+            htmlTruncatedAt: null,
+            forms: [],
             errors: [],
           };
 
+          /* Four parallel Browserless calls. The two AtF calls also bring
+           * back HTML + form descriptors (only the desktop result is used
+           * for the body capture; mobile HTML is identical post-hydration
+           * and we already have the desktop one). The two full-page calls
+           * are screenshot-only. Promise.allSettled so one slow / failing
+           * call cannot poison the others. */
           const results = await Promise.allSettled([
             captureScreenshot(resolvedUrl, { width: 1440, height: 900 }, scanId),
             captureScreenshot(resolvedUrl, { width: 375, height: 812 }, scanId),
+            captureFullPageScreenshot(
+              resolvedUrl,
+              { width: 1440, height: 900 },
+              scanId,
+            ),
+            captureFullPageScreenshot(
+              resolvedUrl,
+              { width: 375, height: 812 },
+              scanId,
+            ),
           ]);
 
           if (results[0].status === "fulfilled") {
-            outcome.desktop = `data:image/jpeg;base64,${results[0].value.toString("base64")}`;
+            const r = results[0].value;
+            outcome.desktop = `data:image/jpeg;base64,${r.screenshot.toString("base64")}`;
+            outcome.html = r.html;
+            outcome.htmlTruncatedAt = r.htmlTruncatedAt;
+            outcome.forms = r.forms;
           } else {
             outcome.errors.push(
               `desktop: ${(results[0].reason as Error)?.message ?? "unknown"}`
@@ -151,15 +194,55 @@ export const scanRequested = inngest.createFunction(
           }
 
           if (results[1].status === "fulfilled") {
-            outcome.mobile = `data:image/jpeg;base64,${results[1].value.toString("base64")}`;
+            const r = results[1].value;
+            outcome.mobile = `data:image/jpeg;base64,${r.screenshot.toString("base64")}`;
+            /* If desktop AtF failed but mobile succeeded, fall back to the
+             * mobile HTML / forms so downstream text-side analysis still
+             * has something to chew on. */
+            if (!outcome.html && r.html) {
+              outcome.html = r.html;
+              outcome.htmlTruncatedAt = r.htmlTruncatedAt;
+            }
+            if (outcome.forms.length === 0 && r.forms.length > 0) {
+              outcome.forms = r.forms;
+            }
           } else {
             outcome.errors.push(
               `mobile: ${(results[1].reason as Error)?.message ?? "unknown"}`
             );
           }
 
+          if (results[2].status === "fulfilled") {
+            outcome.desktopFullPage = `data:image/jpeg;base64,${results[2].value.toString("base64")}`;
+          } /* full-page failure is silent: collapsed accordion absence */
+
+          if (results[3].status === "fulfilled") {
+            outcome.mobileFullPage = `data:image/jpeg;base64,${results[3].value.toString("base64")}`;
+          } /* full-page failure is silent */
+
           if (outcome.desktop || outcome.mobile) {
             await updateScanScreenshots(scanId, outcome.desktop, outcome.mobile);
+          }
+
+          if (outcome.desktopFullPage || outcome.mobileFullPage) {
+            await updateScanFullPageScreenshots(
+              scanId,
+              outcome.desktopFullPage,
+              outcome.mobileFullPage,
+            );
+          }
+
+          if (outcome.html) {
+            await updateScanHtmlSnapshot(scanId, {
+              html: outcome.html,
+              capturedAt: new Date().toISOString(),
+              viewport: outcome.desktop ? "desktop" : "mobile",
+              truncatedAt: outcome.htmlTruncatedAt,
+            });
+          }
+
+          if (outcome.forms.length > 0) {
+            await updateScanFormsExtracted(scanId, outcome.forms);
           }
 
           return outcome;
@@ -634,6 +717,54 @@ export const scanRequested = inngest.createFunction(
             "audio.failed",
             { error: message.slice(0, 500) },
             { scanId, level: "warn" }
+          );
+          return { ok: false, error: message };
+        }
+      });
+
+      /* f1: best-effort forms-audit. Runs after the report is finalized
+       * and after the audio side-step, before the report email goes out.
+       * Mirrors the a5 audio pattern: gated, swallowed-on-failure, never
+       * marks the scan partial. The renderer falls back to the captured
+       * descriptors when this is absent. Gated on forms.length > 0 so a
+       * page with no <form> elements never burns a Claude call. */
+      await step.run("f1", async () => {
+        try {
+          if (screenshots.forms.length === 0) {
+            return { ok: true, skipped: "no-forms" };
+          }
+          const { getFormsAuditInput } = await import("../db/queries");
+          const input = await getFormsAuditInput(scanId);
+          if (!input || input.forms.length === 0) {
+            return { ok: true, skipped: "no-forms-on-read" };
+          }
+          const { runFormsAudit } = await import("../services/forms-audit");
+          const analysis = await runFormsAudit({
+            scanId,
+            forms: input.forms,
+            html: input.html,
+            url: input.resolvedUrl ?? input.url,
+            businessName: input.businessName,
+            industry: input.industry,
+            city: input.city,
+          });
+          await updateScanFormsAudit(scanId, analysis);
+          await track(
+            "forms-audit.generated",
+            { items: analysis.items.length, formsExtracted: input.forms.length },
+            { scanId },
+          );
+          return { ok: true, items: analysis.items.length };
+        } catch (err) {
+          const message = describeError(err);
+          console.warn(
+            "[f1] forms-audit failed (scan still ships):",
+            message,
+          );
+          await track(
+            "forms-audit.failed",
+            { error: message.slice(0, 500) },
+            { scanId, level: "warn" },
           );
           return { ok: false, error: message };
         }

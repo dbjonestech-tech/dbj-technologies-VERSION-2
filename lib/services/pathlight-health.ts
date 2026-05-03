@@ -20,6 +20,7 @@ export const PATHLIGHT_STAGES = [
   "revenue",
   "score",
   "audio",
+  "forms-audit",
   "email",
 ] as const;
 
@@ -27,7 +28,13 @@ export type PathlightStage = (typeof PATHLIGHT_STAGES)[number];
 
 /* Map a sub-error label inside scans.error_message to the stage it
  * belongs to. The pipeline writes labels like "desktop:" and "mobile:"
- * for the two screenshot calls, "audit:" for Lighthouse, and so on. */
+ * for the two screenshot calls, "audit:" for Lighthouse, and so on.
+ *
+ * The forms-audit step (Stage 2) runs as a post-finalize side-step
+ * whose failures are swallowed and never written into error_message,
+ * so this entry is forward-compatibility scaffolding: if a future
+ * change ever does promote forms-audit failures into the partial
+ * cascade, the stage attribution already has a slot for it. */
 const LABEL_TO_STAGE: Record<string, PathlightStage> = {
   desktop: "screenshot",
   mobile: "screenshot",
@@ -37,6 +44,7 @@ const LABEL_TO_STAGE: Record<string, PathlightStage> = {
   revenue: "revenue",
   score: "score",
   audio: "audio",
+  "forms-audit": "forms-audit",
   email: "email",
 };
 

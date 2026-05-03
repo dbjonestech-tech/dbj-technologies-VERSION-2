@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AskPathlightLoader from "./AskPathlightLoader";
+import { FormsAuditSection } from "./FormsAuditSection";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
   DesignScores,
+  FormsAuditResult,
+  FullPageScreenshotPair,
   LighthouseCategoryScores,
   PerformanceScores,
   PillarScores,
@@ -45,6 +48,13 @@ type ApiReport = {
   pillarScores: PillarScores | null;
   lighthouseScores: LighthouseCategoryScores | null;
   audioSummaryUrl: string | null;
+  /* Stage 2 (May 3 2026): full-page captures + forms audit. Both
+   * optional and arrive late on a fresh scan (full-page is captured in
+   * parallel with the AtF pair so it lands the same time; forms audit
+   * is post-finalize so it shows up a few seconds after status flips
+   * to complete). */
+  screenshotsFullPage: FullPageScreenshotPair | null;
+  formsAudit: FormsAuditResult | null;
   isOutOfScope: boolean;
   outOfScopeLabel: string | null;
   screenshotNotice: string | null;
@@ -608,10 +618,13 @@ function Report({
         <LighthouseBreakdown scores={report.lighthouseScores} />
       ) : null}
 
+      <FormsAuditSection formsAudit={report.formsAudit} />
+
       {hasScreenshots ? (
         <ScreenshotsSection
           desktop={report.screenshotDesktop}
           mobile={report.screenshotMobile}
+          fullPage={report.screenshotsFullPage}
         />
       ) : null}
 
@@ -1036,10 +1049,19 @@ function LighthouseBreakdown({ scores }: { scores: LighthouseCategoryScores }) {
 function ScreenshotsSection({
   desktop,
   mobile,
+  fullPage,
 }: {
   desktop: string | null;
   mobile: string | null;
+  fullPage: FullPageScreenshotPair | null;
 }) {
+  /* Stage 2: full-page captures live in a collapsed accordion below the
+   * AtF hero pair. Default closed because most readers want the AtF
+   * comparison front and center; the long-form captures are forward-
+   * the-PDF artifacts that benefit from being available without
+   * dominating the layout. */
+  const hasFullPage = !!(fullPage && (fullPage.desktop || fullPage.mobile));
+  const [open, setOpen] = useState(false);
   return (
     <section>
       <h2
@@ -1052,7 +1074,75 @@ function ScreenshotsSection({
         <ScreenshotPanel label="Desktop" src={desktop} aspect="aspect-[16/10]" />
         <ScreenshotPanel label="Mobile" src={mobile} aspect="aspect-[9/16]" printBreakBefore />
       </div>
+      {hasFullPage ? (
+        <div className="mt-6 print-expand">
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            className="print-hidden flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-white/50 hover:text-white/70 transition-colors"
+            aria-expanded={open}
+          >
+            <span>Full-page captures</span>
+            <span
+              className="text-[10px] transition-transform"
+              style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+              aria-hidden="true"
+            >
+              ▾
+            </span>
+          </button>
+          <div
+            className={`mt-4 grid gap-4 md:grid-cols-2 print-grid-expand${open ? "" : " hidden"}`}
+          >
+            <FullPagePanel label="Desktop, full page" src={fullPage!.desktop} />
+            <FullPagePanel
+              label="Mobile, full page"
+              src={fullPage!.mobile}
+              printBreakBefore
+            />
+          </div>
+        </div>
+      ) : null}
     </section>
+  );
+}
+
+function FullPagePanel({
+  label,
+  src,
+  printBreakBefore = false,
+}: {
+  label: string;
+  src: string | null;
+  printBreakBefore?: boolean;
+}) {
+  if (!src) return null;
+  return (
+    <div
+      className={`rounded-2xl border p-3 print-avoid-break${printBreakBefore ? " print-break-before" : ""}`}
+      style={{
+        borderColor: "rgba(255,255,255,0.08)",
+        backgroundColor: "rgba(10,12,18,0.7)",
+      }}
+    >
+      <div
+        className="text-xs uppercase tracking-[0.25em]"
+        style={{ color: "#9aa3b2" }}
+      >
+        {label}
+      </div>
+      <div
+        className="mt-3 overflow-hidden rounded-xl"
+        style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={`${label} capture`}
+          className="h-auto w-full"
+        />
+      </div>
+    </div>
   );
 }
 

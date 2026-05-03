@@ -1,6 +1,11 @@
 import { getDb } from "./index";
 import type {
   DesignScores,
+  FormDescriptor,
+  FormsAuditAnalysis,
+  FormsAuditResult,
+  FullPageScreenshotPair,
+  HtmlSnapshot,
   IndustryBenchmark,
   LighthouseCategoryScores,
   PathlightReport,
@@ -42,6 +47,10 @@ type ScanResultsRow = {
   industry_benchmark: unknown;
   audio_summary_url: string | null;
   audio_summary_script: string | null;
+  /* Stage 2 columns. All nullable; pre-Stage-2 scans coerce to null. */
+  html_snapshot: unknown;
+  screenshots_fullpage: FullPageScreenshotPair | null;
+  forms_audit: unknown;
 };
 
 export async function updateScanStatus(
@@ -179,6 +188,75 @@ export async function updateScanAudioSummary(
     ON CONFLICT (scan_id) DO UPDATE
     SET audio_summary_url = EXCLUDED.audio_summary_url,
         audio_summary_script = EXCLUDED.audio_summary_script
+  `;
+}
+
+export async function updateScanHtmlSnapshot(
+  scanId: string,
+  snapshot: HtmlSnapshot
+): Promise<void> {
+  const sql = getDb();
+  await sql`
+    INSERT INTO scan_results (scan_id, html_snapshot)
+    VALUES (${scanId}, ${JSON.stringify(snapshot)}::jsonb)
+    ON CONFLICT (scan_id) DO UPDATE
+    SET html_snapshot = EXCLUDED.html_snapshot
+  `;
+}
+
+export async function updateScanFullPageScreenshots(
+  scanId: string,
+  desktop: string | null,
+  mobile: string | null
+): Promise<void> {
+  const sql = getDb();
+  const payload: FullPageScreenshotPair = { desktop, mobile };
+  await sql`
+    INSERT INTO scan_results (scan_id, screenshots_fullpage)
+    VALUES (${scanId}, ${JSON.stringify(payload)}::jsonb)
+    ON CONFLICT (scan_id) DO UPDATE
+    SET screenshots_fullpage = EXCLUDED.screenshots_fullpage
+  `;
+}
+
+/* Two-phase write for forms_audit. The capture step writes the
+ * `extracted` half (DOM walk) immediately so the report renderer has
+ * something to show while the post-finalize forms-audit step is still
+ * generating its narrative. The audit step then writes the `analysis`
+ * half via updateScanFormsAudit, preserving extracted on conflict. */
+export async function updateScanFormsExtracted(
+  scanId: string,
+  forms: FormDescriptor[]
+): Promise<void> {
+  const sql = getDb();
+  const payload = { extracted: { forms }, analysis: null };
+  await sql`
+    INSERT INTO scan_results (scan_id, forms_audit)
+    VALUES (${scanId}, ${JSON.stringify(payload)}::jsonb)
+    ON CONFLICT (scan_id) DO UPDATE
+    SET forms_audit = jsonb_set(
+      COALESCE(scan_results.forms_audit, '{}'::jsonb),
+      '{extracted}',
+      ${JSON.stringify({ forms })}::jsonb,
+      true
+    )
+  `;
+}
+
+export async function updateScanFormsAudit(
+  scanId: string,
+  analysis: FormsAuditAnalysis
+): Promise<void> {
+  const sql = getDb();
+  await sql`
+    UPDATE scan_results
+    SET forms_audit = jsonb_set(
+      COALESCE(forms_audit, '{}'::jsonb),
+      '{analysis}',
+      ${JSON.stringify(analysis)}::jsonb,
+      true
+    )
+    WHERE scan_id = ${scanId}
   `;
 }
 
@@ -408,6 +486,104 @@ function coerceRevenueImpact(v: unknown): RevenueImpactResult | null {
   return o as unknown as RevenueImpactResult;
 }
 
+function coerceHtmlSnapshot(v: unknown): HtmlSnapshot | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  if (typeof o.html !== "string" || o.html.length === 0) return null;
+  const viewport = o.viewport === "mobile" ? "mobile" : "desktop";
+  return {
+    html: o.html,
+    capturedAt:
+      typeof o.capturedAt === "string" ? o.capturedAt : new Date(0).toISOString(),
+    viewport,
+    truncatedAt:
+      typeof o.truncatedAt === "number" ? o.truncatedAt : null,
+  };
+}
+
+function coerceFullPageScreenshots(
+  v: unknown,
+): FullPageScreenshotPair | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  const desktop = typeof o.desktop === "string" ? o.desktop : null;
+  const mobile = typeof o.mobile === "string" ? o.mobile : null;
+  if (!desktop && !mobile) return null;
+  return { desktop, mobile };
+}
+
+function coerceFormDescriptor(v: unknown): FormDescriptor | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  if (typeof o.formIndex !== "number" || typeof o.fieldCount !== "number") {
+    return null;
+  }
+  return {
+    formIndex: o.formIndex,
+    fieldCount: o.fieldCount,
+    fieldTypes:
+      o.fieldTypes && typeof o.fieldTypes === "object"
+        ? (o.fieldTypes as Record<string, number>)
+        : {},
+    requiredCount: typeof o.requiredCount === "number" ? o.requiredCount : 0,
+    optionalCount: typeof o.optionalCount === "number" ? o.optionalCount : 0,
+    hiddenCount: typeof o.hiddenCount === "number" ? o.hiddenCount : 0,
+    unlabeledCount:
+      typeof o.unlabeledCount === "number" ? o.unlabeledCount : 0,
+    buttonCopy: typeof o.buttonCopy === "string" ? o.buttonCopy : null,
+    action: typeof o.action === "string" ? o.action : null,
+    method: typeof o.method === "string" ? o.method : null,
+    hasLabels: o.hasLabels === true,
+    ariaLabel: typeof o.ariaLabel === "string" ? o.ariaLabel : null,
+  };
+}
+
+function coerceFormsAudit(v: unknown): FormsAuditResult | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  const extractedRaw = o.extracted as { forms?: unknown[] } | undefined;
+  const formsRaw = Array.isArray(extractedRaw?.forms) ? extractedRaw!.forms! : [];
+  const forms: FormDescriptor[] = [];
+  for (const f of formsRaw) {
+    const d = coerceFormDescriptor(f);
+    if (d) forms.push(d);
+  }
+
+  let analysis: FormsAuditAnalysis | null = null;
+  const analysisRaw = o.analysis as { items?: unknown[] } | null | undefined;
+  if (analysisRaw && typeof analysisRaw === "object" && Array.isArray(analysisRaw.items)) {
+    const items = analysisRaw.items
+      .map((it) => {
+        if (!it || typeof it !== "object") return null;
+        const item = it as Record<string, unknown>;
+        if (
+          typeof item.formIndex !== "number" ||
+          typeof item.headline !== "string" ||
+          typeof item.observation !== "string" ||
+          typeof item.nextAction !== "string"
+        ) {
+          return null;
+        }
+        const impact: "high" | "medium" | "low" =
+          item.impact === "high" || item.impact === "low"
+            ? item.impact
+            : "medium";
+        return {
+          formIndex: item.formIndex,
+          headline: item.headline,
+          observation: item.observation,
+          nextAction: item.nextAction,
+          impact,
+        };
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null);
+    if (items.length > 0) analysis = { items };
+  }
+
+  if (forms.length === 0 && !analysis) return null;
+  return { extracted: { forms }, analysis };
+}
+
 async function loadScanWithResults(scanId: string): Promise<{
   scan: ScanRow;
   result: ScanResultsRow | null;
@@ -426,7 +602,8 @@ async function loadScanWithResults(scanId: string): Promise<{
   const resultRows = (await sql`
     SELECT lighthouse_data, screenshots, ai_analysis, pathlight_score,
            pillar_scores, remediation_items, revenue_impact, industry_benchmark,
-           audio_summary_url, audio_summary_script
+           audio_summary_url, audio_summary_script,
+           html_snapshot, screenshots_fullpage, forms_audit
     FROM scan_results
     WHERE scan_id = ${scanId}
     ORDER BY created_at DESC
@@ -496,6 +673,50 @@ export async function getScanPipelineContext(scanId: string): Promise<{
   };
 }
 
+/* Stage 2 read helper for the post-finalize forms-audit step. Pulls only
+ * the columns it needs (extracted forms + html snapshot for narrative
+ * grounding + business context) to keep the row payload small. */
+export async function getFormsAuditInput(scanId: string): Promise<{
+  forms: FormDescriptor[];
+  html: string | null;
+  url: string;
+  resolvedUrl: string | null;
+  businessName: string | null;
+  industry: string | null;
+  city: string | null;
+} | null> {
+  const sql = getDb();
+  const rows = (await sql`
+    SELECT s.url, s.resolved_url, s.business_name, s.industry, s.city,
+           sr.forms_audit, sr.html_snapshot
+    FROM scans s
+    LEFT JOIN scan_results sr ON sr.scan_id = s.id
+    WHERE s.id = ${scanId}
+    LIMIT 1
+  `) as Array<{
+    url: string;
+    resolved_url: string | null;
+    business_name: string | null;
+    industry: string | null;
+    city: string | null;
+    forms_audit: unknown;
+    html_snapshot: unknown;
+  }>;
+  const row = rows[0];
+  if (!row) return null;
+  const audit = coerceFormsAudit(row.forms_audit);
+  const snapshot = coerceHtmlSnapshot(row.html_snapshot);
+  return {
+    forms: audit?.extracted.forms ?? [],
+    html: snapshot?.html ?? null,
+    url: row.url,
+    resolvedUrl: row.resolved_url,
+    businessName: row.business_name,
+    industry: row.industry,
+    city: row.city,
+  };
+}
+
 export async function getFullScanReport(
   scanId: string
 ): Promise<PathlightReport | null> {
@@ -538,6 +759,9 @@ export async function getFullScanReport(
     industryBenchmark,
     audioSummaryUrl: result?.audio_summary_url ?? null,
     audioSummaryScript: result?.audio_summary_script ?? null,
+    htmlSnapshot: coerceHtmlSnapshot(result?.html_snapshot),
+    screenshotsFullPage: coerceFullPageScreenshots(result?.screenshots_fullpage),
+    formsAudit: coerceFormsAudit(result?.forms_audit),
     businessModel: vision?.businessModel,
     inferredVertical: vision?.inferredVertical,
     inferredVerticalParent: vision?.inferredVerticalParent,

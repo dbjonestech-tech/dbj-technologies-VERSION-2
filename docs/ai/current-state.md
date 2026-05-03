@@ -180,6 +180,35 @@ Contact form persistence: `app/(marketing)/api/contact/route.ts` writes to `cont
 
 ## Pathlight
 
+### Stage 2 enhancements (May 3, 2026): HTML capture, full-page screenshots, forms audit
+
+Stage 2 of the Pathlight enhancement project ships in working tree as of this session. Migration 034 (applied to prod Neon, three additive nullable JSONB columns) and the wired pipeline + render changes commit together.
+
+What is now captured on every scan:
+- **Body HTML.** The Browserless function returns `await page.content()` truncated to 256KB at the boundary, persisted to `scan_results.html_snapshot` (`{ html, capturedAt, viewport, truncatedAt }`). The HTML is captured server-side only and is not surfaced through the public scan API; it is the substrate for Stage 3 text-side analyses (tone-of-voice, NAP extract, OG/social-card preview).
+- **Full-page screenshots.** A second pair of Browserless calls captures `fullPage: true` desktop and mobile screenshots in parallel with the existing above-the-fold pair. Persisted to `scan_results.screenshots_fullpage`. Rendered in a collapsible accordion under the existing AtF hero pair on the report (closed by default; expanded automatically in print/PDF). The AtF pair stays the hero pair.
+- **Form descriptors.** An in-Browserless DOM walk captures every `<form>` (capped at 5) with field count, field types, required/optional/hidden/unlabeled counts, button copy, action, method, label association, and aria-label. Persisted under `scan_results.forms_audit.extracted.forms[]`.
+
+What is now analyzed on every scan with at least one form:
+- **Forms audit.** A new post-finalize side-step (mirrors the audio side-step posture: gated, swallowed-on-failure, never marks the scan partial) calls Sonnet against the form descriptors plus a 6KB HTML excerpt. Output is per-form `{ headline, observation, nextAction, impact }` items, persisted under `scan_results.forms_audit.analysis.items[]`. Per-call timeout is 30s (well below the standard 90s) so a stuck forms-audit cannot block the report email. Render copy is first-person "I", with a "Try this" callout per item carrying the concrete next action.
+
+What changed in the public scan API (`/api/scan/[scanId]`):
+- New surfaced fields: `screenshotsFullPage` (the data-URI pair) and `formsAudit` (extracted descriptors plus optional analysis). The HTML snapshot is **not** surfaced (server-side only).
+
+What changed in the report rendering (`app/(grade)/pathlight/[scanId]/ScanStatus.tsx`):
+- New `FormsAuditSection` component inserted between `LighthouseBreakdown` and `ScreenshotsSection`. Renders only when forms exist.
+- `ScreenshotsSection` now renders a collapsible "Full-page captures" accordion below the AtF pair when full-page captures are present.
+- Existing `ScoreHero`, `PillarBreakdown`, `RevenueImpactBlock` were not touched.
+
+What changed in the Pathlight Health dashboard (`/admin/monitor`):
+- `PATHLIGHT_STAGES` extended with `forms-audit`. `LABEL_TO_STAGE` extended likewise (forward-compat scaffolding; forms-audit failures are swallowed and do not currently surface in the partial cascade). Provider rollups gain new operations `screenshot-fullpage-desktop` and `screenshot-fullpage-mobile`.
+
+What was deliberately NOT shipped in this stage:
+- No design-audit schema changes. The `visionAuditSchema` at `lib/services/claude-analysis.ts` remains untouched. Stage 1's bundled vision call is a separate workstream.
+- No new vendor signups, no new env vars.
+- No `.claude/rules/pathlight-enhancements.md`. That file is a Stage 1 deliverable per the Stage 0 audit.
+- No updates to `do-not-break.md` yet. Wait for at least one real scan in production to confirm the new capture and render work end-to-end before declaring Stage 2 pieces load-bearing.
+
 ### Pipeline (All Shipped and Validated)
 - Phase 1 (c86fc2e): Vision classifies businessModel (B2B/B2C/mixed), inferredVertical, inferredVerticalParent
 - Phase 2 (8a9e9cc): Benchmark prompt receives classification, rejects residential sources for B2B (HomeAdvisor/Fixr/Angi/Thumbtack blocklist), $500 B2B floor clamp

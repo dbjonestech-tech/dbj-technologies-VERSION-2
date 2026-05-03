@@ -1,5 +1,28 @@
 # Decision Log
 
+## May 3, 2026 -- Pathlight Stage 2 shipped: HTML capture as the foundation, forms audit as the proof
+
+Decision: Ship Stage 2 of the Pathlight enhancement project (HTML body capture, full-page screenshots, form audit) BEFORE Stage 1 (the bundled richer design audit). Stage 0's audit recommended this ordering and this session implements it end-to-end.
+
+Reason: Stage 2 is the foundation every later text-side analysis depends on. The Browserless capture function previously returned only a base64 JPEG; without HTML, Stages 3-6 each need a parallel fetch path. Extending the existing capture function once (Option A: in-browser DOM walk for forms, plus `await page.content()` for body HTML) gives every downstream stage the same payload off one Browserless call. Doing the smaller, lower-risk infrastructure change first means Stage 1's bundled vision call can later be informed by both the screenshots AND the extracted body copy, materially improving the model's grounding compared to landing the vision call against screenshots alone.
+
+Implementation choices:
+- **HTML capture truncated at 256KB at the Browserless boundary.** Mirrors the change-monitoring fetch cap and bounds the JSONB column at a predictable upper limit. The truncation point is recorded so downstream readers can detect it.
+- **Full-page screenshots are a SEPARATE Browserless call path.** A new `captureFullPageScreenshot` and a small `SCREENSHOT_FULLPAGE_FUNCTION` body live alongside (not inside) the AtF capture function. The AtF function stays focused on its known failure modes; the do-not-break.md screenshot pipeline keeps its known shape. The two pairs run in parallel as `Promise.allSettled` so a slow full-page capture cannot poison the AtF pair, and vice versa.
+- **Forms extracted in-browser, not server-side.** The DOM walk runs inside Browserless's Chromium where every form attribute is natively available. Server-side parsing would have required pulling in cheerio or jsdom (neither in package.json today) and would have re-derived facts the browser already knows.
+- **Forms-audit step is post-finalize, mirroring the audio step.** Inserted as `f1` between `a5` (audio) and `e1` (report email). Failure is swallowed: the report finalizes, the email fires, the section just does not render. Per-call timeout is 30s (vs the 90s default) so a stuck forms-audit cannot consume the function's 420s budget.
+- **Two-phase forms_audit write.** The capture step writes the `extracted` half immediately so the report has something to render the moment the user opens it. The post-finalize forms-audit step writes the `analysis` half via a `jsonb_set` at the `analysis` key, preserving the `extracted` half on conflict.
+- **Forms_audit failure does NOT mark a scan partial.** Same posture as audio. The partial-failure cascade in the finalize step is unchanged. `LABEL_TO_STAGE` carries the new `forms-audit` entry as forward-compatibility scaffolding only.
+- **No design-audit schema changes.** The `visionAuditSchema` at `lib/services/claude-analysis.ts` is untouched. The only change to claude-analysis.ts is adding `export` to `callClaudeWithJsonSchema` (so the new forms-audit service can reuse the retry/schema-repair pattern instead of duplicating it) and adding a third per-operation timeout bucket (`FORMS_AUDIT_CALL_TIMEOUT_MS = 30_000`).
+- **The HTML snapshot is server-side only.** It does not flow through the public scan API. Render-side consumers see only `screenshotsFullPage` and `formsAudit` (extracted descriptors plus optional analysis). Surfacing the body HTML to the client would expose a working set of source material that downstream stages will analyze; keeping it server-side preserves option value.
+- **Migration 034 committed and pushed independently.** Three additive nullable JSONB columns (`html_snapshot`, `screenshots_fullpage`, `forms_audit`). Idempotent ALTER TABLE statements. Applied to prod Neon before code committed so any column-shape mismatches surface at migration time, not at first scan.
+
+What this stage explicitly does NOT do:
+- Stage 1's bundled richer design audit. Stage 1 is a separate, larger commit and lands on Joshua's authorization. The Stage 2 HTML payload becomes available to it.
+- Stage 3 (tone analysis, per-vertical checklist, tech health). Same posture: each stage authorizes separately.
+- A `.claude/rules/pathlight-enhancements.md` file. Per the Stage 0 audit, that is Stage 1's deliverable since Stage 1 introduces the public-presentation rules around new finding sections.
+- Updates to `do-not-break.md`. Wait for at least one real scan in production to confirm the Stage 2 pieces work before declaring them load-bearing.
+
 ## May 1, 2026 (latest) -- Canopy v2 Phase 1: deal-centric CRM pivot
 
 Decision: Add a `deals` table alongside `contacts`. The Kanban moves DEALS now, not contacts. One contact can have many deals over time. The legacy `contacts.status` column stays as a denormalized "primary deal stage" mirror so the existing `/admin/relationships/pipeline` kanban keeps working without a hard cutover. A banner on the legacy kanban points operators to `/admin/deals` as the new primary board.

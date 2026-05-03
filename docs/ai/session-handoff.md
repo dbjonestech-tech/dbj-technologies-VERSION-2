@@ -2,71 +2,73 @@
 
 Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`). The most recent archive is
-[`history/2026-05-02.md`](history/2026-05-02.md), which holds the verbatim
-record of every May 2 entry that was below this header before this reset.
+[`history/2026-05-02.md`](history/2026-05-02.md).
 
-## Current state (May 3, 2026 -- doc-only commit shipped. Tree clean, pushed to origin main.)
+## Current state (May 3, 2026 -- Pathlight Stage 2 shipped end-to-end)
 
 ### Anchor block
 
-Phase 0 Canopy site-wide-rewrite sweep ran at `d570a57`. This commit is **doc-only** (sidebar label correction, unwired-cron acknowledgment in `current-state.md`, phase-count fix from "nine" to "ten", session-handoff hash bump). No code changes, no marketing-surface changes, no Inngest registry changes, no `canopy.md` commit, no Phase 1 work.
+HEAD: `decde08` (Stage 2 implementation: HTML capture, full-page screenshots, forms audit). The hash above reflects the published commit; one prior amend shifted the hash by a byte to fill in this line. `git log -1` is the authoritative source.
 
-HEAD: `452dbff docs(ai): correct sidebar labels, ack unwired crons, fix phase count, bump session handoff hash` (this commit, pre-amend hash; the post-amend hash that ships to `origin/main` will differ by one byte-content amend that fills in this very line; the actual published hash is in `git log -1` after this commit lands)
+Prior commit: `5ad1a0a feat(pathlight): migration 034, html_snapshot/screenshots_fullpage/forms_audit columns` (the migration shipped independently before the code commit).
 
-Prior chore: `d570a57 docs: update session-handoff with 5cc71c4 hash, tree clean`
+Migration 034 was applied to prod Neon as part of this session (`scripts/run-migration.mjs`, all three ALTER TABLE statements ok).
 
-Older head before the May 3 doc-only commit: `5cc71c4 chore(docs): archive May 2 session-handoff, reset live handoff to compact summary`
+Working tree: clean.
 
-Prior chore: `ce7f57e chore(hooks): forcing function for end-of-session memory discipline`
+### What shipped this session
 
-Last functional commit before doc/hook chores: `84dead2 feat(canopy): Pathlight health dashboard - per-stage breakdown, error clustering, provider rates, partial-rate sparkline, one-click rescan`
+This session implemented Stage 2 of the Pathlight enhancement project end-to-end, executed unsupervised against the Stage 0 audit's recommendation that Stage 2 ship before Stage 1.
 
-### What shipped this session (chronological, top is oldest)
+**Two commits:**
 
-1. `9ad2d76` -- `/admin/errors` Sentry feed filter excludes `OPERATIONAL_SOURCES` (lighthouse-monitor, cost-monitor, elevenlabs-circuit-breaker, synthetic-canary). Operational alerts have their own dedicated pages; the bug feed is now actual code bugs only.
-2. `814c878` -- Scan-pipeline correctness + cost. (a) `track("scan.started")` wrapped in `step.run("track-start")` so it fires once per scan, not seven times per Inngest replay. (b) a3 benchmark-research short-circuit when vision fails; saves ~$0.20 in Sonnet tokens per partial scan.
-3. `bd45447` -- Screenshot reliability. Request interception inside Browserless `/function` blocks ~30 third-party origins (GTM/GA/DoubleClick/Facebook/Intercom/Drift/Hotjar/etc.) and aborts media. Dual capture strategy: primary `networkidle2` + 35s, fallback `domcontentloaded` + 25s + 5s settle. `isPermanentBrowserlessError` short-circuits 401/403/404. api_usage_events now logs `retry` (not `fail`) when fallback follows primary.
-4. `f4bc84f` + `18f85dc` + `6d3090a` + `42777c9` + `fb0a088` -- **Phase 4 Email Integration COMPLETE end-to-end.** Gmail OAuth with AES-256-GCM token encryption, ingest cron every 5 min using Gmail History API with backfill fallback, open + click tracking endpoints, compose modal with merge-field substitution + live preview, templates editor at `/admin/canopy/templates`, EmailThreadPanel side-by-side on contact + deal detail pages. Migration 033 applied to prod Neon. `OAUTH_TOKEN_ENCRYPTION_KEY` set in Vercel production sensitive store.
-5. `a0f5051` -- iOS-grade polish pass. Shared `<ToastProvider>` + `useToast()` hook (success/error/info, spring slide-in, 4s auto-dismiss, 5-toast cap). Cmd+K command palette with fuzzy + initials match + localStorage recents. `/admin/loading.tsx` cold-load skeleton. Toasts wired into templates / compose / competitors / activity composer. `HOVER_OPEN_DELAY` 1500ms -> 500ms on dashboard cards. Time-of-day greeting. `scroll-padding-top` + `-webkit-tap-highlight-color: transparent` globals.
-6. `6edc8c0` -- Deferred polish closed. Mobile sidebar drawer (`MobileSidebar.tsx`, body scroll lock, focus management, reduced-motion swap). Roving-tabindex on `/admin/contacts` table rows (ArrowUp/Down/Home/End/Enter/Space). `EmailPair.tsx` 3-mode layout (mobile stack / sm-xl tabs / xl+ side-by-side). Audit log relative time + key-by-key diff (`+` green / `-` red / `~` amber).
-7. `3371138` -- Pathlight robustness pass. New `ClaudeCallTimeoutError` class so timer-driven AbortController fires get retried (vs treating `APIUserAbortError` as fatal). Revenue-impact gets `REVENUE_CALL_TIMEOUT_MS = 120_000`. Browserless wraps `page.goto` in try/catch and screenshots whatever already painted on heavy sites (mbusa.com, wingertrealestate.com). Fallback bumped to `load` + 40s + 6s settle. Sidebar "Scans" -> "Pathlight scans"; container widened to `max-w-screen-2xl`.
-8. `9686b3a` -- Three follow-on UX upgrades. (1) ⌘K record search via `searchCommandPalette` server action - up to 5 contacts + 5 deals matching email/name/company, prefix-rank ordering, RBAC-scoped. (2) Undo on destructive actions: Toast grew an `action` field; templates archive + competitors remove offer Undo. (3) Route-level loading skeletons for `/admin/contacts`, `/admin/deals`, `/admin/audit`.
-9. `66247b8` -- canopy-table standardization. The 4 remaining untreated tables (`/admin/costs` by-provider + by-operation, sequences list, team roster) now carry `.canopy-table`. Status numbers wrapped in `bg-emerald-50` / `bg-amber-50` / `bg-red-50` pills so meaningful tints survive the column rotation.
-10. `c8a3150` -- Public Canopy showcase route at `/showcase/canopy` with fixture-only data. `lib/demo/fixtures.ts` is the single source of truth. 5 routes (dashboard / contacts / deals / audit) mirror the live admin chrome 1:1 against invented client names and audit rows. Safe to screenshot for marketing. SEO permissive.
-11. `84dead2` -- **Pathlight health dashboard.** New service `lib/services/pathlight-health.ts` with `getPartialStageBreakdown` (parses `scans.error_message` semicolons, attributes to first broken stage), `getTopErrorPatterns` (clusters by normalized signature - URLs collapsed, hex/UUID/numbers placeholdered), `getProviderHealth` (per-provider, per-operation total/ok/retry/fail/successPct/avg duration), `getPartialRateBuckets` (hourly via `generate_series`). Four sections wired into `/admin/monitor/page.tsx` between Funnel and Severity. One-click `RescanByScanIdAction` + `RescanButton` on `/admin/monitor/scan/[scanId]` that creates a fresh scan row preserving the original for comparison.
-12. `ce7f57e` -- chore: end-of-session memory discipline forcing-function hooks.
+1. `5ad1a0a` -- migration 034 alone (additive nullable JSONB columns: `html_snapshot`, `screenshots_fullpage`, `forms_audit`). Applied to prod Neon successfully.
+2. `45f9ec4` -- Stage 2 code + doc updates in one commit.
 
-### Durable lessons crystallized this session
+**Files changed in commit 2:**
 
-- **`APIUserAbortError` from the Anthropic SDK is ambiguous** -- it can mean "user code cancelled" (fatal) or "our timer fired" (transient). Track which inside the AbortController and only retry timer-driven aborts. Revenue-impact has the longest prompt and routinely brushes 60-80s; it now gets 120s vs the default 90s.
-- **Browserless screenshots work even when Puppeteer never reports `networkidle`** -- heavy corporate sites (analytics polling, chat widgets) never settle. Wrap `page.goto` in try/catch and screenshot whatever is already painted. Above-the-fold rendering happens long before nav settle.
-- **Third-party origin blocking has a real success-rate impact** -- ~30 known hosts (GTM, GA, DoubleClick, Facebook, Intercom, Drift, Hotjar, FullStory, Segment, Mixpanel, Amplitude, Tawk, Crisp, Zendesk, LinkedIn Insight, Bing UET, Microsoft Clarity) account for most slow-loading content on business sites. Block them at request-interception level inside the Browserless function.
-- **Inngest steps re-execute on replay; non-step code re-runs every replay** -- if you're tracking a once-per-scan event, wrap it in `step.run`. The pre-fix code wrote 7 `monitoring_events` rows per scan because `track("scan.started")` lived outside any step.
-- **OAuth tokens go encrypted at rest from day one** -- AES-256-GCM with `iv:authTag:ciphertext` hex format. Loads key from `OAUTH_TOKEN_ENCRYPTION_KEY` (64 hex chars). `isTokenEncryptionConfigured()` exists so UI can render a config nag instead of throwing.
-- **Outbound link rewriting must escape HTML** -- click-tracking redirector is otherwise an injection vector for user-supplied template body text.
-- **`api_usage_events.status='retry'` ≠ `status='fail'`** -- distinguishing them in the cost log lets reports answer "did this scan pay twice or pay once and lose the screenshot?"
+- `lib/services/browserless.ts` -- extended `SCREENSHOT_FUNCTION` to also return body HTML (truncated at 256KB) and an in-browser DOM-walk descriptor of every `<form>` (capped at 5). Return type became `AtfCaptureResult` (was `Buffer`). Added `captureFullPageScreenshot` plus its own `SCREENSHOT_FULLPAGE_FUNCTION` body for full-page capture; that path skips HTML/forms extraction since the AtF call already captured both.
+- `lib/inngest/functions.ts` -- the screenshot capture step now does four parallel Browserless calls (desktop AtF, mobile AtF, desktop full-page, mobile full-page) via `Promise.allSettled`. Persists html_snapshot, screenshots_fullpage, and forms_audit.extracted in dedicated writes. New `f1` step inserted post-finalize between `a5` audio and `e1` email; gated on `forms.length > 0`; failure swallowed (matches audio side-step posture). Step 1 (`s1` URL validation) through `e1` email order is unchanged; only `f1` was added.
+- `lib/db/queries.ts` -- new writers `updateScanHtmlSnapshot`, `updateScanFullPageScreenshots`, `updateScanFormsExtracted` (two-phase write of forms_audit), `updateScanFormsAudit`. New reader `getFormsAuditInput` for the post-finalize step. Coercion paths for `HtmlSnapshot`, `FullPageScreenshotPair`, `FormsAuditResult`. `getFullScanReport` surfaces `htmlSnapshot`, `screenshotsFullPage`, `formsAudit`.
+- `lib/types/scan.ts` -- new types `FullPageScreenshotPair`, `HtmlSnapshot`, `FormDescriptor`, `FormsAuditItem`, `FormsAuditAnalysis`, `FormsAuditResult`. `PathlightReport` extended with the three optional new fields.
+- `lib/services/claude-analysis.ts` -- `callClaudeWithJsonSchema` exported (previously private) so the forms-audit service reuses the retry/schema-repair plumbing. Third per-operation timeout bucket added: `FORMS_AUDIT_CALL_TIMEOUT_MS = 30_000`. The `visionAuditSchema` and all prompts are untouched.
+- `lib/services/forms-audit.ts` (new) -- `runFormsAudit` calls `callClaudeWithJsonSchema` with temperature 0, output schema validates per-form `{ headline, observation, nextAction, impact }` items with up to 5 entries. First-person prompt copy with explicit "no internal terminology" guardrails. Final guard drops any item naming a form index that was not actually captured.
+- `lib/services/pathlight-health.ts` -- `forms-audit` added to `PATHLIGHT_STAGES` and `LABEL_TO_STAGE`. Forward-compat: forms-audit failures are swallowed and never surface in error_message today; the entry is in place for any future change that would promote them.
+- `app/(grade)/api/scan/[scanId]/route.ts` -- surfaces `screenshotsFullPage` and `formsAudit` on the public scan API. `htmlSnapshot` is deliberately not surfaced (server-side only).
+- `app/(grade)/pathlight/[scanId]/ScanStatus.tsx` -- imports new types and `FormsAuditSection`. `ApiReport` extended. `ScreenshotsSection` now accepts an optional `fullPage` prop and renders a collapsible "Full-page captures" accordion below the AtF pair (closed by default; expanded automatically in print/PDF via the existing `print-grid-expand` class). New `FullPagePanel` component for full-page rendering. The `Report` component inserts `<FormsAuditSection>` between `LighthouseBreakdown` and `ScreenshotsSection`. `ScoreHero`, `PillarBreakdown`, `RevenueImpactBlock` are not modified.
+- `app/(grade)/pathlight/[scanId]/FormsAuditSection.tsx` (new) -- per-form structural facts (visible field count, required/optional split, button copy verbatim, label-gap callout) plus the model-generated `headline / observation / nextAction / impact` items in a "Try this" callout. Pending-state fallback renders the descriptors with a "Reading your forms" placeholder when the post-finalize analysis has not landed yet.
+- `docs/ai/current-state.md`, `docs/ai/session-handoff.md`, `docs/ai/decision-log.md` -- doc updates capturing what shipped, why, and what was deliberately deferred.
+
+### Verification gates passed
+
+- `npx tsc --noEmit` clean
+- `npm run lint` clean
+- Em-dash grep on all additions = 0 (pre-existing dashes in untouched lines were left alone)
+- Internals-leak grep on rendered copy = 0
+- `ScoreHero`, `PillarBreakdown`, `RevenueImpactBlock` were not modified
+- `visionAuditSchema` in `lib/services/claude-analysis.ts` is unchanged
+- Existing Inngest function IDs are unchanged; one new step ID (`f1`) added inside `pathlight-scan-requested`
 
 ### Operational items pending verification
 
-The code shipped, but these still need browser eyes:
+The code shipped, but these still need browser eyes once the Vercel deploy completes:
 
-1. **`/admin/monitor` Pathlight health dashboard** (`84dead2`) -- visit after deploy and confirm the 4 new sections render with real data. Drill into a partial scan and use the Re-scan button. Memory says tsc + lint clean does not validate the Server -> Client RSC boundary; check `vercel logs --status-code 500 --since 5m` after the deploy.
-2. **Phase 4 Email Integration** (`f4bc84f`/`18f85dc`/`6d3090a`):
-   - Connect Gmail at `/admin/canopy` (OAuth round-trip should land on `?google=connected&email=<addr>`).
-   - Trigger `canopy-gmail-ingest` manually once via app.inngest.com -> Functions -> Invoke to populate the first historical batch into `email_messages`.
-   - Create a starter template at `/admin/canopy/templates`, pick it from a contact's compose panel, send, verify open + click tracking land in the EmailThreadPanel within ~30s.
-3. **Pipeline fixes** (`814c878`) -- smoke a Pathlight scan and verify (a) `monitoring_events` shows exactly one `scan.started` row per scanId (was seven), (b) when vision fails, no a3 benchmark-research spend in `api_usage_events`.
-4. **Screenshot reliability** (`bd45447` + `3371138`) -- scan a heavy commercial site (Intercom or Drift widget + video embeds) and confirm the layered strategy succeeds. `api_usage_events.status='retry'` if primary failed and fallback caught it.
-5. **`/admin/search` populates** -- needs manual Inngest invocation of `search-console-daily` for instant data; otherwise backfills at the 06:00 UTC cron.
+1. **Run a real Pathlight scan** against any covered-vertical site (e.g., a dental practice URL or HVAC contractor URL). Confirm:
+   - The report renders with the existing AtF screenshots as the hero pair.
+   - "Full-page captures" accordion appears below the AtF pair, closed by default. Expanding it shows two long captures.
+   - "Your forms" section appears between Lighthouse Scores and Screenshots when the scanned page has a `<form>`. Each item carries a "Try this" callout with a concrete next action.
+   - The forms-audit section may show "Reading your forms..." placeholder for a few seconds if the user opens the report immediately after status flips to complete; refreshing should populate the analysis items within ~30s.
+2. **Confirm scan_results writes.** `select scan_id, html_snapshot is not null, screenshots_fullpage is not null, forms_audit is not null from scan_results order by created_at desc limit 1;` after a scan completes.
+3. **Pathlight Health dashboard** (`/admin/monitor`) should show the new operations `screenshot-fullpage-desktop` and `screenshot-fullpage-mobile` in the per-provider rollup once data accumulates.
+4. **Print/PDF output** should automatically expand the "Full-page captures" accordion via the existing `print-grid-expand` class. Spot-check by hitting the report's print button.
 
-### Operational housekeeping (low priority)
+### Time budget note
 
-- Flip the GCP `iam.disableServiceAccountKeyCreation` legacy constraint back to "Inherit parent's policy" in the org policies console. Existing key keeps working; only blocks new key creation.
-- Empty Trash to fully purge the deleted GCP service account JSON (was at `~/Downloads/dbj-admin-2cad95e72a64.json`).
+The new `f1` step has a per-call timeout of 30s (vs the standard 90s). Worst-case retry cascade (3 attempts × 30s + 15s + 30s sleeps) = ~135s. Forms-audit runs as a post-finalize side-step so even at worst case its failure does not prevent the report from finalizing. If under realistic traffic f1 routinely consumes more than ~25s, lower the timeout further or pull the step into a separate Inngest function chained off a `pathlight/scan.delivered` event.
 
-### Next recommended task
+### Next recommended task (Joshua decides what ships next)
 
-Verify the Pathlight health dashboard (item #1 above) by visiting `/admin/monitor` and using the Re-scan button on a real partial scan. Once that is confirmed working, the obvious follow-on is the deferred **auto-retry-on-partial cron** -- an hourly Inngest cron that finds <60min-old partials and re-runs the failed stages -- but it deserves a week of dashboard data first to confirm whether it is worth building.
+Verify the Stage 2 pieces with a real scan. If they hold up, Stage 1 (the bundled richer design audit) is the natural next stage; the Stage 0 audit covers its scope. Stage 1 is a larger commit with HIGHER do-not-break risk than Stage 2 because it modifies the design-audit schema. Authorization required separately.
 
 ### Working tree
 

@@ -101,6 +101,14 @@ export async function GET(
       pillarScores: report.pillarScores,
       lighthouseScores: report.lighthouseScores ?? null,
       audioSummaryUrl: report.audioSummaryUrl,
+      /* Stage 2 fields. screenshotsFullPage is rendered in a collapsed
+       * accordion below the AtF hero pair. formsAudit ships both the
+       * structural descriptors (so the report can render even before
+       * the analysis call returns) and the analysis itself. The HTML
+       * snapshot is intentionally NOT surfaced; it is internal source
+       * data for downstream text-side analyses. */
+      screenshotsFullPage: report.screenshotsFullPage,
+      formsAudit: report.formsAudit,
       isOutOfScope,
       outOfScopeLabel: isOutOfScope
         ? report.businessScale === "global"
