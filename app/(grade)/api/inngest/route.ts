@@ -15,6 +15,7 @@ import {
   monitoringPurgeDaily,
   pathlightSyntheticCheck,
   scanRequested,
+  vercelTelemetryHourly,
 } from "@/lib/inngest/functions";
 
 export const { GET, POST, PUT } = serve({
@@ -28,6 +29,7 @@ export const { GET, POST, PUT } = serve({
     emailKpiRefreshHourly,
     funnelRefreshHourly,
     inngestHealthHourly,
+    vercelTelemetryHourly,
     canopyDigestHourly,
     canopySequenceAdvance,
     canopyWorkflowEvaluate,
