@@ -4,22 +4,33 @@ Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`). The most recent archive is
 [`history/2026-05-02.md`](history/2026-05-02.md).
 
-## Current state (May 3, 2026 -- Pathlight reliability hardening shipped on top of Stage 1)
+## Current state (May 3, 2026 -- Inngest cron registration in flight; Commits A and B shipped)
 
 ### Anchor block
 
-HEAD: `acc2bce` (Pathlight reliability hardening: send-time email integrity gate, vision desktop-only support, Browserless 429 exponential backoff, report CTA gate, migration 036). The hash above reflects the published commit; one prior amend shifted the hash by a byte to fill in this line. `git log -1` is the authoritative source.
+HEAD: `8420b34` (feat(inngest): wire Commit B cron `vercel-telemetry-hourly`; same-commit `current-state.md` update). `git log -1` is the authoritative source.
 
 Recent commits (newest first):
-- Pathlight reliability hardening (this commit, hash above)
+- `8420b34` -- Commit B: wire `vercel-telemetry-hourly` in serve handler (this commit). Fires at `:10` past each hour, snapshots Vercel deployments via REST API into `vercel_deployments` for `/admin/platform`. All three Vercel env vars confirmed set in production.
+- `b637ca3` -- Commit A: wire `inngest-health-hourly`, `funnel-refresh-hourly`, `email-kpi-refresh-hourly`. Verified green in Inngest dashboard with multiple successful runs at 0% failure rate before Commit B shipped.
+- `acc2bce` -- Pathlight reliability hardening (send-time email integrity gate, vision desktop-only support, Browserless 429 exponential backoff, report CTA gate, migration 036)
 - `ffd760a` -- Pathlight scan form business-name placeholder refreshed to "Mockingbird Optical"
-- `688ec27` -- Stage 1 implementation: page critique side-step, CTA inventory, headline alternatives, hero observation
+- `688ec27` -- Stage 1: page critique side-step
 - `0efae8e` -- migration 035 (page_critique JSONB column)
-- `a755793` -- Stage 2 cleanup (hoist f1 dynamic imports to static)
-- `1027ca3` -- Stage 2 (HTML capture, full-page screenshots, forms audit)
-- `5ad1a0a` -- migration 034
 
-Working tree: clean.
+Working tree: clean. Pushed to origin main confirmed.
+
+### Cron registration progress (staged plan A through E)
+
+The seven Inngest cron exports added in commit `1173bc2` (April 28) were never registered in the serve handler. Staged registration in flight, one risk-tier per commit. Each commit deploys, we verify the cron's first scheduled fire (or manual Inngest invoke for the daily ones) in the Inngest dashboard, then proceed.
+
+- **Commit A** (`b637ca3`): `inngest-health-hourly` (`:15`), `funnel-refresh-hourly` (`:05`), `email-kpi-refresh-hourly` (`:25`). Zero env-var deps. **Verified green** in Inngest dashboard (multiple successful runs, 0% failure rate).
+- **Commit B** (`8420b34`, this commit): `vercel-telemetry-hourly` (`:10`). Requires `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID` (all confirmed set in Vercel production). **Awaiting first scheduled fire** at next `:10` UTC.
+- **Commit C** (pending): `anthropic-budget-hourly` (`:20`). Requires `ANTHROPIC_ADMIN_KEY`, `ANTHROPIC_MONTHLY_BUDGET_USD` (both confirmed set).
+- **Commit D** (pending): `search-console-daily` (06:00 UTC). Requires `GOOGLE_SC_CREDENTIALS_JSON`, `GOOGLE_SC_SITE_URL` (both confirmed set), plus GSC permissions UI grant for the service account.
+- **Commit E** (pending): `infrastructure-check-daily` (08:00 UTC). No new env vars. Most operationally severe of the four pending, since it is the sole TLS / WHOIS / DNS-auth expiry warning channel.
+
+Verify Commit B in the Inngest dashboard at https://app.inngest.com/env/production/functions/dbj-technologies-vercel-telemetry-hourly within ~60 minutes of this push. Green run = ship Commit C.
 
 ### What shipped this session: Pathlight reliability hardening (Phase 1 + Phase 2)
 
