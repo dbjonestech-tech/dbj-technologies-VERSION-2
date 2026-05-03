@@ -154,11 +154,26 @@ function formatNumber(n: number): string {
   return new Intl.NumberFormat("en-US").format(n);
 }
 
-function formatDate(iso: string): string {
+function formatRelativeTime(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 0) return "just now";
+  if (ms < 5_000) return "just now";
+  if (ms < 60_000) return `${Math.floor(ms / 1000)}s ago`;
+  if (ms < 3_600_000) return `${Math.floor(ms / 60_000)}m ago`;
+  if (ms < 86_400_000) return `${Math.floor(ms / 3_600_000)}h ago`;
+  if (ms < 7 * 86_400_000) return `${Math.floor(ms / 86_400_000)}d ago`;
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatAbsolute(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
+    year: "numeric",
     hour: "numeric",
     minute: "2-digit",
     second: "2-digit",
@@ -272,11 +287,14 @@ export default async function AdminAuditPage({
                 ) : (
                   rows.map((row) => {
                     const meta = row.metadata ?? {};
-                    const hasMeta = Object.keys(meta).length > 0;
+                    const metaKeys = Object.keys(meta);
                     return (
                       <tr key={row.id} className="border-t border-zinc-100 align-top">
-                        <td className="px-4 py-3 text-xs text-zinc-600">
-                          {formatDate(row.created_at)}
+                        <td
+                          className="px-4 py-3 text-xs text-zinc-600"
+                          title={formatAbsolute(row.created_at)}
+                        >
+                          {formatRelativeTime(row.created_at)}
                         </td>
                         <td className="px-4 py-3 font-mono text-xs text-zinc-900">
                           {row.event}
@@ -297,20 +315,8 @@ export default async function AdminAuditPage({
                         <td className="px-4 py-3 text-xs text-zinc-500">
                           {shortUserAgent(row.user_agent)}
                         </td>
-                        <td className="px-4 py-3 max-w-sm">
-                          {hasMeta ? (
-                            <details>
-                              <summary className="cursor-pointer text-xs text-zinc-600 hover:text-zinc-900">
-                                {Object.keys(meta).length} field
-                                {Object.keys(meta).length === 1 ? "" : "s"}
-                              </summary>
-                              <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded-md bg-zinc-50 p-2 text-[11px] text-zinc-800">
-                                {JSON.stringify(meta, null, 2)}
-                              </pre>
-                            </details>
-                          ) : (
-                            <span className="text-xs text-zinc-400">-</span>
-                          )}
+                        <td className="max-w-sm px-4 py-3">
+                          <MetadataCell meta={meta} keys={metaKeys} />
                         </td>
                       </tr>
                     );
@@ -436,6 +442,60 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       {children}
     </label>
   );
+}
+
+/* Renders the audit metadata column. Most rows have 0-3 keys; render
+ * those inline as a tidy key:value list (no JSON braces, no quotes).
+ * Heavy payloads collapse into a <details> block so the row height
+ * stays predictable and scanning the table is fast. */
+function MetadataCell({
+  meta,
+  keys,
+}: {
+  meta: Record<string, unknown>;
+  keys: string[];
+}) {
+  if (keys.length === 0) {
+    return <span className="text-xs text-zinc-400">-</span>;
+  }
+  if (keys.length <= 3) {
+    return (
+      <dl className="space-y-0.5 text-[11px]">
+        {keys.map((k) => (
+          <div key={k} className="flex gap-2">
+            <dt className="font-mono text-zinc-500">{k}</dt>
+            <dd className="font-mono break-all text-zinc-800">
+              {formatMetaValue(meta[k])}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    );
+  }
+  return (
+    <details>
+      <summary className="cursor-pointer text-xs text-zinc-600 hover:text-zinc-900">
+        {keys.length} fields
+      </summary>
+      <dl className="mt-2 space-y-0.5 rounded-md bg-zinc-50 p-2 text-[11px]">
+        {keys.map((k) => (
+          <div key={k} className="flex gap-2">
+            <dt className="font-mono text-zinc-500">{k}</dt>
+            <dd className="font-mono break-all text-zinc-800">
+              {formatMetaValue(meta[k])}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </details>
+  );
+}
+
+function formatMetaValue(value: unknown): string {
+  if (value === null || value === undefined) return "null";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return JSON.stringify(value);
 }
 
 function Pagination({

@@ -4,162 +4,18 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { signOutAction } from "@/lib/auth/actions";
-import {
-  LogOut,
-  LayoutDashboard,
-  Activity,
-  DollarSign,
-  Database,
-  Mail,
-  Users,
-  FileText,
-  Briefcase,
-  Globe,
-  Filter,
-  Repeat,
-  Search,
-  Server,
-  Workflow,
-  Wifi,
-  AlertTriangle,
-  Zap,
-  ShieldCheck,
-  Settings,
-  ClipboardList,
-  Kanban,
-  Sliders,
-  BarChart3,
-  Send,
-  Key,
-  Sprout,
-  Radar,
-  Radio,
-  Files,
-} from "lucide-react";
-import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
+import { LogOut } from "lucide-react";
+import { getPalette } from "@/lib/admin/page-themes";
+import { buildAdminNavGroups } from "@/lib/admin/nav-config";
 import { getContactsDashboardSummary } from "@/lib/services/contacts";
 import { ToastProvider } from "./components/Toast";
 import CommandPalette from "./components/CommandPalette";
+import MobileSidebar from "./components/MobileSidebar";
 
 export const metadata: Metadata = {
   title: { default: "Admin", template: "%s | DBJ Admin" },
   robots: { index: false, follow: false, nocache: true },
 };
-
-type NavItem = {
-  label: string;
-  href: string;
-  icon: typeof LayoutDashboard;
-  /* Palette name pulled into class strings on the rendered Link.
-   * Mirrors PAGE_PALETTE in lib/admin/page-themes.ts so the sidebar
-   * label/icon color matches the destination page's identity. */
-  palette: PaletteName;
-  disabled?: boolean;
-  /* When set, the nav row renders a small numeric or pulse badge.
-   * Used for the Contacts overdue follow-up indicator so an admin
-   * sees stale-lead pressure from any /admin page. */
-  badge?: { count: number; tone: "danger" | "info" } | null;
-};
-
-function buildNavGroups(overdueCount: number): { label: string; items: NavItem[] }[] {
-  return [
-  {
-    label: "Overview",
-    items: [
-      { label: "Dashboard", href: "/admin", icon: LayoutDashboard, palette: "zinc" },
-    ],
-  },
-  {
-    label: "Acquisition",
-    items: [
-      { label: "Visitors", href: "/admin/visitors", icon: Globe, palette: "sky" },
-      { label: "Recurring users", href: "/admin/recurring", icon: Repeat, palette: "pink" },
-      { label: "Funnel", href: "/admin/funnel", icon: Filter, palette: "violet" },
-      { label: "Search", href: "/admin/search", icon: Search, palette: "indigo" },
-      { label: "RUM", href: "/admin/performance/rum", icon: Zap, palette: "fuchsia" },
-    ],
-  },
-  {
-    label: "Relationships",
-    items: [
-      {
-        label: "Contacts",
-        href: "/admin/contacts",
-        icon: ClipboardList,
-        palette: "pink",
-        badge: overdueCount > 0 ? { count: overdueCount, tone: "danger" } : null,
-      },
-      {
-        label: "Deals",
-        href: "/admin/deals",
-        icon: Briefcase,
-        palette: "violet",
-      },
-      {
-        label: "Stage board",
-        href: "/admin/relationships/pipeline",
-        icon: Kanban,
-        palette: "rose",
-      },
-    ],
-  },
-  {
-    label: "Analytics",
-    items: [
-      { label: "Sales analytics", href: "/admin/analytics/pipeline", icon: BarChart3, palette: "emerald" },
-    ],
-  },
-  {
-    label: "Automation",
-    items: [
-      { label: "Sequences", href: "/admin/sequences", icon: Send, palette: "violet" },
-      { label: "Workflow rules", href: "/admin/automations", icon: Zap, palette: "violet" },
-      { label: "Email templates", href: "/admin/canopy/templates", icon: Files, palette: "violet" },
-    ],
-  },
-  {
-    label: "Pathlight Advanced",
-    items: [
-      { label: "Prospecting", href: "/admin/prospecting", icon: Sprout, palette: "lime" },
-      { label: "Website changes", href: "/admin/website-changes", icon: Radar, palette: "lime" },
-      { label: "Beacon", href: "/admin/canopy/beacon", icon: Radio, palette: "lime" },
-    ],
-  },
-  {
-    label: "Operations",
-    items: [
-      { label: "Tasks", href: "/admin/tasks", icon: ClipboardList, palette: "amber" },
-      { label: "Monitor", href: "/admin/monitor", icon: Activity, palette: "cyan" },
-      { label: "Costs", href: "/admin/costs", icon: DollarSign, palette: "amber" },
-      { label: "Scans", href: "/admin/scans", icon: FileText, palette: "teal" },
-      { label: "Leads", href: "/admin/leads", icon: Mail, palette: "blue" },
-      { label: "Clients", href: "/admin/clients", icon: Briefcase, palette: "yellow" },
-      { label: "Database", href: "/admin/database", icon: Database, palette: "orange" },
-    ],
-  },
-  {
-    label: "Health",
-    items: [
-      { label: "Pipeline", href: "/admin/pipeline", icon: Workflow, palette: "emerald" },
-      { label: "Platform", href: "/admin/platform", icon: Server, palette: "green" },
-      { label: "Errors", href: "/admin/errors", icon: AlertTriangle, palette: "red" },
-      { label: "Email", href: "/admin/email", icon: Mail, palette: "purple" },
-      { label: "Infrastructure", href: "/admin/infrastructure", icon: Wifi, palette: "lime" },
-    ],
-  },
-  {
-    label: "Account",
-    items: [
-      { label: "Canopy controls", href: "/admin/canopy", icon: Sliders, palette: "stone" },
-      { label: "Team", href: "/admin/canopy/team", icon: Users, palette: "zinc" },
-      { label: "API & webhooks", href: "/admin/canopy/api", icon: Key, palette: "stone" },
-      { label: "Audit log", href: "/admin/audit", icon: ShieldCheck, palette: "stone" },
-      { label: "Users", href: "/admin/users", icon: Users, palette: "zinc" },
-      { label: "Config", href: "/admin/config", icon: Settings, palette: "teal" },
-    ],
-  },
-  ];
-}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -171,7 +27,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
    * /admin page without requiring per-page wiring. Best-effort: any
    * failure inside getContactsDashboardSummary already returns zeros. */
   const summary = await getContactsDashboardSummary();
-  const navGroups = buildNavGroups(summary.overdue);
+  const navGroups = buildAdminNavGroups(summary.overdue);
 
   return (
     <ToastProvider>
@@ -269,18 +125,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </aside>
 
         <main className="flex flex-1 flex-col">
-          <header className="flex min-h-16 items-center justify-between border-b border-zinc-200 bg-white px-6 py-3 lg:hidden">
+          <header className="flex min-h-14 items-center gap-3 border-b border-zinc-200 bg-white px-4 py-2 lg:hidden">
+            <MobileSidebar
+              overdueCount={summary.overdue}
+              signedInEmail={session.user.email ?? ""}
+            />
             <CanopyWordmark />
-
-            <form action={signOutAction}>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 rounded-md border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
-              >
-                <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
-                Sign out
-              </button>
-            </form>
           </header>
           <div className="flex-1 overflow-x-hidden">{children}</div>
         </main>

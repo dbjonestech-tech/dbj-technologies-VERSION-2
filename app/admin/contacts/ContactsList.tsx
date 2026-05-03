@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import {
   Mail,
   Phone,
@@ -104,20 +104,77 @@ export default function ContactsList({
   const [pending, startTransition] = useTransition();
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
-  function toggleOne(id: number) {
+  /* Roving tabindex for keyboard navigation. focusedIndex tracks
+   * which row owns tabIndex=0; arrow keys move it, Enter opens the
+   * contact, Space toggles the row selection. */
+  const [focusedIndex, setFocusedIndex] = useState(0);
+  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+
+  useEffect(() => {
+    if (focusedIndex >= rows.length) setFocusedIndex(Math.max(0, rows.length - 1));
+  }, [rows.length, focusedIndex]);
+
+  const toggleOne = useCallback((id: number) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  }
+  }, []);
+
   function toggleAll() {
     setSelectedIds((prev) => {
       if (prev.size === rows.length) return new Set();
       return new Set(rows.map((r) => r.id));
     });
   }
+
+  const focusRow = useCallback(
+    (idx: number) => {
+      if (rows.length === 0) return;
+      const clamped = Math.max(0, Math.min(rows.length - 1, idx));
+      setFocusedIndex(clamped);
+      rowRefs.current[clamped]?.focus();
+    },
+    [rows.length]
+  );
+
+  const onRowKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTableRowElement>, idx: number, id: number) => {
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          focusRow(idx + 1);
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          focusRow(idx - 1);
+          break;
+        case "Home":
+          e.preventDefault();
+          focusRow(0);
+          break;
+        case "End":
+          e.preventDefault();
+          focusRow(rows.length - 1);
+          break;
+        case "Enter":
+          e.preventDefault();
+          router.push(`/admin/contacts/${id}`);
+          break;
+        case " ":
+          /* Don't hijack space when the user is typing in an input
+           * inside the row (search the whole tbody for focused input)
+           * or when toggling the visible checkbox directly. */
+          if ((e.target as HTMLElement).tagName === "INPUT") break;
+          e.preventDefault();
+          toggleOne(id);
+          break;
+      }
+    },
+    [focusRow, rows.length, router, toggleOne]
+  );
 
   /* Debounced search: rewrite the URL after 300ms idle so the server
    * can re-query without flooding navigation events. */
@@ -305,12 +362,19 @@ export default function ContactsList({
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
+                {rows.map((r, idx) => (
                   <ContactRow
                     key={r.id}
                     row={r}
                     selected={selectedIds.has(r.id)}
                     onToggle={() => toggleOne(r.id)}
+                    tabIndex={focusedIndex === idx ? 0 : -1}
+                    isFocused={focusedIndex === idx}
+                    onKeyDown={(e) => onRowKeyDown(e, idx, r.id)}
+                    onFocus={() => setFocusedIndex(idx)}
+                    rowRef={(el) => {
+                      rowRefs.current[idx] = el;
+                    }}
                   />
                 ))}
               </tbody>
@@ -354,10 +418,20 @@ function ContactRow({
   row,
   selected,
   onToggle,
+  tabIndex,
+  isFocused,
+  onKeyDown,
+  onFocus,
+  rowRef,
 }: {
   row: ContactListRow;
   selected: boolean;
   onToggle: () => void;
+  tabIndex: number;
+  isFocused: boolean;
+  onKeyDown: (e: React.KeyboardEvent<HTMLTableRowElement>) => void;
+  onFocus: () => void;
+  rowRef: (el: HTMLTableRowElement | null) => void;
 }) {
   const followUp = formatFollowUp(row.followUpDate);
   const followUpClass =
@@ -368,20 +442,36 @@ function ContactRow({
         : followUp.tone === "later"
           ? "text-zinc-700"
           : "text-zinc-400";
+  const focusedRing = isFocused
+    ? "ring-2 ring-inset ring-pink-400 outline-none"
+    : "outline-none";
   return (
-    <tr className={`border-t border-zinc-100 transition-colors even:bg-zinc-100/70 hover:bg-pink-50 ${selected ? "!bg-pink-100" : ""}`}>
+    <tr
+      ref={rowRef}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
+      onFocus={onFocus}
+      aria-selected={selected}
+      aria-label={`${row.name ?? row.email}${row.company ? ` at ${row.company}` : ""}, ${selected ? "selected" : "not selected"}. Press Enter to open, Space to toggle.`}
+      className={`cursor-pointer border-t border-zinc-100 transition-colors even:bg-zinc-100/70 hover:bg-pink-50 ${focusedRing} ${selected ? "!bg-pink-100" : ""}`}
+    >
       <td className="px-2 py-2 align-middle">
         <input
           type="checkbox"
           aria-label={`Select ${row.email}`}
           checked={selected}
           onChange={onToggle}
+          /* Don't grab keyboard tab stops; row keyboard nav handles
+           * select via Space. Mouse and screen-reader users still
+           * interact with the checkbox directly. */
+          tabIndex={-1}
         />
       </td>
       <td className="px-3 py-2">
         <Link
           href={`/admin/contacts/${row.id}`}
           className="block hover:underline"
+          tabIndex={-1}
         >
           {row.name ? (
             <>

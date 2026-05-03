@@ -52,6 +52,7 @@ import EntityAuditList from "../../components/EntityAuditList";
 import CompetitorsPanel from "./CompetitorsPanel";
 import EmailComposePanel from "./EmailComposePanel";
 import EmailThreadPanel from "./EmailThreadPanel";
+import EmailPair from "./EmailPair";
 import { listCompetitors } from "@/lib/canopy/competitors";
 import { getOAuthTokenForUser } from "@/lib/canopy/email/oauth-tokens";
 import { listTemplatesForOwner } from "@/lib/canopy/email/templates";
@@ -271,25 +272,28 @@ export default async function ContactDetailPage({ params }: Props) {
           gateReason={competitiveGate.reason ?? null}
         />
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <EmailComposePanel
-            contactId={contact.id}
-            dealId={openDeal?.id ?? null}
-            contactEmail={contact.email}
-            contactName={contact.name}
-            contactCompany={contact.company}
-            fromEmail={myTokenInfo?.connectedEmail ?? null}
-            templates={myTemplates.map((t) => ({
-              id: t.id,
-              name: t.name,
-              subject: t.subject,
-              bodyMarkdown: t.body_markdown,
-            }))}
-            ableToSend={ableToSend}
-            unavailableReason={unavailableReason}
-          />
-          <EmailThreadPanel contactId={contact.id} />
-        </div>
+        <EmailPair
+          compose={
+            <EmailComposePanel
+              contactId={contact.id}
+              dealId={openDeal?.id ?? null}
+              contactEmail={contact.email}
+              contactName={contact.name}
+              contactCompany={contact.company}
+              fromEmail={myTokenInfo?.connectedEmail ?? null}
+              templates={myTemplates.map((t) => ({
+                id: t.id,
+                name: t.name,
+                subject: t.subject,
+                bodyMarkdown: t.body_markdown,
+              }))}
+              ableToSend={ableToSend}
+              unavailableReason={unavailableReason}
+            />
+          }
+          thread={<EmailThreadPanel contactId={contact.id} />}
+        />
+
 
         <div className="mt-6">
           <EntityAuditList audit={audit} />
