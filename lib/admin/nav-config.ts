@@ -112,7 +112,7 @@ export function buildAdminNavGroups(overdueCount: number): NavGroup[] {
         { label: "Tasks", href: "/admin/tasks", icon: ClipboardList, palette: "amber" },
         { label: "Monitor", href: "/admin/monitor", icon: Activity, palette: "cyan" },
         { label: "Costs", href: "/admin/costs", icon: DollarSign, palette: "amber" },
-        { label: "Scans", href: "/admin/scans", icon: FileText, palette: "teal" },
+        { label: "Pathlight scans", href: "/admin/scans", icon: FileText, palette: "teal" },
         { label: "Leads", href: "/admin/leads", icon: Mail, palette: "blue" },
         { label: "Clients", href: "/admin/clients", icon: Briefcase, palette: "yellow" },
         { label: "Database", href: "/admin/database", icon: Database, palette: "orange" },

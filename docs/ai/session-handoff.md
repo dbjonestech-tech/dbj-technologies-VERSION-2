@@ -5,7 +5,36 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- **deferred polish punch list closed at `6edc8c0`** on top of `a0f5051`. Mobile sidebar drawer, contacts table keyboard nav, tablet email tabs, audit log relative-time + key-by-key diff. Tree clean, pushed to origin main.)
+## Current state (May 2, 2026 -- **Pathlight pipeline robustness pass + Canopy nav rename + scans table fit, awaiting user approval to commit** on top of `6edc8c0`. Four files modified, tsc + lint clean.)
+
+### Pathlight robustness pass (uncommitted)
+
+Diagnosed 12 most recent partial scans against production Neon. Two failure classes traced to deterministic bugs in our retry/fallback logic, not external flakiness:
+
+1. **Browserless 25s nav timeout, both desktop and mobile.** Heavy sites (mbusa.com, wingertrealestate.com) never reach `networkidle2` or `domcontentloaded` inside the Browserless function's nav window because of persistent analytics polling and chat widgets. Real users see content paint long before navigation fully settles.
+2. **`Claude API error: Request was aborted` on revenue-impact.** Our own 90s `CALL_TIMEOUT_MS` AbortController fires; `APIUserAbortError` was classified as non-transient, so no retry. Revenue-impact is the longest prompt in the pipeline (vision findings + remediation summary + benchmark JSON + assumptions) and routinely brushes 60-80s.
+
+The other partials (PSI 500 / 60s timeout, Anthropic 529 overloaded, vision 400 "Could not process image") are upstream and already retry-handled.
+
+Files changed:
+
+- `lib/services/browserless.ts` -- inside the Browserless `/function` body, wrap `page.goto` in try/catch. On nav timeout, log and continue; we screenshot whatever the browser already painted. Bumped fallback strategy from `domcontentloaded` + 25s to `load` + 40s, and bumped fallback settle from 5s to 6s. Above-the-fold content was already rendering on the failing sites, just not "settled" by Puppeteer's definition.
+- `lib/services/claude-analysis.ts` -- new `ClaudeCallTimeoutError` class. The two `callWithRetry` blocks (`callClaude` and `researchIndustryBenchmark`) now track a `timedOut` flag set inside the AbortController's timer. If the SDK throws `APIUserAbortError` AND our timer fired, the error is normalized into `ClaudeCallTimeoutError` which `isTransientAnthropicError` treats as transient; `callWithRetry` now retries timer-driven timeouts. True upstream cancellations (timedOut=false) still propagate as fatal. Also added `REVENUE_CALL_TIMEOUT_MS = 120_000` and routed the `revenue-impact` operation to use it; everyone else stays at 90s.
+- `lib/admin/nav-config.ts` -- sidebar label "Scans" -> "Pathlight scans" so it is obvious what the page surfaces.
+- `app/admin/scans/page.tsx` -- container max-width `max-w-6xl` -> `max-w-screen-2xl` so the table fits standard desktop viewports without horizontal scroll. Page header `pageName` and metadata title also flipped to "Pathlight scans". Tightened the inline error-message truncate from `max-w-xs` (320px) to `max-w-[180px]` so the long Browserless JSON blob does not blow out the Status column.
+
+What this should fix on the next scan of mbusa.com / wingertrealestate.com / similar heavy corporate sites: the screenshot stage will return a usable frame even when the page never reaches networkidle, the vision audit will run, the rest of the pipeline will not skip, and the scan completes instead of going partial.
+
+What this does **not** address: PSI/Lighthouse upstream failures (Google's), Anthropic 529 capacity events (transient and already retried), and the one-off vision 400 "Could not process image" (would need investigation of which screenshot encoding tripped Anthropic). Revisit if those reappear.
+
+### Verification before commit
+
+- `npx tsc --noEmit` clean.
+- `npm run lint` clean.
+- Diagnostic script (`scripts/_tmp_scan_errors_query.mjs`) used during investigation has been removed.
+- Runtime not yet verified (memory: tsc + lint clean does not validate the Server -> Client RSC boundary; check `vercel logs --status-code 500` after deploy and re-scan one of the previously-failing sites to confirm the screenshot fallback works in practice).
+
+
 
 ### Deferred polish punch list closed at `6edc8c0`
 

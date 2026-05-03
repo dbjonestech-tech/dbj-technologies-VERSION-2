@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Scans",
+  title: "Pathlight scans",
   robots: { index: false, follow: false, nocache: true },
 };
 
@@ -260,11 +260,11 @@ export default async function AdminScansPage({
 
   return (
     <div className="px-6 py-10 sm:px-10">
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="mx-auto w-full max-w-screen-2xl">
         <PageHeader
           palette="teal"
           section="Today"
-          pageName="Scans"
+          pageName="Pathlight scans"
           description="Every Pathlight scan with status, score, and computed monthly revenue impact. Click a row to drill into its event timeline."
         />
 
@@ -331,7 +331,7 @@ export default async function AdminScansPage({
                           </span>
                           {row.error_message ? (
                             <div
-                              className="mt-1 max-w-xs truncate text-[11px] text-red-600"
+                              className="mt-1 max-w-[180px] truncate text-[11px] text-red-600"
                               title={row.error_message}
                             >
                               {row.error_message}

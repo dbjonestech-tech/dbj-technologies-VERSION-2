@@ -28,6 +28,12 @@ export type AnthropicCallMeta = {
   scanId: string | null;
 };
 const CALL_TIMEOUT_MS = 90_000;
+// revenue-impact assembles the longest user prompt (vision findings +
+// remediation summary + benchmark JSON + assumptions) and routinely
+// pushes 60-80s end to end. Five recent partial scans hit our own 90s
+// AbortController on this stage, so it gets a longer budget. Inngest's
+// per-step ceiling is well above 120s.
+const REVENUE_CALL_TIMEOUT_MS = 120_000;
 const MAX_HEADINGS = 40;
 const MAX_LINK_TEXTS = 40;
 const MAX_TEXT_CHARS = 160;
@@ -166,7 +172,19 @@ function getAnthropic(): Anthropic {
 
 const RETRY_DELAYS_MS = [15_000, 30_000];
 
+// Thrown when our own AbortController's timer fires. Distinguishes a
+// timeout-driven abort from a true upstream APIUserAbortError (which
+// would mean the caller cancelled). The classifier below treats this
+// as transient so callWithRetry will give the request another shot.
+class ClaudeCallTimeoutError extends Error {
+  constructor(operation: string, ms: number) {
+    super(`Claude API call '${operation}' timed out after ${ms / 1000}s`);
+    this.name = "ClaudeCallTimeoutError";
+  }
+}
+
 function isTransientAnthropicError(err: unknown): boolean {
+  if (err instanceof ClaudeCallTimeoutError) return true;
   if (err instanceof APIUserAbortError) return false;
   if (err instanceof APIConnectionError) return true;
   if (err instanceof RateLimitError) return true;
@@ -258,6 +276,8 @@ async function callClaude(
   const client = getAnthropic();
   const operation = meta?.operation ?? "claude-call";
   const scanId = meta?.scanId ?? null;
+  const callTimeoutMs =
+    operation === "revenue-impact" ? REVENUE_CALL_TIMEOUT_MS : CALL_TIMEOUT_MS;
   let attempt = 0;
 
   try {
@@ -265,7 +285,11 @@ async function callClaude(
       attempt += 1;
       const start = Date.now();
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), CALL_TIMEOUT_MS);
+      let timedOut = false;
+      const timer = setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+      }, callTimeoutMs);
       try {
         const apiResp = (await client.messages.create(
           {
@@ -299,7 +323,14 @@ async function callClaude(
         });
         return apiResp;
       } catch (err) {
-        const status: ApiCallStatus = isTransientAnthropicError(err)
+        // If our own timer fired, the SDK throws APIUserAbortError. Re-cast
+        // it so callWithRetry treats it as transient and retries. A real
+        // upstream cancellation (timedOut=false) still propagates as fatal.
+        const normalized =
+          timedOut && err instanceof APIUserAbortError
+            ? new ClaudeCallTimeoutError(operation, callTimeoutMs)
+            : err;
+        const status: ApiCallStatus = isTransientAnthropicError(normalized)
           ? "retry"
           : "fail";
         await recordAnthropicUsage({
@@ -311,7 +342,7 @@ async function callClaude(
           attempt,
           usage: null,
         });
-        throw err;
+        throw normalized;
       } finally {
         clearTimeout(timer);
       }
@@ -1103,7 +1134,11 @@ Search for "${industryLabel} average job ticket value" or "${industryLabel} aver
         benchmarkAttempt += 1;
         const start = Date.now();
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 90_000);
+        let timedOut = false;
+        const timeout = setTimeout(() => {
+          timedOut = true;
+          controller.abort();
+        }, 90_000);
         try {
           const apiResp = (await client.messages.create(
             {
@@ -1141,7 +1176,11 @@ Search for "${industryLabel} average job ticket value" or "${industryLabel} aver
           });
           return apiResp;
         } catch (err) {
-          const status: ApiCallStatus = isTransientAnthropicError(err)
+          const normalized =
+            timedOut && err instanceof APIUserAbortError
+              ? new ClaudeCallTimeoutError("benchmark-research", 90_000)
+              : err;
+          const status: ApiCallStatus = isTransientAnthropicError(normalized)
             ? "retry"
             : "fail";
           await recordAnthropicUsage({
@@ -1153,7 +1192,7 @@ Search for "${industryLabel} average job ticket value" or "${industryLabel} aver
             attempt: benchmarkAttempt,
             usage: null,
           });
-          throw err;
+          throw normalized;
         } finally {
           clearTimeout(timeout);
         }

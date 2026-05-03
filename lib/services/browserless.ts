@@ -102,11 +102,27 @@ export default async function ({ page, context }) {
     });
   } catch (_err) { /* request interception is best-effort */ }
 
-  const waitUntil = isFallback ? 'domcontentloaded' : 'networkidle2';
-  const navTimeout = isFallback ? 25000 : 35000;
-  const settleMs = isFallback ? 5000 : 2500;
+  // Heavy sites (corporate homepages with chat widgets, persistent
+  // analytics polling, video embeds) can fail to reach networkidle2 or
+  // even domcontentloaded inside Browserless's nav window. Real users
+  // see content render long before that. So: if navigation throws a
+  // timeout, log it and continue. We screenshot whatever the browser
+  // already painted. This was the dominant cause of "partial" scans on
+  // mbusa.com / wingertrealestate.com.
+  const waitUntil = isFallback ? 'load' : 'networkidle2';
+  const navTimeout = isFallback ? 40000 : 35000;
+  const settleMs = isFallback ? 6000 : 2500;
 
-  await page.goto(url, { waitUntil, timeout: navTimeout });
+  try {
+    await page.goto(url, { waitUntil, timeout: navTimeout });
+  } catch (err) {
+    const msg = (err && err.message) || String(err);
+    if (/timeout/i.test(msg)) {
+      console.warn('[browserless-fn] navigation timed out, screenshotting current frame: ' + msg.slice(0, 200));
+    } else {
+      throw err;
+    }
+  }
 
   try {
     await page.evaluate(() => {
