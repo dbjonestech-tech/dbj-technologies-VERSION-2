@@ -5,7 +5,35 @@ Live snapshot of what the next session needs. Older sessions live under
 [`history/2026-05-01.md`](history/2026-05-01.md), which holds the verbatim
 record of every May 1 entry that was below this header before this reset.
 
-## Current state (May 2, 2026 -- **Pathlight pipeline robustness pass + Canopy nav rename + scans table fit shipped at `3371138`** on top of `6edc8c0`. Five files committed (4 code + this doc), pushed to origin main, working tree carries pre-existing untouched WIP from a prior session.)
+## Current state (May 2, 2026 -- **three follow-on Canopy upgrades shipped at `9686b3a`** on top of `3371138`: ⌘K record search (contacts + deals), Undo affordance on destructive actions, route-level loading skeletons for /contacts /deals /audit. Working tree clean, pushed to origin main.)
+
+### Three follow-on UX upgrades at `9686b3a`
+
+The "what would actually elevate Canopy" cuts on top of the polish pass and the Pathlight pipeline pass. All three are real capability bumps. Verified `npx tsc --noEmit` clean, `npm run lint` clean, em-dash count 0 across all 11 changed/new files.
+
+**1. ⌘K record search (contacts + deals):**
+
+- `lib/actions/cmdk.ts` -- new server action `searchCommandPalette(q)`. Returns up to 5 contacts + 5 deals matching email/name/company (contacts) or name/contact (deals). CASE-when prefix ranking so `"ac"` surfaces "Acme" before "Pacific". Honors `getQueryOwnerFilter` so non-admin sales users never see records outside their book. Auth re-checked inside the action; client RBAC is not trusted.
+- `app/admin/components/CommandPalette.tsx` -- debounced (250ms) action call with a stale-call cancellation guard so a fast typer never sees results from a cancelled query land on top. New `PaletteRow` union so arrow-key nav walks records + pages in one flat list. Records always rank above pages when the query is non-empty (jumping to a record is more specific than to a section index). `Loader2` spinner appears in the input row while the request is in flight. `RecordResultRow` renders contacts with a pink User icon, deals with a violet Briefcase, both with truncated label/sublabel + arrow affordance on hover. Section dividers ("Records" / "Pages") only show when both kinds are present.
+
+**2. Undo on destructive actions:**
+
+- `app/admin/components/Toast.tsx` -- `ToastInput` grows an optional `action: { label, onClick }`. `ToastCard` renders an inline button next to the dismiss control; click awaits the async callback, shows a brief disabled `"..."` state, dismisses on completion.
+- `lib/canopy/email/templates.ts` + `lib/actions/email.ts` -- new `restoreTemplate(id, ownerEmail)` flips `archived_at` -> `NULL`. `restoreTemplateAction` wraps it with `recordChange(action: template.restored)` so the audit trail reflects both the archive and its undo.
+- `app/admin/canopy/templates/TemplatesClient.tsx` -- archive flow snapshots the row, shows a toast with Undo. On Undo: `restoreTemplateAction` + splice the row back into local state alphabetically (no order flash).
+- `app/admin/contacts/[id]/CompetitorsPanel.tsx` -- `handleRemove` snapshots the competitor's name/url/notes before delete, offers Undo via `addCompetitorAction` with the same payload. The new id will differ (true reversal would need a soft-delete schema change), but the data is preserved bit-for-bit.
+
+Note: notes/activities also have hard-delete actions but reversal needs `deleted_at` schema columns to preserve the original id + timestamps + author. Skipped for this round; that's a real schema project.
+
+**3. Route-level loading skeletons:**
+
+- `app/admin/contacts/loading.tsx` -- page header + action bar + filter card (status chips, source chips, search row) + table with 8 ghost rows.
+- `app/admin/deals/loading.tsx` -- page header + 4 rollup cards + 6-column kanban (1-3 cards per stage).
+- `app/admin/audit/loading.tsx` -- page header + 4 24h stat cards + filter bar + 10 table rows.
+
+All three pure server components, zero JS shipped. Closes the perceived-speed gap on the three heaviest routes in the shell -- each runs multiple `Promise.all` queries; on a slow link the previous flash-of-blank was real.
+
+### Prior commit on top of `6edc8c0` -- Pathlight pipeline robustness pass + nav rename at `3371138`
 
 ### Pathlight robustness pass at `3371138`
 
