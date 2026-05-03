@@ -140,11 +140,21 @@ export default function EmailComposePanel({
             </span>
           </div>
 
-          {templates.length > 0 && (
-            <div>
-              <label className="mb-1 block text-xs font-medium text-zinc-700">
+          <div>
+            <div className="mb-1 flex items-baseline justify-between">
+              <label className="block text-xs font-medium text-zinc-700">
                 Template
               </label>
+              <a
+                href="/admin/canopy/templates"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[11px] font-medium text-violet-700 hover:underline"
+              >
+                {templates.length > 0 ? "Manage templates →" : "Create template →"}
+              </a>
+            </div>
+            {templates.length > 0 ? (
               <select
                 value={templateId ?? ""}
                 onChange={(e) =>
@@ -159,8 +169,12 @@ export default function EmailComposePanel({
                   </option>
                 ))}
               </select>
-            </div>
-          )}
+            ) : (
+              <p className="text-xs text-zinc-500">
+                No templates yet. Save common copy as a template to reuse it from this picker on every contact and deal.
+              </p>
+            )}
+          </div>
 
           <div>
             <label className="mb-1 block text-xs font-medium text-zinc-700">

@@ -34,6 +34,7 @@ import {
   Sprout,
   Radar,
   Radio,
+  Files,
 } from "lucide-react";
 import { getPalette, type PaletteName } from "@/lib/admin/page-themes";
 import { getContactsDashboardSummary } from "@/lib/services/contacts";
@@ -111,6 +112,7 @@ function buildNavGroups(overdueCount: number): { label: string; items: NavItem[]
     items: [
       { label: "Sequences", href: "/admin/sequences", icon: Send, palette: "violet" },
       { label: "Workflow rules", href: "/admin/automations", icon: Zap, palette: "violet" },
+      { label: "Email templates", href: "/admin/canopy/templates", icon: Files, palette: "violet" },
     ],
   },
   {
