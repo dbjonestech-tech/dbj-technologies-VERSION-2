@@ -4,33 +4,37 @@ Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`). The most recent archive is
 [`history/2026-05-02.md`](history/2026-05-02.md).
 
-## Current state (May 3, 2026 -- Inngest cron registration in flight; Commits A and B shipped)
+## Current state (May 3, 2026 -- Inngest cron registration complete; Commits A through E all shipped)
 
 ### Anchor block
 
-HEAD: `8420b34` (feat(inngest): wire Commit B cron `vercel-telemetry-hourly`; same-commit `current-state.md` update). `git log -1` is the authoritative source.
+HEAD: Commit E (this commit, hash filled by `git log -1` post-push). All seven previously-unwired Inngest cron exports from the April 28 monitoring-cockpit work are now registered in the serve handler. `git log -1` is authoritative.
 
 Recent commits (newest first):
-- `8420b34` -- Commit B: wire `vercel-telemetry-hourly` in serve handler (this commit). Fires at `:10` past each hour, snapshots Vercel deployments via REST API into `vercel_deployments` for `/admin/platform`. All three Vercel env vars confirmed set in production.
-- `b637ca3` -- Commit A: wire `inngest-health-hourly`, `funnel-refresh-hourly`, `email-kpi-refresh-hourly`. Verified green in Inngest dashboard with multiple successful runs at 0% failure rate before Commit B shipped.
+- Commit E -- wire `infrastructure-check-daily` in serve handler (this commit). Fires daily at 08:00 UTC. WHOIS / TLS / DNS-auth expiry checks for every DBJ-managed domain. `retries: 0` is intentional (slow probes; retrying amplifies budget envelope).
+- `77583c5` -- Commit D: wire `search-console-daily` (06:00 UTC). Bundled an unrelated print-fix change to `ScanStatus.tsx` and `globals.css` that had been staged in the working tree (Joshua's pending print/PDF stylesheet work). The cron edit and the print fix are independent and both intentional, just landed in the same commit by accident of staging timing.
+- `141856c` -- Commit C: wire `anthropic-budget-hourly` (`:20`). `snapshotAnthropicBudget` falls back to local `api_usage_events` when Admin API yields nothing.
+- `95d1dcd` -- standalone session-handoff doc update (branch protection blocked the amend force-push for Commit B, so this followed as a separate commit per CLAUDE.md fallback).
+- `8420b34` -- Commit B: wire `vercel-telemetry-hourly` (`:10`). Registered, visible in Inngest dashboard.
+- `b637ca3` -- Commit A: wire `inngest-health-hourly` (`:15`), `funnel-refresh-hourly` (`:05`), `email-kpi-refresh-hourly` (`:25`). **Verified green** in Inngest dashboard with multiple successful runs at 0% failure rate before B shipped.
 - `acc2bce` -- Pathlight reliability hardening (send-time email integrity gate, vision desktop-only support, Browserless 429 exponential backoff, report CTA gate, migration 036)
-- `ffd760a` -- Pathlight scan form business-name placeholder refreshed to "Mockingbird Optical"
-- `688ec27` -- Stage 1: page critique side-step
-- `0efae8e` -- migration 035 (page_critique JSONB column)
 
 Working tree: clean. Pushed to origin main confirmed.
 
-### Cron registration progress (staged plan A through E)
+### Cron registration progress (staged plan A through E -- COMPLETE)
 
-The seven Inngest cron exports added in commit `1173bc2` (April 28) were never registered in the serve handler. Staged registration in flight, one risk-tier per commit. Each commit deploys, we verify the cron's first scheduled fire (or manual Inngest invoke for the daily ones) in the Inngest dashboard, then proceed.
+The seven Inngest cron exports added in commit `1173bc2` (April 28) were never registered in the serve handler. Staged registration is now complete, one risk-tier per commit:
 
-- **Commit A** (`b637ca3`): `inngest-health-hourly` (`:15`), `funnel-refresh-hourly` (`:05`), `email-kpi-refresh-hourly` (`:25`). Zero env-var deps. **Verified green** in Inngest dashboard (multiple successful runs, 0% failure rate).
-- **Commit B** (`8420b34`, this commit): `vercel-telemetry-hourly` (`:10`). Requires `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID` (all confirmed set in Vercel production). **Awaiting first scheduled fire** at next `:10` UTC.
-- **Commit C** (pending): `anthropic-budget-hourly` (`:20`). Requires `ANTHROPIC_ADMIN_KEY`, `ANTHROPIC_MONTHLY_BUDGET_USD` (both confirmed set).
-- **Commit D** (pending): `search-console-daily` (06:00 UTC). Requires `GOOGLE_SC_CREDENTIALS_JSON`, `GOOGLE_SC_SITE_URL` (both confirmed set), plus GSC permissions UI grant for the service account.
-- **Commit E** (pending): `infrastructure-check-daily` (08:00 UTC). No new env vars. Most operationally severe of the four pending, since it is the sole TLS / WHOIS / DNS-auth expiry warning channel.
+- **Commit A** (`b637ca3`, shipped): `inngest-health-hourly`, `funnel-refresh-hourly`, `email-kpi-refresh-hourly`. **Verified green.**
+- **Commit B** (`8420b34`, shipped): `vercel-telemetry-hourly`. Registered and visible in dashboard. Awaits first scheduled `:10` UTC fire (~30 min after deploy).
+- **Commit C** (`141856c`, shipped): `anthropic-budget-hourly`. Defensively coded with local-event fallback. Awaits first `:20` UTC fire.
+- **Commit D** (`77583c5`, shipped): `search-console-daily` (06:00 UTC). Awaits first daily fire OR a manual Inngest dashboard invoke for faster verification. **Outstanding risk:** the function will return 403 on first run if the GSC service account does not have access to the GSC property. Fix is a Google Cloud Console permissions grant, not a code change.
+- **Commit E** (this commit): `infrastructure-check-daily` (08:00 UTC). No new env vars. `retries: 0` is intentional. Awaits first daily fire OR a manual dashboard invoke.
 
-Verify Commit B in the Inngest dashboard at https://app.inngest.com/env/production/functions/dbj-technologies-vercel-telemetry-hourly within ~60 minutes of this push. Green run = ship Commit C.
+### Next session priorities
+
+1. **Verify the four daily/hourly first runs in the Inngest dashboard.** B and C will fire automatically within the next hour; D and E require either patience until tomorrow morning UTC or manual dashboard invocation. For D specifically, click Invoke first, watch for 403, then resolve the GSC permission grant in the Google Cloud Console if needed.
+2. **Track 2 (Canopy marketing rewrite) remains gated** on Joshua's redline of `.claude/rules/canopy.md` and the six lead-score component name strings. Self-review surfaced 10 tightenings (most load-bearing: Section 4 bare-token "Canopy" rule rewrite; Sentry shouldn't be in Section 1 vendor list; Cloudflare Turnstile shouldn't either). Drafting Phase 1 unblocks the moment those two inputs land.
 
 ### What shipped this session: Pathlight reliability hardening (Phase 1 + Phase 2)
 
