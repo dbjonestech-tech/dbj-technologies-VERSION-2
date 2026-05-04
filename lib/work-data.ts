@@ -125,7 +125,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
   },
   {
     slug: "star-auto-service",
-    name: "Star Auto Service",
+    name: "The Star Auto Service",
     description:
       "A complete rebuild for a 28-year Richardson, TX auto repair shop. Six service-area pages, twelve service pages, five long-form guides, a fixed desktop call button after years of silently dropped leads, and a cinematic hero entrance. Next.js 16. Perfect Lighthouse 100s across every category, every page.",
     category: "Client Project",
