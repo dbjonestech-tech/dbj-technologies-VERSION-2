@@ -339,8 +339,10 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "An operating-system admin I built first for myself to run DBJ Technologies, then shipped as the first external install to The Star Auto Service. Visitors, recurring users, funnels, search behavior, performance, deals, contacts, sequences, automations, infrastructure health, deliverability, error volume, and budget headroom in one dashboard, on the buyer's domain, behind the buyer's auth.",
     category: "Internal Tooling",
     gradient: "from-cyan-500 to-blue-600",
-    /* No public liveUrl: the dashboard itself is auth-walled per-client,
-     * so a "View Live Site" button would dead-end at a Google sign-in. */
+    /* The live install at ops.thestarautoservice.com is auth-walled
+     * per-client. The /showcase/canopy tour is the public-rendered
+     * fixture-only demo of the same product. */
+    liveUrl: "/showcase/canopy",
     metrics: [
       { label: "Sections", value: "9" },
       { label: "Live Install", value: "The Star Auto Service" },

@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: May 4, 2026 (Canopy marketing Phase 1C Layer 1 work-page rewrite + canopy.md factual fixes shipped at `c58a8a8`). **All 10 Canopy phases shipped (0 through 9 inclusive).**
+Last updated: May 4, 2026 (Canopy showcase tour expanded from 4 to 8 sections + /work/canopy now links to /showcase/canopy via the View Live Site button, shipped at `<showcase-expansion-commit>`). **All 10 Canopy phases shipped (0 through 9 inclusive).**
 
 ## Canopy v2 build status
 
@@ -20,6 +20,30 @@ Last updated: May 4, 2026 (Canopy marketing Phase 1C Layer 1 work-page rewrite +
 | 9 | Pathlight Advanced (prospecting, change monitoring, competitive intel, beacon) | shipped | 032 |
 
 The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
+
+## Canopy showcase expansion: tour mirrors the 9-section /work/canopy narrative (May 4, 2026)
+
+Shipped at `<showcase-expansion-commit>`. The /showcase/canopy tour previously had four pages (Dashboard, Contacts, Deals, Audit log) while the Phase 1C /work/canopy work entry described nine capability sections. A buyer reading the comprehensive 9-section pitch and clicking through to the showcase saw a 4-page tour with no Analytics, Automation, Operations, or Pathlight surface. This commit closes that coverage gap.
+
+Four new showcase pages, all fixture-only and publicly indexable:
+
+- `app/showcase/canopy/analytics/page.tsx`: First-party visitor KPIs (humans 7d, sessions, pages/session, bounce rate, avg duration, recurring rate), Real-User Web Vitals tiles (LCP, INP, CLS, TTFB, FCP) with thresholded color, top pages table, top sources table, search-queries table, recent visitors table. Eyebrow "Acquisition", sky palette.
+- `app/showcase/canopy/automation/page.tsx`: Sequences table with reply-exit framing, workflow rules list with trigger labels and 24h/7d fire counts, email templates table with merge-field counts and last-used timestamps. Eyebrow "Automation", violet palette.
+- `app/showcase/canopy/operations/page.tsx`: Worst-of status banner with six area signals, infrastructure table (per-domain TLS expiry, WHOIS expiry, SPF/DKIM/DMARC pass marks), deliverability stats, function-health table with invocations/error rate/p95, budget headroom panel with progress bar. Eyebrow "Operations", cyan palette.
+- `app/showcase/canopy/pathlight/page.tsx`: Layered guardrails status panel (capability enabled, triggers manual or rules-bounded, monthly budget headroom), prospecting candidates table with vertical/score/status, change-monitoring alerts list with manual-rescan framing, competitive scans list with delta vs the contact's own score. Eyebrow "Pathlight Advanced", lime palette. Per canopy.md Public Presentation: describes the EXISTENCE of guardrails (sales feature) without revealing per-layer order, column names, function signatures, or lead-score component names.
+
+Showcase navigation updated from 4 items to 8: Dashboard / Analytics / Contacts / Deals / Automation / Operations / Pathlight / Audit log. The original four sections retain their existing palettes; the new four use sky, indigo, cyan, and lime to match the canonical /admin sidebar palette assignments.
+
+Showcase dashboard polish:
+- Salutation changed from "Good afternoon, Joshua." to "Good afternoon." A public-indexable page should not greet a specific operator by name; the Phase 1C "demo view of an operator's view" framing subhead carries the demo context.
+- Previously dead-linked dashboard cards (`/showcase/canopy` self-references for Visitors, Monitor, Pathlight scans, Costs, Errors) now point to their corresponding new pages: Visitors → /analytics, Monitor → /operations, Pathlight scans → /pathlight, Costs → /operations, Errors → /operations.
+
+Cross-link from /work/canopy to /showcase/canopy:
+- `lib/work-data.ts` Canopy entry adds `liveUrl: "/showcase/canopy"`. The ProjectDetailLayout component already renders a "View Live Site" button when `liveUrl` is present, so the work-page deep-dive hero now has that button alongside the existing Get in Touch CTA. The previous comment explaining the absence of `liveUrl` (auth-walled per-client install) is replaced with a comment pointing at the showcase as the public-rendered demo.
+
+Demo fixtures added to `lib/demo/fixtures.ts` (~390 new lines): DEMO_VISITOR_KPIS, DEMO_VISITORS_RECENT, DEMO_TOP_PAGES, DEMO_TOP_SOURCES, DEMO_RUM, DEMO_SEARCH_QUERIES, DEMO_SEQUENCES, DEMO_WORKFLOWS, DEMO_EMAIL_TEMPLATES, DEMO_STATUS_BANNER, DEMO_INFRA_CHECKS, DEMO_DELIVERABILITY, DEMO_FUNCTION_HEALTH, DEMO_BUDGET_HEADROOM, DEMO_PATHLIGHT_GATE, DEMO_PROSPECTS, DEMO_CHANGE_ALERTS, DEMO_COMPETITOR_SCANS. All values fictional, names invented, no production data.
+
+No /admin/* surface touched. No Pathlight code touched. No cron registry touched. No `lib/canopy/*` code touched. No migrations touched. Verification gates passed: tsc clean, lint clean, 0 em dashes, 0 JSONB in marketing copy, 0 deliberate lead-score enumeration, 0 RBAC enum lists, 0 "three-layer" / "Layer N" disclosure, 0 "we"/"our"/"us" in new copy.
 
 ## Canopy marketing Phase 1C, Layer 1 work-page rewrite (May 4, 2026)
 

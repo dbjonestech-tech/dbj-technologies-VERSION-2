@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  LayoutDashboard,
-  ClipboardList,
+  Activity,
+  BarChart3,
   Briefcase,
+  ClipboardList,
+  ExternalLink,
+  LayoutDashboard,
   ShieldCheck,
   Sparkles,
-  ExternalLink,
+  Sprout,
+  Zap,
 } from "lucide-react";
 import { getPalette } from "@/lib/admin/page-themes";
 
@@ -31,6 +35,12 @@ const SHOWCASE_NAV = [
     palette: "zinc" as const,
   },
   {
+    label: "Analytics",
+    href: "/showcase/canopy/analytics",
+    icon: BarChart3,
+    palette: "sky" as const,
+  },
+  {
     label: "Contacts",
     href: "/showcase/canopy/contacts",
     icon: ClipboardList,
@@ -41,6 +51,24 @@ const SHOWCASE_NAV = [
     href: "/showcase/canopy/deals",
     icon: Briefcase,
     palette: "violet" as const,
+  },
+  {
+    label: "Automation",
+    href: "/showcase/canopy/automation",
+    icon: Zap,
+    palette: "indigo" as const,
+  },
+  {
+    label: "Operations",
+    href: "/showcase/canopy/operations",
+    icon: Activity,
+    palette: "cyan" as const,
+  },
+  {
+    label: "Pathlight",
+    href: "/showcase/canopy/pathlight",
+    icon: Sprout,
+    palette: "lime" as const,
   },
   {
     label: "Audit log",

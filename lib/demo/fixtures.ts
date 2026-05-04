@@ -451,3 +451,393 @@ export function formatRelativeTime(iso: string): string {
     day: "numeric",
   });
 }
+
+/* ─── ANALYTICS & PERFORMANCE FIXTURES ────────────── */
+
+export const DEMO_VISITOR_KPIS = {
+  humans7d: 1284,
+  humans7dDeltaPct: 18,
+  sessions7d: 1631,
+  pagesPerSession: 2.4,
+  bounceRatePct: 38,
+  avgDurationSec: 142,
+  recurringRate: 22,
+};
+
+export interface DemoVisitorRow {
+  id: string;
+  city: string | null;
+  source: string;
+  pageviews: number;
+  durationSec: number;
+  device: "desktop" | "mobile" | "tablet";
+  startedAt: string;
+}
+
+export const DEMO_VISITORS_RECENT: DemoVisitorRow[] = [
+  { id: "v1", city: "Dallas, TX", source: "google.com", pageviews: 5, durationSec: 287, device: "desktop", startedAt: minutes(4) },
+  { id: "v2", city: "Plano, TX", source: "direct", pageviews: 3, durationSec: 142, device: "mobile", startedAt: minutes(11) },
+  { id: "v3", city: "Frisco, TX", source: "linkedin.com", pageviews: 8, durationSec: 521, device: "desktop", startedAt: minutes(18) },
+  { id: "v4", city: "Richardson, TX", source: "google.com", pageviews: 2, durationSec: 73, device: "mobile", startedAt: minutes(24) },
+  { id: "v5", city: "Austin, TX", source: "twitter.com", pageviews: 4, durationSec: 198, device: "desktop", startedAt: minutes(31) },
+  { id: "v6", city: "Houston, TX", source: "google.com", pageviews: 1, durationSec: 22, device: "mobile", startedAt: minutes(38) },
+  { id: "v7", city: null, source: "direct", pageviews: 6, durationSec: 312, device: "desktop", startedAt: minutes(47) },
+  { id: "v8", city: "Fort Worth, TX", source: "bing.com", pageviews: 3, durationSec: 165, device: "tablet", startedAt: minutes(53) },
+];
+
+export interface DemoTopPage {
+  path: string;
+  views: number;
+  avgDurationSec: number;
+  bounceRatePct: number;
+}
+
+export const DEMO_TOP_PAGES: DemoTopPage[] = [
+  { path: "/", views: 487, avgDurationSec: 124, bounceRatePct: 32 },
+  { path: "/services/web-design", views: 213, avgDurationSec: 198, bounceRatePct: 28 },
+  { path: "/work/canopy", views: 184, avgDurationSec: 264, bounceRatePct: 19 },
+  { path: "/pathlight", views: 167, avgDurationSec: 312, bounceRatePct: 22 },
+  { path: "/about", views: 142, avgDurationSec: 156, bounceRatePct: 41 },
+  { path: "/contact", views: 89, avgDurationSec: 87, bounceRatePct: 18 },
+  { path: "/work", views: 71, avgDurationSec: 142, bounceRatePct: 35 },
+];
+
+export interface DemoTopSource {
+  label: string;
+  visits: number;
+  conversions: number;
+}
+
+export const DEMO_TOP_SOURCES: DemoTopSource[] = [
+  { label: "google.com", visits: 612, conversions: 14 },
+  { label: "direct", visits: 348, conversions: 11 },
+  { label: "linkedin.com", visits: 154, conversions: 9 },
+  { label: "twitter.com", visits: 87, conversions: 3 },
+  { label: "bing.com", visits: 53, conversions: 1 },
+  { label: "duckduckgo.com", visits: 30, conversions: 0 },
+];
+
+export const DEMO_RUM = {
+  lcpSec: 1.8,
+  lcpThreshold: { good: 2.5, poor: 4.0 },
+  inpMs: 124,
+  inpThreshold: { good: 200, poor: 500 },
+  cls: 0.04,
+  clsThreshold: { good: 0.1, poor: 0.25 },
+  ttfbSec: 0.62,
+  fcpSec: 1.2,
+};
+
+export interface DemoSearchQuery {
+  query: string;
+  impressions: number;
+  clicks: number;
+  ctrPct: number;
+  avgPosition: number;
+}
+
+export const DEMO_SEARCH_QUERIES: DemoSearchQuery[] = [
+  { query: "dallas web design", impressions: 1240, clicks: 87, ctrPct: 7.0, avgPosition: 4.2 },
+  { query: "pathlight website audit", impressions: 612, clicks: 92, ctrPct: 15.0, avgPosition: 1.8 },
+  { query: "principal architect studio", impressions: 184, clicks: 31, ctrPct: 16.8, avgPosition: 2.4 },
+  { query: "operations dashboard small business", impressions: 156, clicks: 18, ctrPct: 11.5, avgPosition: 3.6 },
+  { query: "next.js studio dallas", impressions: 92, clicks: 14, ctrPct: 15.2, avgPosition: 2.1 },
+];
+
+/* ─── AUTOMATION FIXTURES ─────────────────────────── */
+
+export interface DemoSequence {
+  id: number;
+  name: string;
+  status: "active" | "paused" | "draft";
+  enrolled: number;
+  completed: number;
+  replied: number;
+  nextStepLabel: string;
+  steps: number;
+}
+
+export const DEMO_SEQUENCES: DemoSequence[] = [
+  {
+    id: 7001,
+    name: "Pathlight scan follow-up",
+    status: "active",
+    enrolled: 14,
+    completed: 38,
+    replied: 6,
+    nextStepLabel: "Day 3 nudge",
+    steps: 4,
+  },
+  {
+    id: 7002,
+    name: "Discovery call no-show recovery",
+    status: "active",
+    enrolled: 3,
+    completed: 11,
+    replied: 4,
+    nextStepLabel: "Day 1 reschedule offer",
+    steps: 3,
+  },
+  {
+    id: 7003,
+    name: "Proposal sent, day 5 check-in",
+    status: "active",
+    enrolled: 5,
+    completed: 9,
+    replied: 5,
+    nextStepLabel: "Day 5 soft-close",
+    steps: 2,
+  },
+  {
+    id: 7004,
+    name: "Closed-Lost reactivation, 90-day",
+    status: "paused",
+    enrolled: 0,
+    completed: 4,
+    replied: 1,
+    nextStepLabel: "Day 0 reopener",
+    steps: 5,
+  },
+];
+
+export interface DemoWorkflowRule {
+  id: number;
+  name: string;
+  triggerLabel: string;
+  enabled: boolean;
+  fired24h: number;
+  fired7d: number;
+  lastFiredAt: string | null;
+}
+
+export const DEMO_WORKFLOWS: DemoWorkflowRule[] = [
+  {
+    id: 8001,
+    name: "Deal moved to Proposal, send proof-of-craft email and create follow-up task",
+    triggerLabel: "Deal stage changed",
+    enabled: true,
+    fired24h: 2,
+    fired7d: 8,
+    lastFiredAt: hours(2),
+  },
+  {
+    id: 8002,
+    name: "New scan completed with score below 50, flag for outreach",
+    triggerLabel: "Pathlight scan completed",
+    enabled: true,
+    fired24h: 4,
+    fired7d: 14,
+    lastFiredAt: hours(5),
+  },
+  {
+    id: 8003,
+    name: "Contact form submitted with budget over $10k, send instant intro and assign",
+    triggerLabel: "Contact form submitted",
+    enabled: true,
+    fired24h: 1,
+    fired7d: 3,
+    lastFiredAt: hours(9),
+  },
+  {
+    id: 8004,
+    name: "Deal silent for 14 days, reset stage to Qualified and log warning",
+    triggerLabel: "Deal idle",
+    enabled: true,
+    fired24h: 0,
+    fired7d: 1,
+    lastFiredAt: days(2),
+  },
+  {
+    id: 8005,
+    name: "Reply received during sequence, exit enrollment",
+    triggerLabel: "Email reply received",
+    enabled: true,
+    fired24h: 3,
+    fired7d: 11,
+    lastFiredAt: hours(1),
+  },
+];
+
+export interface DemoEmailTemplate {
+  id: number;
+  name: string;
+  subject: string;
+  mergeFieldCount: number;
+  lastUsedAt: string | null;
+  usedCount: number;
+}
+
+export const DEMO_EMAIL_TEMPLATES: DemoEmailTemplate[] = [
+  {
+    id: 6001,
+    name: "Pathlight scan results, day 0",
+    subject: "Your Pathlight scan results are ready",
+    mergeFieldCount: 4,
+    lastUsedAt: hours(3),
+    usedCount: 142,
+  },
+  {
+    id: 6002,
+    name: "Pathlight follow-up, day 3",
+    subject: "A few specific things I would change on {{contact.company}}",
+    mergeFieldCount: 5,
+    lastUsedAt: hours(8),
+    usedCount: 87,
+  },
+  {
+    id: 6003,
+    name: "Proof of craft, post-call",
+    subject: "Reference architectures for {{contact.vertical}}",
+    mergeFieldCount: 3,
+    lastUsedAt: days(1),
+    usedCount: 34,
+  },
+  {
+    id: 6004,
+    name: "Proposal sent, day 5 check-in",
+    subject: "Quick follow-up on the proposal",
+    mergeFieldCount: 2,
+    lastUsedAt: hours(20),
+    usedCount: 19,
+  },
+];
+
+/* ─── OPERATIONS & HEALTH FIXTURES ────────────────── */
+
+export type DemoStatusLevel = "ok" | "warn" | "fail";
+
+export interface DemoStatusSignal {
+  area: string;
+  level: DemoStatusLevel;
+  message: string;
+}
+
+export const DEMO_STATUS_BANNER = {
+  level: "ok" as DemoStatusLevel,
+  signals: [
+    { area: "Deployments", level: "ok", message: "Last deploy 4h ago, all checks green." },
+    { area: "Pipeline", level: "ok", message: "All scheduled jobs ran on time, last 24h." },
+    { area: "Budget", level: "ok", message: "$12.40 of $200 monthly budget used." },
+    { area: "Infrastructure", level: "ok", message: "All tracked domains pass TLS, WHOIS, DKIM, DMARC." },
+    { area: "Errors", level: "ok", message: "0 unresolved issues, last 24h." },
+    { area: "Mobile RUM", level: "ok", message: "LCP 1.8s, CLS 0.04, INP 124ms, all within target." },
+  ] satisfies DemoStatusSignal[],
+};
+
+export interface DemoInfraCheck {
+  domain: string;
+  tlsExpiryDays: number;
+  whoisExpiryDays: number;
+  spfPass: boolean;
+  dkimPass: boolean;
+  dmarcPass: boolean;
+}
+
+export const DEMO_INFRA_CHECKS: DemoInfraCheck[] = [
+  { domain: "dbjtechnologies.com", tlsExpiryDays: 67, whoisExpiryDays: 312, spfPass: true, dkimPass: true, dmarcPass: true },
+  { domain: "pathlight.dbjtechnologies.com", tlsExpiryDays: 67, whoisExpiryDays: 312, spfPass: true, dkimPass: true, dmarcPass: true },
+  { domain: "thestarautoservice.com", tlsExpiryDays: 41, whoisExpiryDays: 198, spfPass: true, dkimPass: true, dmarcPass: true },
+  { domain: "ops.thestarautoservice.com", tlsExpiryDays: 41, whoisExpiryDays: 198, spfPass: true, dkimPass: true, dmarcPass: true },
+  { domain: "soil-depot.com", tlsExpiryDays: 23, whoisExpiryDays: 152, spfPass: true, dkimPass: true, dmarcPass: true },
+];
+
+export const DEMO_DELIVERABILITY = {
+  sent30d: 1842,
+  delivered30d: 1818,
+  bounced30d: 24,
+  complained30d: 1,
+  deliveryRatePct: 98.7,
+  bounceRatePct: 1.3,
+};
+
+export interface DemoFunctionRow {
+  name: string;
+  invocations24h: number;
+  errorRatePct: number;
+  p95Ms: number;
+}
+
+export const DEMO_FUNCTION_HEALTH: DemoFunctionRow[] = [
+  { name: "scan-pipeline", invocations24h: 28, errorRatePct: 0, p95Ms: 87000 },
+  { name: "contact-form", invocations24h: 6, errorRatePct: 0, p95Ms: 412 },
+  { name: "infra-check-daily", invocations24h: 1, errorRatePct: 0, p95Ms: 19400 },
+  { name: "email-kpi-refresh", invocations24h: 24, errorRatePct: 0, p95Ms: 1240 },
+  { name: "vercel-telemetry", invocations24h: 24, errorRatePct: 0, p95Ms: 890 },
+];
+
+export const DEMO_BUDGET_HEADROOM = {
+  monthlyBudgetUsd: 200,
+  spentThisPeriodUsd: 12.4,
+  pctSpent: 6.2,
+  daysRemaining: 26,
+};
+
+/* ─── PATHLIGHT INTEGRATION FIXTURES ──────────────── */
+
+/* Public-OK gate state. Per .claude/rules/canopy.md: the EXISTENCE
+ * of guardrails is a sales feature; per-layer order and column
+ * names stay private. This fixture exposes status only, not
+ * implementation specifics. */
+export const DEMO_PATHLIGHT_GATE = {
+  capabilityEnabled: true,
+  manualOnly: true,
+  monthlyBudgetUsd: 200,
+  spentThisPeriodUsd: 12.4,
+  budgetRemainingUsd: 187.6,
+  pctSpent: 6.2,
+};
+
+export interface DemoProspect {
+  id: number;
+  business: string;
+  domain: string;
+  vertical: string;
+  city: string;
+  scanScore: number | null;
+  status: "candidate" | "scanned" | "outreach";
+  scannedAt: string | null;
+}
+
+export const DEMO_PROSPECTS: DemoProspect[] = [
+  { id: 4001, business: "Northwood Plumbing", domain: "northwoodplumbing.com", vertical: "Plumbing", city: "Plano, TX", scanScore: 47, status: "outreach", scannedAt: hours(8) },
+  { id: 4002, business: "Riverbend Dental", domain: "riverbenddental.com", vertical: "Dental Practice", city: "Frisco, TX", scanScore: 53, status: "outreach", scannedAt: days(2) },
+  { id: 4003, business: "Beacon Hill Realty", domain: "beaconhillrealty.example", vertical: "Real Estate", city: "Dallas, TX", scanScore: 61, status: "scanned", scannedAt: days(1) },
+  { id: 4004, business: "Cottonwood Veterinary", domain: "cottonwoodvet.example", vertical: "Veterinary", city: "Richardson, TX", scanScore: 44, status: "scanned", scannedAt: hours(12) },
+  { id: 4005, business: "Summit Auto Glass", domain: "summitautoglass.example", vertical: "Auto Repair", city: "Dallas, TX", scanScore: 51, status: "outreach", scannedAt: hours(20) },
+  { id: 4006, business: "Bluebonnet HVAC", domain: "bluebonnethvac.example", vertical: "HVAC", city: "Plano, TX", scanScore: null, status: "candidate", scannedAt: null },
+  { id: 4007, business: "Lakeshore CPA", domain: "lakeshorecpa.com", vertical: "Financial Advisor", city: "Frisco, TX", scanScore: 78, status: "outreach", scannedAt: days(5) },
+  { id: 4008, business: "Heritage Med Spa", domain: "heritagemedspa.example", vertical: "Med Spa", city: "Dallas, TX", scanScore: null, status: "candidate", scannedAt: null },
+];
+
+export interface DemoChangeAlert {
+  id: number;
+  contactCompany: string;
+  domain: string;
+  changeKind: string;
+  observedAt: string;
+  resolved: boolean;
+}
+
+export const DEMO_CHANGE_ALERTS: DemoChangeAlert[] = [
+  { id: 5001, contactCompany: "Riverbend Dental", domain: "riverbenddental.com", changeKind: "Hero copy and CTA changed", observedAt: hours(3), resolved: false },
+  { id: 5002, contactCompany: "Northwood Plumbing", domain: "northwoodplumbing.com", changeKind: "New service-area page added", observedAt: hours(11), resolved: false },
+  { id: 5003, contactCompany: "Beacon Hill Realty", domain: "beaconhillrealty.example", changeKind: "Site theme refreshed sitewide", observedAt: days(1), resolved: false },
+  { id: 5004, contactCompany: "Lakeshore CPA", domain: "lakeshorecpa.com", changeKind: "Blog post added", observedAt: days(2), resolved: true },
+];
+
+export interface DemoCompetitorScan {
+  id: number;
+  forContactCompany: string;
+  competitor: string;
+  competitorDomain: string;
+  scanScore: number;
+  delta: number;
+  scannedAt: string;
+}
+
+export const DEMO_COMPETITOR_SCANS: DemoCompetitorScan[] = [
+  { id: 3001, forContactCompany: "Northwood Plumbing", competitor: "Cedarbrook Plumbing", competitorDomain: "cedarbrookplumbing.example", scanScore: 62, delta: 15, scannedAt: hours(6) },
+  { id: 3002, forContactCompany: "Northwood Plumbing", competitor: "Pinewood Plumbing", competitorDomain: "pinewoodplumbing.example", scanScore: 38, delta: -9, scannedAt: hours(6) },
+  { id: 3003, forContactCompany: "Riverbend Dental", competitor: "Whitestone Dental", competitorDomain: "whitestonedental.example", scanScore: 71, delta: 18, scannedAt: days(1) },
+  { id: 3004, forContactCompany: "Riverbend Dental", competitor: "Greenpoint Family Dental", competitorDomain: "greenpointdental.example", scanScore: 59, delta: 6, scannedAt: days(1) },
+];

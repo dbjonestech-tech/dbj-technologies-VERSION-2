@@ -34,7 +34,7 @@ export default function ShowcaseDashboard() {
             Fictional data, real product.
           </p>
           <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
-            Good afternoon, Joshua.
+            Good afternoon.
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
             One canopy for visitors, conversions, Pathlight, costs,
@@ -229,7 +229,7 @@ const SHOWCASE_CARDS: { label: string; cards: ShowcaseCard[] }[] = [
         label: "Visitors",
         description:
           "Who is on the site right now, what they read, and where they came from.",
-        href: "/showcase/canopy",
+        href: "/showcase/canopy/analytics",
         Icon: Globe,
         palette: "sky",
         kpiHref: "/showcase/canopy/visitors",
@@ -255,8 +255,8 @@ const SHOWCASE_CARDS: { label: string; cards: ShowcaseCard[] }[] = [
       {
         label: "Monitor",
         description:
-          "Live event tail with funnel counts, severity, and Lighthouse trend.",
-        href: "/showcase/canopy",
+          "Worst-of status across deploys, infrastructure, deliverability, and budget.",
+        href: "/showcase/canopy/operations",
         Icon: Activity,
         palette: "cyan",
         kpiHref: "/showcase/canopy/visitors",
@@ -269,8 +269,8 @@ const SHOWCASE_CARDS: { label: string; cards: ShowcaseCard[] }[] = [
       {
         label: "Pathlight scans",
         description:
-          "Every Pathlight scan with status, score, and revenue range.",
-        href: "/showcase/canopy",
+          "Prospecting candidates, change alerts, and competitive scans, all gated.",
+        href: "/showcase/canopy/pathlight",
         Icon: FileText,
         palette: "teal",
         kpiHref: "/showcase/canopy/scans",
@@ -279,7 +279,7 @@ const SHOWCASE_CARDS: { label: string; cards: ShowcaseCard[] }[] = [
         label: "Leads",
         description:
           "Pathlight scan signups and contact-form submissions, side by side.",
-        href: "/showcase/canopy",
+        href: "/showcase/canopy/contacts",
         Icon: Mail,
         palette: "blue",
         kpiHref: "/showcase/canopy/leads",
@@ -287,7 +287,7 @@ const SHOWCASE_CARDS: { label: string; cards: ShowcaseCard[] }[] = [
       {
         label: "Costs",
         description: "Spend per provider, operation, and scan.",
-        href: "/showcase/canopy",
+        href: "/showcase/canopy/operations",
         Icon: DollarSign,
         palette: "amber",
         kpiHref: "/showcase/canopy/costs",
@@ -295,8 +295,8 @@ const SHOWCASE_CARDS: { label: string; cards: ShowcaseCard[] }[] = [
       {
         label: "Errors",
         description:
-          "Top unresolved Sentry issues from the trailing 24 hours.",
-        href: "/showcase/canopy",
+          "Top unresolved issues from the trailing 24 hours.",
+        href: "/showcase/canopy/operations",
         Icon: AlertTriangle,
         palette: "red",
         kpiHref: "/showcase/canopy/errors",
