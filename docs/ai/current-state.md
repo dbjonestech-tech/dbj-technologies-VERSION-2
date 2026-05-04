@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: May 3, 2026 (doc corrections: sidebar labels, unwired-cron acknowledgment, phase count). **All 10 Canopy phases shipped (0 through 9 inclusive).**
+Last updated: May 4, 2026 (Canopy marketing Phase 1C Layer 1 work-page rewrite + canopy.md factual fixes shipped at `<phase-1c-commit>`). **All 10 Canopy phases shipped (0 through 9 inclusive).**
 
 ## Canopy v2 build status
 
@@ -20,6 +20,19 @@ Last updated: May 3, 2026 (doc corrections: sidebar labels, unwired-cron acknowl
 | 9 | Pathlight Advanced (prospecting, change monitoring, competitive intel, beacon) | shipped | 032 |
 
 The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
+
+## Canopy marketing Phase 1C, Layer 1 work-page rewrite (May 4, 2026)
+
+Shipped at `<phase-1c-commit>`. Six files touched in one focused commit:
+
+- `lib/work-data.ts`: Canopy entry expanded from 5 sections to 9 (The Problem, What You Get, Analytics & Performance, Pipeline & Relationships, Automation, Operations & Health, Pathlight Integration, Architecture & Ownership, What Comes Next). Sentry/Datadog/PostHog "excellent products" vendor list at the prior line 375 removed in favor of generic SaaS-sprawl framing per the canopy.md Vendor Posture rule. Section-5 "we can scope a custom build" voice violation fixed to first-person. Description and heroDescription tightened to first-person and refer to Canopy as an "operating-system admin" rather than "operations dashboard." Metrics array updated to `Sections: 9 / Live Install: Star Auto / Categories Replaced: 6` (replacing the prior `5-7` range with a concrete count). techStack expanded from 4 items to 8: Next.js 16, TypeScript, Neon Postgres, Auth.js, Inngest, Vercel, Resend, Sentry. The Section-7 Pathlight integration paragraph uses "layered guardrails" framing rather than the prior "three-layer guardrail" phrasing, to keep the per-layer order private per canopy.md.
+- `app/(marketing)/about/AboutContent.tsx`: legacy `OPS_CAPABILITIES` constant renamed to `CANOPY_CAPABILITIES` at the declaration and the single usage. No copy changes; the Built for Myself First section already aligned with the April 30 reposition.
+- `app/showcase/canopy/layout.tsx`: metadata description and in-page Live demo banner softened from "the operating-system admin DBJ Technologies runs and ships to clients" to install-zero-honest first-person framing ("the operating-system admin I built for the studio, with the first external install live for a client").
+- `app/showcase/canopy/page.tsx`: "One cockpit" replaced with "One canopy" in the showcase dashboard header. New subhead added between the Canopy Admin eyebrow and the salutation: "A demo view of Canopy as an operator would see it. Fictional data, real product."
+- `.claude/rules/canopy.md`: three factual fixes. Line 3 disambiguation block "the /pricing/canopy detail page" corrected to "the /work/canopy detail page." Line 15 Public-Presentation forbidden-list "/work entry, /pricing/canopy detail page, /showcase/canopy tour" corrected to "/work/canopy detail page, /showcase/canopy tour." Line 80 Legacy-Names "The /pricing/operations slug 308-redirects to /pricing/canopy" corrected to reflect the actual `next.config.mjs` posture (both `/pricing/operations` and `/pricing/canopy` 308-redirect to `/work/canopy`).
+- `docs/ai/current-state.md`: this section added; the prior stale "Canopy DBJ marketing surfaces" subsection rewritten to reflect actual production state.
+
+No /admin/* surface touched. No Pathlight code touched. No cron registry touched. No `lib/canopy/*` code touched. No migrations touched. Layer 2 (animated drop-down toggles) and Layer 3 (dedicated deep-dive routes per section) remain deferred to subsequent phases.
 
 
 
@@ -68,14 +81,16 @@ All routes under `/admin/*`, gated by Auth.js Google sign-in + `ADMIN_EMAILS` al
 
 Sidebar grouped Overview / Acquisition / Relationships / Analytics / Automation / Pathlight Advanced / Operations / Health / Account with section icons + Canopy logomark chip + signed-in chip. (Source of truth: `lib/admin/nav-config.ts` `buildAdminNavGroups()`. Earlier "Today / Acquisition / Health / Engagement / Security" labels predate the May 1 expansion and were corrected May 3.)
 
-### Canopy DBJ marketing surfaces (unchanged from earlier session)
+### Canopy DBJ marketing surfaces (post-April-30 reposition + Phase 1C Layer 1 rewrite shipped May 4)
 
 Surfaces (all on the marketing site, no admin internals exposed):
-- **About page**: section "Built for Myself First" (eyebrow "The Stack Behind the Studio") between Operating Principles and the CTA. 6-tile glass-card capability grid; dual CTAs to `/pricing/canopy` (primary) and `/contact?topic=canopy` (private walkthrough).
-- **Pricing page**: "Specialty Engagement" section between the 3-tier grid and the Add-Ons grid. Single full-width feature card with $25,000 price block linking to the detail page.
-- **Detail page** at `/pricing/canopy`: rendered by existing `[slug]/page.tsx` from a `slug: "canopy"` entry in `PRICING_DETAILS` (`lib/pricing-data.ts`). Hero, idealFor, three sections, four FAQs.
-- **Contact form**: `topic=canopy` query param prefills budget `$25,000+`, projectType `Other`, and a scoping-context message; renders a Gauge-icon topic card above the form. Legacy `topic=operations-cockpit` still routes through the same prefill for transition safety.
-- **Redirect**: `/pricing/operations` 308-redirects to `/pricing/canopy` (configured in `next.config.mjs`).
+- **Work page detail entry at `/work/canopy`**: rendered by `app/(marketing)/work/[slug]/page.tsx` from the `slug: "canopy"` entry in `lib/work-data.ts`. Phase 1C expanded the entry from 5 sections to 9 (The Problem, What You Get, Analytics & Performance, Pipeline & Relationships, Automation, Operations & Health, Pathlight Integration, Architecture & Ownership, What Comes Next). techStack expanded to 8 items. Metrics: Sections 9, Live Install Star Auto, Categories Replaced 6.
+- **About page**: section "Built for Myself First" (eyebrow "The Stack Behind the Studio") between Operating Principles and the CTA. 6-tile glass-card capability grid; the constant is `CANOPY_CAPABILITIES` (renamed from `OPS_CAPABILITIES` in Phase 1C). CTAs: primary "See What Was Built" to `/work/canopy`, secondary "Get in Touch" to `/contact`. The April 30 reposition removed the prior dual CTAs to `/pricing/canopy` and `/contact?topic=canopy`.
+- **Pricing page**: NO Canopy section. The April 30 decision pulled the Specialty Engagement card; a comment block at `app/(marketing)/pricing/PricingContent.tsx:713-717` preserves the context for restoration once 2-3 installs prove the playbook out.
+- **Detail page at `/pricing/canopy`**: NO LONGER EXISTS. Pulled from `lib/pricing-data.ts` April 30; only a comment block at lines 210-211 remains. `/pricing/canopy` is a 308 redirect to `/work/canopy` configured in `next.config.mjs:81-83`.
+- **Contact form**: `topic=canopy` query param prefills `projectType: "Other"` and a custom-build scoping message; renders a Gauge-icon topic card above the form. The `$25,000+` budget pre-fill was removed April 30. Legacy `topic=operations-cockpit` still routes through the same prefill for transition safety.
+- **Redirects**: `/pricing/operations` 308-redirects to `/work/canopy`. `/pricing/canopy` 308-redirects to `/work/canopy`. Both configured in `next.config.mjs:76-83`.
+- **Showcase tour at `/showcase/canopy`**: publicly indexable, fixture-only data, mirrors the /admin product surface. Phase 1C softened the metadata description and Live demo banner to install-zero-honest first-person framing. Page-level header gained a "demo view of an operator's view, fictional data, real product" subhead, and the prior "One cockpit for visitors..." dashboard intro was changed to "One canopy for visitors..." per the canopy.md Brand Chrome rule against legacy product-name framings.
 
 Sitemap auto-includes via `getPricingSlugs()`. No new env vars on the DBJ marketing site. No new migrations. Public copy is outcome-led; no Pathlight internals (model names, function IDs, vertical database) leak through.
 

@@ -19,7 +19,7 @@ import { getPalette } from "@/lib/admin/page-themes";
 export const metadata: Metadata = {
   title: { default: "Canopy showcase", template: "%s | Canopy showcase" },
   description:
-    "A guided tour of Canopy, the operating-system admin DBJ Technologies runs and ships to clients. Fictional data, real product.",
+    "A guided tour of Canopy, the operating-system admin I built for the studio, with the first external install live for a client. Fictional data, real product.",
   robots: { index: true, follow: true },
 };
 
@@ -105,8 +105,9 @@ export default function ShowcaseLayout({
               </div>
               <p className="mt-1.5 text-xs leading-relaxed text-violet-900/80">
                 Every record on this tour is invented. The product
-                that renders them is the one DBJ runs internally and
-                ships to clients.
+                that renders them is the operating-system admin I
+                built for the studio, with the first external install
+                live for a client.
               </p>
               <Link
                 href="/work/canopy"

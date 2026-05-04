@@ -29,11 +29,15 @@ export default function ShowcaseDashboard() {
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400">
             Canopy Admin
           </p>
+          <p className="mt-2 text-xs text-zinc-500">
+            A demo view of Canopy as an operator would see it.
+            Fictional data, real product.
+          </p>
           <h1 className="mt-2 font-display text-3xl font-semibold text-zinc-900 sm:text-4xl">
             Good afternoon, Joshua.
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            One cockpit for visitors, conversions, Pathlight, costs,
+            One canopy for visitors, conversions, Pathlight, costs,
             pipeline health, and infrastructure. Hover any card to see
             its current state. The status bar below reflects the
             worst-of every signal, green is good.

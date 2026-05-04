@@ -1,6 +1,6 @@
 # Canopy Rules
 
-Canopy and Pathlight are two separate products in this repo with two separate marketing surfaces and two separate rule files. Canopy rules (this file, `.claude/rules/canopy.md`) govern `/admin/*`, `/showcase/canopy/*`, the `/pricing/canopy` detail page, the About-page Canopy capability section, the `/work` Canopy entry, and `lib/canopy/*`. Pathlight rules (`.claude/rules/pathlight.md`) govern `/(grade)/*`, the Pathlight scan pipeline, and `lib/services/claude-analysis.ts`. Apply the right file to the right code path. The two products share a Postgres database and a Vercel deployment, but the public copy, the locks, and the safety invariants do not transfer between them.
+Canopy and Pathlight are two separate products in this repo with two separate marketing surfaces and two separate rule files. Canopy rules (this file, `.claude/rules/canopy.md`) govern `/admin/*`, `/showcase/canopy/*`, the `/work/canopy` detail page, the About-page Canopy capability section, and `lib/canopy/*`. Pathlight rules (`.claude/rules/pathlight.md`) govern `/(grade)/*`, the Pathlight scan pipeline, and `lib/services/claude-analysis.ts`. Apply the right file to the right code path. The two products share a Postgres database and a Vercel deployment, but the public copy, the locks, and the safety invariants do not transfer between them.
 
 ## Public Presentation
 - Canopy is described publicly by outcomes ("one dashboard, one auth wall, one source of truth on the buyer's domain"), not by internal architecture.
@@ -12,7 +12,7 @@ Canopy and Pathlight are two separate products in this repo with two separate ma
 
 ## Lead-score component names (NEVER publish)
 
-The internal LeadScoreComponents interface in lib/canopy/lead-scoring.ts contains six weighted signals. None of these strings may appear as a deliberate enumeration in any public-rendered copy, marketing page, About page, /work entry, /pricing/canopy detail page, /showcase/canopy tour, blog post, or rules-file commentary that could be pasted into a prospect-facing context:
+The internal LeadScoreComponents interface in lib/canopy/lead-scoring.ts contains six weighted signals. None of these strings may appear as a deliberate enumeration in any public-rendered copy, marketing page, About page, /work/canopy detail page, /showcase/canopy tour, blog post, or rules-file commentary that could be pasted into a prospect-facing context:
 
 - pathlight
 - engagement
@@ -77,7 +77,7 @@ The gate lives at lib/canopy/pathlight-gate.ts and exports canFireScan(kind). Ev
 
 ## Legacy Names / Migration Shims
 - The product is now "Canopy." It was previously "Operations Cockpit." Marketing copy uses "Canopy" only; legacy `topic=operations-cockpit` query-param routing on the contact form stays for transition safety only and is not a current name.
-- The /pricing/operations slug 308-redirects to /pricing/canopy in next.config.mjs. Keep the redirect; do not remove it.
+- The /pricing/operations slug 308-redirects to /work/canopy in next.config.mjs. The /pricing/canopy slug 308-redirects to /work/canopy in next.config.mjs. Keep both redirects; do not remove them.
 
 ## Brand Chrome
 - First-person "I" copy across all Canopy public surfaces. Never "we."

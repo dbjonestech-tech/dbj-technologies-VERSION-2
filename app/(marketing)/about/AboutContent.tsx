@@ -38,7 +38,7 @@ const valueIcons = [Zap, Eye, Target, Heart];
    The 6 tiles surfaced on the About page as proof-of-craft
    for the Canopy engagement. Body copy is outcome-led and
    avoids exposing Pathlight internals. */
-const OPS_CAPABILITIES = [
+const CANOPY_CAPABILITIES = [
   {
     icon: Activity,
     title: "First-party analytics",
@@ -813,7 +813,7 @@ export default function AboutContent() {
             }}
             className="mt-16 lg:mt-20 grid gap-6 lg:gap-8 sm:grid-cols-2 lg:grid-cols-3"
           >
-            {OPS_CAPABILITIES.map((cap) => {
+            {CANOPY_CAPABILITIES.map((cap) => {
               const Icon = cap.icon;
               return (
                 <motion.div
