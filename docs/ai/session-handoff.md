@@ -4,14 +4,19 @@ Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`). The most recent archive is
 [`history/2026-05-02.md`](history/2026-05-02.md).
 
-## Current state (May 3, 2026 -- Inngest cron registration complete; Commits A through E all shipped)
+## Current state (May 3, 2026 -- Inngest cron registration A-E shipped; canopy.md rules file shipped at `5d17cbd`; Phase 1 Canopy marketing rewrite unblocked)
 
 ### Anchor block
 
-HEAD: Commit E (this commit, hash filled by `git log -1` post-push). All seven previously-unwired Inngest cron exports from the April 28 monitoring-cockpit work are now registered in the serve handler. `git log -1` is authoritative.
+HEAD: `5d17cbd` -- adds `.claude/rules/canopy.md`, the canonical Canopy rules file. Unblocks Track 2 (Phase 1 Canopy marketing rewrite). `git log -1` is authoritative.
 
 Recent commits (newest first):
-- Commit E -- wire `infrastructure-check-daily` in serve handler (this commit). Fires daily at 08:00 UTC. WHOIS / TLS / DNS-auth expiry checks for every DBJ-managed domain. `retries: 0` is intentional (slow probes; retrying amplifies budget envelope).
+- `5d17cbd` (this commit) -- `docs(rules): add .claude/rules/canopy.md`. New 92-line rules file modeled on pathlight.md / deployment.md / frontend.md. Sections: top-level disambiguation block (literally names both `.claude/rules/canopy.md` and `.claude/rules/pathlight.md` with their respective code paths), Public Presentation, the six lead-score component names as forbidden public enumerations with a token-vs-enumeration clarifier, the three-layer Pathlight lock invariant, CRM Architecture Invariants (auth gate moved here as a security invariant, deals-as-primary-stage), Vendor Posture (Sentry stays wired and is NOT a Canopy replacement, Turnstile unrelated, Resend stays for transactional), Migrations, Phase Discipline (durable directive form, not state declaration), Frozen Codebases (operations-cockpit, canopy starter, starauto-ops Vercel project), UI Conventions, Legacy Names / Migration Shims (operations-cockpit query-param transition shim), Brand Chrome, Testing. All 10 self-review tightenings applied; Joshua reviewed and stamped accept-all before commit. Zero em dashes. Marketing-rewrite-scope note logged: the Phase 1 prompt must include the `lib/work-data.ts:375` Sentry-cleanup (drop Sentry from the "excellent products" replaceable-vendor example list) in the same commit so canopy.md does not ship with a rule the repo violates.
+- `2b2b54e` -- `docs: fill aff8118 hash for Stage 3a in handoff` (handoff hash-fill)
+- `aff8118` -- Pathlight Stage 3a, social-share preview side-step (migration 037, OG-preview parser, OgPreviewSection on report page)
+- `4ab7a65` -- `docs: fill 29545c0 hash for screenshotHealth fix in handoff` (handoff hash-fill)
+- `29545c0` -- Pathlight vision-audit screenshotHealth tightening (eliminates false-positive `loading-or-skeleton` on sparse-by-design pages)
+- Commit E (`796bcfa`) -- wire `infrastructure-check-daily` in serve handler. Fires daily at 08:00 UTC. WHOIS / TLS / DNS-auth expiry checks for every DBJ-managed domain. `retries: 0` is intentional (slow probes; retrying amplifies budget envelope).
 - `77583c5` -- Commit D: wire `search-console-daily` (06:00 UTC). Bundled an unrelated print-fix change to `ScanStatus.tsx` and `globals.css` that had been staged in the working tree (Joshua's pending print/PDF stylesheet work). The cron edit and the print fix are independent and both intentional, just landed in the same commit by accident of staging timing.
 - `141856c` -- Commit C: wire `anthropic-budget-hourly` (`:20`). `snapshotAnthropicBudget` falls back to local `api_usage_events` when Admin API yields nothing.
 - `95d1dcd` -- standalone session-handoff doc update (branch protection blocked the amend force-push for Commit B, so this followed as a separate commit per CLAUDE.md fallback).
@@ -34,7 +39,7 @@ The seven Inngest cron exports added in commit `1173bc2` (April 28) were never r
 ### Next session priorities
 
 1. **Verify the four daily/hourly first runs in the Inngest dashboard.** B and C will fire automatically within the next hour; D and E require either patience until tomorrow morning UTC or manual dashboard invocation. For D specifically, click Invoke first, watch for 403, then resolve the GSC permission grant in the Google Cloud Console if needed.
-2. **Track 2 (Canopy marketing rewrite) remains gated** on Joshua's redline of `.claude/rules/canopy.md` and the six lead-score component name strings. Self-review surfaced 10 tightenings (most load-bearing: Section 4 bare-token "Canopy" rule rewrite; Sentry shouldn't be in Section 1 vendor list; Cloudflare Turnstile shouldn't either). Drafting Phase 1 unblocks the moment those two inputs land.
+2. **Track 2 (Canopy marketing rewrite) is now UNBLOCKED.** `.claude/rules/canopy.md` shipped at `5d17cbd` with all 10 self-review tightenings applied. Joshua to issue the Phase 1 marketing rewrite prompt next. Scope: rewrite of the `lib/work-data.ts` Canopy entry, productized-engagement softenings on `/about` and `/work/canopy`, the `OPS_CAPABILITIES` to `CANOPY_CAPABILITIES` rename in `AboutContent.tsx`, the `/showcase/canopy/layout.tsx` banner softening, stale work-page metric updates, and the `lib/work-data.ts:375` Sentry-cleanup (drop Sentry from the "excellent products" replaceable-vendor example list per the new Vendor Posture rule, must ship in the same commit so canopy.md does not land with a rule the repo violates). Same-commit `current-state.md` update per CLAUDE.md.
 
 ### What shipped this session: Pathlight reliability hardening (Phase 1 + Phase 2)
 
