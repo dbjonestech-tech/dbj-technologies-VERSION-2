@@ -400,6 +400,15 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                 <p className="text-[1.0625rem] lg:text-[1.125rem] leading-[1.85] text-text-secondary whitespace-pre-line">
                   {section.body}
                 </p>
+                {section.liveHref ? (
+                  <Link
+                    href={section.liveHref}
+                    className="mt-8 inline-flex items-center text-sm font-medium hover:underline"
+                    style={{ color: accent }}
+                  >
+                    View this live →
+                  </Link>
+                ) : null}
               </motion.div>
             </motion.article>
           ))}

@@ -21,6 +21,16 @@ Last updated: May 4, 2026 (Canopy showcase tour expanded from 4 to 8 sections + 
 
 The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
 
+## Canopy work-card chip wrap fix and in-section showcase links (May 4, 2026)
+
+Shipped at `<chip-and-links-commit>`. End-to-end browser audit surfaced two visual gaps after the showcase expansion landed; this commit closes both.
+
+- `lib/work-data.ts` Canopy entry: "Live Install" metric chip value shortened from "The Star Auto Service" (21 chars, wrapped to three lines on the work-card at sm:grid-cols-3) to "The Star Auto" (13 chars, two-line max). Article preserved (canonical to the brand), recognizable "Star Auto" anchor preserved, redundant "Service" word dropped. Full brand name "The Star Auto Service" stays everywhere else in the file (description, heroDescription, notable, timeline, all section bodies) and across the rest of the codebase. Fix is purely at the data value-string layer; no styling, no Tailwind, no chip-width or overflow CSS touched.
+- `lib/work-data.ts` ProjectSection interface gained an optional `liveHref?: string` field. Six Canopy sections now carry liveHref pointing to their matching showcase pages: Section 3 Analytics & Performance → /showcase/canopy/analytics, Section 4 Pipeline & Relationships → /showcase/canopy/deals, Section 5 Automation → /showcase/canopy/automation, Section 6 Operations & Health → /showcase/canopy/operations, Section 7 Pathlight Integration → /showcase/canopy/pathlight, Section 8 Architecture & Ownership → /showcase/canopy/audit. Sections 1 (The Problem), 2 (What You Get), and 9 (What Comes Next) deliberately omit liveHref because they are narrative, not capability surfaces.
+- `components/templates/ProjectDetailLayout.tsx` adds a conditional render inside the section body wrapper at line ~399. When `section.liveHref` is truthy, a quiet "View this live →" Link renders below the body paragraph: text-sm font-medium, accent-tinted color, accent/40 border underline. Quieter than the hero secondary "Read the Case Study" CTA by weight (medium vs semibold) and color (accent vs text-primary) so it does not compete with the hero CTA pair. Pathlight, The Star Auto Service, and Soil Depot detail pages render unchanged because none of their sections set liveHref.
+
+No /admin/* surface touched. No /showcase/canopy/* page or shared layout touched. No hero CTA pair touched. No styling fix to the chip; data-only. No new components introduced.
+
 ## Canopy showcase expansion: tour mirrors the 9-section /work/canopy narrative (May 4, 2026)
 
 Shipped at `d84f1b7`. The /showcase/canopy tour previously had four pages (Dashboard, Contacts, Deals, Audit log) while the Phase 1C /work/canopy work entry described nine capability sections. A buyer reading the comprehensive 9-section pitch and clicking through to the showcase saw a 4-page tour with no Analytics, Automation, Operations, or Pathlight surface. This commit closes that coverage gap.
