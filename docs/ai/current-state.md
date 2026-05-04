@@ -23,7 +23,7 @@ The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebu
 
 ## Google Analytics 4 SPA pageview tracking (May 4, 2026)
 
-Shipped at `<spa-pageview-commit>`. Closes the last meaningful gap in the GA4 install: client-side Next.js route changes now fire pageviews to GA. Without this, every visitor would have appeared to view exactly one page (the entry page) because `gtag('config')` only fires its implicit pageview once when the inline init script runs; subsequent `next/link` navigations within the SPA registered nothing.
+Shipped at `1440e39`. Closes the last meaningful gap in the GA4 install: client-side Next.js route changes now fire pageviews to GA. Without this, every visitor would have appeared to view exactly one page (the entry page) because `gtag('config')` only fires its implicit pageview once when the inline init script runs; subsequent `next/link` navigations within the SPA registered nothing.
 
 Two coordinated changes in `components/layout/GoogleAnalytics.tsx`:
 
