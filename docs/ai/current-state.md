@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: May 4, 2026 (Canopy marketing Phase 1C Layer 1 work-page rewrite + canopy.md factual fixes shipped at `<phase-1c-commit>`). **All 10 Canopy phases shipped (0 through 9 inclusive).**
+Last updated: May 4, 2026 (Canopy marketing Phase 1C Layer 1 work-page rewrite + canopy.md factual fixes shipped at `c58a8a8`). **All 10 Canopy phases shipped (0 through 9 inclusive).**
 
 ## Canopy v2 build status
 
@@ -23,7 +23,7 @@ The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebu
 
 ## Canopy marketing Phase 1C, Layer 1 work-page rewrite (May 4, 2026)
 
-Shipped at `<phase-1c-commit>`. Six files touched in one focused commit:
+Shipped at `c58a8a8`. Six files touched in one focused commit:
 
 - `lib/work-data.ts`: Canopy entry expanded from 5 sections to 9 (The Problem, What You Get, Analytics & Performance, Pipeline & Relationships, Automation, Operations & Health, Pathlight Integration, Architecture & Ownership, What Comes Next). Sentry/Datadog/PostHog "excellent products" vendor list at the prior line 375 removed in favor of generic SaaS-sprawl framing per the canopy.md Vendor Posture rule. Section-5 "we can scope a custom build" voice violation fixed to first-person. Description and heroDescription tightened to first-person and refer to Canopy as an "operating-system admin" rather than "operations dashboard." Metrics array updated to `Sections: 9 / Live Install: Star Auto / Categories Replaced: 6` (replacing the prior `5-7` range with a concrete count). techStack expanded from 4 items to 8: Next.js 16, TypeScript, Neon Postgres, Auth.js, Inngest, Vercel, Resend, Sentry. The Section-7 Pathlight integration paragraph uses "layered guardrails" framing rather than the prior "three-layer guardrail" phrasing, to keep the per-layer order private per canopy.md.
 - `app/(marketing)/about/AboutContent.tsx`: legacy `OPS_CAPABILITIES` constant renamed to `CANOPY_CAPABILITIES` at the declaration and the single usage. No copy changes; the Built for Myself First section already aligned with the April 30 reposition.
