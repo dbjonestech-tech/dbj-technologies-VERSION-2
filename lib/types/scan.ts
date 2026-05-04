@@ -127,6 +127,39 @@ export type PageCritiqueResult = {
   ctas: PageCta[];
 };
 
+/* Stage 3a: social-share preview. Pure HTML parse of <meta property=og:*>
+ * and <meta name=twitter:*> tags from the captured html_snapshot. No AI
+ * call. Surfaced under a "When someone shares your site" section so the
+ * prospect sees what their link looks like in a Facebook / LinkedIn /
+ * Slack feed. */
+export type OgPreviewProblemSeverity = "high" | "medium" | "low";
+
+export type OgPreviewProblem = {
+  severity: OgPreviewProblemSeverity;
+  title: string;
+  detail: string;
+};
+
+export type OgPreviewMeta = {
+  title: string | null;
+  description: string | null;
+  image: string | null;
+  imageAlt: string | null;
+  url: string | null;
+  siteName: string | null;
+  twitterCard: string | null;
+  twitterTitle: string | null;
+  twitterDescription: string | null;
+  twitterImage: string | null;
+};
+
+export type OgPreviewResult = {
+  meta: OgPreviewMeta;
+  pageTitle: string | null;
+  pageDescription: string | null;
+  problems: OgPreviewProblem[];
+};
+
 export type DesignMetric = {
   score: number;
   observation: string;
@@ -279,6 +312,11 @@ export type PathlightReport = {
    * the HeroCritiqueSection returns null gracefully. Late-arriving on a
    * fresh scan because the underlying call runs post-email. */
   pageCritique: PageCritiqueResult | null;
+  /* Stage 3a field. Optional: pre-Stage-3 scans and any scan where the
+   * html_snapshot did not land load with this as null and the
+   * OgPreviewSection returns null gracefully. Lands shortly after status
+   * flips to complete; the polling loop in ScanStatus picks it up. */
+  ogPreview: OgPreviewResult | null;
   businessModel?: "B2B" | "B2C" | "mixed";
   inferredVertical?: string;
   inferredVerticalParent?: string;

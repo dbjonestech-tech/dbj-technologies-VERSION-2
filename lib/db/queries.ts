@@ -8,6 +8,10 @@ import type {
   HtmlSnapshot,
   IndustryBenchmark,
   LighthouseCategoryScores,
+  OgPreviewMeta,
+  OgPreviewProblem,
+  OgPreviewProblemSeverity,
+  OgPreviewResult,
   PageCritiqueResult,
   PageCta,
   PageHeadlineAlternative,
@@ -57,6 +61,10 @@ type ScanResultsRow = {
   /* Stage 1 column (added in migration 035). Nullable; pre-Stage-1 scans
    * coerce to null and HeroCritiqueSection returns null gracefully. */
   page_critique: unknown;
+  /* Stage 3a column (added in migration 037). Nullable; pre-Stage-3 scans
+   * and any scan whose html_snapshot did not land coerce to null and the
+   * OgPreviewSection returns null gracefully. */
+  og_preview: unknown;
 };
 
 export async function updateScanStatus(
@@ -259,6 +267,19 @@ export async function updateScanPageCritique(
     VALUES (${scanId}, ${JSON.stringify(critique)}::jsonb)
     ON CONFLICT (scan_id) DO UPDATE
     SET page_critique = EXCLUDED.page_critique
+  `;
+}
+
+export async function updateScanOgPreview(
+  scanId: string,
+  preview: OgPreviewResult,
+): Promise<void> {
+  const sql = getDb();
+  await sql`
+    INSERT INTO scan_results (scan_id, og_preview)
+    VALUES (${scanId}, ${JSON.stringify(preview)}::jsonb)
+    ON CONFLICT (scan_id) DO UPDATE
+    SET og_preview = EXCLUDED.og_preview
   `;
 }
 
@@ -629,6 +650,82 @@ function coercePageCritique(v: unknown): PageCritiqueResult | null {
   };
 }
 
+function coerceOgPreviewMeta(v: unknown): OgPreviewMeta {
+  const blank: OgPreviewMeta = {
+    title: null,
+    description: null,
+    image: null,
+    imageAlt: null,
+    url: null,
+    siteName: null,
+    twitterCard: null,
+    twitterTitle: null,
+    twitterDescription: null,
+    twitterImage: null,
+  };
+  if (!v || typeof v !== "object") return blank;
+  const o = v as Record<string, unknown>;
+  const s = (k: string): string | null =>
+    typeof o[k] === "string" && (o[k] as string).length > 0
+      ? (o[k] as string)
+      : null;
+  return {
+    title: s("title"),
+    description: s("description"),
+    image: s("image"),
+    imageAlt: s("imageAlt"),
+    url: s("url"),
+    siteName: s("siteName"),
+    twitterCard: s("twitterCard"),
+    twitterTitle: s("twitterTitle"),
+    twitterDescription: s("twitterDescription"),
+    twitterImage: s("twitterImage"),
+  };
+}
+
+function coerceOgPreviewProblem(v: unknown): OgPreviewProblem | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  if (
+    typeof o.title !== "string" ||
+    typeof o.detail !== "string" ||
+    o.title.length === 0
+  ) {
+    return null;
+  }
+  const severity: OgPreviewProblemSeverity =
+    o.severity === "high" || o.severity === "low" ? o.severity : "medium";
+  return { severity, title: o.title, detail: o.detail };
+}
+
+function coerceOgPreview(v: unknown): OgPreviewResult | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  const meta = coerceOgPreviewMeta(o.meta);
+  const pageTitle = typeof o.pageTitle === "string" ? o.pageTitle : null;
+  const pageDescription =
+    typeof o.pageDescription === "string" ? o.pageDescription : null;
+  const problemsRaw = Array.isArray(o.problems) ? o.problems : [];
+  const problems: OgPreviewProblem[] = [];
+  for (const p of problemsRaw) {
+    const coerced = coerceOgPreviewProblem(p);
+    if (coerced) problems.push(coerced);
+  }
+  /* Render-side gate: if every meta field is null, no <title>, no
+   * description, AND no detected problems, treat as no result so the
+   * section returns null gracefully. */
+  const anyMetaPresent = Object.values(meta).some((x) => x !== null);
+  if (
+    !anyMetaPresent &&
+    !pageTitle &&
+    !pageDescription &&
+    problems.length === 0
+  ) {
+    return null;
+  }
+  return { meta, pageTitle, pageDescription, problems };
+}
+
 function coerceFormsAudit(v: unknown): FormsAuditResult | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Record<string, unknown>;
@@ -694,7 +791,8 @@ async function loadScanWithResults(scanId: string): Promise<{
     SELECT lighthouse_data, screenshots, ai_analysis, pathlight_score,
            pillar_scores, remediation_items, revenue_impact, industry_benchmark,
            audio_summary_url, audio_summary_script,
-           html_snapshot, screenshots_fullpage, forms_audit, page_critique
+           html_snapshot, screenshots_fullpage, forms_audit, page_critique,
+           og_preview
     FROM scan_results
     WHERE scan_id = ${scanId}
     ORDER BY created_at DESC
@@ -813,6 +911,37 @@ export async function getPageCritiqueInput(scanId: string): Promise<{
   };
 }
 
+/* Stage 3a read helper for the post-finalize og-preview step. Pulls only
+ * the html_snapshot row + the resolved URL (used as the base for resolving
+ * relative og:image / og:url values). Keeps the payload tight; html_snapshot
+ * is capped at 256KB by the capture step itself. */
+export async function getOgPreviewInput(scanId: string): Promise<{
+  html: string | null;
+  url: string;
+  resolvedUrl: string | null;
+} | null> {
+  const sql = getDb();
+  const rows = (await sql`
+    SELECT s.url, s.resolved_url, sr.html_snapshot
+    FROM scans s
+    LEFT JOIN scan_results sr ON sr.scan_id = s.id
+    WHERE s.id = ${scanId}
+    LIMIT 1
+  `) as Array<{
+    url: string;
+    resolved_url: string | null;
+    html_snapshot: unknown;
+  }>;
+  const row = rows[0];
+  if (!row) return null;
+  const snapshot = coerceHtmlSnapshot(row.html_snapshot);
+  return {
+    html: snapshot?.html ?? null,
+    url: row.url,
+    resolvedUrl: row.resolved_url,
+  };
+}
+
 /* Stage 2 read helper for the post-finalize forms-audit step. Pulls only
  * the columns it needs (extracted forms + html snapshot for narrative
  * grounding + business context) to keep the row payload small. */
@@ -903,6 +1032,7 @@ export async function getFullScanReport(
     screenshotsFullPage: coerceFullPageScreenshots(result?.screenshots_fullpage),
     formsAudit: coerceFormsAudit(result?.forms_audit),
     pageCritique: coercePageCritique(result?.page_critique),
+    ogPreview: coerceOgPreview(result?.og_preview),
     businessModel: vision?.businessModel,
     inferredVertical: vision?.inferredVertical,
     inferredVerticalParent: vision?.inferredVerticalParent,

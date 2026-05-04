@@ -4,6 +4,7 @@ import {
   getExistingAudioSummary,
   getFormsAuditInput,
   getFullScanReport,
+  getOgPreviewInput,
   getPageCritiqueInput,
   getScanPipelineContext,
   markScanComplete,
@@ -15,6 +16,7 @@ import {
   updateScanFullPageScreenshots,
   updateScanHtmlSnapshot,
   updateScanIndustryBenchmark,
+  updateScanOgPreview,
   updateScanPageCritique,
   updateScanRemediation,
   updateScanResolvedUrl,
@@ -24,6 +26,7 @@ import {
   updateScanStatus,
 } from "../db/queries";
 import { runFormsAudit } from "../services/forms-audit";
+import { extractOgPreview } from "../services/og-preview";
 import { runPageCritique } from "../services/page-critique";
 import { generateVoiceSummary } from "../services/voice";
 import { getProviderSpendUsd } from "../services/api-usage";
@@ -856,6 +859,51 @@ export const scanRequested = inngest.createFunction(
           );
           await track(
             "page-critique.failed",
+            { error: message.slice(0, 500) },
+            { scanId, level: "warn" },
+          );
+          return { ok: false, error: message };
+        }
+      });
+
+      /* o1: Stage 3a social-share preview. Runs after c1 and before the
+       * first follow-up sleep so a parse failure (which should be impossible
+       * given the pure-HTML extractor) cannot block email delivery. Pure
+       * HTML parser, no AI call, no external network -- the per-call cost
+       * is effectively zero. Gated on html_snapshot present; without
+       * captured HTML there is nothing to parse. Failure swallowed,
+       * matches the a5/f1/c1 side-step posture. */
+      await step.run("o1", async () => {
+        try {
+          const input = await getOgPreviewInput(scanId);
+          if (!input || !input.html) {
+            return { ok: true, skipped: "no-html-snapshot" };
+          }
+          const preview = extractOgPreview(
+            input.html,
+            input.resolvedUrl ?? input.url,
+          );
+          await updateScanOgPreview(scanId, preview);
+          await track(
+            "og-preview.generated",
+            {
+              hasOgImage: preview.meta.image !== null,
+              hasOgTitle: preview.meta.title !== null,
+              hasOgDescription: preview.meta.description !== null,
+              hasTwitterCard: preview.meta.twitterCard !== null,
+              problemCount: preview.problems.length,
+            },
+            { scanId },
+          );
+          return { ok: true, problems: preview.problems.length };
+        } catch (err) {
+          const message = describeError(err);
+          console.warn(
+            "[o1] og-preview failed (scan still ships):",
+            message,
+          );
+          await track(
+            "og-preview.failed",
             { error: message.slice(0, 500) },
             { scanId, level: "warn" },
           );

@@ -5,12 +5,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import AskPathlightLoader from "./AskPathlightLoader";
 import { FormsAuditSection } from "./FormsAuditSection";
 import { HeroCritiqueSection } from "./HeroCritiqueSection";
+import { OgPreviewSection } from "./OgPreviewSection";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
   DesignScores,
   FormsAuditResult,
   FullPageScreenshotPair,
   LighthouseCategoryScores,
+  OgPreviewResult,
   PageCritiqueResult,
   PerformanceScores,
   PillarScores,
@@ -60,6 +62,9 @@ type ApiReport = {
   /* Stage 1 (May 3 2026): page critique. Lands AFTER the report email
    * ships, so this is the latest field to populate on a fresh scan. */
   pageCritique: PageCritiqueResult | null;
+  /* Stage 3a (May 3 2026): social-share preview. Pure HTML parse output,
+   * lands a beat after pageCritique on a fresh scan. */
+  ogPreview: OgPreviewResult | null;
   isOutOfScope: boolean;
   outOfScopeLabel: string | null;
   screenshotNotice: string | null;
@@ -90,7 +95,11 @@ function postFinalizeFieldsLanded(report: ApiReport): boolean {
   // Page critique: only runs when the design audit succeeded AND a
   // desktop screenshot was captured. Same client-side ambiguity as forms.
   const critiqueSettled = !!report.pageCritique;
-  return audioSettled && formsSettled && critiqueSettled;
+  // OG preview: only runs when html_snapshot was captured. Same client-side
+  // ambiguity; treat any non-null ogPreview as settled and rely on the
+  // poll cap to stop the loop when no html_snapshot exists.
+  const ogSettled = !!report.ogPreview;
+  return audioSettled && formsSettled && critiqueSettled && ogSettled;
 }
 
 const PHASE_LABELS = [
@@ -646,6 +655,8 @@ function Report({
       <HeroCritiqueSection pageCritique={report.pageCritique} />
 
       <FormsAuditSection formsAudit={report.formsAudit} />
+
+      <OgPreviewSection preview={report.ogPreview} />
 
       {hasScreenshots ? (
         <ScreenshotsSection

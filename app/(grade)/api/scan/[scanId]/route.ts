@@ -114,6 +114,11 @@ export async function GET(
        * alternatives, hero observation) and shows up late on a fresh scan
        * because the underlying call runs post-email. */
       pageCritique: report.pageCritique,
+      /* Stage 3a field. Pure HTML parse output: parsed OG / Twitter card
+       * metadata plus a list of structural problems. Late-arriving on a
+       * fresh scan because the o1 step runs after c1; the polling loop
+       * in ScanStatus picks it up without requiring a refresh. */
+      ogPreview: report.ogPreview,
       isOutOfScope,
       outOfScopeLabel: isOutOfScope
         ? report.businessScale === "global"
