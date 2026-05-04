@@ -200,8 +200,14 @@ export default async function ({ page, context }) {
         } catch (_e) { /* keep trying others */ }
       }
 
-      const ERROR_RE = /(format\(s\) not supported|source\(s\) not found|your browser does not support)/i;
-      const MEDIA_URL_RE = /^[\w.-]+\.[a-z]{2,}\/[\w/-]+\.(mp4|webm|mov|m4v|ogv)\b/i;
+      // NOTE: Backslashes are doubled here on purpose. This whole function
+      // body is the inside of a JS template literal in browserless.ts; the
+      // template literal interprets \\b as backspace and drops \\/ to '/',
+      // which would prematurely terminate a regex literal and break the
+      // function with "Unexpected token ']'" at Browserless runtime.
+      // Character classes [(]/[)] avoid the same issue for literal parens.
+      const ERROR_RE = /(format[(]s[)] not supported|source[(]s[)] not found|your browser does not support)/i;
+      const MEDIA_URL_RE = /^[\\w.-]+\\.[a-z]{2,}\\/[\\w/-]+\\.(mp4|webm|mov|m4v|ogv)\\b/i;
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       let node;
       while ((node = walker.nextNode())) {
@@ -403,8 +409,9 @@ export default async function ({ page, context }) {
           if (p && typeof p.catch === 'function') p.catch(() => {});
         } catch (_e) { /* keep trying others */ }
       }
-      const ERROR_RE = /(format\(s\) not supported|source\(s\) not found|your browser does not support)/i;
-      const MEDIA_URL_RE = /^[\w.-]+\.[a-z]{2,}\/[\w/-]+\.(mp4|webm|mov|m4v|ogv)\b/i;
+      // See AtF capture for the backslash-doubling rationale.
+      const ERROR_RE = /(format[(]s[)] not supported|source[(]s[)] not found|your browser does not support)/i;
+      const MEDIA_URL_RE = /^[\\w.-]+\\.[a-z]{2,}\\/[\\w/-]+\\.(mp4|webm|mov|m4v|ogv)\\b/i;
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       let node;
       while ((node = walker.nextNode())) {
