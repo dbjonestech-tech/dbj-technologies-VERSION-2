@@ -21,6 +21,14 @@ Last updated: May 4, 2026 (Canopy showcase tour expanded from 4 to 8 sections + 
 
 The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
 
+## Google Analytics 4 production env var added (May 4, 2026)
+
+`NEXT_PUBLIC_GA_MEASUREMENT_ID=G-1Z1PVKKRW2` added to the Vercel project `dbj-technologies` (Production scope only) via `vercel env add`. Triggers a fresh Vercel build on the next push. After that build deploys, `components/layout/GoogleAnalytics.tsx` (already mounted in `app/layout.tsx:172` since April 28) will start rendering its two `<Script strategy="afterInteractive">` tags for any visitor whose `dbj-cookie-consent` localStorage value is `"accepted"`, on every public route except `/admin/*` and `/pathlight/<scanId>` subpaths.
+
+The April 28 GA install was complete in code but had been silently no-oping in production because the env var was never added to Vercel. The component reads `process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID` and returns null when unset; with no value present at build time, the rendered HTML contained zero gtag/googletagmanager/dataLayer references, which a May 4 live-site browser scan correctly observed and incorrectly concluded that GA was not installed at all. The actual fix was a single env-var add. No code change.
+
+Preview scope deliberately left without the env var so preview deploys remain GA-free until explicitly turned on. Joshua to verify on production within 1-5 minutes of the next build completing: load dbjtechnologies.com in a fresh browser, accept the cookie banner, watch Network for `gtag/js?id=G-1Z1PVKKRW2`, then check Realtime in the GA dashboard at analytics.google.com for the visit.
+
 ## Canopy showcase-link tightening: hero label override, conditional icon, in-section copy refinement (May 4, 2026)
 
 Shipped at `0e6e0fc`. Three small label/icon refinements after the chip+links commit landed, all driven by the same observation: the hero CTA "View Live Site" with ExternalLink icon was inherited from projects with real production URLs (Pathlight, The Star Auto Service, Soil Depot all use https URLs that legitimately open external) but for Canopy the liveUrl points at the internal `/showcase/canopy` tour, where "View Live Site" + the external-link icon both read slightly off.
