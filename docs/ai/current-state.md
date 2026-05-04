@@ -21,6 +21,24 @@ Last updated: May 4, 2026 (Canopy showcase tour expanded from 4 to 8 sections + 
 
 The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
 
+## CSP amended to allow Google Analytics traffic (May 4, 2026)
+
+Shipped at `<csp-fix-commit>`. Real production bug surfaced by a Chrome MCP CSP audit: the GA install was correctly wired since April 28 but blocked at the Content-Security-Policy layer this entire time. The `vercel.json` CSP excluded both `googletagmanager.com` from `script-src` and `google-analytics.com` from `connect-src`, so the browser silently refused to download `gtag.js` (verified by `transferSize: 0` and `decodedBodySize: 0` on both googletagmanager.com performance entries). The inline init stub still ran, defining `window.gtag` as a local dataLayer-pusher and populating dataLayer with the config event, which is why every superficial verification (Tag Assistant green check, `typeof gtag === 'function'`, dataLayer entries present) read as healthy. The library that actually processes dataLayer and sends `/g/collect` hits never loaded, so no traffic ever reached Google's servers.
+
+Surgical CSP amendment, three directives touched, no other changes:
+
+- **`script-src`**: added `https://www.googletagmanager.com` so `gtag.js` can load
+- **`connect-src`**: added `https://www.google-analytics.com https://*.analytics.google.com https://*.google-analytics.com` so `/g/collect` hits and `_ga` Set-Cookie responses reach the browser
+- **`img-src`**: added `https://www.google-analytics.com https://*.google-analytics.com` so the legacy 1x1 pixel beacon transport is allowed as a fallback
+
+No other CSP directives touched. No relaxation (no `'unsafe-eval'`, no `'strict-dynamic'`). No new dependencies. No changes to `GoogleAnalytics.tsx`, `CookieConsent.tsx`, or `app/layout.tsx` (those were correct; the CSP was the problem).
+
+Sentry tunnel is configured at `next.config.mjs:145` (`tunnelRoute: "/monitoring"`), so Sentry error reporting routes through `'self'` and is unaffected by CSP. No follow-up needed for Sentry.
+
+Verification path post-deploy: incognito window → DevTools Network tab filtered by `collect` → load `dbjtechnologies.com` → click Accept on cookie banner → within 5 seconds expect `www.google-analytics.com/g/collect?...` request with status 200/204. That request is the conclusive evidence GA hits are reaching Google's servers. GA Realtime should show the visit within 30 seconds.
+
+The earlier "Verify GA via real browser, not curl/MCP-Chrome" memory note was directionally right but missed the underlying cause: the install was being blocked before any browser test could surface it. The actual operational rule is to **inspect the document's CSP first** when GA scripts appear inert across multiple environments, not assume environmental blocking. Memory entry updated.
+
 ## Bottom-CTA fix, sitemap expansion, showcase Costs precision (May 4, 2026)
 
 Shipped at `04a2af0`. Three coordinated cleanups after the GA install was conclusively verified end-to-end via Chrome MCP (twelve of thirteen checks green; the thirteenth a network-layer block specific to the MCP browser session, not production).
