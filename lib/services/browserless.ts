@@ -177,6 +177,49 @@ export default async function ({ page, context }) {
     await new Promise((resolve) => setTimeout(resolve, 600));
   } catch (_err) { /* banner dismissal is best-effort */ }
 
+  // Best-effort hero-video unstuck. Many sites place an autoplaying
+  // background video in the hero. Headless Chromium often refuses to
+  // autoplay (autoplay policy, missing proprietary codecs) or the CDN
+  // serving the video blocks headless user agents. The <video> element
+  // then fires its 'error' event and the site renders a fallback that
+  // commonly includes the literal browser error string plus the raw
+  // video URL as debug text. We try two layered remediations:
+  //   (1) Set every <video> to muted and call .play() explicitly; this
+  //       fixes the case where autoplay policy was the only block.
+  //   (2) Hide any text whose content matches typical media-error
+  //       fallback patterns, so the screenshot does not capture
+  //       diagnostic strings that no real visitor would ever see.
+  try {
+    await page.evaluate(() => {
+      const videos = Array.from(document.querySelectorAll('video'));
+      for (const v of videos) {
+        try {
+          v.muted = true;
+          const p = v.play();
+          if (p && typeof p.catch === 'function') p.catch(() => {});
+        } catch (_e) { /* keep trying others */ }
+      }
+
+      const ERROR_RE = /(format\(s\) not supported|source\(s\) not found|your browser does not support)/i;
+      const MEDIA_URL_RE = /^[\w.-]+\.[a-z]{2,}\/[\w/-]+\.(mp4|webm|mov|m4v|ogv)\b/i;
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let node;
+      while ((node = walker.nextNode())) {
+        const text = (node.nodeValue || '').trim();
+        if (!text) continue;
+        if (ERROR_RE.test(text) || MEDIA_URL_RE.test(text)) {
+          const el = node.parentElement;
+          if (el) {
+            el.style.display = 'none';
+            el.style.visibility = 'hidden';
+          }
+        }
+      }
+    });
+    // Brief settle for explicit play() to render a first frame
+    await new Promise((resolve) => setTimeout(resolve, 800));
+  } catch (_err) { /* video unstuck + error cleanup is best-effort */ }
+
   try {
     await page.evaluate(() =>
       document.fonts && document.fonts.ready ? document.fonts.ready : null
@@ -347,6 +390,37 @@ export default async function ({ page, context }) {
     const msg = (err && err.message) || String(err);
     if (!/timeout/i.test(msg)) throw err;
   }
+
+  // Hero-video unstuck + media-error fallback cleanup. Mirrors the AtF
+  // capture function above; see that function's comment for full rationale.
+  try {
+    await page.evaluate(() => {
+      const videos = Array.from(document.querySelectorAll('video'));
+      for (const v of videos) {
+        try {
+          v.muted = true;
+          const p = v.play();
+          if (p && typeof p.catch === 'function') p.catch(() => {});
+        } catch (_e) { /* keep trying others */ }
+      }
+      const ERROR_RE = /(format\(s\) not supported|source\(s\) not found|your browser does not support)/i;
+      const MEDIA_URL_RE = /^[\w.-]+\.[a-z]{2,}\/[\w/-]+\.(mp4|webm|mov|m4v|ogv)\b/i;
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let node;
+      while ((node = walker.nextNode())) {
+        const text = (node.nodeValue || '').trim();
+        if (!text) continue;
+        if (ERROR_RE.test(text) || MEDIA_URL_RE.test(text)) {
+          const el = node.parentElement;
+          if (el) {
+            el.style.display = 'none';
+            el.style.visibility = 'hidden';
+          }
+        }
+      }
+    });
+    await new Promise((resolve) => setTimeout(resolve, 800));
+  } catch (_err) { /* best-effort */ }
 
   try {
     await page.evaluate(() =>
