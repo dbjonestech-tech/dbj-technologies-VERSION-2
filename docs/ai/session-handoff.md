@@ -8,7 +8,7 @@ Live snapshot of what the next session needs. Older sessions live under
 
 ### Anchor block
 
-HEAD: `<filled post-push>` -- `feat(canopy): replace work card image and detail hero with showcase screen recording, add per-section fixture screenshots`. Working tree clean and pushed to origin main confirmed.
+HEAD: `182821f` -- `feat(canopy): replace work card image and detail hero with showcase screen recording, add per-section fixture screenshots`. Working tree clean and pushed to origin main confirmed. (Auto-doc-fill commit `1eb6c8a` followed for the unrelated SPA pageview tracking entry in `current-state.md`.)
 
 ### What shipped this session
 
