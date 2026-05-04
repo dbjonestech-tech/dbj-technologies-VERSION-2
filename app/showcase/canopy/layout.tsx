@@ -13,7 +13,7 @@ import {
   Sprout,
   Zap,
 } from "lucide-react";
-import { getPalette } from "@/lib/admin/page-themes";
+import { PALETTES } from "@/lib/admin/page-themes";
 
 /* Public Canopy showcase shell. Mirrors the /admin layout (sidebar +
  * header + content well) without the auth gate so visitors landing
@@ -101,9 +101,7 @@ export default function ShowcaseLayout({
             <ul className="space-y-0.5">
               {SHOWCASE_NAV.map((item) => {
                 const Icon = item.icon;
-                const tokens = getPalette(
-                  item.href.replace("/showcase/canopy", "/admin")
-                );
+                const tokens = PALETTES[item.palette];
                 return (
                   <li key={item.href}>
                     <Link
