@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Activity,
+  ArrowLeft,
   BarChart3,
   Briefcase,
   ClipboardList,
@@ -95,6 +96,13 @@ export default function ShowcaseLayout({
             <CanopyWordmark />
           </div>
           <nav className="flex-1 overflow-y-auto px-3 py-4">
+            <Link
+              href="/work/canopy"
+              className="mb-4 flex items-center gap-2 rounded-lg border border-violet-200 bg-violet-50/40 px-3 py-2 text-xs font-semibold text-violet-700 transition-colors hover:bg-violet-100 hover:border-violet-300"
+            >
+              <ArrowLeft className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              Back to Canopy case study
+            </Link>
             <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
               Showcase tour
             </p>
@@ -155,6 +163,19 @@ export default function ShowcaseLayout({
               </p>
             </div>
           </div>
+          <div className="border-t border-zinc-200 px-3 py-3">
+            <Link
+              href="/"
+              className="group flex items-center gap-2 rounded-md px-3 py-2 transition-colors hover:bg-zinc-100"
+              aria-label="Back to DBJ Technologies"
+            >
+              <DbjMark className="h-4 w-auto shrink-0" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-700">
+                DBJ Technologies
+              </span>
+              <ArrowLeft className="ml-auto h-3 w-3 shrink-0 text-zinc-400 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
+            </Link>
+          </div>
         </aside>
         <main className="flex flex-1 flex-col">
           <header className="flex min-h-14 items-center gap-3 border-b border-zinc-200 bg-white px-4 py-2 lg:hidden">
@@ -178,6 +199,25 @@ function ShowcaseBanner() {
         return to /work/canopy
       </Link>
     </div>
+  );
+}
+
+function DbjMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 173 213"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="DBJ Technologies"
+      className={className}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M173 98L153 87V149L88 189L21 150V88L0 99V160L8 166L87 213H90L93 210L103 205L173 160V98ZM57 67L37 79V143L57 155H59V67H57ZM116 66V154L122 153L123 151L135 145L138 142V77L122 68L116 66ZM116 24L115 26V46L116 48L172 83L173 82V58L125 29L122 26L116 24ZM96 0L92 1L89 4L0 58V82H2L42 58L74 37L76 38V165L87 171L96 167V0Z"
+        fill="#1AD4EA"
+      />
+    </svg>
   );
 }
 
