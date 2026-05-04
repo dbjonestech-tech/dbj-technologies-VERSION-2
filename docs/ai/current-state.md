@@ -21,6 +21,16 @@ Last updated: May 4, 2026 (Canopy showcase tour expanded from 4 to 8 sections + 
 
 The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
 
+## Canopy showcase-link tightening: hero label override, conditional icon, in-section copy refinement (May 4, 2026)
+
+Shipped at `<tightening-commit>`. Three small label/icon refinements after the chip+links commit landed, all driven by the same observation: the hero CTA "View Live Site" with ExternalLink icon was inherited from projects with real production URLs (Pathlight, The Star Auto Service, Soil Depot all use https URLs that legitimately open external) but for Canopy the liveUrl points at the internal `/showcase/canopy` tour, where "View Live Site" + the external-link icon both read slightly off.
+
+- `lib/work-data.ts` ProjectDetail interface gained an optional `liveUrlLabel?: string` field. Defaults to "View Live Site" when omitted, preserving the rendering of every other work entry. Canopy entry sets `liveUrlLabel: "Open the Showcase"` so the hero button reads accurately for a fixture-only tour destination.
+- `components/templates/ProjectDetailLayout.tsx` hero-button rendering now branches the icon on `liveUrl.startsWith("http")`. External URLs (the other three projects) keep the existing `ExternalLink` icon. Internal URLs (Canopy) render `ArrowRight` instead. Aligns with the convention that the external-link icon should only signal "this leaves the site" actions.
+- `components/templates/ProjectDetailLayout.tsx` in-section link copy tightened from "View this live →" to "Open in showcase →". Differentiates verb ("Open" vs "View") and names the destination ("showcase") so it does not parallel the hero CTA's "View Live Site" pattern. Verb consistency between the new hero "Open the Showcase" and the in-section "Open in showcase →" reinforces the destination relationship.
+
+Pathlight, The Star Auto Service, and Soil Depot detail pages remain visually identical to the prior commit; the new override field is unset on those entries and the icon-branching keeps `ExternalLink` for all three. Verification: tsc clean, lint clean, 0 em dashes in changed files.
+
 ## Canopy work-card chip wrap fix and in-section showcase links (May 4, 2026)
 
 Shipped at `5f0732f`. End-to-end browser audit surfaced two visual gaps after the showcase expansion landed; this commit closes both.

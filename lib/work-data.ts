@@ -42,6 +42,11 @@ export interface ProjectDetail {
    * button in the hero. Omit for projects that have no public-facing live
    * URL the visitor could meaningfully click through to. */
   liveUrl?: string;
+  /** Optional. Override the hero CTA button text when "View Live Site"
+   * does not fit the destination. Useful when liveUrl points at a tour or
+   * showcase rather than a production live site. Defaults to
+   * "View Live Site" when omitted. */
+  liveUrlLabel?: string;
   metrics: ProjectMetric[];
   techStack: string[];
   notable: string;
@@ -349,6 +354,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
      * per-client. The /showcase/canopy tour is the public-rendered
      * fixture-only demo of the same product. */
     liveUrl: "/showcase/canopy",
+    liveUrlLabel: "Open the Showcase",
     metrics: [
       { label: "Sections", value: "9" },
       { label: "Live Install", value: "The Star Auto" },

@@ -243,8 +243,12 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                     className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
                     style={{ backgroundColor: accent }}
                   >
-                    View Live Site
-                    <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                    {project.liveUrlLabel ?? "View Live Site"}
+                    {project.liveUrl.startsWith("http") ? (
+                      <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    )}
                   </a>
                 ) : null}
                 <Link
@@ -406,7 +410,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                     className="mt-8 inline-flex items-center text-sm font-medium hover:underline"
                     style={{ color: accent }}
                   >
-                    View this live →
+                    Open in showcase →
                   </Link>
                 ) : null}
               </motion.div>
