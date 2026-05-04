@@ -23,7 +23,7 @@ The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebu
 
 ## Canopy work-card chip wrap fix and in-section showcase links (May 4, 2026)
 
-Shipped at `<chip-and-links-commit>`. End-to-end browser audit surfaced two visual gaps after the showcase expansion landed; this commit closes both.
+Shipped at `5f0732f`. End-to-end browser audit surfaced two visual gaps after the showcase expansion landed; this commit closes both.
 
 - `lib/work-data.ts` Canopy entry: "Live Install" metric chip value shortened from "The Star Auto Service" (21 chars, wrapped to three lines on the work-card at sm:grid-cols-3) to "The Star Auto" (13 chars, two-line max). Article preserved (canonical to the brand), recognizable "Star Auto" anchor preserved, redundant "Service" word dropped. Full brand name "The Star Auto Service" stays everywhere else in the file (description, heroDescription, notable, timeline, all section bodies) and across the rest of the codebase. Fix is purely at the data value-string layer; no styling, no Tailwind, no chip-width or overflow CSS touched.
 - `lib/work-data.ts` ProjectSection interface gained an optional `liveHref?: string` field. Six Canopy sections now carry liveHref pointing to their matching showcase pages: Section 3 Analytics & Performance → /showcase/canopy/analytics, Section 4 Pipeline & Relationships → /showcase/canopy/deals, Section 5 Automation → /showcase/canopy/automation, Section 6 Operations & Health → /showcase/canopy/operations, Section 7 Pathlight Integration → /showcase/canopy/pathlight, Section 8 Architecture & Ownership → /showcase/canopy/audit. Sections 1 (The Problem), 2 (What You Get), and 9 (What Comes Next) deliberately omit liveHref because they are narrative, not capability surfaces.
