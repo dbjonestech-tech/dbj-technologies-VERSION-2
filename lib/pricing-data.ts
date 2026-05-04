@@ -208,7 +208,7 @@ export const PRICING_DETAILS: PricingDetail[] = [
     ctaHref: "/contact",
   },
   /* Canopy intentionally pulled from public pricing on 2026-04-30. The
-   * first install (Star Auto Service) shipped April 29 but Canopy is not
+   * first install (The Star Auto Service) shipped April 29 but Canopy is not
    * yet ready to be sold as a productized engagement: 1 install, no
    * proven case studies across multiple verticals, no testimonials, ICP
    * still being validated. Lives on the Work page as proof-of-craft until

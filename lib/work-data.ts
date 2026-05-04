@@ -336,14 +336,14 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "canopy",
     name: "Canopy",
     description:
-      "An operating-system admin I built first for myself to run DBJ Technologies, then shipped as the first external install to Star Auto Service. Visitors, recurring users, funnels, search behavior, performance, deals, contacts, sequences, automations, infrastructure health, deliverability, error volume, and budget headroom in one dashboard, on the buyer's domain, behind the buyer's auth.",
+      "An operating-system admin I built first for myself to run DBJ Technologies, then shipped as the first external install to The Star Auto Service. Visitors, recurring users, funnels, search behavior, performance, deals, contacts, sequences, automations, infrastructure health, deliverability, error volume, and budget headroom in one dashboard, on the buyer's domain, behind the buyer's auth.",
     category: "Internal Tooling",
     gradient: "from-cyan-500 to-blue-600",
     /* No public liveUrl: the dashboard itself is auth-walled per-client,
      * so a "View Live Site" button would dead-end at a Google sign-in. */
     metrics: [
       { label: "Sections", value: "9" },
-      { label: "Live Install", value: "Star Auto" },
+      { label: "Live Install", value: "The Star Auto Service" },
       { label: "Categories Replaced", value: "6" },
     ],
     techStack: [
@@ -357,10 +357,10 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       "Sentry",
     ],
     notable:
-      "Built first for myself to run DBJ Technologies. Star Auto Service is install zero, the proving ground for the architecture before any wider productized rollout.",
+      "Built first for myself to run DBJ Technologies. The Star Auto Service is install zero, the proving ground for the architecture before any wider productized rollout.",
     image: "/images/case-studies/canopy-dashboard.webp",
     heroDescription:
-      "An operating-system admin I built first for the studio that ships it, then deployed as install zero for a real client. Star Auto Service in Richardson, TX is the first external Canopy, surfacing first-party visitor data, performance, pipeline, automation, operations health, and Pathlight-driven outreach, all on the client's own domain behind a Google sign-in. Not yet a productized offering for sale. Live as a working install, on the way to becoming one once the playbook proves out across more verticals.",
+      "An operating-system admin I built first for the studio that ships it, then deployed as install zero for a real client. The Star Auto Service in Richardson, TX is the first external Canopy, surfacing first-party visitor data, performance, pipeline, automation, operations health, and Pathlight-driven outreach, all on the client's own domain behind a Google sign-in. Not yet a productized offering for sale. Live as a working install, on the way to becoming one once the playbook proves out across more verticals.",
     sections: [
       {
         heading: "The Problem",
@@ -368,7 +368,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
       {
         heading: "What You Get",
-        body: "One dashboard. One auth wall. One source of truth. On the buyer's domain, in the buyer's database, behind the buyer's auth.\n\nCanopy is the operating-system admin I built first to run DBJ Technologies, then shipped as the first external install to Star Auto Service. Same codebase, same architecture, configured per install. Visitors, recurring users, funnels, search behavior, performance metrics, deals, contacts, sequences, automations, infrastructure health, deliverability, error volume, and budget headroom all live in one place. The buyer logs in to one URL, sees one banner that summarizes the worst of every signal across the whole stack, and drills into whichever section needs attention.\n\nNothing is rented. The Postgres database is the buyer's. The auth wall is the buyer's. The domain is the buyer's. The audit log captures every meaningful change so a wrong update is recoverable. The architecture is per-install, not multi-tenant, so there is no shared infrastructure to leak across customers and no vendor to call when something breaks.\n\nI built it for myself first, which means every decision is the one I made when the customer was me.",
+        body: "One dashboard. One auth wall. One source of truth. On the buyer's domain, in the buyer's database, behind the buyer's auth.\n\nCanopy is the operating-system admin I built first to run DBJ Technologies, then shipped as the first external install to The Star Auto Service. Same codebase, same architecture, configured per install. Visitors, recurring users, funnels, search behavior, performance metrics, deals, contacts, sequences, automations, infrastructure health, deliverability, error volume, and budget headroom all live in one place. The buyer logs in to one URL, sees one banner that summarizes the worst of every signal across the whole stack, and drills into whichever section needs attention.\n\nNothing is rented. The Postgres database is the buyer's. The auth wall is the buyer's. The domain is the buyer's. The audit log captures every meaningful change so a wrong update is recoverable. The architecture is per-install, not multi-tenant, so there is no shared infrastructure to leak across customers and no vendor to call when something breaks.\n\nI built it for myself first, which means every decision is the one I made when the customer was me.",
       },
       {
         heading: "Analytics & Performance",
@@ -396,7 +396,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
       {
         heading: "What Comes Next",
-        body: "Canopy is install zero. Star Auto Service is the first external customer, live now, running the full stack. The architecture is shipped. The product is real. The price is not yet productized.\n\nInstall zero is priced well below what the engagement is worth, in exchange for the right to point at it as the proof of craft for the next install. The plan is to ship the next few installs at progressively closer-to-market rates, learn what the configuration-per-vertical work actually costs in time, then publish a real productized engagement at a real price. Until then, every Canopy conversation is a custom-scoped engagement that starts with a discovery call.\n\nIf you have an operations problem that this kind of stack might solve, get in touch and I will scope a custom build. The honest framing: I am looking for the next install. A small business with revenue, SaaS sprawl, and the appetite to own the stack instead of renting it. The fastest way to find out if Canopy fits is a thirty-minute conversation.",
+        body: "Canopy is install zero. The Star Auto Service is the first external customer, live now, running the full stack. The architecture is shipped. The product is real. The price is not yet productized.\n\nInstall zero is priced well below what the engagement is worth, in exchange for the right to point at it as the proof of craft for the next install. The plan is to ship the next few installs at progressively closer-to-market rates, learn what the configuration-per-vertical work actually costs in time, then publish a real productized engagement at a real price. Until then, every Canopy conversation is a custom-scoped engagement that starts with a discovery call.\n\nIf you have an operations problem that this kind of stack might solve, get in touch and I will scope a custom build. The honest framing: I am looking for the next install. A small business with revenue, SaaS sprawl, and the appetite to own the stack instead of renting it. The fastest way to find out if Canopy fits is a thirty-minute conversation.",
       },
     ],
     techDetails: [
@@ -427,7 +427,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
     ],
     timeline:
-      "Built first for DBJ Technologies as my own internal operating-system admin. Star Auto Service in Richardson, TX is install zero, the first external proof that the architecture transfers cleanly off the studio's stack and onto somebody else's. Each install is delivered as the client's own infrastructure, in their own accounts, structured so they keep deploying it themselves long after the work is done.",
+      "Built first for DBJ Technologies as my own internal operating-system admin. The Star Auto Service in Richardson, TX is install zero, the first external proof that the architecture transfers cleanly off the studio's stack and onto somebody else's. Each install is delivered as the client's own infrastructure, in their own accounts, structured so they keep deploying it themselves long after the work is done.",
     ctaText: "Get in Touch",
     ctaHref: "/contact",
     showcaseVideo: {

@@ -711,7 +711,7 @@ export default function PricingContent() {
       </section>
 
       {/* Canopy Specialty Engagement section pulled 2026-04-30. The first
-       * install (Star Auto Service) shipped April 29 but Canopy is not yet
+       * install (The Star Auto Service) shipped April 29 but Canopy is not yet
        * ready to be sold publicly: 1 install, no proven case studies across
        * verticals, no testimonials, ICP still being validated. Lives on
        * /work/canopy as proof-of-craft until the playbook proves out. The

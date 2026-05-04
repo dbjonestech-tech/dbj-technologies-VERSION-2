@@ -113,7 +113,7 @@ export const TESTIMONIALS: Testimonial[] = [
       "Created an amazing business website for us! Very impressed and would highly recommend to anyone!",
     name: "Miguel Ibarra",
     title: "Owner",
-    business: "Star Auto Service",
+    business: "The Star Auto Service",
     location: "Richardson, TX",
     url: "https://thestarautoservice.com",
     rating: 5,
