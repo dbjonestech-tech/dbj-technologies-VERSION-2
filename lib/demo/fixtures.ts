@@ -412,7 +412,7 @@ export const DEMO_DASHBOARD_KPIS: DemoDashboardKpiCard[] = [
   { href: "/showcase/canopy/deals", primary: "$94.5k", secondary: "weighted, 12 open", meta: "pipeline" },
   { href: "/showcase/canopy/scans", primary: "342", secondary: "94% complete rate", meta: "Pathlight runs, 30d" },
   { href: "/showcase/canopy/leads", primary: "63", secondary: "+9 this week", meta: "captured leads" },
-  { href: "/showcase/canopy/costs", primary: "$11.83", secondary: "$0.034 / scan avg", meta: "spend, last 7d" },
+  { href: "/showcase/canopy/costs", primary: "$11.83", secondary: "$0.03 / scan avg", meta: "spend, last 7d" },
   { href: "/showcase/canopy/errors", primary: "0", secondary: "no unresolved", meta: "Sentry, 24h" },
   { href: "/showcase/canopy/email", primary: "98.7%", secondary: "deliverability", meta: "Resend, 30d" },
 ];

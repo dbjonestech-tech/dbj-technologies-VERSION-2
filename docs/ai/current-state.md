@@ -21,6 +21,16 @@ Last updated: May 4, 2026 (Canopy showcase tour expanded from 4 to 8 sections + 
 
 The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
 
+## Bottom-CTA fix, sitemap expansion, showcase Costs precision (May 4, 2026)
+
+Shipped at `<post-ga-cleanup-commit>`. Three coordinated cleanups after the GA install was conclusively verified end-to-end via Chrome MCP (twelve of thirteen checks green; the thirteenth a network-layer block specific to the MCP browser session, not production).
+
+- **Bottom-CTA bug fix in `components/templates/ProjectDetailLayout.tsx`.** The `resolveCtaButtonText` helper hardcoded "Start a Project" for any non-`/pathlight` ctaHref, ignoring `project.ctaText` from the data. For Canopy specifically, the bottom CTA read "Start a Project" instead of "Get in Touch." Fix introduces an optional `ctaButtonText?: string` field on `ProjectDetail` that the helper reads first, falling through to the legacy hardcoded labels when unset. `lib/work-data.ts` Canopy entry sets `ctaButtonText: "Get in Touch"` and rewrites `ctaText` to a heading-shaped question "Ready for a stack like this?" (parallel to Star Auto / Soil Depot's "Ready for Results Like These?"). Pathlight, The Star Auto Service, and Soil Depot leave `ctaButtonText` unset and continue rendering "Try Pathlight" / "Start a Project" via the helper fallback, so their detail pages render byte-identically pre and post commit.
+- **Sitemap expansion in `app/sitemap.ts`.** Previously listed 12 static marketing routes plus services/pricing/work slug-derived entries. Three static additions (`/websites`, `/pricing/build`, `/portal-access`), plus a new design-brief block (8 entries via `getAllDesignBriefSlugs()`), plus the 8 Canopy showcase tour pages as a static block. Net new sitemap URLs: 19. Estimated total sitemap size now ~59 URLs across all categories.
+- **Showcase Costs precision tightening in `lib/demo/fixtures.ts`.** Demo dashboard KPI for Costs changed from `"$0.034 / scan avg"` (three-decimal machine precision) to `"$0.03 / scan avg"` (two-decimal designed copy). Cosmetic.
+
+Verification: tsc clean, lint clean, 0 em dashes in any changed file. Component render logic unchanged for three of four projects; Canopy specifically gets the corrected button label.
+
 ## Google Analytics 4 SPA pageview tracking (May 4, 2026)
 
 Shipped at `1440e39`. Closes the last meaningful gap in the GA4 install: client-side Next.js route changes now fire pageviews to GA. Without this, every visitor would have appeared to view exactly one page (the entry page) because `gtag('config')` only fires its implicit pageview once when the inline init script runs; subsequent `next/link` navigations within the SPA registered nothing.

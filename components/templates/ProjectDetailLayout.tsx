@@ -55,8 +55,9 @@ function deriveHaloColors(gradient: string): [string, string] {
   return [a, b];
 }
 
-function resolveCtaButtonText(ctaHref: string): string {
-  if (ctaHref === "/pathlight") return "Try Pathlight";
+function resolveCtaButtonText(project: ProjectDetail): string {
+  if (project.ctaButtonText) return project.ctaButtonText;
+  if (project.ctaHref === "/pathlight") return "Try Pathlight";
   return "Start a Project";
 }
 
@@ -64,7 +65,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
   const reduced = useReducedMotion();
   const accent = deriveAccent(project.gradient);
   const [haloA, haloB] = deriveHaloColors(project.gradient);
-  const ctaButtonText = resolveCtaButtonText(project.ctaHref);
+  const ctaButtonText = resolveCtaButtonText(project);
   const sectionTotal = project.sections.length;
 
   // Variants

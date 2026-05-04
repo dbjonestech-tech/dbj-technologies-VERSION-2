@@ -62,8 +62,16 @@ export interface ProjectDetail {
   sections: ProjectSection[];
   techDetails: ProjectTechDetail[];
   timeline: string;
+  /** Heading copy for the bottom CTA section. Question-shaped or
+   * exhortation-shaped (e.g. "Ready for Results Like These?"), rendered
+   * as a large H3 above the action button. */
   ctaText: string;
   ctaHref: string;
+  /** Optional. Action-shaped label for the bottom CTA button (e.g.
+   * "Start a Project", "Get in Touch", "Try Pathlight"). When omitted,
+   * the layout falls back to "Try Pathlight" for /pathlight ctaHrefs and
+   * "Start a Project" for everything else, preserving prior behavior. */
+  ctaButtonText?: string;
   /** Optional brand mark to render in place of the text title in the
    * deep-dive hero. Use for projects whose wordmark is part of the logo. */
   logoImage?: string;
@@ -467,8 +475,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     timeline:
       "Built first for DBJ Technologies as my own internal operating-system admin. The Star Auto Service in Richardson, TX is install zero, the first external proof that the architecture transfers cleanly off the studio's stack and onto somebody else's. Each install is delivered as the client's own infrastructure, in their own accounts, structured so they keep deploying it themselves long after the work is done.",
-    ctaText: "Get in Touch",
+    ctaText: "Ready for a stack like this?",
     ctaHref: "/contact",
+    ctaButtonText: "Get in Touch",
     showcaseVideo: {
       mp4: "/images/case-studies/canopy-showcase.mp4",
       webm: "/images/case-studies/canopy-showcase.webm",
