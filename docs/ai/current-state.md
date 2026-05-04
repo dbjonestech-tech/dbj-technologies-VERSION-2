@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: May 4, 2026 (Canopy showcase tour expanded from 4 to 8 sections + /work/canopy now links to /showcase/canopy via the View Live Site button, shipped at `<showcase-expansion-commit>`). **All 10 Canopy phases shipped (0 through 9 inclusive).**
+Last updated: May 4, 2026 (Canopy showcase tour expanded from 4 to 8 sections + /work/canopy now links to /showcase/canopy via the View Live Site button, shipped at `d84f1b7`). **All 10 Canopy phases shipped (0 through 9 inclusive).**
 
 ## Canopy v2 build status
 
@@ -23,7 +23,7 @@ The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebu
 
 ## Canopy showcase expansion: tour mirrors the 9-section /work/canopy narrative (May 4, 2026)
 
-Shipped at `<showcase-expansion-commit>`. The /showcase/canopy tour previously had four pages (Dashboard, Contacts, Deals, Audit log) while the Phase 1C /work/canopy work entry described nine capability sections. A buyer reading the comprehensive 9-section pitch and clicking through to the showcase saw a 4-page tour with no Analytics, Automation, Operations, or Pathlight surface. This commit closes that coverage gap.
+Shipped at `d84f1b7`. The /showcase/canopy tour previously had four pages (Dashboard, Contacts, Deals, Audit log) while the Phase 1C /work/canopy work entry described nine capability sections. A buyer reading the comprehensive 9-section pitch and clicking through to the showcase saw a 4-page tour with no Analytics, Automation, Operations, or Pathlight surface. This commit closes that coverage gap.
 
 Four new showcase pages, all fixture-only and publicly indexable:
 
