@@ -404,16 +404,45 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                 <p className="text-[1.0625rem] lg:text-[1.125rem] leading-[1.85] text-text-secondary whitespace-pre-line">
                   {section.body}
                 </p>
-                {section.liveHref ? (
+              </motion.div>
+
+              {section.image ? (
+                <motion.div
+                  variants={item}
+                  className="mx-auto max-w-5xl mt-10 lg:mt-14"
+                >
+                  <div
+                    className="relative overflow-hidden rounded-xl lg:rounded-2xl border bg-bg-secondary aspect-[1800/1170]"
+                    style={{
+                      borderColor: `${accent}38`,
+                      boxShadow: `0 30px 80px -20px ${accent}40, 0 15px 40px -15px rgba(0,0,0,0.18)`,
+                    }}
+                  >
+                    <Image
+                      src={section.image}
+                      alt={section.imageAlt ?? section.heading}
+                      fill
+                      className="object-cover object-top"
+                      sizes="(max-width: 1024px) 100vw, 1024px"
+                    />
+                  </div>
+                </motion.div>
+              ) : null}
+
+              {section.liveHref ? (
+                <motion.div
+                  variants={item}
+                  className="mx-auto max-w-3xl mt-8"
+                >
                   <Link
                     href={section.liveHref}
-                    className="mt-8 inline-flex items-center text-sm font-medium hover:underline"
+                    className="inline-flex items-center text-sm font-medium hover:underline"
                     style={{ color: accent }}
                   >
                     Open in showcase →
                   </Link>
-                ) : null}
-              </motion.div>
+                </motion.div>
+              ) : null}
             </motion.article>
           ))}
         </div>

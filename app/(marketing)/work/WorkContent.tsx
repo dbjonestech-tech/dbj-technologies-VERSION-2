@@ -166,15 +166,39 @@ export default function WorkContent({ designBriefs }: WorkContentProps) {
                   aria-hidden="true"
                 />
 
-                {/* Screenshot */}
-                <div className="relative aspect-[3/2] overflow-hidden rounded-t-2xl">
-                  <Image
-                    src={project.image}
-                    alt={`${project.name} screenshot`}
-                    fill
-                    className="object-cover object-top transition-transform duration-700 ease-out motion-safe:group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 600px"
-                  />
+                {/* Screenshot or autoplay showcase loop */}
+                <div className="relative aspect-[3/2] overflow-hidden rounded-t-2xl bg-bg-secondary">
+                  {project.showcaseVideo ? (
+                    <video
+                      className="h-full w-full object-cover object-top transition-transform duration-700 ease-out motion-safe:group-hover:scale-105"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      poster={project.showcaseVideo.poster}
+                      preload="metadata"
+                      aria-label={`${project.name} showcase`}
+                    >
+                      {project.showcaseVideo.webm ? (
+                        <source
+                          src={project.showcaseVideo.webm}
+                          type="video/webm"
+                        />
+                      ) : null}
+                      <source
+                        src={project.showcaseVideo.mp4}
+                        type="video/mp4"
+                      />
+                    </video>
+                  ) : (
+                    <Image
+                      src={project.image}
+                      alt={`${project.name} screenshot`}
+                      fill
+                      className="object-cover object-top transition-transform duration-700 ease-out motion-safe:group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 600px"
+                    />
+                  )}
                 </div>
 
                 <div className="flex flex-1 flex-col p-8">

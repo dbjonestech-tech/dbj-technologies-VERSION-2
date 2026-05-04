@@ -14,6 +14,13 @@ export interface ProjectSection {
    * section describes. Omit on narrative sections that have no
    * corresponding capability surface. */
   liveHref?: string;
+  /** Optional. Path to a wide screenshot rendered between the section
+   * body and the live link. Use for capability sections that benefit
+   * from a visual proof point. */
+  image?: string;
+  /** Optional alt text for the section image. Defaults to the heading
+   * when omitted. */
+  imageAlt?: string;
 }
 
 export interface ProjectTechDetail {
@@ -372,7 +379,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     notable:
       "Built first for myself to run DBJ Technologies. The Star Auto Service is install zero, the proving ground for the architecture before any wider productized rollout.",
-    image: "/images/case-studies/canopy-dashboard.webp",
+    image: "/images/case-studies/canopy-showcase-poster.jpg",
     heroDescription:
       "An operating-system admin I built first for the studio that ships it, then deployed as install zero for a real client. The Star Auto Service in Richardson, TX is the first external Canopy, surfacing first-party visitor data, performance, pipeline, automation, operations health, and Pathlight-driven outreach, all on the client's own domain behind a Google sign-in. Not yet a productized offering for sale. Live as a working install, on the way to becoming one once the playbook proves out across more verticals.",
     sections: [
@@ -388,31 +395,43 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
         heading: "Analytics & Performance",
         body: "Buyers spend on analytics platforms, real-user-monitoring tools, and search-insight services and still cannot answer the question that matters: which visitor became which customer.\n\nCanopy captures first-party visitor data, recurring-user behavior, conversion funnels, search queries, and Web Vitals directly into the buyer's Postgres. Every event is timestamped and queryable. Performance data lives next to the conversion data, in the same database, with the same auth gate. When a regression shows up after a deploy, the buyer sees it in the same dashboard where they review pipeline.\n\nNo browser-tab switching. No SaaS-to-SaaS export reconciliation. No quarterly conversation about whether the analytics tool's numbers and the CRM's numbers agree. They are the same numbers, in the same database, owned by the same buyer.\n\nThe honest exclusion: Canopy is not built for systems with billions of events per day. It is built for small businesses doing thousands to tens of thousands of events per day, where architectural ownership matters more than horizontal scale.",
         liveHref: "/showcase/canopy/analytics",
+        image: "/images/case-studies/canopy/canopy-analytics.webp",
+        imageAlt: "Canopy Analytics and Performance dashboard showing first-party visitor counts, real-user Web Vitals, top pages, and top sources",
       },
       {
         heading: "Pipeline & Relationships",
         body: "Deals scattered across spreadsheets. Follow-ups falling through the cracks. Contact records last updated whenever the team remembered. The CRM that nobody updates is the most expensive software a small business can buy, because it produces no value at full price.\n\nCanopy is deal-stage primary. The pipeline kanban board is the source of truth for where every prospect stands. The contact detail view brings together every interaction the buyer has ever had with that person, automatically: form submissions, scan reports, email replies, calls logged, notes added, deal-stage transitions. Nothing has to be manually copied between systems because there are no other systems.\n\nBulk actions handle the repetitive operations. Keyboard navigation works the way an operator who lives in the tool every day expects it to work. Every change writes a before-and-after snapshot to the audit log, so the question 'who marked this deal closed-lost and when' has a definitive answer instead of a Slack thread.\n\nThe pipeline rolls up weighted forecasts. The contact timeline reconciles with the audit log. The data is the buyer's, and the buyer's team can leave whenever they like and take the whole database with them.",
         liveHref: "/showcase/canopy/deals",
+        image: "/images/case-studies/canopy/canopy-deals.webp",
+        imageAlt: "Canopy Deals kanban board with weighted pipeline, unweighted pipeline, closed-won, and average cycle metrics across New, Contacted, Qualified, Proposal, Won, and Lost columns",
       },
       {
         heading: "Automation",
         body: "Manual follow-ups are how revenue leaks. The calendar reminder gets dismissed. The 'I will email them tomorrow' never happens. The deal-stage change does not trigger any of the things that should follow from it.\n\nCanopy runs sequences, workflows, and rule-based automations on top of the audit log. Sequences send multi-step outbound with reply-exit, so a prospect who replies stops receiving the next message in the chain. Workflows fire on domain events: a new deal hits a stage, an old deal goes silent for an extended window, a scan report flags a finding worth a follow-up. Rules condition on what changed in the audit log, which means I can express 'any time a deal moves to proposal, send the proof-of-craft email and assign a follow-up task' without writing custom code.\n\nEmail templates are versioned. Bulk actions cover the cases where automation is overkill. Every automated action writes to the audit log with the rule that fired it, so when something automates that should not have, the answer is one query away.\n\nThe honest exclusion: this is not a marketing automation suite for thousand-step lifecycle programs. It is built for small-team operators who need the next ten things to happen without remembering them.",
         liveHref: "/showcase/canopy/automation",
+        image: "/images/case-studies/canopy/canopy-automation.webp",
+        imageAlt: "Canopy Sequences and Workflows view listing active sequences, enrolled and replied counts, and rule-based workflow triggers",
       },
       {
         heading: "Operations & Health",
         body: "Most small businesses cannot answer 'is everything okay right now' without checking five separate dashboards. The deploy status is in one place. The error volume is in another. The TLS certificate expiry is in nobody's hands. The deliverability is whatever the email provider's last bounce report said. The cost picture is a spreadsheet someone updates monthly.\n\nCanopy collapses all of it into one banner at the top of the dashboard. Worst of every signal, green when everything is fine, amber when something needs attention this week, red when something needs attention right now. Drill into the banner and the relevant subsystem opens with the underlying data: per-domain TLS expiry, WHOIS expiration, email-authentication status, real-time deliverability, function-level error volume, real-time spend against the configured budget ceilings.\n\nThe infrastructure-health checks run on a daily cron and write to the audit log, so a domain's TLS certificate going to expire gets surfaced well before it does. If deliverability degrades because a sender domain's authentication failed validation, the banner reflects it on the next check. The whole point of operations telemetry is to interrupt the operator when it matters and stay quiet when it does not.\n\nOperations is not a dashboard you visit. It is a banner you trust.",
         liveHref: "/showcase/canopy/operations",
+        image: "/images/case-studies/canopy/canopy-operations.webp",
+        imageAlt: "Canopy Operations and Health view showing the All Systems Normal banner across deployments, pipeline, budget, infrastructure, errors, and mobile RUM, plus a per-domain TLS, WHOIS, SPF, DKIM, and DMARC posture table",
       },
       {
         heading: "Pathlight Integration",
         body: "Pathlight is the AI-driven website-audit platform DBJ runs as the top of its sales funnel. Canopy is where Pathlight's signals become operator workflows: prospecting candidate research, change monitoring on existing customer sites with manual rescan triggers, competitive-intelligence scans on direct competitors of the buyer.\n\nEvery Pathlight call from inside Canopy passes through layered guardrails. Triggers are manual, or rules-bounded with explicit human approval. The monthly budget cap has to have headroom. Each capability has to be turned on per install. If any guardrail blocks the call, nothing fires and the operator sees why. The buyer never gets a surprise bill from a runaway loop because the architecture does not allow runaway loops.\n\nProspecting candidates flow into the pipeline with their scan context attached. Change-monitoring alerts surface in the operations banner. Competitive scans are stored next to the prospect record so the next conversation has context. The integration is opt-in, monitored, and capped, which is the only way an AI-cost line item belongs in a productized engagement.\n\nThe honest exclusion: this integration is bundled with Canopy, not sold separately. Pathlight as a standalone product has its own surface. This section describes how Canopy uses it.",
         liveHref: "/showcase/canopy/pathlight",
+        image: "/images/case-studies/canopy/canopy-pathlight.webp",
+        imageAlt: "Canopy Pathlight Integration view showing layered guardrails for capability, triggers, and monthly budget, plus a prospecting candidates table with scan scores and outreach status",
       },
       {
         heading: "Architecture & Ownership",
         body: "Most small-business software lives in someone else's data center, behind someone else's auth, governed by someone else's terms of service. The buyer rents access to their own data and pays a monthly subscription for the privilege.\n\nCanopy inverts that. Per-install Postgres database, per-install Google sign-in with an admin-only allow-list, per-install deployment to a Vercel project the buyer owns. No shared infrastructure between customers. No multi-tenant database to leak across accounts. No 'we are migrating you to a new region' email. The buyer's data sits in a database the buyer pays for directly, behind a domain the buyer paid the registrar for directly, with an SSL certificate issued to the buyer.\n\nRole-based access control gates who can see what, with multiple permission tiers configurable per install. Every meaningful entity change writes a before-and-after snapshot to the audit log, attributed to the user who made the change. The audit log is queryable. The role assignments are revocable. The whole architecture is the buyer's to inspect, modify, audit, or migrate away from.\n\nIf I get hit by a bus, the buyer keeps their database, their auth, their domain, their data, and their operating system. That is what ownership actually means.",
         liveHref: "/showcase/canopy/audit",
+        image: "/images/case-studies/canopy/canopy-audit.webp",
+        imageAlt: "Canopy Audit log entries showing deal stage changes, contact follow-up updates, email sends, tag edits, and scan completions with key-by-key diffs",
       },
       {
         heading: "What Comes Next",

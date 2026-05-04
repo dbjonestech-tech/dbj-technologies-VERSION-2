@@ -4,7 +4,49 @@ Live snapshot of what the next session needs. Older sessions live under
 `docs/ai/history/` (see `history/index.md`). The most recent archive is
 [`history/2026-05-02.md`](history/2026-05-02.md).
 
-## Current state (May 3, 2026 -- Inngest cron registration A-E shipped; canopy.md rules file shipped at `5d17cbd`; Phase 1 Canopy marketing rewrite unblocked)
+## Current state (May 4, 2026 -- Canopy work card + detail hero now play the showcase screen recording; six capability sections gain matched fixture screenshots)
+
+### Anchor block
+
+HEAD: `<filled post-push>` -- `feat(canopy): replace work card image and detail hero with showcase screen recording, add per-section fixture screenshots`. Working tree clean and pushed to origin main confirmed.
+
+### What shipped this session
+
+- New 36-second muted/loop showcase recording encoded from `~/Downloads/Canopy Showcase Screen Recording.mov`:
+  - `public/images/case-studies/canopy-showcase.mp4` (h.264, 1600w, faststart, ~2.7MB)
+  - `public/images/case-studies/canopy-showcase.webm` (VP9, 1600w, ~2.6MB)
+  - `public/images/case-studies/canopy-showcase-poster.jpg` (~118KB) -- now also serves as `project.image` for OG/JsonLd, replacing the deleted `canopy-dashboard.webp`.
+- Six matched fixture screenshots converted to WebP at 1800x1170 (q82, 55-82KB each) and dropped under `public/images/case-studies/canopy/`:
+  - `canopy-analytics.webp` to the "Analytics & Performance" section
+  - `canopy-deals.webp` to the "Pipeline & Relationships" section
+  - `canopy-automation.webp` to the "Automation" section
+  - `canopy-operations.webp` to the "Operations & Health" section
+  - `canopy-pathlight.webp` to the "Pathlight Integration" section
+  - `canopy-audit.webp` to the "Architecture & Ownership" section (matches the `audit` showcase liveHref already wired there)
+- `lib/work-data.ts`:
+  - `ProjectSection` interface gains optional `image?: string` and `imageAlt?: string`.
+  - Six Canopy sections wired with the matching screenshot path and a descriptive alt string.
+  - `image` for the Canopy entry switched from `/images/case-studies/canopy-dashboard.webp` (deleted) to `/images/case-studies/canopy-showcase-poster.jpg` so OG previews and JsonLd creativeWork still resolve to a real frame from the showcase.
+- `app/(marketing)/work/WorkContent.tsx`:
+  - The project card now renders an autoplay/loop/muted/playsInline `<video>` (with WebM + MP4 sources and the JPG poster) when `project.showcaseVideo` is defined; falls back to the existing `<Image>` for projects that have only a screenshot. Hover scale and rounded-top corner preserved.
+- `components/templates/ProjectDetailLayout.tsx`:
+  - The narrative-section render splits the body div from the live link, and inserts a `max-w-5xl` image container (rounded-2xl border, accent-tinted shadow, locked to the screenshot's native `aspect-[1800/1170]`, `object-cover object-top`, `sizes="(max-width: 1024px) 100vw, 1024px"`) between them when the section has an `image`. Reading rhythm is body -> proof -> "Open in showcase ->".
+  - The Canopy hero already used `project.showcaseVideo` over `project.image`, so the new MP4/WebM auto-play in place once the public files are picked up by Vercel.
+- Deleted `public/images/case-studies/canopy-dashboard.webp` (no remaining references in `--include="*.ts" --include="*.tsx"` after the swap).
+
+### Verification gates passed
+
+- `npx tsc --noEmit` clean
+- `npm run lint` clean
+- 0 em dashes in the changed source files (`grep -c $'\xe2\x80\x94' lib/work-data.ts components/templates/ProjectDetailLayout.tsx app/(marketing)/work/WorkContent.tsx` -> all 0)
+- All six section image paths and the showcase video paths confirmed present on disk before commit.
+
+### Next recommended task
+
+- Spot-check `/work` and `/work/canopy` on the live Vercel deploy once it finishes building. Confirm: card video autoplays muted, hero video autoplays muted, all six section screenshots render in order, "Open in showcase ->" link still resolves under each. If anything looks off on a real device (autoplay restrictions, layout shift), tighten there rather than guessing locally.
+- Decide whether the older Canopy section narratives that lack a screenshot ("The Problem," "What You Get," "What Comes Next") want a hand-picked image too, or stay text-only as deliberate breathers.
+
+## Earlier state (May 3, 2026 -- Inngest cron registration A-E shipped; canopy.md rules file shipped at `5d17cbd`; Phase 1 Canopy marketing rewrite unblocked)
 
 ### Anchor block
 
