@@ -21,6 +21,21 @@ Last updated: May 4, 2026 (Canopy showcase tour expanded from 4 to 8 sections + 
 
 The Star Auto install at `ops.thestarautoservice.com` is now eligible to be rebuilt from this canonical Canopy per the operational note in `canopy-build-plan.md`. The frozen starter at `github.com/dbjonestech-tech/canopy` is also eligible for rebuild from this codebase.
 
+## Google Analytics 4 SPA pageview tracking (May 4, 2026)
+
+Shipped at `<spa-pageview-commit>`. Closes the last meaningful gap in the GA4 install: client-side Next.js route changes now fire pageviews to GA. Without this, every visitor would have appeared to view exactly one page (the entry page) because `gtag('config')` only fires its implicit pageview once when the inline init script runs; subsequent `next/link` navigations within the SPA registered nothing.
+
+Two coordinated changes in `components/layout/GoogleAnalytics.tsx`:
+
+- New useEffect with `[pathname, consent, hydrated]` deps fires `gtag('event', 'page_view', { page_path, page_location, page_title })` on every pathname change. Same exclusion rules apply (`/admin/*` and `/pathlight/<scanId>` subpaths skip silently). Same consent and hydration guards apply (no fire while consent is null or declined, no fire pre-hydration).
+- Inline init script's `gtag('config', ${GA_ID}, ...)` call gains `send_page_view: false` so the initial pageview also flows through the new useEffect rather than firing implicitly from config. Single source of truth, no double-counting.
+
+Race-safety: under `afterInteractive` strategy the inline init may execute in a tick after the new useEffect first runs (so `window.gtag` could be undefined when the effect tries to fire the initial pageview). The effect's fallback writes the pageview directly to `window.dataLayer` (initializing the array if it does not yet exist), and gtag.js drains the queue in the conventional order when it finishes loading. Net result: no pageview is lost to the race.
+
+Decline-then-accept-mid-session flow continues to work: on accept, the consent effect re-runs and so does this new effect, firing a pageview for the current path against the now-enabled tracker. On decline, the effect returns early via the `consent !== "accepted"` guard, and the existing `ga-disable-${GA_ID}` window flag suppresses any tracking from already-loaded gtag.js.
+
+Verified locally: tsc clean, lint clean, 0 em dashes, no new dependencies.
+
 ## Google Analytics 4 production env var added (May 4, 2026)
 
 `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-1Z1PVKKRW2` added to the Vercel project `dbj-technologies` (Production scope only) via `vercel env add`. Triggers a fresh Vercel build on the next push. After that build deploys, `components/layout/GoogleAnalytics.tsx` (already mounted in `app/layout.tsx:172` since April 28) will start rendering its two `<Script strategy="afterInteractive">` tags for any visitor whose `dbj-cookie-consent` localStorage value is `"accepted"`, on every public route except `/admin/*` and `/pathlight/<scanId>` subpaths.

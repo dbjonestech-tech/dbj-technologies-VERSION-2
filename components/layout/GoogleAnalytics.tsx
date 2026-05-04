@@ -55,6 +55,40 @@ export function GoogleAnalytics() {
       consent !== "accepted";
   }, [consent]);
 
+  // SPA pageview tracking. Fires page_view on every Next.js client-side
+  // route change while consent is accepted and the path is not excluded.
+  // The inline init script below sets `send_page_view: false` so the
+  // initial pageview also flows through this effect rather than firing
+  // implicitly from `gtag('config')`, which would double-count when
+  // combined with this effect.
+  //
+  // Race: under `afterInteractive` strategy the inline init may run in a
+  // future tick after this effect first fires. The fallback writes
+  // directly to `window.dataLayer` (creating it if absent) so any
+  // pageview queued before gtag.js loads is processed when it does.
+  useEffect(() => {
+    if (!GA_ID) return;
+    if (!hydrated) return;
+    if (consent !== "accepted") return;
+    if (isExcludedPath(pathname)) return;
+    if (typeof window === "undefined") return;
+    const w = window as unknown as {
+      gtag?: (...args: unknown[]) => void;
+      dataLayer?: unknown[];
+    };
+    const params = {
+      page_path: pathname,
+      page_location: window.location.href,
+      page_title: typeof document !== "undefined" ? document.title : "",
+    };
+    if (typeof w.gtag === "function") {
+      w.gtag("event", "page_view", params);
+    } else {
+      if (!w.dataLayer) w.dataLayer = [];
+      w.dataLayer.push(["event", "page_view", params]);
+    }
+  }, [pathname, consent, hydrated]);
+
   if (!GA_ID) return null;
   if (!hydrated) return null;
   if (consent !== "accepted") return null;
@@ -71,7 +105,7 @@ export function GoogleAnalytics() {
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', '${GA_ID}', { anonymize_ip: true });
+gtag('config', '${GA_ID}', { anonymize_ip: true, send_page_view: false });
         `}
       </Script>
     </>
