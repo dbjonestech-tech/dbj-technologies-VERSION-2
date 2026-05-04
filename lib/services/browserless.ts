@@ -115,10 +115,15 @@ export default async function ({ page, context }) {
     page.on('request', (req) => {
       try {
         const reqUrl = req.url();
-        const type = req.resourceType();
-        if (type === 'media') {
-          return req.abort();
-        }
+        // We deliberately do NOT abort 'media' resource types. Many sites
+        // ship a hero background video; aborting the video request makes
+        // the <video> element fire its error handler, which often renders
+        // a visible "Format(s) not supported or source(s) not found"
+        // overlay plus the raw file path on the page. We then screenshot
+        // that overlay and the vision audit reports a defect that does
+        // not exist on the live site. The settle window will not wait for
+        // the entire video to download; the browser starts playing and we
+        // capture whatever frame is current.
         for (const host of BLOCKED_HOSTS) {
           if (reqUrl.indexOf(host) !== -1) {
             return req.abort();
@@ -319,8 +324,9 @@ export default async function ({ page, context }) {
     page.on('request', (req) => {
       try {
         const reqUrl = req.url();
-        const type = req.resourceType();
-        if (type === 'media') return req.abort();
+        // 'media' requests are NOT aborted: see the AtF capture function
+        // above for the rationale (background hero videos render a visible
+        // error overlay if their request is killed, poisoning the screenshot).
         for (const host of BLOCKED_HOSTS) {
           if (reqUrl.indexOf(host) !== -1) return req.abort();
         }

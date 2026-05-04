@@ -569,6 +569,10 @@ SCORING RUBRIC — POSITIONING (each 0-10)
 - contact_accessibility: Is it obvious how to reach the business (phone, form, chat)?
 - competitive_differentiation: What makes them different from direct competitors?
 
+READ THE PAGE AS A COMPOSITION, NOT AS ISOLATED ELEMENTS. The visitor's understanding of "what is this business" is built from at least three layers stacked together: (a) the navigation brand mark plus any tagline next to it (e.g. "Wingert | Real Estate Company"), (b) the hero headline, subline, and supporting copy, and (c) the visible CTAs and any trust indicators. Score value_proposition, service_clarity, and brand_coherence based on what the COMPOSITION communicates to the visitor, not what any single element communicates in isolation. If the nav brand mark already names the company plus the category and the hero subline reinforces or completes that category statement, do not penalize service_clarity for "the page never says what they do" -- the page is saying it across two surfaces. Conversely, if the hero alone is doing the work and the nav offers no support, factor that asymmetry into your observation.
+
+A NOTE ON BACKGROUND VIDEO AND ANIMATED HEROES: many sites place a hero card on top of a looping background video showing their work, their city, or their products. The screenshot captured one frame of that video. Do NOT classify the page as broken or low-confidence simply because of imagery behind a hero card; that is the intended composition. Only treat a hero as broken if the screenshot literally shows an error string like "Format(s) not supported" or "source not found" overlaid on the page in a way no real visitor would see, AND the page text gives no other signal the imagery is intentional. When in doubt, score what you see and note your interpretation in the observation rather than penalizing the design for ambiguity.
+
 BUSINESS MODEL CLASSIFICATION:
 Determine the business model from visible website content:
 - B2B: Look for indicators like "contractors", "enterprise", "wholesale", "fleet", "commercial", bulk pricing, RFQ forms, industry jargon, no consumer-facing shopping cart.
