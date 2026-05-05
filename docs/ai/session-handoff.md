@@ -9,8 +9,9 @@ May 4 Canopy showcase swap.
 ## Current state (May 4, 2026, late evening)
 
 `git log -1` is authoritative for the actual HEAD; this handoff was
-written on top of the third archetype + Dallas city page commit
-landed in this session. Working tree clean, pushed to origin/main.
+written on top of `2696989` (`feat(page-system): local-lander
+archetype + Dallas city page`). Working tree clean, pushed to
+origin/main.
 Three of the five planned archetypes are now live: Editorial,
 Reference Dense, and Local Lander. Three city / pillar pages live
 in main: `/resources/core-web-vitals-explained`,
