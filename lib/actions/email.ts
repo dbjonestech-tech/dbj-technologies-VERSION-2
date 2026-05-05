@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getValidAccessToken } from "@/lib/integrations/google-oauth";
 import { sendMessage } from "@/lib/integrations/gmail-api";
-import { getSessionRole } from "@/lib/canopy/rbac";
+import { requireRole } from "@/lib/canopy/rbac";
 import { recordChange } from "@/lib/canopy/audit";
 import {
   buildRenderContextForContact,
@@ -38,8 +38,7 @@ export interface SendEmailActionResult {
 export async function sendEmailAction(
   input: SendEmailActionInput
 ): Promise<SendEmailActionResult> {
-  const session = await getSessionRole();
-  if (!session) return { ok: false, error: "not authenticated" };
+  const session = await requireRole("admin");
 
   const tokenInfo = await getValidAccessToken(session.email);
   if (!tokenInfo) {
@@ -209,8 +208,7 @@ export interface CreateTemplateActionInput {
 export async function createTemplateAction(
   input: CreateTemplateActionInput
 ): Promise<{ ok: boolean; error?: string; id?: number }> {
-  const session = await getSessionRole();
-  if (!session) return { ok: false, error: "not authenticated" };
+  const session = await requireRole("admin");
   if (!input.name.trim() || !input.subject.trim() || !input.bodyMarkdown.trim()) {
     return { ok: false, error: "name, subject, and body are all required" };
   }
@@ -240,8 +238,7 @@ export interface UpdateTemplateActionInput {
 export async function updateTemplateAction(
   input: UpdateTemplateActionInput
 ): Promise<{ ok: boolean; error?: string }> {
-  const session = await getSessionRole();
-  if (!session) return { ok: false, error: "not authenticated" };
+  const session = await requireRole("admin");
   const row = await updateTemplate({
     id: input.id,
     ownerEmail: session.email,
@@ -263,8 +260,7 @@ export async function updateTemplateAction(
 export async function archiveTemplateAction(
   id: number
 ): Promise<{ ok: boolean; error?: string }> {
-  const session = await getSessionRole();
-  if (!session) return { ok: false, error: "not authenticated" };
+  const session = await requireRole("admin");
   const ok = await archiveTemplate(id, session.email);
   if (!ok) return { ok: false, error: "template not found or already archived" };
   await recordChange({
@@ -282,8 +278,7 @@ export async function archiveTemplateAction(
 export async function restoreTemplateAction(
   id: number
 ): Promise<{ ok: boolean; error?: string }> {
-  const session = await getSessionRole();
-  if (!session) return { ok: false, error: "not authenticated" };
+  const session = await requireRole("admin");
   const ok = await restoreTemplate(id, session.email);
   if (!ok) return { ok: false, error: "template not found or not archived" };
   await recordChange({
