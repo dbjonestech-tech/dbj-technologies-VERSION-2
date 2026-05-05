@@ -9,12 +9,11 @@ May 4 Canopy showcase swap.
 ## Current state (May 5, 2026, early)
 
 `git log -1` is authoritative for the actual HEAD; this handoff was
-written on top of the Phase 4 commit landed in this session (the
-fourth archetype + Next.js Development service deep-dive page).
-Working tree clean, pushed to origin/main. Four of the five planned
-archetypes are now live: Editorial, Reference Dense, Local Lander,
-and Service Deep-Dive. Four pillar / validation pages live in main:
-`/resources/core-web-vitals-explained`,
+written on top of `b3ca460` (`feat(page-system): service deep-dive
+archetype + Next.js development page`). Pushed to origin/main. Four
+of the five planned archetypes are now live: Editorial, Reference
+Dense, Local Lander, and Service Deep-Dive. Four pillar / validation
+pages live in main: `/resources/core-web-vitals-explained`,
 `/resources/agency-vs-studio-vs-freelancer`,
 `/dallas-web-design`, and `/services/nextjs-development`.
 Previous handoff anchor commits: `d7f2de1` (Phases 1+2),
