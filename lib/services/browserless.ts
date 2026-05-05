@@ -116,6 +116,20 @@ export default async function ({ page, context }) {
     });
   } else {
     await page.setViewport({ width, height });
+    // Set a realistic desktop Chrome User-Agent. The default Browserless
+    // Chrome UA contains "HeadlessChrome", which video CDNs (Wix's
+    // video.wixstatic.com, Showit's xstatic.com, and similar) sniff for and
+    // refuse to serve. Even on the codec-enabled /chrome endpoint, the
+    // <video> element fires its error event because the byte stream never
+    // arrives. Masking the UA to a current macOS Chrome string makes the
+    // CDN treat the request like a real visitor; the video file then loads
+    // and our muted .play() call (later in this function) renders a real
+    // first frame instead of the player's broken-state fallback.
+    try {
+      await page.setUserAgent(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
+      );
+    } catch (_e) { /* setUserAgent is best-effort; fall through to default */ }
   }
 
   try {
@@ -414,6 +428,13 @@ export default async function ({ page, context }) {
     });
   } else {
     await page.setViewport({ width, height });
+    // Realistic desktop Chrome UA. See AtF capture function for full
+    // rationale: video CDNs sniff for "HeadlessChrome" and refuse to serve.
+    try {
+      await page.setUserAgent(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
+      );
+    } catch (_e) { /* best-effort */ }
   }
 
   try {
