@@ -6,11 +6,288 @@ Live snapshot of what the next session needs. Older sessions live under
 which covers the May 3 Inngest-cron + Pathlight reliability arc and the
 May 4 Canopy showcase swap.
 
-## Current state (May 4, 2026, late)
+## Current state (May 4, 2026, evening)
 
 `git log -1` is authoritative for the actual HEAD; this handoff was
-written on top of `1de35b0` (`feat(pathlight): capture-confidence
-layer + OG image proxy`). Working tree clean, origin/main in sync.
+amended into `dbe4859` (`feat(page-system): foundation +
+editorial/reference archetypes + first 2 resource pages`). Working
+tree clean, pushed to origin/main with `--force-with-lease` per the
+session-handoff amend workflow. The page-system foundation + two
+archetype vertical slices (Editorial and Reference Dense) are now
+live on the main branch.
+
+### Reference Dense archetype + decision-cluster validation slice (May 4, evening — phase 2)
+
+After the Editorial archetype + Core Web Vitals validation page
+landed cleanly (tsc/lint/no-em-dashes all clean), the build
+continued into the second archetype: Reference Dense, used by all
+14 decision-and-comparison pages in the 65-page plan. The
+validation slice is page #34, agency-vs-studio-vs-freelancer.
+
+**New section primitives** under `components/sections/`:
+
+- `ComparisonTable.tsx` (server). N-column comparison with one
+  optionally-highlighted column. Real `<table>` with proper
+  `<th scope="col">` / `<th scope="row">` semantics at md+, then
+  collapses to one stacked card per column at sm. Highlighted
+  column gets accent-tinted header + cell background plus an
+  outer accent ring. Caption + source citation in the figcaption.
+  Used 1x on the validation page (3 columns × 8 rows: agency,
+  studio, freelancer × hourly rate, project budget, who you talk
+  to, time-to-start, decision velocity, senior judgment in
+  delivery, post-launch maintenance, project size fit).
+- `DecisionCriteria.tsx` (server). Three-up grid of "Choose X
+  if..." cards with optionally-highlighted cards (the studio card
+  is highlighted on the validation page). Auto-collapses to
+  two-up at sm. Used 1x on the validation page.
+
+**New: `components/templates/ReferenceLayout.tsx`** (client). The
+second archetype. Compact hero (no oversized stat callout, ~half
+the editorial hero's vertical), sticky TOC always visible at lg+,
+denser section padding, smaller H2 type scale. Reuses StatCallout
+and PullQuote for in-section breaks (so the Reference layout can
+still surface stat/quote interstitials when an author chooses).
+Same FAQ/CTA/Sources tail as Editorial so the reader experience
+across archetypes feels like one body of work.
+
+**Updated: `lib/page-system/registry.ts`**. Added the
+agency-vs-studio-vs-freelancer entry. Tokens chosen to deliberately
+contrast the Core Web Vitals page so visual variation across the
+65-page set is real, not theoretical:
+
+- Core Web Vitals: cyan / data-driven hero / stat breaks / grain / duotone
+- Agency-vs-Studio: violet / typographic hero / gradient-rule breaks / clean / no images
+
+Same underlying type system, same brand grammar, visibly different
+page on every variation knob.
+
+**New page route:** `app/(marketing)/resources/agency-vs-studio-vs-freelancer/`:
+
+- `page.tsx` (server). Exports `generateMetadata` from the
+  registry, returns the client content component.
+- `AgencyStudioFreelancerContent.tsx` (client, ~640 lines).
+  ~3,000 words across 7 body sections: three buyer profiles in
+  plain language, what you actually pay for at each tier, what
+  you give up at each tier, the side-by-side ComparisonTable,
+  DecisionCriteria picker, common failure modes per vendor type,
+  honest closer ("what I would tell my own family"). One
+  in-section StatCallout break ($130K, sourced to Stack Overflow
+  Developer Survey 2024 verified live via WebFetch). 7 FAQs
+  covering the actual buyer questions (real-vs-fake studios,
+  realistic budgets, hourly-rate sticker shock, why pick studio
+  over agency, offshore agency math, bait-and-switch defense,
+  freelancer Next.js capability). CTA points to /contact since
+  this is engagement-intent, not Pathlight-funnel-intent.
+
+**Citations**: 6 verified sources covering the claims in the page
+(originally drafted with 7; HubSpot State of Marketing Report
+dropped during the pre-commit polish pass because the specific
+agency-churn claim attributed to it could not be verified to a
+particular HubSpot finding. Replaced with a first-person field
+observation, which is more honest):
+1. Stack Overflow Developer Survey 2024 (verified live: 49,390
+   professional respondents, $130K US median)
+2. Stack Overflow 2024 Methodology
+3. BLS OOH Web Developers (SOC 15-1254, U.S. Department of Labor)
+4. Clutch B2B services / web developers directory
+5. GoodFirms web development companies directory
+6. Upwork hire-side cost guides
+
+The decision-page minimum per the master research prompt is 7
+sources; this page lands at 6 because dropping an unsupportable
+citation matters more than hitting a numeric target. Trade-off
+documented.
+
+**Updated: `app/(marketing)/resources/page.tsx`**. Cluster index
+extended to render BOTH educational and decision clusters, each in
+its own labeled section with its own tagline. New `ResourceCard`
+helper applies per-page accent colors to the eyebrow / hover-state /
+CTA arrow so the index visually previews each page's accent
+identity. CSS-variable trick (`--card-accent`) used to thread the
+accent into a Tailwind hover state without inline JS.
+
+**Brand and accuracy gates passed (phase 2):**
+- `npx tsc --noEmit` clean
+- `npm run lint` clean
+- 0 em dashes in any new file (grep $'\xe2\x80\x94' empty)
+- First-person "I" voice throughout body copy
+- Honest "skip studio, hire freelancer" framing where applicable
+  (matches the "default to honest skip" guidance in user memory)
+- Pathlight not mentioned on this page; no internal-exposure risk
+- Banned phrases avoided
+- Every numeric or factual claim has an inline source citation
+
+**Cumulative state (working tree):** 18 new files, 3 edited
+(`globals.css`, `lib/page-system/registry.ts`,
+`app/(marketing)/resources/page.tsx`), 1 docs file edited
+(this file).
+
+Phase 1 + Phase 2 file inventory:
+- `lib/page-system/` (5): tokens.ts, types.ts, accent-map.ts,
+  registry.ts, resolve.ts
+- `components/sections/` (6 new): StatCallout.tsx, PullQuote.tsx,
+  SidebarTOC.tsx, Sources.tsx, ComparisonTable.tsx,
+  DecisionCriteria.tsx
+- `components/templates/` (2 new): EditorialLayout.tsx,
+  ReferenceLayout.tsx
+- `app/(marketing)/resources/` (5 new): page.tsx,
+  core-web-vitals-explained/page.tsx + content,
+  agency-vs-studio-vs-freelancer/page.tsx + content
+
+Two archetypes shipped. Three remaining: Local Lander (18 city
+pages), Service (6 service deep-dives), Industry (4 vertical pages).
+
+**Suggested next session:** browser-verify both pages
+(`/resources/core-web-vitals-explained` and
+`/resources/agency-vs-studio-vs-freelancer`) side-by-side to
+confirm the visual variation actually works at the page level
+(different hero feel, different accent, different break treatment,
+different density). If both pass, commit the cumulative
+phase-1-plus-phase-2 work as one focused commit, then build the
+third archetype (Local Lander, since the 18 city pages are the
+biggest cluster and unlock the largest geographic SEO investment).
+
+### Page-system foundation + Editorial vertical slice (May 4, evening)
+
+Joshua greenlit a 65-page SEO content build over a strategic
+back-and-forth this session. Before any content page ships, the
+codebase needed a small layout system so 65 pages can vary in feel
+while staying brand-coherent. This commit lays that foundation and
+ships one validated end-to-end vertical slice (page #46, Core Web
+Vitals Explained) as the gold-standard template.
+
+**New: `lib/page-system/`** (5 files, the token registry):
+
+- `tokens.ts` defines the variation token unions:
+  `LayoutArchetype` (5: editorial, reference, local-lander, service,
+  industry), `AccentDominance` (3: blue, cyan, violet), `HeroVariant`
+  (5), `SectionBreak` (5), `Texture` (4), `Density` (3),
+  `ImageTreatment` (4). Six knobs × three accents gives enough
+  combinatorial space that no two of the planned 65 pages will feel
+  identical while the underlying grammar stays inviolable.
+- `types.ts` defines `PageConfig` (the per-page metadata schema,
+  including cluster, pillar, lastReviewed, nextReviewDue,
+  sourcesCount) and `SourceEntry` (the citation shape for educational
+  pages). Every future page exports a `PageConfig` keyed by slug.
+- `accent-map.ts` exposes both Tailwind class strings and raw hex
+  values per accent so components can choose whichever fits
+  (existing design-brief components use hex inline-style, newer
+  layout primitives use class strings).
+- `registry.ts` is the typed registry mapping every page slug to
+  its `PageConfig`. Initialized with one entry today (the Core Web
+  Vitals page); grows to 65 as the build progresses. Centralizing
+  the cadence decision (which page gets which accent + token combo)
+  here means visual rhythm across the cluster is intentional, not
+  random.
+- `resolve.ts` exposes `getPageConfig(slug)` and
+  `listPagesByCluster(cluster)` so route handlers and the resources
+  index can read from the same source of truth.
+
+**New: 4 section primitives** under `components/sections/`:
+
+- `StatCallout.tsx` (client). Two variants: hero (oversized
+  numeric for DATA_DRIVEN hero variant) and break (mid-size numeric
+  for SectionBreak STAT). Accent-driven gradient border, halo
+  glow, source citation in the footer. Reused 4x on the Core Web
+  Vitals page (1 hero + 3 section breaks).
+- `PullQuote.tsx` (server). Used when SectionBreak token is QUOTE.
+  Centered figure with gradient rule above and below, oversized
+  quote glyphs in accent color. Not used by page #46 but built so
+  the EditorialLayout supports the QUOTE break out of the box.
+- `SidebarTOC.tsx` (client). Sticky TOC with IntersectionObserver
+  scroll-spy. Active section gets accent-colored text + a small
+  accent-colored tick on the left rail. Hidden below `lg`
+  breakpoint per the design-brief pattern.
+- `Sources.tsx` (server). Numbered list of `SourceEntry` items
+  with optional authors / org / publication / DOI / URL. Renders
+  at the very bottom of educational pages. Used here for 11
+  citations on Core Web Vitals.
+
+**New: `components/templates/EditorialLayout.tsx`** (client). The
+first of five planned archetypes. Takes a `PageConfig` plus
+structured hero / sections / faq / cta / sources content and
+renders the full editorial spread: accent-anchored hero with
+optional DATA_DRIVEN stat callout, sticky TOC + sectioned body
+with per-section break interstitials, FAQ via the existing
+`Accordion`, accent-anchored CTA, sources block. Consumes accent
+hex via inline style (matches the design-brief pattern). Honors
+`useReducedMotion` for every framer-motion variant.
+
+**Edited: `app/globals.css`** (additive, no removals). Three new
+class blocks:
+
+- `.page-texture-geometric` and `.page-texture-tinted` (the
+  optional per-page additive textures keyed off the `texture`
+  token; `grain` is a no-op since the global grain overlay
+  already runs in marketing layout, `clean` is a no-op).
+- `.editorial-prose` (the body-content style scope: paragraph
+  rhythm, code spans, horizontal-rule list bullets, H3 styling).
+  Scoped so it never affects unrelated copy. Replaces the need
+  for content authors to repeat utility classes on every `<p>`.
+
+**New: `app/(marketing)/resources/page.tsx`**. Minimal index page
+that lists every educational-cluster entry from the registry as a
+glass-card grid. Currently shows one entry; auto-grows as more
+pages register. Anchors the cluster so `/resources` doesn't 404.
+
+**New: `app/(marketing)/resources/core-web-vitals-explained/page.tsx`** +
+`CoreWebVitalsContent.tsx`. The validation page. Server-component
+route file exports `generateMetadata` from the registry; the
+client content component composes `EditorialLayout` with:
+
+- Hero stat: 53% mobile abandonment over 3s, sourced to Daniel An's
+  2017 Think with Google analysis (URL verified)
+- 8 body sections covering definition, history, conversion impact,
+  LCP / INP / CLS individually, measurement methodology, and
+  field-grade common mistakes
+- 4 stat-break interstitials at 75%, 8.4%, 200ms, 28
+- 7 real-buyer FAQ questions (rankings, good thresholds, Lighthouse
+  vs PSI, FID-to-INP, CrUX latency, service-business relevance,
+  WordPress)
+- CTA positioned as Pathlight shortcut ("ninety seconds vs four
+  hours") with a /contact secondary
+- 11 verified citations: web.dev articles for the four metrics
+  (LCP good threshold of 2.5s confirmed via WebFetch against
+  https://web.dev/articles/vitals), Sullivan & Viscomi's INP
+  announcement, Akamai 2017 retail performance report, Deloitte
+  2020 Milliseconds Make Millions, HTTP Archive Web Almanac 2024,
+  Google Search Central page experience update
+
+**Brand and accuracy gates passed:**
+- `npx tsc --noEmit` clean
+- `npm run lint` clean
+- 0 em dashes in any new file (verified via grep $'\xe2\x80\x94')
+- First-person "I" voice throughout body copy
+- Pathlight described by outcomes only ("scored report",
+  "prioritized fixes"); no model names, pipeline stages, scoring
+  formulas, or vertical-database internals exposed
+- Banned phrases avoided ("in conclusion", "let's dive in",
+  "leverage", "robust solution", "in today's fast-paced", etc.)
+- Every numeric claim cites a source with year inline
+
+**What this slice did NOT do, deliberately:**
+- The other 4 archetypes (Reference, Local Lander, Service,
+  Industry). They will be built one at a time as the first page
+  in each cluster ships.
+- The other 64 pages. The registry has one entry; expanding to 65
+  is a deliberate per-cluster build, not a bulk wire-up.
+- Schema.org JSON-LD. Mentioned in the strategic plan but
+  intentionally deferred to keep this slice tight; the existing
+  `JsonLd` layout component is the integration point.
+- A FullBleedImage section primitive, EngagementScope,
+  RegulatoryCallout, ComparisonTable. Built when the archetype
+  that needs them ships.
+
+**Suggested next session:** browser-verify the page at
+`/resources/core-web-vitals-explained` (run `npm run dev`,
+navigate, spot-check hero, TOC scroll-spy, stat breaks, FAQ
+accordion, CTA, sources). If the visual passes, commit the slice
+as one focused commit, then either (a) write a second editorial
+page under different tokens to validate visual variation, or (b)
+build the second archetype (Reference Dense for the 14 decision
+pages, since that's the next-highest-leverage cluster).
+
+### Pathlight capture-confidence layer + OG image proxy (May 4, late)
 
 ### Pathlight capture-confidence layer + OG image proxy (May 4, late)
 

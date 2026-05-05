@@ -325,6 +325,93 @@ body {
   background-size: 32px 32px;
 }
 
+/* ─── PAGE-SYSTEM TEXTURES ────────────────────────── */
+/* Per-page additive backgrounds keyed off the texture token in the
+   page registry. The global grain overlay is already drawn by
+   layout.tsx, so the "grain" texture is a no-op at this level. */
+.page-texture-geometric {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+.page-texture-tinted::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(8, 145, 178, 0.025), transparent 40%);
+  pointer-events: none;
+}
+
+/* ─── EDITORIAL PROSE ─────────────────────────────── */
+/* Used by EditorialLayout to style the body content of each section
+   without forcing the calling page to repeat utility classes on every
+   <p>. Scoped to .editorial-prose so it never affects unrelated copy. */
+.editorial-prose > p {
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: #475569;
+}
+@media (min-width: 1024px) {
+  .editorial-prose > p {
+    font-size: 1.125rem;
+  }
+}
+.editorial-prose > p:not(:last-child) {
+  margin-bottom: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .editorial-prose > p:not(:last-child) {
+    margin-bottom: 1.75rem;
+  }
+}
+.editorial-prose strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+.editorial-prose em {
+  font-style: italic;
+}
+.editorial-prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.92em;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  color: #0f172a;
+}
+.editorial-prose ul {
+  margin: 1.5rem 0;
+  padding-left: 1.25rem;
+  list-style: none;
+}
+.editorial-prose ul > li {
+  position: relative;
+  padding-left: 1rem;
+  margin-bottom: 0.625rem;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #475569;
+}
+.editorial-prose ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 0.5rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+}
+.editorial-prose h3 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #0f172a;
+  margin-top: 2.25rem;
+  margin-bottom: 0.875rem;
+}
+
 /* ─── GLOW EFFECTS ────────────────────────────────── */
 .glow-spot {
   position: absolute;
