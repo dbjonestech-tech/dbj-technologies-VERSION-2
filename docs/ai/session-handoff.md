@@ -9,8 +9,8 @@ May 4 Canopy showcase swap.
 ## Current state (May 4, 2026, late)
 
 `git log -1` is authoritative for the actual HEAD; this handoff was
-written on top of `0c08585` (`chore(deps): remove unused wait-on to
-close axios advisories`). Working tree clean, origin/main in sync.
+written on top of `1de35b0` (`feat(pathlight): capture-confidence
+layer + OG image proxy`). Working tree clean, origin/main in sync.
 
 ### Pathlight capture-confidence layer + OG image proxy (May 4, late)
 
