@@ -9,12 +9,13 @@ May 4 Canopy showcase swap.
 ## Current state (May 4, 2026, evening)
 
 `git log -1` is authoritative for the actual HEAD; this handoff was
-amended into `dbe4859` (`feat(page-system): foundation +
+written on top of `d7f2de1` (`feat(page-system): foundation +
 editorial/reference archetypes + first 2 resource pages`). Working
-tree clean, pushed to origin/main with `--force-with-lease` per the
-session-handoff amend workflow. The page-system foundation + two
+tree clean, pushed to origin/main. The page-system foundation + two
 archetype vertical slices (Editorial and Reference Dense) are now
-live on the main branch.
+live on the main branch. The follow-up commit anchoring this handoff
+at `d7f2de1` matches the project's existing handoff-amend pattern
+(see prior `docs: anchor session-handoff at 1de35b0`).
 
 ### Reference Dense archetype + decision-cluster validation slice (May 4, evening — phase 2)
 
