@@ -106,7 +106,7 @@ function isPrivateIp(ip: string): boolean {
   return true;
 }
 
-async function hostnameResolvesPublic(hostname: string): Promise<boolean> {
+export async function hostnameResolvesPublic(hostname: string): Promise<boolean> {
   const lower = hostname.toLowerCase();
   if (lower === "localhost" || lower === "localhost.localdomain") return false;
   if (net.isIP(hostname)) return !isPrivateIp(hostname);

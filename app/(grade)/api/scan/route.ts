@@ -7,6 +7,7 @@ import { emailLimiter, ipLimiter } from "@/lib/rate-limit";
 import { track } from "@/lib/services/monitoring";
 import { attachScanToSession } from "@/lib/services/analytics";
 import { readSessionIdFromRequest } from "@/lib/services/visitor-id";
+import { hostnameResolvesPublic, normalizeUrl } from "@/lib/services/url";
 
 const scanSchema = z.object({
   url: z.string().url(),
@@ -60,8 +61,38 @@ export async function POST(request: Request) {
       );
     }
 
-    const { url, email, businessName, city, turnstileToken } = parsed.data;
+    const { url: rawUrl, email, businessName, city, turnstileToken } = parsed.data;
     const ip = extractIp(request);
+
+    /* Boundary URL validation: normalize to a canonical form (rejects
+     * non-http/https schemes, embedded credentials, and sensitive query
+     * params) and reject hosts that resolve to a private network. The
+     * Inngest pipeline does the same checks plus a HEAD probe later;
+     * the boundary versions give the user immediate 400 feedback and
+     * keep garbage strings out of the scans table. The HEAD probe is
+     * deliberately skipped here so the API stays sub-second. */
+    let url: string;
+    try {
+      url = normalizeUrl(rawUrl);
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Invalid URL." },
+        { status: 400 }
+      );
+    }
+
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      return NextResponse.json({ error: "Invalid URL." }, { status: 400 });
+    }
+    if (!(await hostnameResolvesPublic(parsedUrl.hostname))) {
+      return NextResponse.json(
+        { error: "URL must be a publicly reachable site." },
+        { status: 400 }
+      );
+    }
 
     const turnstileOk = await verifyTurnstile(turnstileToken, ip);
     if (!turnstileOk) {
