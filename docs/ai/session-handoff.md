@@ -6,22 +6,86 @@ Live snapshot of what the next session needs. Older sessions live under
 which covers the May 3 Inngest-cron + Pathlight reliability arc and the
 May 4 Canopy showcase swap.
 
-## Current state (May 5, 2026, late)
+## Current state (May 5, 2026, very late)
 
 `git log -1` is authoritative for the actual HEAD. After the Phase 5
-page-system commit `a70d3c6` landed earlier today, three security
-audit follow-ups closed in sequence on top of it: `2ac6f54`
-(security.txt), `14fc13c` (Pathlight gate atomic check-and-reserve),
-`def65bf` (DNS-rebinding pin in validateUrl). All five planned
-page-system archetypes are also live: Editorial, Reference Dense,
-Local Lander, Service Deep-Dive, and Industry Vertical, with five
-validation pages shipped (`/resources/core-web-vitals-explained`,
+page-system commit `a70d3c6` landed earlier today, seven security
+audit follow-ups closed in sequence on top of it across two waves:
+
+- Wave 1 (mid-late): `2ac6f54` (security.txt), `14fc13c` (Pathlight
+  gate atomic check-and-reserve), `def65bf` (DNS-rebinding pin in
+  validateUrl).
+- Wave 2 (late-very-late): `bacaa1f` (email actions to admin role),
+  `262067c` (scan submitter URL boundary validation), `883821a`
+  (client-upload extension allowlist), `de717a9` (CI workflow
+  SHA-pin).
+
+All five planned page-system archetypes are also live: Editorial,
+Reference Dense, Local Lander, Service Deep-Dive, and Industry
+Vertical, with five validation pages shipped
+(`/resources/core-web-vitals-explained`,
 `/resources/agency-vs-studio-vs-freelancer`, `/dallas-web-design`,
 `/services/nextjs-development`, `/industries/auto-service`). Previous
 handoff anchor commits: `d7f2de1` (Phases 1+2), `2696989` (Phase 3),
 `b3ca460` (Phase 4). Joshua's parallel Canopy track shipped at
 `5437174` between Phase 4 and Phase 5; that scaffold is unrelated to
 the page-system arc.
+
+### Security audit follow-ups wave 2: F11, F6, F8, F9 (May 5, very late)
+
+Four more items from `/tmp/dbj-audit-2026-05-04.md` closed in
+sequence. Each is its own commit + Vercel deploy.
+
+- **Audit F11, email actions to admin role** (`bacaa1f`). Replaced
+  `if (!session)` with `await requireRole("admin")` across all five
+  exported actions in `lib/actions/email.ts`. Matches the pattern in
+  team.ts, api-tokens.ts, webhooks.ts. Removes the dependency on
+  upstream guards (signIn callback, middleware) holding for the
+  defense-in-depth tier.
+- **Audit F6, scan submitter URL boundary validation** (`262067c`).
+  Public scan API at `app/(grade)/api/scan/route.ts` now calls
+  `normalizeUrl` and `hostnameResolvesPublic` at the boundary, so
+  bad protocols / private hosts / localhost get a 400 before any
+  DB write. The Inngest pipeline still does the same checks plus
+  the HEAD probe as defense in depth. The HEAD probe is deliberately
+  NOT run at the boundary so the API stays sub-second.
+  `hostnameResolvesPublic` is now exported from
+  `lib/services/url.ts` so the boundary check shares the same IP
+  range coverage validateUrl uses.
+- **Audit F8, client-upload extension allowlist** (`883821a`). The
+  download proxy at `/portal/files/[id]/download` already forces
+  Content-Disposition: attachment, which closes the immediate
+  stored-XSS vector when an admin uploads .html. This adds an
+  explicit extension allowlist at the upload boundary in
+  `app/admin/clients/actions.ts` (PDF, raster images, Office docs,
+  zip, mp4 / mov / webm, AI / EPS / PSD / .sketch / .fig). SVG is
+  deliberately excluded. Defense-in-depth so a future weakening of
+  the proxy disposition cannot reintroduce the vector.
+- **Audit F9, CI workflow SHA-pin** (`de717a9`). Pinned the three
+  GitHub Actions used in `.github/workflows/lighthouse-gate.yml` to
+  full 40-char commit SHAs (with `# v4.x.y` comments for review):
+  `actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5` (v4.3.1),
+  `actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020` (v4.4.0),
+  `actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02`
+  (v4.6.2). Trigger is pull_request (not pull_request_target) so
+  blast radius is bounded to CI; this hardens that bound. Newer
+  majors exist (v6 / v6 / v7); upgrading those is on the backlog
+  as a separate task.
+
+**Audit posture across May 4 + May 5:** 11 of 17 audit findings
+closed (F1, F2, F3 eslint, F4 eslint-config-next, F5 axios, plus
+audit-numbering F1, F2, F4, F5, F10 wave 1, then F11, F6, F8, F9
+wave 2; the audit-doc and yesterday's session-handoff use
+overlapping numbering; `/tmp/dbj-audit-2026-05-04.md` is the
+canonical source). Remaining: F3 beacon hardening, F7 email
+tracking IDs (both deferred this session: F3 because the snippet
+generator change affects Tyler's deployed install, F7 because it
+needs a schema migration that wants Joshua review).
+
+### Security audit follow-ups F10, F5, F4 (May 5, late)
+
+Three Medium / Low items from `/tmp/dbj-audit-2026-05-04.md` closed
+in three independent commits. Each shipped its own Vercel deploy.
 
 ### Security audit follow-ups F10, F5, F4 (May 5, late)
 
