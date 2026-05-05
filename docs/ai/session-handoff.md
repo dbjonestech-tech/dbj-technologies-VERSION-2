@@ -6,20 +6,77 @@ Live snapshot of what the next session needs. Older sessions live under
 which covers the May 3 Inngest-cron + Pathlight reliability arc and the
 May 4 Canopy showcase swap.
 
-## Current state (May 5, 2026, mid)
+## Current state (May 5, 2026, late)
 
-`git log -1` is authoritative for the actual HEAD; this handoff was
-written on top of `a70d3c6` (`feat(page-system): industry vertical
-archetype + auto service page`). Pushed to origin/main. **All five planned archetypes are now live:**
-Editorial, Reference Dense, Local Lander, Service Deep-Dive, and
-Industry Vertical. Five pillar / validation pages live in main:
-`/resources/core-web-vitals-explained`,
-`/resources/agency-vs-studio-vs-freelancer`,
-`/dallas-web-design`, `/services/nextjs-development`,
-and `/industries/auto-service`. Previous handoff anchor commits:
-`d7f2de1` (Phases 1+2), `2696989` (Phase 3), `b3ca460` (Phase 4).
-Joshua's parallel Canopy track shipped at `5437174` between Phase 4
-and Phase 5; that scaffold is unrelated to the page-system arc.
+`git log -1` is authoritative for the actual HEAD. After the Phase 5
+page-system commit `a70d3c6` landed earlier today, three security
+audit follow-ups closed in sequence on top of it: `2ac6f54`
+(security.txt), `14fc13c` (Pathlight gate atomic check-and-reserve),
+`def65bf` (DNS-rebinding pin in validateUrl). All five planned
+page-system archetypes are also live: Editorial, Reference Dense,
+Local Lander, Service Deep-Dive, and Industry Vertical, with five
+validation pages shipped (`/resources/core-web-vitals-explained`,
+`/resources/agency-vs-studio-vs-freelancer`, `/dallas-web-design`,
+`/services/nextjs-development`, `/industries/auto-service`). Previous
+handoff anchor commits: `d7f2de1` (Phases 1+2), `2696989` (Phase 3),
+`b3ca460` (Phase 4). Joshua's parallel Canopy track shipped at
+`5437174` between Phase 4 and Phase 5; that scaffold is unrelated to
+the page-system arc.
+
+### Security audit follow-ups F10, F5, F4 (May 5, late)
+
+Three Medium / Low items from `/tmp/dbj-audit-2026-05-04.md` closed
+in three independent commits. Each shipped its own Vercel deploy.
+
+- **Audit F10, security.txt** (`2ac6f54`). Added
+  `public/.well-known/security.txt` per RFC 9116 with mailto contact,
+  ISO 8601 Expires (2027-05-05), Preferred-Languages, and Canonical
+  pinned to the production host. Researchers now have a documented
+  disclosure channel.
+- **Audit F5, Pathlight gate atomic check-and-reserve** (`14fc13c`).
+  Replaced the `canFireScan` + `incrementScanUsage` TOCTOU pattern
+  with a single atomic UPDATE that increments only when all three
+  layers pass. New `tryReserveScan(kind, count)` and
+  `releaseScanReservation(count)` in `lib/canopy/pathlight-gate.ts`.
+  Migrated four firing call sites: `triggerRescanForContact`,
+  `rescanByScanIdAction`, `scanProspectCandidateAction`, and the
+  batch case `scanCompetitorsAction` (which uses `tryReserveScan(N)`
+  + try/finally refund for partial-fire). Read-only sites
+  (`/admin/contacts/[id]` UI, `automation/actions.ts` early-fail)
+  stay on `canFireScan`. `incrementScanUsage` removed (zero callers
+  after migration). Two concurrent admin clicks at remaining=1 can
+  no longer both pass.
+- **Audit F4, DNS rebinding pin in validateUrl** (`def65bf`). The
+  HEAD probe used to do two DNS lookups (one in
+  `hostnameResolvesPublic` and one inside `fetch` at connect time);
+  attacker-controlled DNS could return public for the first lookup
+  and 169.254.169.254 for the second. New `resolveToPublicIp` does
+  one lookup and returns the IP the connector should use; new
+  `pinnedAgent` returns an undici Agent whose `connect.lookup`
+  always returns that exact IP regardless of subsequent DNS. TLS
+  SNI and Host header continue to use the URL hostname so HTTPS
+  certs validate normally. Re-pinning happens per redirect hop;
+  agents close in finally. `undici@^8.2.0` added as an explicit
+  runtime dep (Node bundles its own at runtime; explicit install
+  gives types and version determinism).
+
+**Verification gates passed (this round):**
+
+- `npx tsc --noEmit` clean after each of F10, F5, F4
+- `npm run lint` clean
+- `npm run build` succeeds; only the pre-existing edge-runtime
+  advisory remains (unrelated, predates this work)
+- 0 em dashes added in any changed source file
+- All three Vercel deploys confirmed (F10 Ready, F5 Ready, F4
+  Building at handoff write)
+- Surgical staging throughout: Joshua's parallel `page-system` and
+  `industries` working-tree files were deliberately NOT included in
+  any of the three security commits
+
+Audit posture after this round: 7 of 17 audit findings closed across
+the May 4 + May 5 sessions. Remaining: F3 beacon hardening, F6 public
+scan URL validation, F7 email tracking IDs, F8 file upload allowlist,
+F9 CI SHA pinning, F11 email actions auth narrow.
 
 ### Industry Vertical archetype + Auto Service page (May 5, mid, phase 5)
 
