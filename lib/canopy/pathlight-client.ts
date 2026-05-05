@@ -1,6 +1,6 @@
 import { getDb } from "@/lib/db";
 import { inngest } from "@/lib/inngest/client";
-import { canFireScan, incrementScanUsage } from "@/lib/canopy/pathlight-gate";
+import { releaseScanReservation, tryReserveScan } from "@/lib/canopy/pathlight-gate";
 
 export interface RescanInput {
   contactId: number;
@@ -19,21 +19,23 @@ export interface RescanResult {
   log_id: number;
 }
 
-/* Trigger a fresh Pathlight scan for an existing contact. Always
- * passes through canFireScan first; on success increments the budget
- * counter and writes a row to pathlight_scans_log so the contact
- * detail page can render the rescan ledger. The actual scan runs
- * asynchronously in the existing Inngest pipeline; the score_delta
- * column on the log row is filled in later by the pipeline's finalize
- * step (Phase 6.5 wiring) - for now the row carries previous_score
- * and the operator sees the new score appear when the pipeline
- * finishes via the existing Pathlight scan card on the contact page. */
+/* Trigger a fresh Pathlight scan for an existing contact. Atomically
+ * reserves a budget slot via tryReserveScan first; refunds the
+ * reservation on any pre-Inngest failure or if Inngest itself rejects
+ * the send. On success writes a row to pathlight_scans_log so the
+ * contact detail page can render the rescan ledger. The actual scan
+ * runs asynchronously in the existing Inngest pipeline; the
+ * score_delta column on the log row is filled in later by the
+ * pipeline's finalize step (Phase 6.5 wiring) - for now the row
+ * carries previous_score and the operator sees the new score appear
+ * when the pipeline finishes via the existing Pathlight scan card on
+ * the contact page. */
 export async function triggerRescanForContact(
   input: RescanInput
 ): Promise<{ ok: true; data: RescanResult } | { ok: false; error: string; reason?: string }> {
-  const gate = await canFireScan("rescan");
-  if (!gate.allowed) {
-    return { ok: false, error: gate.reason ?? "Scan gate denied", reason: gate.reason };
+  const reservation = await tryReserveScan("rescan", 1);
+  if (!reservation.allowed) {
+    return { ok: false, error: reservation.reason ?? "Scan gate denied", reason: reservation.reason };
   }
 
   const sql = getDb();
@@ -45,6 +47,7 @@ export async function triggerRescanForContact(
   `) as Array<{ id: number; email: string; name: string | null; company: string | null; website: string | null }>;
   const contact = contactRows[0];
   if (!contact) {
+    await releaseScanReservation(1);
     return { ok: false, error: "Contact not found" };
   }
 
@@ -68,6 +71,7 @@ export async function triggerRescanForContact(
     url = contact.website;
   }
   if (!url) {
+    await releaseScanReservation(1);
     return {
       ok: false,
       error: "No URL on file for this contact. Add a website to the contact, or provide a URL with the rescan.",
@@ -89,7 +93,7 @@ export async function triggerRescanForContact(
 
   /* Insert a fresh scans row and send the pipeline event. Match the
    * shape of app/(grade)/api/scan/route.ts but skip Turnstile + rate
-   * limits since this is admin-triggered behind canFireScan. */
+   * limits since this is admin-triggered behind tryReserveScan. */
   const scanRows = (await sql`
     INSERT INTO scans (url, email, business_name, city, status)
     VALUES (
@@ -103,13 +107,19 @@ export async function triggerRescanForContact(
   `) as Array<{ id: string }>;
   const scanId = scanRows[0]?.id;
   if (!scanId) {
+    await releaseScanReservation(1);
     return { ok: false, error: "Could not create scan row" };
   }
 
-  await inngest.send({
-    name: "pathlight/scan.requested",
-    data: { scanId },
-  });
+  try {
+    await inngest.send({
+      name: "pathlight/scan.requested",
+      data: { scanId },
+    });
+  } catch (err) {
+    await releaseScanReservation(1);
+    throw err;
+  }
 
   const logRows = (await sql`
     INSERT INTO pathlight_scans_log
@@ -126,8 +136,6 @@ export async function triggerRescanForContact(
     )
     RETURNING id
   `) as Array<{ id: number }>;
-
-  await incrementScanUsage(1);
 
   return {
     ok: true,

@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import { inngest } from "@/lib/inngest/client";
 import { recordChange } from "@/lib/canopy/audit";
-import { canFireScan, incrementScanUsage } from "@/lib/canopy/pathlight-gate";
+import { releaseScanReservation, tryReserveScan } from "@/lib/canopy/pathlight-gate";
 import { triggerRescanForContact, type RescanResult } from "@/lib/canopy/pathlight-client";
 import { track } from "@/lib/services/monitoring";
 
@@ -80,9 +80,9 @@ export async function rescanByScanIdAction(input: {
   try {
     const admin = await requireAdmin();
 
-    const gate = await canFireScan("rescan");
-    if (!gate.allowed) {
-      return { ok: false, error: gate.reason ?? "Scan gate denied", reason: gate.reason };
+    const reservation = await tryReserveScan("rescan", 1);
+    if (!reservation.allowed) {
+      return { ok: false, error: reservation.reason ?? "Scan gate denied", reason: reservation.reason };
     }
 
     const sql = getDb();
@@ -100,6 +100,7 @@ export async function rescanByScanIdAction(input: {
     }>;
     const src = original[0];
     if (!src) {
+      await releaseScanReservation(1);
       return { ok: false, error: "Scan not found" };
     }
 
@@ -116,15 +117,19 @@ export async function rescanByScanIdAction(input: {
     `) as Array<{ id: string }>;
     const newScanId = inserted[0]?.id;
     if (!newScanId) {
+      await releaseScanReservation(1);
       return { ok: false, error: "Failed to create new scan row" };
     }
 
-    await inngest.send({
-      name: "pathlight/scan.requested",
-      data: { scanId: newScanId },
-    });
-
-    await incrementScanUsage(1);
+    try {
+      await inngest.send({
+        name: "pathlight/scan.requested",
+        data: { scanId: newScanId },
+      });
+    } catch (err) {
+      await releaseScanReservation(1);
+      throw err;
+    }
 
     await track(
       "scan.requested",

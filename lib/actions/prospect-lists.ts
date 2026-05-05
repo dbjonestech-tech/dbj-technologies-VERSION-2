@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import { inngest } from "@/lib/inngest/client";
 import { recordChange } from "@/lib/canopy/audit";
-import { canFireScan, incrementScanUsage } from "@/lib/canopy/pathlight-gate";
+import { releaseScanReservation, tryReserveScan } from "@/lib/canopy/pathlight-gate";
 import { inferCandidateVertical } from "@/lib/canopy/prospect-lists";
 
 export type ProspectActionResult<T> =
@@ -141,14 +141,16 @@ export async function removeProspectCandidateAction(input: {
 }
 
 /* Fire a Pathlight scan against a single prospect candidate. Routes
- * through canFireScan('prospecting') so master kill / prospecting
- * toggle / monthly budget all gate the action. On success creates a
- * scans row, sends the inngest pipeline event, and writes back the
- * scan_id + scanning status to the candidate row. The pipeline's
- * finalize step doesn't currently know about prospect_candidates;
- * the candidate's pathlight_score column gets backfilled when the
- * operator clicks the row in the UI (which calls a thin server
- * action to read scans/scan_results and update). */
+ * through tryReserveScan('prospecting') so master kill / prospecting
+ * toggle / monthly budget all gate the action atomically. On success
+ * creates a scans row, sends the inngest pipeline event, and writes
+ * back the scan_id + scanning status to the candidate row. Refunds
+ * the reservation on any pre-Inngest failure or if Inngest itself
+ * rejects the send. The pipeline's finalize step doesn't currently
+ * know about prospect_candidates; the candidate's pathlight_score
+ * column gets backfilled when the operator clicks the row in the UI
+ * (which calls a thin server action to read scans/scan_results and
+ * update). */
 export async function scanProspectCandidateAction(input: {
   candidateId: number;
 }): Promise<
@@ -157,9 +159,9 @@ export async function scanProspectCandidateAction(input: {
   try {
     const admin = await requireAdmin();
 
-    const gate = await canFireScan("prospecting");
-    if (!gate.allowed) {
-      return { ok: false, error: gate.reason ?? "Scan gate denied", reason: gate.reason };
+    const reservation = await tryReserveScan("prospecting", 1);
+    if (!reservation.allowed) {
+      return { ok: false, error: reservation.reason ?? "Scan gate denied", reason: reservation.reason };
     }
 
     const sql = getDb();
@@ -176,8 +178,12 @@ export async function scanProspectCandidateAction(input: {
       scan_status: string;
     }>;
     const cand = candRows[0];
-    if (!cand) return { ok: false, error: "Candidate not found" };
+    if (!cand) {
+      await releaseScanReservation(1);
+      return { ok: false, error: "Candidate not found" };
+    }
     if (cand.scan_status === "scanning" || cand.scan_status === "scanned") {
+      await releaseScanReservation(1);
       return { ok: false, error: `Candidate already ${cand.scan_status}` };
     }
 
@@ -193,7 +199,10 @@ export async function scanProspectCandidateAction(input: {
       RETURNING id::text AS id
     `) as Array<{ id: string }>;
     const scanId = scanRows[0]?.id;
-    if (!scanId) return { ok: false, error: "Could not create scan row" };
+    if (!scanId) {
+      await releaseScanReservation(1);
+      return { ok: false, error: "Could not create scan row" };
+    }
 
     await sql`
       UPDATE prospect_candidates
@@ -203,12 +212,15 @@ export async function scanProspectCandidateAction(input: {
       WHERE id = ${cand.id}
     `;
 
-    await inngest.send({
-      name: "pathlight/scan.requested",
-      data: { scanId },
-    });
-
-    await incrementScanUsage(1);
+    try {
+      await inngest.send({
+        name: "pathlight/scan.requested",
+        data: { scanId },
+      });
+    } catch (err) {
+      await releaseScanReservation(1);
+      throw err;
+    }
 
     await recordChange({
       entityType: "prospect_candidate",
@@ -221,7 +233,7 @@ export async function scanProspectCandidateAction(input: {
     revalidatePath(`/admin/prospecting/${cand.list_id}`);
     return {
       ok: true,
-      data: { scan_id: scanId, remaining: (gate.remaining ?? 0) - 1 },
+      data: { scan_id: scanId, remaining: reservation.remaining ?? null },
     };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Failed" };

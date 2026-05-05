@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import { inngest } from "@/lib/inngest/client";
 import { recordChange } from "@/lib/canopy/audit";
-import { canFireScan, incrementScanUsage } from "@/lib/canopy/pathlight-gate";
+import { releaseScanReservation, tryReserveScan } from "@/lib/canopy/pathlight-gate";
 import {
   countCompetitors,
   insertCompetitor,
@@ -95,10 +95,12 @@ export async function removeCompetitorAction(input: {
 }
 
 /* Scan all the competitors for one contact. Counts as N scans against
- * the budget (one per competitor). Gate fails fast if any single scan
- * would exceed the cap; partial-fire is intentionally avoided so the
- * operator gets either all-or-none and the budget reading on the next
- * page load is accurate. */
+ * the budget (one per competitor). Reservation is atomic on the full
+ * batch via tryReserveScan(N): either N slots reserve cleanly or the
+ * call fails before any scan fires, so two operators clicking on the
+ * same contact cannot both partially-overshoot the cap. Any individual
+ * row whose INSERT or Inngest send fails refunds its slot via the
+ * try/finally below. */
 export async function scanCompetitorsAction(input: {
   contactId: number;
 }): Promise<
@@ -106,13 +108,11 @@ export async function scanCompetitorsAction(input: {
 > {
   try {
     const admin = await requireAdmin();
-
-    const gate = await canFireScan("competitive_intel");
-    if (!gate.allowed) {
-      return { ok: false, error: gate.reason ?? "Scan gate denied", reason: gate.reason };
-    }
-
     const sql = getDb();
+
+    /* Fetch the row count first so the atomic reservation knows how
+     * many slots to reserve. Two-step is unavoidable because the budget
+     * cap depends on N, and N comes from the DB. */
     const rows = (await sql`
       SELECT id, competitor_name, website_url
       FROM competitors
@@ -125,46 +125,55 @@ export async function scanCompetitorsAction(input: {
       return { ok: false, error: "No competitors pending a scan" };
     }
 
-    if ((gate.remaining ?? 0) < rows.length) {
-      return {
-        ok: false,
-        error: `Need ${rows.length} scans for this contact's competitors but only ${gate.remaining ?? 0} remaining in the monthly budget.`,
-      };
+    /* Atomically reserve all N slots. Fails fast (and undoes nothing,
+     * since nothing was reserved) if the budget cannot fit the batch.
+     * The "need N have M" message is now produced inside the reserver. */
+    const reservation = await tryReserveScan("competitive_intel", rows.length);
+    if (!reservation.allowed) {
+      return { ok: false, error: reservation.reason ?? "Scan gate denied", reason: reservation.reason };
     }
 
     let scanned = 0;
-    for (const c of rows) {
-      const scanRows = (await sql`
-        INSERT INTO scans (url, email, business_name, city, status)
-        VALUES (
-          ${c.website_url},
-          ${`competitor+${c.id}@dbjtechnologies.com`},
-          ${c.competitor_name},
-          ${"Dallas"},
-          'pending'
-        )
-        RETURNING id::text AS id
-      `) as Array<{ id: string }>;
-      const scanId = scanRows[0]?.id;
-      if (!scanId) continue;
+    try {
+      for (const c of rows) {
+        const scanRows = (await sql`
+          INSERT INTO scans (url, email, business_name, city, status)
+          VALUES (
+            ${c.website_url},
+            ${`competitor+${c.id}@dbjtechnologies.com`},
+            ${c.competitor_name},
+            ${"Dallas"},
+            'pending'
+          )
+          RETURNING id::text AS id
+        `) as Array<{ id: string }>;
+        const scanId = scanRows[0]?.id;
+        if (!scanId) continue;
 
-      await sql`
-        UPDATE competitors
-        SET scan_status = 'scanning',
-            last_scan_id = ${scanId},
-            last_scanned_at = NOW(),
-            updated_at = NOW()
-        WHERE id = ${c.id}
-      `;
+        await sql`
+          UPDATE competitors
+          SET scan_status = 'scanning',
+              last_scan_id = ${scanId},
+              last_scanned_at = NOW(),
+              updated_at = NOW()
+          WHERE id = ${c.id}
+        `;
 
-      await inngest.send({
-        name: "pathlight/scan.requested",
-        data: { scanId },
-      });
-      scanned++;
+        await inngest.send({
+          name: "pathlight/scan.requested",
+          data: { scanId },
+        });
+        scanned++;
+      }
+    } finally {
+      /* Refund any reserved-but-not-fired slots whether the loop
+       * completed cleanly or threw. Without this, a mid-loop failure
+       * (or any row whose INSERT returned no id) would leak budget. */
+      const unfired = rows.length - scanned;
+      if (unfired > 0) {
+        await releaseScanReservation(unfired);
+      }
     }
-
-    await incrementScanUsage(scanned);
 
     await recordChange({
       entityType: "contact",
@@ -177,7 +186,10 @@ export async function scanCompetitorsAction(input: {
     revalidatePath(`/admin/contacts/${input.contactId}`);
     return {
       ok: true,
-      data: { scanned, remaining: (gate.remaining ?? 0) - scanned },
+      data: {
+        scanned,
+        remaining: (reservation.remaining ?? 0) + (rows.length - scanned),
+      },
     };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Failed" };
