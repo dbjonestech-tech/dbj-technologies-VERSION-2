@@ -146,18 +146,48 @@ export async function GET(request: Request): Promise<Response> {
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  let upstream: Response;
-  try {
-    upstream = await fetch(target.toString(), {
+  const scannedSiteRef = report.resolvedUrl ?? report.url;
+  /* Capture the validated URL into a local const so the type is
+   * narrowed inside the fetchOnce closure (TS does not propagate the
+   * earlier null-guard into the closure body). */
+  const targetUrl = target.toString();
+
+  /* Some CDNs (Webflow's website-files.com is the case that drove this)
+   * happily serve images to a same-site Referer but reject anything else,
+   * while OTHER CDNs apply the inverse rule and reject when Referer is
+   * present. We try Referer-set first because hotlink-protected images
+   * are the more common case among small-business sites Pathlight
+   * scans, then fall back to no-Referer if the first attempt returns a
+   * 4xx. The status-code gate keeps us from retrying server-error
+   * responses, which would only burn time. */
+  async function fetchOnce(includeReferer: boolean): Promise<Response> {
+    const headers: Record<string, string> = {
+      "user-agent": REALISTIC_UA,
+      accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*;q=0.8",
+      "accept-language": "en-US,en;q=0.9",
+    };
+    if (includeReferer) headers.referer = scannedSiteRef;
+    return fetch(targetUrl, {
       method: "GET",
       redirect: "follow",
       signal: controller.signal,
-      headers: {
-        "user-agent": REALISTIC_UA,
-        accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*;q=0.8",
-        referer: report.resolvedUrl ?? report.url,
-      },
+      headers,
     });
+  }
+
+  let upstream: Response;
+  let attemptDescription = "with-referer";
+  try {
+    upstream = await fetchOnce(true);
+    if (!upstream.ok && upstream.status >= 400 && upstream.status < 500) {
+      attemptDescription = "fallback-no-referer";
+      try {
+        upstream = await fetchOnce(false);
+      } catch (retryErr) {
+        void retryErr;
+        /* Keep the original 4xx response if the fallback throws. */
+      }
+    }
   } catch (err) {
     void err;
     clearTimeout(timer);
@@ -166,11 +196,25 @@ export async function GET(request: Request): Promise<Response> {
   clearTimeout(timer);
 
   if (!upstream.ok) {
-    return placeholderResponse("upstream-status", 502);
+    return placeholderResponse(
+      `upstream-status-${upstream.status}-${attemptDescription}`,
+      502,
+    );
   }
   const ct = (upstream.headers.get("content-type") ?? "").toLowerCase();
-  if (ct && !ct.startsWith("image/")) {
-    return placeholderResponse("non-image-content-type", 502);
+  /* Reject only when the upstream is clearly serving NON-image bytes
+   * (HTML error page, JSON, etc.). Empty content-type and odd values
+   * like application/octet-stream are passed through; the browser
+   * sniffs the bytes from the `<img>` tag, and rejecting them here
+   * would cause false-positive proxy failures on CDNs that omit the
+   * header entirely. */
+  if (
+    ct.startsWith("text/html") ||
+    ct.startsWith("text/plain") ||
+    ct.startsWith("application/json") ||
+    ct.startsWith("application/xml")
+  ) {
+    return placeholderResponse(`non-image-content-type-${ct}`, 502);
   }
   const declaredLen = parseInt(
     upstream.headers.get("content-length") ?? "",
@@ -216,7 +260,7 @@ export async function GET(request: Request): Promise<Response> {
        * different ?scanId= so cache keying naturally segments them. */
       "Cache-Control":
         "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800",
-      "X-Pathlight-Proxy": "ok",
+      "X-Pathlight-Proxy": `ok:${attemptDescription}`,
     },
   });
 }

@@ -44,18 +44,26 @@ export interface CaptureCaveatInput {
 }
 
 /**
- * Probe whether the og:image URL is reachable from a non-browser
- * fetch. We use a HEAD request with the same realistic UA the report
- * page proxy uses; if the resource returns a non-2xx status, a
- * non-image content-type, or fails entirely, it is unlikely to
- * render reliably in social feeds either, and the report should
- * surface that as a finding the prospect can act on.
+ * Probe whether the og:image URL is reachable using the same fetch
+ * behavior the runtime proxy at /api/og-image-proxy will use. The
+ * probe and the proxy MUST agree: anything the probe sees succeed
+ * has to render in the OG card, anything the probe sees fail has to
+ * fail in the card too. If they disagree the user reads a caveat
+ * that contradicts what they see on the page.
  *
- * Returns true when the image is verifiably reachable, false when it
- * failed in a definite way, null when the probe itself was
- * inconclusive (network blip, timeout, transient 5xx). Inconclusive
- * outcomes do NOT fire a caveat: we never want a transient probe
- * failure to defame the prospect's site.
+ * Implementation: GET with Range bytes=0-1023 instead of HEAD. Many
+ * CDNs (Webflow's website-files.com, some Cloudflare configs)
+ * reject HEAD with a 4xx even when they happily serve a normal GET.
+ * Range keeps the payload tiny so this never reads more than ~1KB.
+ *
+ * Three-state return:
+ *   true:  verifiably reachable (proxy will succeed)
+ *   false: definitively gone (404/410, or text/html error page).
+ *          This is the only path that fires the caveat.
+ *   null:  inconclusive (5xx, network error, timeout, 4xx other
+ *          than 404/410). Do NOT fire the caveat: we don't want
+ *          transient or ambiguous probe results to defame the
+ *          prospect's site.
  */
 export async function probeOgImageReachable(
   imageUrl: string,
@@ -68,35 +76,8 @@ export async function probeOgImageReachable(
     OG_IMAGE_FETCH_TIMEOUT_MS,
   );
   try {
-    const res = await fetch(imageUrl, {
-      method: "HEAD",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        "user-agent": OG_IMAGE_FETCH_USER_AGENT,
-        accept: "image/*",
-        referer: scannedSiteUrl,
-      },
-    });
-    if (res.status >= 500) return null;
-    if (res.status === 405 || res.status === 501) {
-      /* Some CDNs reject HEAD; fall through to a GET probe with no body
-       * read. We still set Range to keep the bytes minimal. */
-      const getRes = await fetch(imageUrl, {
-        method: "GET",
-        redirect: "follow",
-        signal: controller.signal,
-        headers: {
-          "user-agent": OG_IMAGE_FETCH_USER_AGENT,
-          accept: "image/*",
-          referer: scannedSiteUrl,
-          range: "bytes=0-0",
-        },
-      });
-      if (getRes.status >= 500) return null;
-      return checkImageResponse(getRes);
-    }
-    return checkImageResponse(res);
+    const res = await fetchOgImagePeek(imageUrl, scannedSiteUrl, controller);
+    return classifyProbeResponse(res);
   } catch (err) {
     /* AbortError + network errors are inconclusive. */
     void err;
@@ -106,13 +87,50 @@ export async function probeOgImageReachable(
   }
 }
 
-function checkImageResponse(res: Response): boolean {
-  if (!res.ok && res.status !== 206) return false;
+async function fetchOgImagePeek(
+  imageUrl: string,
+  scannedSiteUrl: string,
+  controller: AbortController,
+): Promise<Response> {
+  return fetch(imageUrl, {
+    method: "GET",
+    redirect: "follow",
+    signal: controller.signal,
+    headers: {
+      "user-agent": OG_IMAGE_FETCH_USER_AGENT,
+      accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*;q=0.8",
+      "accept-language": "en-US,en;q=0.9",
+      referer: scannedSiteUrl,
+      range: "bytes=0-1023",
+    },
+  });
+}
+
+function classifyProbeResponse(res: Response): boolean | null {
   const ct = (res.headers.get("content-type") ?? "").toLowerCase();
-  /* Empty content-type is permissive: many image CDNs omit it on HEAD.
-   * Only fail when content-type is set AND clearly non-image. */
-  if (ct && !ct.startsWith("image/")) return false;
-  return true;
+
+  /* 200 / 206 (partial) / 304: image is reachable. Empty CT and
+   * image/* both pass; text/html on a 200 is the rare "CDN returned
+   * an error page with a 200 status" case and counts as definitively
+   * not-an-image. */
+  if (res.status === 200 || res.status === 206 || res.status === 304) {
+    if (ct.startsWith("text/html")) return false;
+    return true;
+  }
+
+  /* 416 (range not satisfiable) is rare but means the resource is
+   * served and our Range header was the issue, not the URL. Treat
+   * as inconclusive so we do not fire the caveat. */
+  if (res.status === 416) return null;
+
+  /* Definitively gone. Fire the caveat. */
+  if (res.status === 404 || res.status === 410) return false;
+
+  /* Everything else (401, 403, 405, 429, 5xx, other 4xx) is
+   * inconclusive. The proxy may still succeed for other reasons
+   * (different IP, retry without Referer), and we never want to
+   * fire a caveat against an ambiguous signal. */
+  return null;
 }
 
 function isLikelyHttpUrl(value: string): boolean {
