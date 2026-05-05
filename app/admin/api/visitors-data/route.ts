@@ -5,7 +5,7 @@ import {
 } from "@/lib/services/analytics";
 
 /* Dashboard payload for the redesigned /admin/visitors page. Auth is
- * enforced by middleware.ts (admin session required for /admin/*).
+ * enforced by proxy.ts (admin session required for /admin/*).
  * The route accepts either a preset range (range=7d|14d|30d|90d) or
  * an absolute window (from=YYYY-MM-DD&to=YYYY-MM-DD). Dates are
  * normalized server-side; invalid input falls back to 30d. */

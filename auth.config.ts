@@ -6,7 +6,7 @@ import { resolveAccess } from "@/lib/auth/access";
 
 /* Edge-safe Auth.js config. Imported by both `auth.ts` (full app
  * runtime, used by route handlers + server components) and
- * `middleware.ts` (Edge runtime). Splitting the config keeps Node-only
+ * `proxy.ts` (Edge runtime). Splitting the config keeps Node-only
  * code paths (Web Crypto is fine, but Resend SDK + node:crypto are
  * not) out of the middleware bundle.
  *

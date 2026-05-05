@@ -10,7 +10,7 @@ import {
  * MAX_CONNECTION_MS so the function does not run indefinitely; the
  * client reconnects automatically.
  *
- * Auth: gated by middleware.ts (admin session required). The route
+ * Auth: gated by proxy.ts (admin session required). The route
  * itself adds no further check.
  */
 

@@ -109,7 +109,7 @@ export default async function RootLayout({
      download window, before any styles are computed. Without it, the
      UA paints its default light canvas in that gap regardless of what
      inline styles say.
-     Path is read via middleware.ts which forwards `x-pathname` on the
+     Path is read via proxy.ts which forwards `x-pathname` on the
      request. Non-home routes get no inline style and behave as before. */
   const pathname = (await headers()).get("x-pathname") ?? "";
   const isHome = pathname === "/";

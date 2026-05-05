@@ -3,11 +3,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import authConfig from "./auth.config";
 
-/* Edge-runtime middleware. Uses a slim NextAuth instance built from
- * the shared auth.config so this file never bundles Node-only modules
- * (Resend, node:crypto via the events hooks in auth.ts). The JWT
- * cookie format is identical between this instance and the full one,
- * so session decoding here Just Works.
+/* Edge-runtime proxy (Next 16 convention; previously called middleware).
+ * Uses a slim NextAuth instance built from the shared auth.config so
+ * this file never bundles Node-only modules (Resend, node:crypto via
+ * the events hooks in auth.ts). The JWT cookie format is identical
+ * between this instance and the full one, so session decoding here
+ * Just Works.
  *
  * Three responsibilities, executed in order on every matched request:
  *

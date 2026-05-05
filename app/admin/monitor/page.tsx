@@ -59,7 +59,7 @@ function scoreClass(n: number | null): string {
 }
 
 export default async function AdminMonitor() {
-  /* Auth is enforced by middleware.ts + the admin layout (defense in
+  /* Auth is enforced by proxy.ts + the admin layout (defense in
    * depth, both require a valid admin session). */
 
   const [

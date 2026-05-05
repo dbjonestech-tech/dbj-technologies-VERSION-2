@@ -3,7 +3,7 @@ import { getLiveVisitors } from "@/lib/services/analytics";
 /* Live presence SSE for /admin/visitors.
  *
  * Pushes the "who is online in the last 5 minutes" snapshot every
- * 10 seconds. Auth is enforced by middleware.ts (admin session
+ * 10 seconds. Auth is enforced by proxy.ts (admin session
  * required). Connection capped at MAX_CONNECTION_MS so the function
  * does not run indefinitely; EventSource on the client auto-reconnects.
  */

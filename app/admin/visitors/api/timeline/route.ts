@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getVisitorTimeline } from "@/lib/services/analytics";
 
 /* Per-visitor timeline endpoint for the /admin/visitors expandable
- * row UI. Auth is enforced by middleware.ts (admin session required).
+ * row UI. Auth is enforced by proxy.ts (admin session required).
  * Visitor id is validated as a UUID inside getVisitorTimeline so any
  * non-conforming input returns an empty array without touching SQL. */
 
