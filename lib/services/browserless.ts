@@ -6,6 +6,14 @@ export type Viewport = { width: number; height: number };
 export type { FormDescriptor };
 
 const DEFAULT_BROWSERLESS_BASE = "https://production-sfo.browserless.io";
+/* Browserless v2 endpoint prefix selecting the Chrome (proprietary codec)
+ * binary instead of the open-source Chromium build. Without this prefix
+ * captures route to Chromium, which ships without H.264 / AAC and fails to
+ * play MP4 hero videos that work fine in real Chrome. Confirmed by
+ * Browserless support: "Switch to Chrome when accessing streaming platforms
+ * or targeting sites that explicitly require proprietary codecs." The path
+ * prefix is universal across regions. */
+const BROWSERLESS_BINARY_PATH = "/chrome";
 const SCREENSHOT_TIMEOUT_MS = 55_000;
 const SCREENSHOT_RETRY_DELAY_MS = 3_000;
 const PDF_TIMEOUT_MS = 60_000;
@@ -601,7 +609,7 @@ async function captureScreenshotAttempt(
 
   try {
     const res = await fetch(
-      `${base}/function?token=${encodeURIComponent(token)}`,
+      `${base}${BROWSERLESS_BINARY_PATH}/function?token=${encodeURIComponent(token)}`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -726,7 +734,7 @@ async function captureFullPageAttempt(
 
   try {
     const res = await fetch(
-      `${base}/function?token=${encodeURIComponent(token)}`,
+      `${base}${BROWSERLESS_BINARY_PATH}/function?token=${encodeURIComponent(token)}`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -871,7 +879,7 @@ export async function generatePdf(
 
   try {
     const res = await fetch(
-      `${base}/pdf?token=${encodeURIComponent(token)}`,
+      `${base}${BROWSERLESS_BINARY_PATH}/pdf?token=${encodeURIComponent(token)}`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
