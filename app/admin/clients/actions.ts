@@ -35,6 +35,34 @@ import { uploadClientFile } from "@/lib/portal/blob";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/* Extension allowlist for client deliverable uploads. Defense-in-depth
+ * with the download proxy at /portal/files/[id]/download which already
+ * forces Content-Disposition: attachment. The allowlist exists so an
+ * accidental future weakening of the proxy disposition (or any code
+ * that reads the blob URL directly and serves it inline) does not
+ * open a stored-XSS path via .html / .svg / .js uploads. SVG is
+ * deliberately excluded because it can carry inline JS even when the
+ * content-type is image/svg+xml; admins who need to ship vector assets
+ * should export to PDF or PNG. */
+const UPLOAD_EXTENSION_ALLOWLIST = new Set<string>([
+  "pdf",
+  "png", "jpg", "jpeg", "webp", "gif", "avif",
+  "zip",
+  "txt", "csv", "md",
+  "doc", "docx", "xls", "xlsx", "ppt", "pptx",
+  "key", "pages", "numbers",
+  "mp4", "mov", "webm",
+  "ai", "eps", "psd",
+  "sketch", "fig",
+]);
+
+function uploadExtensionAllowed(filename: string): boolean {
+  const idx = filename.lastIndexOf(".");
+  if (idx < 0 || idx === filename.length - 1) return false;
+  const ext = filename.slice(idx + 1).toLowerCase();
+  return UPLOAD_EXTENSION_ALLOWLIST.has(ext);
+}
+
 async function requireAdminEmail(): Promise<string> {
   const session = await auth();
   const email = session?.user?.email?.toLowerCase().trim();
@@ -335,6 +363,13 @@ export async function uploadFileAction(formData: FormData): Promise<void> {
   if (!(file instanceof File)) {
     flashRedirect(`/admin/clients/${encodeURIComponent(clientEmail)}`, {
       error: "Invalid upload payload.",
+    });
+  }
+
+  if (!uploadExtensionAllowed(file.name)) {
+    flashRedirect(`/admin/clients/${encodeURIComponent(clientEmail)}`, {
+      error:
+        "File type is not allowed for client uploads. Use PDF, images (PNG / JPG / WebP / AVIF), Office docs, archives, or design files.",
     });
   }
 
