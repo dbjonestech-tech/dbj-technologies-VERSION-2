@@ -1,37 +1,45 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Accordion } from "@/components/ui/Accordion";
-import { ProcessTimeline, type ProcessStep } from "@/components/sections/ProcessTimeline";
-import { EngagementScope } from "@/components/sections/EngagementScope";
 import { Sources } from "@/components/sections/Sources";
 import { PullQuote } from "@/components/sections/PullQuote";
 import { StatCallout } from "@/components/sections/StatCallout";
+import { RegulatoryCallout, type RegulatoryKind } from "@/components/sections/RegulatoryCallout";
 import { accentMap } from "@/lib/page-system/accent-map";
-import type {
-  PageConfig,
-  SourceEntry,
-} from "@/lib/page-system/types";
+import type { PageConfig, SourceEntry } from "@/lib/page-system/types";
 
-export interface ServiceHero {
+export interface IndustryHero {
   eyebrow: string;
   title: string;
   highlight?: string;
   lede: string;
+  image?: { src: string; alt: string };
+  caption?: string;
 }
 
-export interface ServiceSection {
+export interface IndustryRegulatory {
+  kind: RegulatoryKind;
+  title: string;
+  body: string;
+  source?: { name: string; url?: string };
+}
+
+export interface IndustrySection {
   id: string;
   number: string;
   label: string;
   heading: string;
   body: ReactNode;
+  callouts?: IndustryRegulatory[];
   break?:
     | { kind: "rule" }
     | { kind: "gradient-rule" }
+    | { kind: "image"; src: string; alt: string; caption?: string }
     | {
         kind: "quote";
         quote: string;
@@ -45,19 +53,14 @@ export interface ServiceSection {
       };
 }
 
-export interface ServiceProcess {
+export interface IndustryProof {
+  eyebrow: string;
   heading: string;
-  lede?: string;
-  steps: ProcessStep[];
+  body: ReactNode;
+  link?: { label: string; href: string };
 }
 
-export interface ServiceScope {
-  timeline: { label: string; value: string };
-  pricing: { label: string; value: string; note?: string };
-  deliverables: string[];
-}
-
-export interface ServiceCTA {
+export interface IndustryCTA {
   eyebrow: string;
   heading: string;
   body: string;
@@ -65,14 +68,13 @@ export interface ServiceCTA {
   secondary?: { label: string; href: string };
 }
 
-export interface ServiceDeepDiveLayoutProps {
+export interface IndustryVerticalLayoutProps {
   config: PageConfig;
-  hero: ServiceHero;
-  sections: ServiceSection[];
-  process: ServiceProcess;
-  scope: ServiceScope;
+  hero: IndustryHero;
+  sections: IndustrySection[];
+  proof: IndustryProof;
   faq: { question: string; answer: string }[];
-  cta: ServiceCTA;
+  cta: IndustryCTA;
   sources: SourceEntry[];
 }
 
@@ -85,7 +87,7 @@ function SectionBreak({
   variant,
   accent,
 }: {
-  variant: ServiceSection["break"];
+  variant: IndustrySection["break"];
   accent: PageConfig["accent"];
 }) {
   if (!variant) return null;
@@ -97,6 +99,7 @@ function SectionBreak({
         <span
           className="font-mono text-[10px] uppercase tracking-[0.32em]"
           style={{ color: a.hex }}
+          aria-hidden="true"
         >
           §
         </span>
@@ -112,6 +115,29 @@ function SectionBreak({
           background: `linear-gradient(90deg, transparent, ${a.hex}55, transparent)`,
         }}
       />
+    );
+  }
+  if (variant.kind === "image") {
+    return (
+      <figure className="my-16 lg:my-20 -mx-6 lg:mx-0">
+        <div
+          className="relative aspect-[16/9] overflow-hidden rounded-none lg:rounded-2xl"
+          style={{ border: `1px solid ${a.hex}20` }}
+        >
+          <Image
+            src={variant.src}
+            alt={variant.alt}
+            fill
+            sizes="(min-width: 1024px) 800px, 100vw"
+            className="object-cover"
+          />
+        </div>
+        {variant.caption && (
+          <figcaption className="mt-3 px-6 lg:px-0 font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
+            {variant.caption}
+          </figcaption>
+        )}
+      </figure>
     );
   }
   if (variant.kind === "quote") {
@@ -138,56 +164,80 @@ function SectionBreak({
   );
 }
 
-export function ServiceDeepDiveLayout({
+export function IndustryVerticalLayout({
   config,
   hero,
   sections,
-  process,
-  scope,
+  proof,
   faq,
   cta,
   sources,
-}: ServiceDeepDiveLayoutProps) {
+}: IndustryVerticalLayoutProps) {
   const reduce = useReducedMotion();
   const a = accentMap[config.accent];
+  const hasHeroImage = !!hero.image;
 
   return (
     <main className="relative">
       {/* Hero */}
-      <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24">
+      <section className="relative pt-32 pb-12 lg:pt-40 lg:pb-16">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-12">
           <Link
-            href="/services"
+            href="/work"
             className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted hover:text-text-primary transition-colors mb-8"
           >
             <ArrowLeft className="h-3 w-3" aria-hidden="true" />
-            Services
+            Industries
           </Link>
           <motion.div
             initial={reduce ? false : "hidden"}
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="max-w-3xl"
+            className={hasHeroImage ? "grid gap-10 lg:grid-cols-12 lg:gap-12 items-center" : "max-w-3xl"}
           >
-            <p
-              className="font-mono text-[10px] uppercase tracking-[0.32em] mb-5"
-              style={{ color: a.hex }}
-            >
-              {hero.eyebrow}
-            </p>
-            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-[1.05] tracking-tight text-text-primary">
-              {hero.title}
-              {hero.highlight && (
-                <>
-                  {" "}
-                  <span style={{ color: a.hex }}>{hero.highlight}</span>
-                </>
-              )}
-            </h1>
-            <p className="mt-6 lg:mt-8 text-lg lg:text-xl leading-relaxed text-text-secondary">
-              {hero.lede}
-            </p>
+            <div className={hasHeroImage ? "lg:col-span-6" : ""}>
+              <p
+                className="font-mono text-[10px] uppercase tracking-[0.32em] mb-5"
+                style={{ color: a.hex }}
+              >
+                {hero.eyebrow}
+              </p>
+              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-[1.05] tracking-tight text-text-primary">
+                {hero.title}
+                {hero.highlight && (
+                  <>
+                    {" "}
+                    <span style={{ color: a.hex }}>{hero.highlight}</span>
+                  </>
+                )}
+              </h1>
+              <p className="mt-6 lg:mt-8 text-lg lg:text-xl leading-relaxed text-text-secondary">
+                {hero.lede}
+              </p>
+            </div>
+            {hero.image && (
+              <figure className="lg:col-span-6">
+                <div
+                  className="relative aspect-[4/3] lg:aspect-[5/4] overflow-hidden rounded-2xl"
+                  style={{ border: `1px solid ${a.hex}26` }}
+                >
+                  <Image
+                    src={hero.image.src}
+                    alt={hero.image.alt}
+                    fill
+                    sizes="(min-width: 1024px) 600px, 100vw"
+                    priority
+                    className="object-cover"
+                  />
+                </div>
+                {hero.caption && (
+                  <figcaption className="mt-3 font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
+                    {hero.caption}
+                  </figcaption>
+                )}
+              </figure>
+            )}
           </motion.div>
         </div>
       </section>
@@ -196,7 +246,7 @@ export function ServiceDeepDiveLayout({
       <section className="relative pb-20 lg:pb-28">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-12">
           <div className="grid gap-12 lg:grid-cols-12">
-            <article className="lg:col-span-8 lg:col-start-2">
+            <article className="lg:col-span-8 lg:col-start-3">
               {sections.map((s, idx) => (
                 <div key={s.id} id={s.id}>
                   <motion.div
@@ -221,6 +271,20 @@ export function ServiceDeepDiveLayout({
                       {s.heading}
                     </h2>
                     <div className="editorial-prose">{s.body}</div>
+                    {s.callouts && s.callouts.length > 0 && (
+                      <div className="mt-8 space-y-4">
+                        {s.callouts.map((c) => (
+                          <RegulatoryCallout
+                            key={c.title}
+                            kind={c.kind}
+                            title={c.title}
+                            body={c.body}
+                            source={c.source}
+                            accent={config.accent}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </motion.div>
                   {idx < sections.length - 1 && (
                     <SectionBreak variant={s.break} accent={config.accent} />
@@ -228,7 +292,7 @@ export function ServiceDeepDiveLayout({
                 </div>
               ))}
 
-              {/* Process timeline */}
+              {/* Proof block */}
               <motion.div
                 initial={reduce ? false : "hidden"}
                 whileInView="show"
@@ -245,49 +309,23 @@ export function ServiceDeepDiveLayout({
                     {String(sections.length + 1).padStart(2, "0")}
                   </span>
                   <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
-                    Process
+                    {proof.eyebrow}
                   </span>
                 </div>
-                <h2 className="font-display text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight text-text-primary mb-4">
-                  {process.heading}
+                <h2 className="font-display text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight text-text-primary mb-6 lg:mb-8">
+                  {proof.heading}
                 </h2>
-                {process.lede && (
-                  <p className="text-lg leading-relaxed text-text-secondary mb-10 lg:mb-12 max-w-2xl">
-                    {process.lede}
-                  </p>
-                )}
-                <ProcessTimeline steps={process.steps} accent={config.accent} />
-              </motion.div>
-
-              {/* Engagement scope */}
-              <motion.div
-                initial={reduce ? false : "hidden"}
-                whileInView="show"
-                viewport={{ once: true, margin: "-80px" }}
-                variants={fadeUp}
-                transition={{ duration: 0.55, ease: "easeOut" }}
-                className="mt-16 lg:mt-20"
-              >
-                <div className="flex items-baseline gap-4 mb-4">
-                  <span
-                    className="font-mono text-[10px] uppercase tracking-[0.32em]"
+                <div className="editorial-prose">{proof.body}</div>
+                {proof.link && (
+                  <Link
+                    href={proof.link.href}
+                    className="mt-6 inline-flex items-center gap-2 font-semibold text-sm transition-transform hover:translate-x-0.5"
                     style={{ color: a.hex }}
                   >
-                    {String(sections.length + 2).padStart(2, "0")}
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
-                    Scope
-                  </span>
-                </div>
-                <h2 className="font-display text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight text-text-primary mb-6">
-                  Timeline, deliverables, and pricing
-                </h2>
-                <EngagementScope
-                  accent={config.accent}
-                  timeline={scope.timeline}
-                  pricing={scope.pricing}
-                  deliverables={scope.deliverables}
-                />
+                    {proof.link.label}
+                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Link>
+                )}
               </motion.div>
 
               {/* FAQ */}
@@ -306,7 +344,7 @@ export function ServiceDeepDiveLayout({
                   Common questions
                 </p>
                 <h2 className="font-display text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight text-text-primary mb-6">
-                  What buyers usually ask before signing
+                  What buyers ask before signing
                 </h2>
                 <Accordion
                   items={faq.map((f) => ({

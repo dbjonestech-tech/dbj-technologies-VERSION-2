@@ -6,18 +6,164 @@ Live snapshot of what the next session needs. Older sessions live under
 which covers the May 3 Inngest-cron + Pathlight reliability arc and the
 May 4 Canopy showcase swap.
 
-## Current state (May 5, 2026, early)
+## Current state (May 5, 2026, mid)
 
 `git log -1` is authoritative for the actual HEAD; this handoff was
-written on top of `b3ca460` (`feat(page-system): service deep-dive
-archetype + Next.js development page`). Pushed to origin/main. Four
-of the five planned archetypes are now live: Editorial, Reference
-Dense, Local Lander, and Service Deep-Dive. Four pillar / validation
-pages live in main: `/resources/core-web-vitals-explained`,
+written on top of the Phase 5 commit landed in this session (the
+fifth and final planned archetype + Auto Service industry page).
+Pushed to origin/main. **All five planned archetypes are now live:**
+Editorial, Reference Dense, Local Lander, Service Deep-Dive, and
+Industry Vertical. Five pillar / validation pages live in main:
+`/resources/core-web-vitals-explained`,
 `/resources/agency-vs-studio-vs-freelancer`,
-`/dallas-web-design`, and `/services/nextjs-development`.
-Previous handoff anchor commits: `d7f2de1` (Phases 1+2),
-`2696989` (Phase 3).
+`/dallas-web-design`, `/services/nextjs-development`,
+and `/industries/auto-service`. Previous handoff anchor commits:
+`d7f2de1` (Phases 1+2), `2696989` (Phase 3), `b3ca460` (Phase 4).
+Joshua's parallel Canopy track shipped at `5437174` between Phase 4
+and Phase 5; that scaffold is unrelated to the page-system arc.
+
+### Industry Vertical archetype + Auto Service page (May 5, mid, phase 5)
+
+After Phase 4, Joshua said "Continue with the fifth archetype." Phase 5
+brings the fifth and final planned archetype online and ships
+`/industries/auto-service` as the validation slice. After Phase 5,
+the page-system architecture is complete: every remaining page in
+the 65-page plan is content-only work, not architecture work.
+
+**One new section primitive** under `components/sections/`:
+
+- `RegulatoryCallout.tsx` (server). Takes a `kind`
+  (legal / medical / accessibility / privacy / trust), a title, a
+  body, and an optional source citation. Used inline within Industry
+  sections to surface compliance, accessibility, or trust framing
+  without breaking the prose flow. The validation page uses two
+  callouts: WCAG 2.2 accessibility framing in the design-principles
+  section, and a "do not fake what you can prove" trust callout in
+  the trust section.
+
+**New: `components/templates/IndustryVerticalLayout.tsx`** (client).
+The fifth archetype, distinct from the four already live:
+
+- Photo hero by default (split-grid with the validation page using a
+  real screenshot of the Star Auto production site as the hero
+  image). No other archetype uses a photo hero, which gives the
+  Industry pages immediate visual identity.
+- Per-section break vocabulary expanded to include `image` (full-bleed
+  image break with optional caption). Validation page uses one
+  full-bleed image break mid-page reinforcing the Star Auto proof.
+- Inline `RegulatoryCallout` slots inside any section so vertical-
+  specific compliance framing stays attached to the surrounding
+  argument rather than floating as an aside.
+- A dedicated "proof" block after the main sections, rendered as
+  numbered section, with an optional link to the full case study at
+  `/work/[slug]`.
+- Same FAQ + accent-anchored CTA + Sources + Author block tail as
+  every other archetype.
+
+**Updated: `lib/page-system/registry.ts`**. Added the
+auto-service entry. Tokens chosen to maximize visual difference
+from the four prior live pages: blue accent (matches Dallas, but
+totally different archetype with photo hero), photo hero, rule
+breaks plus one image break, clean texture, full-color image
+treatment.
+
+**New page route:** `app/(marketing)/industries/auto-service/`:
+
+- `page.tsx` (server). Reads from registry for `generateMetadata`,
+  returns the client content. No collision with `/work/[slug]` or
+  any other dynamic segment; `/industries` is a brand-new top-level
+  segment.
+- `AutoServiceContent.tsx` (client, ~340 lines). ~1,950 words across
+  4 narrative sections (buyer reality, common failure patterns,
+  design principles that convert, trust signals) plus the proof
+  block centered on Star Auto Service. 7 buyer FAQs (rebuild vs
+  redesign, custom vs templated, local pack ranking, bilingual
+  content, cost, shop management integration, post-launch
+  maintenance). CTA points to /contact as primary and /pathlight as
+  secondary, framed honestly as "first call is diagnostic" plus
+  "free Pathlight scan for a fast first read."
+
+**Walking-the-talk anchor:** the proof block leans hard on Star Auto
+Service in Richardson (Miguel Ibarra, twenty-eight years on Belt
+Line Road, ASE-Certified, NAPA Auto Care, bilingual, 4.8 across
+136+ Google reviews, live at thestarautoservice.com). Hero image
+is the actual production site screenshot. This is the strongest
+walking-the-talk anchor available in the entire 65-page plan,
+which is why auto-service was the right validation page for this
+archetype.
+
+**6 verified citations:**
+1. Pew Research Center: Mobile Fact Sheet (97% cellphone, 91%
+   smartphone ownership)
+2. U.S. Bureau of Labor Statistics: Occupational Outlook Handbook,
+   Automotive Service Technicians and Mechanics
+3. ASE: National Institute for Automotive Service Excellence
+4. NAPA Auto Care Center program
+5. Google Search Central: local search ranking systems
+6. W3C: WCAG 2.2 (target size and accessibility floor)
+
+**New research notes file:** `docs/ai/research/local-cluster-sources.md`.
+Captures the verified primary-source URLs for the 18 city pages in
+the planned local cluster, drawn from a Gemini deep-research pass
+that surfaced real EDC, Chamber, BLS, and Census endpoints. The
+file lists per-city sources, a verification protocol, and an
+explicit list of what was discarded from the Gemini output (SEO
+marketing blogs, vendor-bias TCO tables, unverifiable specific
+percentages, em-dashed prose). Saves a research pass per city when
+the local cluster build begins.
+
+**Brand and accuracy gates passed (phase 5):**
+- `npx tsc --noEmit` clean for all Phase 5 files. (Project-wide tsc
+  surfaces 4 unrelated errors in `lib/services/url.ts`, which is
+  Joshua's parallel Pathlight work in flight, NOT staged in this
+  commit.)
+- `npm run lint` clean.
+- Zero em or en dashes in any Phase 5 file. Caught and fixed two
+  pre-existing en dashes in author blocks of
+  `IndustryVerticalLayout.tsx` and the prior-shipped
+  `ServiceDeepDiveLayout.tsx` ("Dallas–Fort Worth" → "Dallas-Fort
+  Worth metro") during the triple-check pass.
+- Caught and fixed four em dashes that crept into the
+  `local-cluster-sources.md` research notes file before commit.
+- Banned-phrase scan clean.
+- First-person voice throughout. Caught and fixed one collaborative-
+  "we" instance in the FAQ ("we confirm" → "I confirm") during the
+  triple-check pass.
+- Pathlight described by outcomes only.
+- Honest "skip" framing applied: page recommends a templated path
+  for shops firmly under $25K budget instead of pushing custom
+  Next.js as universally correct.
+- Star Auto facts cross-checked against `lib/work-data.ts` (Miguel
+  Ibarra, Richardson, ASE-Certified, NAPA Auto Care Center,
+  bilingual, twenty-eight years on Belt Line Road, 4.8 stars across
+  136+ Google reviews, live at thestarautoservice.com). All facts
+  match the canonical work-data file; no fabrication.
+
+**Cumulative state after Phase 5:**
+
+- **5 archetypes live**: Editorial, Reference, Local Lander, Service,
+  Industry.
+- **5 validation pages live** (one per archetype).
+- **9 section primitives total**: StatCallout, PullQuote, SidebarTOC,
+  Sources, ComparisonTable, DecisionCriteria, ProcessTimeline,
+  EngagementScope, RegulatoryCallout.
+- **65-page architecture work is COMPLETE.** The remaining 60 pages
+  are pure content + registry-entry work. Every remaining page maps
+  to one of the five archetypes and its tokens are a registry
+  decision, not an architecture decision.
+
+**Suggested next session:** browser-verify all five validation pages
+side-by-side at the live Vercel deploy to confirm the visual
+variation reads cleanly across the full archetype set. If the
+variation passes, the next phase is content batch work, prioritized
+roughly:
+1. The remaining 5 service deep-dives and 3 industry pages (pure
+   content; tokens decided in registry).
+2. The local-SEO hub page (`/resources/local-seo-for-dallas-service-businesses`)
+   to anchor the local cluster before any city pages ship.
+3. The 18 city pages, each with at least 350 words of city-unique
+   substance to clear the doorway-page protection.
+4. The remaining decision and educational pages.
 
 ### Canopy work-page Phase 2 scaffold (May 5, parallel track at `5437174`)
 
