@@ -51,6 +51,7 @@ import {
   captureScreenshot,
 } from "../services/browserless";
 import {
+  detectHeroVideo,
   extractPageTextContent,
   researchIndustryBenchmark,
   runRemediationPlan,
@@ -298,6 +299,13 @@ export const scanRequested = inngest.createFunction(
             const pageText = extractPageTextContent(ctx.lighthouseData);
             const businessName = await lookupBusinessName(scanId);
             const siteUrl = ctx.resolvedUrl ?? ctx.url;
+            /* Detect autoplay <video> in the captured hero region. Used by
+             * runVisionAudit to score photography_quality / hero_impact
+             * fairly when the video plays for real visitors but did not
+             * render in this headless capture (codec, CDN UA, autoplay
+             * policy). Read straight from screenshots.html (already in
+             * memory from s2) rather than re-querying html_snapshot. */
+            const heroHasVideo = detectHeroVideo(screenshots.html);
             const result = await runVisionAudit(
               screenshots.desktop,
               screenshots.mobile,
@@ -308,6 +316,7 @@ export const scanRequested = inngest.createFunction(
               siteUrl,
               businessName,
               ctx.lighthouseData,
+              heroHasVideo,
               scanId
             );
             await updateScanAiAnalysis(scanId, result);

@@ -973,6 +973,25 @@ function summarizePageText(content: PageTextContent): string {
   return lines.join("\n");
 }
 
+/* Detects whether the captured page HTML contains an autoplay <video>
+ * element. The signal is passed to runVisionAudit so the model can score
+ * photography_quality and hero_impact correctly even when the video
+ * itself failed to render in headless capture (Wix CDN block, codec
+ * mismatch, autoplay policy, etc.). The site shows the video to real
+ * visitors; our screenshot just missed it.
+ *
+ * Searches the full captured HTML. Wix and Showit serialize the actual
+ * <video> tag deep into their layout markup (verified: wingertrealestate.com
+ * has its <video autoplay> at byte 166796), so a head-only scan misses it.
+ * False-positive risk from below-the-fold testimonial videos is acceptable
+ * because the prompt only acts on this signal when the hero area in the
+ * screenshot ALSO appears dark or empty, and the model's primary judgment
+ * still comes from the visible design. */
+export function detectHeroVideo(html: string | null | undefined): boolean {
+  if (!html) return false;
+  return /<video\b[^>]*\bautoplay\b/i.test(html);
+}
+
 export async function runVisionAudit(
   desktopScreenshot: string | null,
   mobileScreenshot: string | null,
@@ -983,6 +1002,7 @@ export async function runVisionAudit(
   url: string,
   businessName: string | null,
   lighthouseData: unknown,
+  heroHasVideo: boolean,
   scanId: string | null = null
 ): Promise<VisionAuditResult> {
   /* At least one viewport is required; the inngest a1 gate enforces this
@@ -1055,6 +1075,12 @@ export async function runVisionAudit(
       `Speed Index: ${performanceScores.si}ms`,
       ``,
       renderLighthouseDetails(lighthouseDetails),
+      ``,
+      `STRUCTURAL SIGNAL FROM CAPTURED PAGE HTML`,
+      `heroHasVideo: ${heroHasVideo}`,
+      heroHasVideo
+        ? `The captured HTML confirms an autoplay <video> element in the hero region. Real visitors see this video playing. The screenshot you are reading may show a dark or empty area where the video sits because headless capture cannot always reproduce the video CDN's serving behavior, codec licensing, or autoplay policy. When you see a hero card on a dark/empty background AND heroHasVideo is true, score design.photography_quality and design.hero_impact based on the visible design quality (typography, brand consistency, layout, copy clarity, color discipline) -- not on the absence of imagery in this specific capture. Real visitors do see imagery here.`
+        : `No autoplay <video> element detected in the hero region. If the screenshot shows a dark or empty hero, that absence is real and may be a genuine design issue worth flagging.`,
       ``,
       `EXTRACTED PAGE TEXT`,
       summarizePageText(pageTextContent),

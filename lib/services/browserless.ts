@@ -14,6 +14,15 @@ const DEFAULT_BROWSERLESS_BASE = "https://production-sfo.browserless.io";
  * or targeting sites that explicitly require proprietary codecs." The path
  * prefix is universal across regions. */
 const BROWSERLESS_BINARY_PATH = "/chrome";
+/* Query params attached to every Browserless request:
+ *   token:   API auth (per-request, not in this constant)
+ *   stealth: bundles puppeteer-extra-plugin-stealth + UA / fingerprint /
+ *            navigator.webdriver / runtime randomization. Required because
+ *            video CDNs (Wix's video.wixstatic.com, others) sniff for headless
+ *            tells beyond just User-Agent and refuse to serve the byte stream.
+ *            Realistic UA alone (set inside the function) was not enough; this
+ *            adds the deeper signals. */
+const BROWSERLESS_STEALTH_PARAM = "stealth=true";
 const SCREENSHOT_TIMEOUT_MS = 55_000;
 const SCREENSHOT_RETRY_DELAY_MS = 3_000;
 const PDF_TIMEOUT_MS = 60_000;
@@ -630,7 +639,7 @@ async function captureScreenshotAttempt(
 
   try {
     const res = await fetch(
-      `${base}${BROWSERLESS_BINARY_PATH}/function?token=${encodeURIComponent(token)}`,
+      `${base}${BROWSERLESS_BINARY_PATH}/function?token=${encodeURIComponent(token)}&${BROWSERLESS_STEALTH_PARAM}`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -755,7 +764,7 @@ async function captureFullPageAttempt(
 
   try {
     const res = await fetch(
-      `${base}${BROWSERLESS_BINARY_PATH}/function?token=${encodeURIComponent(token)}`,
+      `${base}${BROWSERLESS_BINARY_PATH}/function?token=${encodeURIComponent(token)}&${BROWSERLESS_STEALTH_PARAM}`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -900,7 +909,7 @@ export async function generatePdf(
 
   try {
     const res = await fetch(
-      `${base}${BROWSERLESS_BINARY_PATH}/pdf?token=${encodeURIComponent(token)}`,
+      `${base}${BROWSERLESS_BINARY_PATH}/pdf?token=${encodeURIComponent(token)}&${BROWSERLESS_STEALTH_PARAM}`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
