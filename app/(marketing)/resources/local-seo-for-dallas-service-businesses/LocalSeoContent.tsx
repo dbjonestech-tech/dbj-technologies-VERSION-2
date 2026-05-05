@@ -134,7 +134,15 @@ const sections: EditorialSection[] = [
           are accurate. Add additional categories for every service
           line you actually deliver, but never categories you do not.
           Misleading categorization triggers Google&apos;s spam filter
-          and gets the listing demoted or suspended.
+          and gets the listing demoted or suspended. The vertical-specific
+          take on how this plays out in one industry is on the{" "}
+          <Link
+            href="/industries/auto-service"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            auto service page
+          </Link>
+          .
         </p>
         <p>
           Write the business description in the customer&apos;s
@@ -323,8 +331,16 @@ const sections: EditorialSection[] = [
         <p>
           On this site I publish a hub page about local SEO (this
           one) and a small set of city pages for the specific markets
-          I have a real connection to. I am based in Royse City and
-          brand as Dallas, which is the standard Texas pattern for a
+          I have a real connection to. The first one is{" "}
+          <Link
+            href="/dallas-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Dallas Web Design
+          </Link>
+          , and more come over time, each with substance unique
+          to the city it covers. I am based in Royse City and brand
+          as Dallas, which is the standard Texas pattern for a
           service business whose registered address is in an exurb
           but whose customer base is metro-wide. The honest framing
           is the differentiator. Hiding the real address would be

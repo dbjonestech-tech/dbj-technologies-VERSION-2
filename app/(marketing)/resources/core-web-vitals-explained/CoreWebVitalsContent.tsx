@@ -395,7 +395,7 @@ const faq = [
   {
     question: "Do Core Web Vitals matter for service businesses or just e-commerce?",
     answer:
-      "They matter for any business with organic search traffic. Google's mobile-first indexing means your mobile experience is what gets ranked, and Core Web Vitals are how Google quantifies that experience. For service businesses competing on local search, the bar is the same as for e-commerce.",
+      "They matter for any business with organic search traffic. Google's mobile-first indexing means your mobile experience is what gets ranked, and Core Web Vitals are how Google quantifies that experience. For service businesses competing on local search, the bar is the same as for e-commerce. The Resources section has the longer playbook on what actually moves the local pack in DFW, and Core Web Vitals is one of the inputs.",
   },
   {
     question: "Can a WordPress site hit good Core Web Vitals?",

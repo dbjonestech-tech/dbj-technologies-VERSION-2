@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ReferenceLayout } from "@/components/templates/ReferenceLayout";
 import type {
   ReferenceCTA,
@@ -381,6 +382,18 @@ const sections: ReferenceSection[] = [
           launches but does not stand up under real traffic, real edge cases,
           and real maintenance. The lowest hourly rate is not the lowest total
           cost when the lifetime of the site is two years instead of seven.
+        </p>
+        <p>
+          For the technical specifics of what I actually build at studio
+          rates, the{" "}
+          <Link
+            href="/services/nextjs-development"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Next.js development page
+          </Link>{" "}
+          covers when the stack is the right call, the engagement model,
+          and what the deliverables look like.
         </p>
       </>
     ),

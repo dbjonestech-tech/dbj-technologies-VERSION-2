@@ -99,12 +99,27 @@ const sections: LocalLanderSection[] = [
           >
             Star Auto Service in Richardson
           </Link>
-          . It is a full custom build on Next.js, in production, used by an
-          active automotive repair business in the eastern DFW corridor.
+          . It is a full custom build on{" "}
+          <Link
+            href="/services/nextjs-development"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Next.js
+          </Link>
+          , in production, used by an active automotive repair business in
+          the eastern DFW corridor.
           The site scores at the top of the Lighthouse range, passes Core
           Web Vitals at the 75th percentile, and serves both the
           customer-facing booking flow and the internal operations
-          dashboard.
+          dashboard. The longer-form discussion of how I build for that
+          vertical specifically lives on the{" "}
+          <Link
+            href="/industries/auto-service"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            auto service industry page
+          </Link>
+          .
         </p>
         <p>
           Beyond Star Auto, my published{" "}
@@ -183,6 +198,19 @@ const sections: LocalLanderSection[] = [
           work, with occasional in-person scoping when it helps. Travel
           inside DFW is included; I do not bill it separately.
         </p>
+        <p>
+          The longer-form playbook on what actually moves the local
+          pack and the standard organic results in DFW lives at{" "}
+          <Link
+            href="/resources/local-seo-for-dallas-service-businesses"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Local SEO for Dallas Service Businesses
+          </Link>
+          . That page is the hub the city pages link up to, and it is
+          the right starting point if you are still figuring out what
+          local SEO is actually buying you.
+        </p>
       </>
     ),
   },
@@ -202,7 +230,7 @@ const faq = [
   {
     question: "Do you handle local SEO for Dallas businesses?",
     answer:
-      "Yes. Every site I ship includes proper local schema (LocalBusiness, Service, FAQPage), Google Business Profile alignment, and on-page elements that the local search algorithm rewards. I also ship Pathlight scans free for any prospect, which surfaces specific local SEO gaps.",
+      "Yes. Every site I ship includes proper local schema (LocalBusiness, Service, FAQPage), Google Business Profile alignment, and on-page elements that the local search algorithm rewards. I also ship Pathlight scans free for any prospect, which surfaces specific local SEO gaps. The Resources section of the site has the longer reference on what actually moves DFW local rankings.",
   },
   {
     question: "What does the engagement timeline look like?",

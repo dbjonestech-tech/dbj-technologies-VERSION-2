@@ -84,6 +84,8 @@ export const FOOTER_NAV_LINKS = [
   { label: "Pathlight", href: "/pathlight" },
   { label: "Process", href: "/process" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Resources", href: "/resources" },
+  { label: "Dallas Web Design", href: "/dallas-web-design" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ] as const;

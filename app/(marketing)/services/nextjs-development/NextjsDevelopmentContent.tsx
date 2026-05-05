@@ -58,7 +58,15 @@ const sections: ServiceSection[] = [
           , the website intelligence product I built, runs on the same
           framework. The two systems share a codebase, a deployment pipeline,
           and a Postgres database. That is the level I work at, and it is the
-          level of system I am proposing when you hire me.
+          level of system I am proposing when you hire me. For a worked example
+          in a specific vertical, the{" "}
+          <Link
+            href="/industries/auto-service"
+            className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+          >
+            auto service industry page
+          </Link>{" "}
+          covers the Star Auto Service rebuild in production detail.
         </p>
       </>
     ),

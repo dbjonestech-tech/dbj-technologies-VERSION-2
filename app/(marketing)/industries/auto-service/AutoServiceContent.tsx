@@ -156,7 +156,16 @@ const sections: IndustrySection[] = [
           mechanic in McKinney&quot; are not weak headlines. They are the
           exact phrases the customer typed into Google and they are the
           phrases Google will reward. Decorative headlines that sound like
-          a luxury watch ad are the wrong choice for this vertical.
+          a luxury watch ad are the wrong choice for this vertical. The
+          longer reference on how Google actually scores local intent for
+          DFW service businesses is{" "}
+          <Link
+            href="/resources/local-seo-for-dallas-service-businesses"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Local SEO for Dallas Service Businesses
+          </Link>
+          .
         </p>
         <p>
           Fourth, services are listed as the customer thinks about them, not
@@ -255,7 +264,14 @@ const proof: IndustryProof = {
         not exist.
       </p>
       <p>
-        I rebuilt the site from scratch on Next.js 16. Mobile-first hero
+        I rebuilt the site from scratch on{" "}
+        <Link
+          href="/services/nextjs-development"
+          className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+        >
+          Next.js 16
+        </Link>
+        . Mobile-first hero
         with the location, the phone number, and the actual services
         listed in customer language. ASE and NAPA badges with live links
         to the issuing bodies. The current Google rating surfaced from
@@ -308,7 +324,7 @@ const faq: { question: string; answer: string }[] = [
   {
     question: "Will the site rank in the Google local pack?",
     answer:
-      "Ranking in the local pack is mostly a function of your Google Business Profile health, your review velocity, your citations across the web, and the relevance of your site content to the search query. The site itself is not the only factor, but it is a meaningful one. I build with proper LocalBusiness schema, fast mobile performance, and customer-language service pages because those are the inputs Google uses to interpret your shop.",
+      "Ranking in the local pack is mostly a function of your Google Business Profile health, your review velocity, your citations across the web, and the relevance of your site content to the search query. The site itself is not the only factor, but it is a meaningful one. I build with proper LocalBusiness schema, fast mobile performance, and customer-language service pages because those are the inputs Google uses to interpret your shop. The longer reference on what actually moves DFW local rankings is the local SEO hub in the Resources section.",
   },
   {
     question: "Do you handle bilingual content?",
