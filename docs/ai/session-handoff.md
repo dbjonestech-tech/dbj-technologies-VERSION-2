@@ -285,33 +285,51 @@ roughly:
    substance to clear the doorway-page protection.
 4. The remaining decision and educational pages.
 
-### Canopy work-page Phase 2 scaffold (May 5, parallel track at `5437174`)
+### Canopy work-page Phase 2 complete (May 5, parallel track at `5437174` + `f4787cc`)
 
 Three-layer Canopy work-page funnel: Layer 1 case study (shipped),
-Layer 2 in-page architectural toggle (this scaffold), Layer 3 dedicated
-deep-dive pages at `/work/canopy/[slug]` (queued, requires extended
-draft-in-chat per page).
+Layer 2 in-page architectural toggle (now content-complete), Layer 3
+dedicated deep-dive pages at `/work/canopy/[slug]` (queued, requires
+extended draft-in-chat per page and is not delegable as a single
+implementation prompt).
 
-Phase 2 scaffold ships at `5437174` (`feat(canopy): Phase 2 scaffold for
-Layer 2 deep-dive toggles, no content yet`). Adds `deepDive?: string`
-and `deepDivePageSlug?: string` to `ProjectSection`, builds
-`components/work/CanopyDeepDive.tsx` (framer-motion AnimatePresence
-height-auto, `useReducedMotion` gating, `useId`-keyed
-`aria-expanded`/`aria-controls`, ChevronDown 180-degree rotate, accent
-hex via prop, `print:hidden` on the screen panel + `print:block`
-sibling rendering the body unconditionally so PDFs read complete), and
-wires it conditionally between section image and live link in
-`ProjectDetailLayout.tsx`. No `deepDive` content populated, so
-`/work/canopy` renders identically to today; the next pass fills the
-six bodies after they are drafted in chat against architectural
-anchors.
+Phase 2 split into two commits to keep the surface decisions
+reviewable independently of the copy decisions:
 
-Next on this track: drop the six architectural anchors (one or two
-sentences each per Analytics & Performance, Pipeline & Relationships,
-Automation, Operations & Health, Pathlight Integration, Architecture &
-Ownership), draft the six ~250-word bodies in chat, ship as a content-
-only commit. Phase 3 (the six dedicated `/work/canopy/[slug]` pages,
-12-18k words total) is a multi-session arc per page and is not delegable
+- `5437174` (scaffold). Adds `deepDive?: string` and
+  `deepDivePageSlug?: string` to `ProjectSection`, builds
+  `components/work/CanopyDeepDive.tsx` (framer-motion AnimatePresence
+  height-auto, `useReducedMotion` gating, `useId`-keyed
+  `aria-expanded`/`aria-controls`, ChevronDown 180-degree rotate,
+  accent hex via prop, `print:hidden` on the screen panel +
+  `print:block` sibling rendering the body unconditionally so PDFs
+  read complete), wires it conditionally between section image and
+  live link in `ProjectDetailLayout.tsx`. Inert until content lands.
+- `f4787cc` (content). Populates `deepDive` on the six substantive
+  Canopy sections (Analytics & Performance, Pipeline & Relationships,
+  Automation, Operations & Health, Pathlight Integration,
+  Architecture & Ownership) at ~250 words each. Sections 1, 2, 9
+  stay narrative-only by design. Each body follows the rhythm
+  question-that-drove-the-design / considered-and-rejected /
+  load-bearing-mechanism / operational-consequence. Voice is
+  first-person to match the existing Canopy chrome; zero em dashes;
+  zero forbidden enumerations from canopy.md (verified against
+  three independent regex categories: lead-score signal names as a
+  deliberate list, internal-identifier leakage including
+  audit_log/canopy_settings/pathlight-gate column names and function
+  signatures, model and Inngest function and step IDs).
+
+The Pathlight body deliberately surfaces the three-gate guardrail
+(per-install capability toggle, manual-or-rules-bounded triggers,
+monthly budget cap with atomic check-and-reserve) because canopy.md
+explicitly carves the EXISTENCE of the guardrails out as public-OK
+and a sales feature. The Architecture & Ownership body echoes the
+Layer 1 "if I get hit by a bus" close as a deliberate refrain.
+
+Next on this track: Phase 3 is the six dedicated
+`/work/canopy/[slug]` pages (12-18k words total), one page per
+session, draft-in-chat-then-implement per page, six rounds. Joshua
+called this not delegable
 to a single implementation prompt.
 
 ### Service Deep-Dive archetype + Next.js Development page (May 5, early — phase 4)
