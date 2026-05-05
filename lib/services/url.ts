@@ -1,5 +1,6 @@
 import { promises as dns } from "node:dns";
 import net from "node:net";
+import { Agent } from "undici";
 
 export type UrlValidationResult = {
   valid: boolean;
@@ -118,6 +119,50 @@ async function hostnameResolvesPublic(hostname: string): Promise<boolean> {
   }
 }
 
+/* DNS-rebinding defense. Resolve the hostname ONCE, return the IP we
+ * intend to connect to. The downstream fetch then uses this exact IP
+ * via a pinned undici Agent so a second DNS lookup at connect time
+ * cannot return a different (potentially private) address.
+ *
+ * Returns null if the hostname is localhost, an IP literal that is
+ * private, or resolves to anything private. The lookup is rejected if
+ * ANY returned record is private (matches the
+ * `records.every((r) => !isPrivateIp(r.address))` posture used by
+ * hostnameResolvesPublic so we never connect to a host that round-
+ * robins between public and private IPs). */
+async function resolveToPublicIp(hostname: string): Promise<string | null> {
+  const lower = hostname.toLowerCase();
+  if (lower === "localhost" || lower === "localhost.localdomain") return null;
+  if (net.isIP(hostname)) {
+    return isPrivateIp(hostname) ? null : hostname;
+  }
+  try {
+    const records = await dns.lookup(hostname, { all: true });
+    if (records.length === 0) return null;
+    if (records.some((r) => isPrivateIp(r.address))) return null;
+    return records[0]!.address;
+  } catch {
+    return null;
+  }
+}
+
+/* Build an undici Agent whose connect step always uses the supplied
+ * IP regardless of what the URL hostname resolves to at connect time.
+ * The Host header and TLS SNI continue to use the URL hostname so
+ * HTTPS certificates validate normally; only the destination IP is
+ * pinned. Caller is responsible for closing the agent (await
+ * agent.close()) when the request finishes. */
+function pinnedAgent(pinnedIp: string): Agent {
+  const family: 4 | 6 = net.isIPv6(pinnedIp) ? 6 : 4;
+  return new Agent({
+    connect: {
+      lookup: (_hostname, _options, callback) => {
+        callback(null, pinnedIp, family);
+      },
+    },
+  });
+}
+
 export async function validateUrl(normalized: string): Promise<UrlValidationResult> {
   let parsed: URL;
   try {
@@ -130,7 +175,15 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
     return { valid: false, error: "URL uses an unsupported protocol." };
   }
 
-  if (!(await hostnameResolvesPublic(parsed.hostname))) {
+  /* Pin the IP we resolved here for the actual fetch below. Without
+   * this, fetch does its own DNS lookup at connect time and an
+   * attacker controlling DNS (short TTL, multi-IP rotation) can
+   * return a public IP for the validation lookup and 169.254.169.254
+   * (or another private address) for the connect lookup. The pinned
+   * agent below uses this exact IP regardless of what the URL
+   * hostname resolves to at connect time. */
+  const initialIp = await resolveToPublicIp(parsed.hostname);
+  if (!initialIp) {
     return { valid: false, error: "URL points to a private network." };
   }
 
@@ -138,6 +191,8 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
   const timer = setTimeout(() => controller.abort(), 10_000);
 
   let current = parsed.toString();
+  let pinnedIp = initialIp;
+  let agent = pinnedAgent(pinnedIp);
   let hops = 0;
   const maxHops = 5;
 
@@ -150,6 +205,10 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
         headers: {
           "user-agent": "PathlightBot/1.0 (+https://dbjtechnologies.com)",
         },
+        // @ts-expect-error - dispatcher is undici-specific; supported by
+        // Node's built-in fetch but not in the standard fetch RequestInit
+        // type. Pinning the dispatcher per-hop closes DNS rebinding TOCTOU.
+        dispatcher: agent,
       }).catch(async (err) => {
         if ((err as Error).name === "AbortError") throw err;
         return fetch(current, {
@@ -160,6 +219,8 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
             "user-agent": "PathlightBot/1.0 (+https://dbjtechnologies.com)",
             range: "bytes=0-0",
           },
+          // @ts-expect-error - see HEAD branch above
+          dispatcher: agent,
         });
       });
 
@@ -170,9 +231,16 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
         if (!ALLOWED_PROTOCOLS.has(next.protocol)) {
           return { valid: false, error: "URL redirects to an unsupported protocol." };
         }
-        if (!(await hostnameResolvesPublic(next.hostname))) {
+        /* Re-pin for the next hop so a redirect target also resolves
+         * once and connects to that exact IP. Close the previous hop's
+         * agent before swapping; agents hold sockets. */
+        const nextIp = await resolveToPublicIp(next.hostname);
+        if (!nextIp) {
           return { valid: false, error: "URL redirects into a private network." };
         }
+        await agent.close();
+        pinnedIp = nextIp;
+        agent = pinnedAgent(pinnedIp);
         current = next.toString();
         hops += 1;
         continue;
@@ -202,5 +270,6 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
     return { valid: false, error: "URL is not reachable." };
   } finally {
     clearTimeout(timer);
+    await agent.close().catch(() => { /* swallow agent-close errors */ });
   }
 }
