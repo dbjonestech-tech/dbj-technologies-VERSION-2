@@ -153,6 +153,7 @@ export async function runPageCritique(params: {
   designScores: DesignScores | null;
   positioningScores: PositioningScores | null;
   performanceScores: PerformanceScores | null;
+  heroHasVideo: boolean;
 }): Promise<PageCritiqueResult> {
   const {
     scanId,
@@ -164,6 +165,7 @@ export async function runPageCritique(params: {
     designScores,
     positioningScores,
     performanceScores,
+    heroHasVideo,
   } = params;
 
   const desktop = stripDataUriPrefix(desktopScreenshot);
@@ -188,6 +190,12 @@ export async function runPageCritique(params: {
         `Business: ${businessName ?? "(not provided)"}`,
         `Industry: ${industry ?? "(not provided)"}`,
         `City: ${city ?? "(not provided)"}`,
+        ``,
+        `STRUCTURAL SIGNAL FROM CAPTURED PAGE HTML`,
+        `heroHasVideo: ${heroHasVideo}`,
+        heroHasVideo
+          ? `The captured HTML confirms an autoplay <video> element on the page. Real visitors see this video playing in the hero area. The screenshot you are reading may show a dark or empty area where the video sits because headless capture cannot always reproduce the video CDN's serving behavior, codec licensing, or autoplay policy. When you describe the hero in heroObservation, treat that dark/empty area as the intended background video, NOT as "empty space" or "unfinished layout" or a defect to flag. Do NOT generate observations like "the right half is empty" or "the layout feels unfinished" when the dark area is where a video plays for real visitors. Focus your hero observation on what IS visible (hero card content, headline, CTAs, brand mark) and on real composition issues, not on the absence of imagery in this specific capture.`
+          : `No autoplay <video> element detected. If the screenshot shows a dark or empty hero area, that absence is real and may be a genuine design issue worth flagging.`,
         ``,
         `EXISTING DESIGN SUB-SCORES (so you do not redundantly call out the same issues):`,
         summarizeDesignScores(designScores),

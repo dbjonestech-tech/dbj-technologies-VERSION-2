@@ -838,6 +838,13 @@ export const scanRequested = inngest.createFunction(
           if (!input || !input.desktopScreenshot) {
             return { ok: true, skipped: "no-input" };
           }
+          /* Same heroHasVideo signal we pass to runVisionAudit. The page
+           * critique generates the user-facing "Above the fold" copy; without
+           * this signal the model writes things like "the right half of the
+           * viewport is entirely empty" against sites whose video element
+           * just did not render in headless capture. Read straight from
+           * screenshots.html (already in memory from s2). */
+          const heroHasVideo = detectHeroVideo(screenshots.html);
           const critique = await runPageCritique({
             scanId,
             desktopScreenshot: input.desktopScreenshot,
@@ -848,6 +855,7 @@ export const scanRequested = inngest.createFunction(
             designScores: input.designScores,
             positioningScores: input.positioningScores,
             performanceScores: input.performanceScores,
+            heroHasVideo,
           });
           await updateScanPageCritique(scanId, critique);
           await track(
