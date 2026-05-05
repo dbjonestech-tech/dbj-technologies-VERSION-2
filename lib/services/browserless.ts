@@ -191,33 +191,73 @@ export default async function ({ page, context }) {
   //       diagnostic strings that no real visitor would ever see.
   try {
     await page.evaluate(() => {
+      // 1) Best-effort video unstuck. Some sites use preload="none", which
+      //    means the browser does not start downloading the video until
+      //    .play() is called. We muted-play every <video> after calling
+      //    .load() so the autoplay policy is satisfied and the first frame
+      //    has a chance to render.
       const videos = Array.from(document.querySelectorAll('video'));
       for (const v of videos) {
         try {
           v.muted = true;
+          v.removeAttribute('controls');
+          if (typeof v.load === 'function') { try { v.load(); } catch (_e) {} }
           const p = v.play();
           if (p && typeof p.catch === 'function') p.catch(() => {});
         } catch (_e) { /* keep trying others */ }
       }
 
-      // NOTE: Backslashes are doubled here on purpose. This whole function
-      // body is the inside of a JS template literal in browserless.ts; the
-      // template literal interprets \\b as backspace and drops \\/ to '/',
-      // which would prematurely terminate a regex literal and break the
-      // function with "Unexpected token ']'" at Browserless runtime.
-      // Character classes [(]/[)] avoid the same issue for literal parens.
-      const ERROR_RE = /(format[(]s[)] not supported|source[(]s[)] not found|your browser does not support)/i;
-      const MEDIA_URL_RE = /^[\\w.-]+\\.[a-z]{2,}\\/[\\w/-]+\\.(mp4|webm|mov|m4v|ogv)\\b/i;
+      // 2) Persistent CSS injection. MediaElement.js (used by every Wix site
+      //    plus many others) renders an error fallback inside .mejs-cannotplay
+      //    that includes a "Download File: <url>" link when the underlying
+      //    video file cannot play. Headless capture commonly trips this even
+      //    on sites that work fine in a real browser, because:
+      //    - Wix's video CDN (video.wixstatic.com) sniffs for headless agents
+      //    - Browserless Chromium ships without proprietary H.264 codec
+      //    - Autoplay policy can block silent autoplay
+      //    Hiding .mejs-cannotplay via CSS injection (rather than runtime
+      //    DOM mutation) is durable: if MediaElement.js re-renders the error
+      //    UI later, the rule still applies. We also hide the broader set of
+      //    cannotplay-style classes some custom players use.
+      try {
+        const style = document.createElement('style');
+        style.setAttribute('data-pathlight-capture', 'video-error-suppress');
+        style.textContent =
+          '.mejs-cannotplay, .mejs-overlay-error, .mejs-overlay.mejs-layer, ' +
+          '[class*="cannotplay" i], [class*="video-error" i] { ' +
+          'display: none !important; visibility: hidden !important; opacity: 0 !important; }';
+        (document.head || document.documentElement).appendChild(style);
+      } catch (_e) { /* best-effort */ }
+
+      // 3) Defensive runtime DOM hide. Catches sites that surface an error
+      //    text or raw media URL through structures we did not anticipate
+      //    in (2). Anchored regexes are deliberately removed so the URL can
+      //    appear inside a longer text node ("Download File: https://...").
+      //    Backslashes are doubled because this function body is the inside
+      //    of a JS template literal: the literal interprets \\b as backspace
+      //    and drops \\/ to '/', which would otherwise break the regex
+      //    literal and produce a 400 at Browserless runtime.
+      const ERROR_RE = /(format[(]s[)] not supported|source[(]s[)] not found|your browser does not support|media error|cannot ?play)/i;
+      const MEDIA_URL_RE = /[\\w.-]+\\.[a-z]{2,}\\/[\\w./-]+\\.(mp4|webm|mov|m4v|ogv)\\b/i;
+      const DOWNLOAD_RE = /download file/i;
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       let node;
       while ((node = walker.nextNode())) {
         const text = (node.nodeValue || '').trim();
         if (!text) continue;
-        if (ERROR_RE.test(text) || MEDIA_URL_RE.test(text)) {
+        if (ERROR_RE.test(text) || MEDIA_URL_RE.test(text) || DOWNLOAD_RE.test(text)) {
           const el = node.parentElement;
           if (el) {
             el.style.display = 'none';
             el.style.visibility = 'hidden';
+            // Walk up one level too: many error fallbacks wrap the text in
+            // a <span> inside a <a> inside a container; hiding only the
+            // <span> leaves the <a>'s residual layout space.
+            const grandparent = el.parentElement;
+            if (grandparent && grandparent !== document.body) {
+              grandparent.style.display = 'none';
+              grandparent.style.visibility = 'hidden';
+            }
           }
         }
       }
@@ -405,23 +445,42 @@ export default async function ({ page, context }) {
       for (const v of videos) {
         try {
           v.muted = true;
+          v.removeAttribute('controls');
+          if (typeof v.load === 'function') { try { v.load(); } catch (_e) {} }
           const p = v.play();
           if (p && typeof p.catch === 'function') p.catch(() => {});
         } catch (_e) { /* keep trying others */ }
       }
-      // See AtF capture for the backslash-doubling rationale.
-      const ERROR_RE = /(format[(]s[)] not supported|source[(]s[)] not found|your browser does not support)/i;
-      const MEDIA_URL_RE = /^[\\w.-]+\\.[a-z]{2,}\\/[\\w/-]+\\.(mp4|webm|mov|m4v|ogv)\\b/i;
+      // CSS injection: hide MediaElement.js / Wix / generic video-error
+      // fallback containers durably across re-renders. See AtF capture
+      // for full rationale + backslash-doubling note.
+      try {
+        const style = document.createElement('style');
+        style.setAttribute('data-pathlight-capture', 'video-error-suppress');
+        style.textContent =
+          '.mejs-cannotplay, .mejs-overlay-error, .mejs-overlay.mejs-layer, ' +
+          '[class*="cannotplay" i], [class*="video-error" i] { ' +
+          'display: none !important; visibility: hidden !important; opacity: 0 !important; }';
+        (document.head || document.documentElement).appendChild(style);
+      } catch (_e) { /* best-effort */ }
+      const ERROR_RE = /(format[(]s[)] not supported|source[(]s[)] not found|your browser does not support|media error|cannot ?play)/i;
+      const MEDIA_URL_RE = /[\\w.-]+\\.[a-z]{2,}\\/[\\w./-]+\\.(mp4|webm|mov|m4v|ogv)\\b/i;
+      const DOWNLOAD_RE = /download file/i;
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       let node;
       while ((node = walker.nextNode())) {
         const text = (node.nodeValue || '').trim();
         if (!text) continue;
-        if (ERROR_RE.test(text) || MEDIA_URL_RE.test(text)) {
+        if (ERROR_RE.test(text) || MEDIA_URL_RE.test(text) || DOWNLOAD_RE.test(text)) {
           const el = node.parentElement;
           if (el) {
             el.style.display = 'none';
             el.style.visibility = 'hidden';
+            const grandparent = el.parentElement;
+            if (grandparent && grandparent !== document.body) {
+              grandparent.style.display = 'none';
+              grandparent.style.visibility = 'hidden';
+            }
           }
         }
       }
