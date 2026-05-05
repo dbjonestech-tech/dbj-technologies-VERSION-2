@@ -6,19 +6,122 @@ Live snapshot of what the next session needs. Older sessions live under
 which covers the May 3 Inngest-cron + Pathlight reliability arc and the
 May 4 Canopy showcase swap.
 
-## Current state (May 4, 2026, late evening)
+## Current state (May 5, 2026, early)
 
 `git log -1` is authoritative for the actual HEAD; this handoff was
-written on top of `2696989` (`feat(page-system): local-lander
-archetype + Dallas city page`). Working tree clean, pushed to
-origin/main.
-Three of the five planned archetypes are now live: Editorial,
-Reference Dense, and Local Lander. Three city / pillar pages live
-in main: `/resources/core-web-vitals-explained`,
-`/resources/agency-vs-studio-vs-freelancer`, and
-`/dallas-web-design`. The previous handoff anchor commit was
-`d7f2de1` (`feat(page-system): foundation + editorial/reference
-archetypes + first 2 resource pages`).
+written on top of the Phase 4 commit landed in this session (the
+fourth archetype + Next.js Development service deep-dive page).
+Working tree clean, pushed to origin/main. Four of the five planned
+archetypes are now live: Editorial, Reference Dense, Local Lander,
+and Service Deep-Dive. Four pillar / validation pages live in main:
+`/resources/core-web-vitals-explained`,
+`/resources/agency-vs-studio-vs-freelancer`,
+`/dallas-web-design`, and `/services/nextjs-development`.
+Previous handoff anchor commits: `d7f2de1` (Phases 1+2),
+`2696989` (Phase 3).
+
+### Service Deep-Dive archetype + Next.js Development page (May 5, early — phase 4)
+
+After Phase 3 landed, Joshua said "Continue with the fourth
+archetype." Phase 4 brings the fourth of five archetypes online and
+ships `/services/nextjs-development` as the validation slice.
+
+**Two new section primitives** under `components/sections/`:
+
+- `ProcessTimeline.tsx` (server). Numbered ordered list with a
+  vertical accent-rail, per-step duration eyebrow, and per-step
+  body copy. Used as the centerpiece of every Service Deep-Dive
+  page. Five steps on the validation page covering Discovery,
+  Architecture, Design, Implementation, Launch.
+- `EngagementScope.tsx` (server). Three-column scope card
+  (Timeline, Investment, Engagement) with a deliverables grid and
+  optional CTA pill. Becomes the conversion-focused element of
+  every Service Deep-Dive page. Pricing intentionally framed as
+  "Starting at $25,000" plus a per-engagement-quote note, matching
+  the Canopy positioning.
+
+**New: `components/templates/ServiceDeepDiveLayout.tsx`** (client).
+The fourth archetype, distinct from the existing
+`ServicePageLayout` (which stays in place for the data-driven
+catalog at `/services/[slug]`). Key visual signature:
+
+- Narrative hero with eyebrow + large display title + lede,
+  back-link to `/services` above. No oversized stat hero (that is
+  Editorial's), no compact eyebrow-only hero (that is
+  Reference's), no geo-typographic hero (that is Local Lander's).
+- Numbered section eyebrows ("01 / Definition", "02 / Fit", etc.)
+  that match the design-brief cadence the rest of the site uses.
+- Process timeline + Engagement scope render as their own
+  numbered sections, automatically continuing the section count
+  past the body sections.
+- Same FAQ + accent-anchored CTA + Sources + Author block tail as
+  the other archetypes.
+
+**Updated: `lib/page-system/registry.ts`**. Added the
+nextjs-development entry. Tokens chosen for distinctness from the
+other three live pages: cyan accent (different archetype than the
+cyan Core Web Vitals page so visual confusion is unlikely),
+typographic hero, gradient-rule breaks, clean texture, no images.
+
+**New page route:**
+`app/(marketing)/services/nextjs-development/`:
+
+- `page.tsx` (server). Reads from registry for `generateMetadata`,
+  returns the client content. Static segment takes precedence over
+  the existing `/services/[slug]` dynamic route at build time, so
+  this page does NOT collide with the data-driven service catalog.
+  Verified `nextjs-development` is not a slug in `lib/service-data.ts`.
+- `NextjsDevelopmentContent.tsx` (client, ~310 lines). ~1,800 words
+  across 4 narrative sections (definition, fit, why-this-stack,
+  tradeoffs) plus the Process and Scope sections. 7 buyer FAQs
+  (Next.js for SMB, vs WordPress, outgrowth, hosting, code
+  ownership, dependency updates, CMS later). CTA points to /contact
+  since this is engagement-intent. 6 verified sources:
+  1. Next.js documentation (App Router and Server Components)
+  2. Google Search Central blog: page experience update April 2021
+  3. web.dev/case-studies/vodafone: 31% LCP improvement, 8% sales,
+     15% lead rate increase
+  4. State of JS 2024 (Devographics): meta-frameworks results
+  5. HTTP Archive Web Almanac 2024 (Jamstack chapter)
+  6. Vercel platform documentation
+
+**Walking-the-talk anchor:** the page explicitly cites `package.json`
+shipping Next.js 16.2.4, references that this site itself runs on
+the stack, and cross-links to `/pathlight` and
+`/resources/agency-vs-studio-vs-freelancer` to tie the cluster
+together.
+
+**Brand and accuracy gates passed (phase 4):**
+- `npx tsc --noEmit` clean
+- `npm run lint` clean (no `<a>` tag violations this round; all
+  internal links use `<Link>` from the start)
+- Zero em dashes / en dashes (grep `$'\xe2\x80\x94\|\xe2\x80\x93'` empty)
+- Banned-phrase scan clean (no leverage / robust solution / etc.)
+- First-person voice throughout. Two collaborative-"we" instances
+  caught and rephrased to "you" or restructured before commit, per
+  the strict no-"we" rule.
+- Pathlight described by outcomes only ("website intelligence
+  product I built"); no model names, pipeline, scoring formulas, or
+  vertical-database internals exposed.
+- Honest "skip" framing applied: page explicitly recommends
+  Squarespace/Wix/Astro for the wrong-fit cases instead of
+  defending Next.js as universally correct.
+
+**Cumulative state:** four archetypes shipped, one remaining
+(Industry Vertical for the 4 industry pages). Foundation pages
+live in main:
+`/resources` (cluster index), `/resources/core-web-vitals-explained`,
+`/resources/agency-vs-studio-vs-freelancer`, `/dallas-web-design`,
+`/services/nextjs-development`.
+
+**Suggested next session:** browser-verify the Service Deep-Dive
+page at `/services/nextjs-development` against the existing
+`/services/[slug]` catalog pages to confirm visual differentiation
+reads as intentional rather than inconsistent. Then ship the fifth
+archetype (Industry Vertical) against `/industries/auto-service`
+since Star Auto is the strongest existing production proof point.
+After all five archetypes exist, the remaining 60 pages become a
+content build, not an architecture build.
 
 ### Local Lander archetype + Dallas city page (May 4, late evening — phase 3)
 
