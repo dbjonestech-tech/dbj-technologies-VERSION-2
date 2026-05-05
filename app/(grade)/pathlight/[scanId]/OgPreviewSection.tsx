@@ -123,7 +123,6 @@ function PreviewCard({
           className="relative w-full overflow-hidden"
           style={{ aspectRatio: "1.91 / 1", backgroundColor: "#0f172a" }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageUrl!}
             alt={imageAlt ?? headline}

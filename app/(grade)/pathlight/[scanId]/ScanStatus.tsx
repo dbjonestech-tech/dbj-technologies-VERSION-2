@@ -1183,7 +1183,6 @@ function FullPagePanel({
         className="mt-3 overflow-hidden rounded-xl"
         style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={`${label} capture`}
@@ -1224,7 +1223,6 @@ function ScreenshotPanel({
         className={`mt-3 ${aspect} overflow-hidden rounded-xl`}
         style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={`${label} screenshot`}

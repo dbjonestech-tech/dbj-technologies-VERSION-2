@@ -132,7 +132,6 @@ function DealCard({ deal }: { deal: DealRow }) {
             start(async () => {
               const result = await changeDealStageAction(deal.id, next);
               if (!result.ok) {
-                /* eslint-disable-next-line no-alert */
                 alert(result.error);
               }
             });
