@@ -9,9 +9,8 @@ May 4 Canopy showcase swap.
 ## Current state (May 5, 2026, mid)
 
 `git log -1` is authoritative for the actual HEAD; this handoff was
-written on top of the Phase 5 commit landed in this session (the
-fifth and final planned archetype + Auto Service industry page).
-Pushed to origin/main. **All five planned archetypes are now live:**
+written on top of `a70d3c6` (`feat(page-system): industry vertical
+archetype + auto service page`). Pushed to origin/main. **All five planned archetypes are now live:**
 Editorial, Reference Dense, Local Lander, Service Deep-Dive, and
 Industry Vertical. Five pillar / validation pages live in main:
 `/resources/core-web-vitals-explained`,
