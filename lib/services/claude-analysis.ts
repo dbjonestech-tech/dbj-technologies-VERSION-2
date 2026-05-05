@@ -79,6 +79,32 @@ function readStringField(item: LighthouseAuditDetailItem, key: string): string |
   return null;
 }
 
+/* Patterns that indicate a captured-by-headless-only artifact, not a real
+ * site defect. Lighthouse runs its own headless Chrome which trips the same
+ * MediaElement.js / Wix CDN failures we see in our screenshot capture, so
+ * its text-extraction audits (heading-order, link-text) end up carrying
+ * "Format(s) not supported", "Download File: <video URL>", and similar
+ * strings into pageTextContent. Without this filter the vision audit sees
+ * those strings even when our own screenshot is clean, and dutifully
+ * generates a "your hero video is broken" finding against a defect that
+ * does not exist on the live site.
+ *
+ * These patterns are intentionally specific. Genuine product copy that
+ * happens to mention "video" or "download" is left untouched. */
+const VIDEO_ARTIFACT_PATTERNS: ReadonlyArray<RegExp> = [
+  /format\(s\)\s+not\s+supported/i,
+  /source\(s\)\s+not\s+found/i,
+  /your\s+browser\s+does\s+not\s+support/i,
+  /\bmedia\s+error\b/i,
+  /\bcannot\s*play\b/i,
+  /\bdownload\s+file\b.*\.(mp4|webm|mov|m4v|ogv)\b/i,
+  /\.(mp4|webm|mov|m4v|ogv)(\?|$|\s)/i,
+];
+
+function isVideoArtifact(text: string): boolean {
+  return VIDEO_ARTIFACT_PATTERNS.some((p) => p.test(text));
+}
+
 export function extractPageTextContent(lighthouseData: unknown): PageTextContent {
   const empty: PageTextContent = {
     title: null,
@@ -112,7 +138,7 @@ export function extractPageTextContent(lighthouseData: unknown): PageTextContent
     const text = readStringField(item, "text") ?? readStringField(item, "headingText");
     if (text) {
       const clean = truncate(text);
-      if (clean) headings.push(clean);
+      if (clean && !isVideoArtifact(clean)) headings.push(clean);
       if (headings.length >= MAX_HEADINGS) break;
     }
   }
@@ -123,7 +149,7 @@ export function extractPageTextContent(lighthouseData: unknown): PageTextContent
     const text = readStringField(item, "text");
     if (text) {
       const clean = truncate(text);
-      if (clean) linkTexts.push(clean);
+      if (clean && !isVideoArtifact(clean)) linkTexts.push(clean);
       if (linkTexts.length >= MAX_LINK_TEXTS) break;
     }
   }
@@ -134,9 +160,18 @@ export function extractPageTextContent(lighthouseData: unknown): PageTextContent
     ? structuredAudit.details.items.slice(0, 5)
     : null;
 
+  /* Title and metaDescription are ALSO sanitized: a few site builders
+   * occasionally leak the broken-media fallback into the document title
+   * when their template's <title> binds to a JS-derived value. */
+  const titleClean =
+    typeof titleRaw === "string" ? truncate(titleRaw) : null;
+  const metaClean =
+    typeof metaRaw === "string" ? truncate(metaRaw, 280) : null;
+
   return {
-    title: typeof titleRaw === "string" ? truncate(titleRaw) : null,
-    metaDescription: typeof metaRaw === "string" ? truncate(metaRaw, 280) : null,
+    title: titleClean && !isVideoArtifact(titleClean) ? titleClean : null,
+    metaDescription:
+      metaClean && !isVideoArtifact(metaClean) ? metaClean : null,
     headings,
     linkTexts,
     structuredData,
