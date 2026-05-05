@@ -21,6 +21,20 @@ export interface ProjectSection {
   /** Optional alt text for the section image. Defaults to the heading
    * when omitted. */
   imageAlt?: string;
+  /** Optional. Architectural-narrative depth (~250 words) revealed via
+   * a "Read the architecture" toggle below the section image. Renders as
+   * paragraphs with whitespace-pre-line. Omit on narrative sections that
+   * have no corresponding architectural depth to expose. The toggle UI
+   * does not render at all when this is empty, so leaving the field
+   * unset on a section keeps the existing layout untouched. */
+  deepDive?: string;
+  /** Optional. When populated, the open deep-dive panel renders a
+   * "Read the full architecture of {heading} ->" link pointing at
+   * /work/canopy/{deepDivePageSlug}. Used to escalate from Layer 2
+   * (in-page toggle) to Layer 3 (dedicated 1.5k-3k word page) once the
+   * matching Phase 3 page exists. Leave unset on sections that do not
+   * yet have a Layer 3 page; the link only renders when set. */
+  deepDivePageSlug?: string;
 }
 
 export interface ProjectTechDetail {

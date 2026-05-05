@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ProjectDetail } from "@/lib/work-data";
+import { CanopyDeepDive } from "@/components/work/CanopyDeepDive";
 
 interface ProjectDetailLayoutProps {
   project: ProjectDetail;
@@ -428,6 +429,15 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
                     />
                   </div>
                 </motion.div>
+              ) : null}
+
+              {section.deepDive ? (
+                <CanopyDeepDive
+                  body={section.deepDive}
+                  accent={accent}
+                  sectionHeading={section.heading}
+                  pageSlug={section.deepDivePageSlug}
+                />
               ) : null}
 
               {section.liveHref ? (
