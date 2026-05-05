@@ -37,4 +37,22 @@ export const pageRegistry: Record<string, PageConfig> = {
     nextReviewDue: "2026-11-04",
     sourcesCount: 6,
   },
+  "/dallas-web-design": {
+    slug: "/dallas-web-design",
+    title: "Dallas Web Design Studio",
+    description:
+      "I build custom websites for Dallas service businesses as a solo principal architect. Engagements start at $25K. Full code ownership. Same person at pitch, build, and launch.",
+    archetype: "local-lander",
+    accent: "blue",
+    hero: "typographic",
+    sectionBreak: "rule",
+    texture: "clean",
+    density: "standard",
+    imageTreatment: "none",
+    cluster: "local-dallas",
+    pillar: "/dallas-web-design",
+    lastReviewed: "2026-05-04",
+    nextReviewDue: "2027-05-04",
+    sourcesCount: 4,
+  },
 };

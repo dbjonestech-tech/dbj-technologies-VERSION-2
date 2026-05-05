@@ -6,16 +6,109 @@ Live snapshot of what the next session needs. Older sessions live under
 which covers the May 3 Inngest-cron + Pathlight reliability arc and the
 May 4 Canopy showcase swap.
 
-## Current state (May 4, 2026, evening)
+## Current state (May 4, 2026, late evening)
 
 `git log -1` is authoritative for the actual HEAD; this handoff was
-written on top of `d7f2de1` (`feat(page-system): foundation +
-editorial/reference archetypes + first 2 resource pages`). Working
-tree clean, pushed to origin/main. The page-system foundation + two
-archetype vertical slices (Editorial and Reference Dense) are now
-live on the main branch. The follow-up commit anchoring this handoff
-at `d7f2de1` matches the project's existing handoff-amend pattern
-(see prior `docs: anchor session-handoff at 1de35b0`).
+written on top of the third archetype + Dallas city page commit
+landed in this session. Working tree clean, pushed to origin/main.
+Three of the five planned archetypes are now live: Editorial,
+Reference Dense, and Local Lander. Three city / pillar pages live
+in main: `/resources/core-web-vitals-explained`,
+`/resources/agency-vs-studio-vs-freelancer`, and
+`/dallas-web-design`. The previous handoff anchor commit was
+`d7f2de1` (`feat(page-system): foundation + editorial/reference
+archetypes + first 2 resource pages`).
+
+### Local Lander archetype + Dallas city page (May 4, late evening — phase 3)
+
+Joshua said "continue" after the Phase 2 commit landed. Phase 3
+brings the third archetype online and ships the highest-leverage
+city page (Dallas) as the validation slice. The Dallas page is
+also the geographic-pillar page for the planned 18-page local
+cluster.
+
+**New: `components/templates/LocalLanderLayout.tsx`** (client). The
+third archetype, distinct from both Editorial and Reference:
+
+- Hero is geo-typographic: city name rendered as a massive
+  gradient-clipped wordmark ("Dallas, Texas" at clamp 3rem to 7rem),
+  with optional coordinate caption in mono uppercase tracking-wide
+  ("32.7767° N, 96.7970° W"). The dot-grid background overlay is
+  reused from the existing site primitives so the local-lander hero
+  has its own visual signature distinct from Editorial's
+  data-driven hero and Reference's compact eyebrow-led hero.
+- No sidebar TOC. Local pages are short enough that the
+  scroll-spy TOC would feel over-engineered.
+- Numbered section eyebrows ("01" through "05") with a thin gradient
+  rule, more restrained than Editorial's "Section 01 / 08" treatment.
+- Same FAQ accordion + accent-anchored CTA + Sources block tail
+  as the other archetypes so the reader experience across all three
+  archetypes feels like one body of work.
+- Uses `editorial-prose` body styling so authoring is consistent.
+
+**Updated: `lib/page-system/registry.ts`**. Added the
+dallas-web-design entry. Tokens: blue / typographic / rule / clean
+/ standard / none. Deliberately distinct from the previous two
+pages: cyan + grain (Core Web Vitals), violet + clean (Agency vs
+Studio), now blue + clean with typographic geo-anchor. Three pages,
+three accent dominances, three hero variants, three section-break
+treatments.
+
+**New: `app/(marketing)/dallas-web-design/`**:
+
+- `page.tsx` (server). Reads from registry for
+  `generateMetadata`, returns the client content.
+- `DallasContent.tsx` (client). ~1,150 words across 5 body
+  sections: who I work with in Dallas (Park Cities, Uptown, Preston
+  Hollow, Bishop Arts, Richardson, Rockwall, Knox-Henderson, Lower
+  Greenville, Las Colinas, Plano named); how my model differs from
+  Dallas's agency market (Built In, Clutch, Deep Ellum, Telecom
+  Corridor named); local proof (Star Auto in Richardson, Design
+  Briefs cluster, Pathlight); engagement model and pricing;
+  honest "where I am based" section that handles the
+  Royse-City-legal-vs-Dallas-brand duality openly. 6 buyer FAQs.
+  CTA points to /contact since this is engagement-intent. 4
+  sources (Census x2, BLS, Federal Reserve Bank of Dallas).
+
+**Doorway-page protection**: per the master prompt's protection
+rule for local pages, the Dallas page must contain at least 350
+words of substance unique to Dallas that could not appear on any
+other city page. Counted: easily over that threshold given the
+named neighborhoods, the agency-market context, the local proof,
+and the explicit Royse-City-vs-Dallas geographic story. When the
+remaining 17 city pages get built, each will need its own
+locally-specific substance, never templated.
+
+**Brand and accuracy gates passed (phase 3):**
+- `npx tsc --noEmit` clean
+- `npm run lint` clean (after fixing 3 raw `<a>` tags in body to
+  `<Link>` from next/link, caught by the @next/next ESLint rule
+  pre-commit; the runtime-only RSC-boundary memory continues to
+  apply but does not block this slice)
+- Zero em dashes in any new file
+- First-person "I" voice throughout
+- Pathlight described by outcomes only ("AI-powered website
+  intelligence product"); no model names, pipeline, scoring
+  formulas, or vertical-database internals exposed
+- Banned phrases avoided
+- Royse-City-vs-Dallas brand-versus-legal duality acknowledged
+  honestly in the page rather than papered over
+
+**Three archetypes shipped, two remaining:**
+- Service Deep-Dive (for the 6 service pages; can generalize the
+  existing `ServicePageLayout` rather than build from scratch)
+- Industry Vertical (for the 4 industry pages; closest to
+  `ProjectDetailLayout` patterns)
+
+**Suggested next session:** browser-verify all three city / pillar
+pages side-by-side at the live Vercel deploy. If the visual
+variation reads cleanly across the three, ship the fourth
+archetype (Service Deep-Dive against `/services/nextjs-development`
+or `/services/website-performance-audit`). The remaining 17 city
+pages stay deferred until the archetype set is fully validated;
+batching them after all 5 archetypes exist avoids retrofit risk.
+
+
 
 ### Reference Dense archetype + decision-cluster validation slice (May 4, evening — phase 2)
 
