@@ -55,6 +55,21 @@ const chatScanRatelimit = new Ratelimit({
   analytics: false,
 });
 
+/* OG image proxy throttle. /api/og-image-proxy fetches third-party
+   images on the report page (Wix-style hotlink-protected images that
+   would otherwise fail to render in our preview card). Every proxy
+   response sets a 24h public Cache-Control so the same image is only
+   refetched after expiry; this limit is the per-IP floor to keep
+   abuse traffic from racking up egress, since the request itself
+   touches an external host with our server's bandwidth. 200/24h
+   absorbs legitimate browse/refresh/multi-device patterns. */
+const proxyImageRatelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(200, "24 h"),
+  prefix: "pathlight:rl:proxy-image",
+  analytics: false,
+});
+
 /* Sign-in throttle. Auth.js retries are user-driven (click button -> OAuth
    round-trip), so 10/min/IP is generous for legitimate use while throttling
    credential-stuffing or replay attempts. Keyed on IP because OAuth doesn't
@@ -89,6 +104,25 @@ export async function chatLimiter(ip: string): Promise<LimitResult> {
 export async function chatScanLimiter(scanId: string): Promise<LimitResult> {
   const { success, remaining } = await chatScanRatelimit.limit(scanId);
   return { success, remaining };
+}
+
+export async function proxyImageLimiter(ip: string): Promise<LimitResult> {
+  /* Fail-open if Upstash env is missing (local dev). The endpoint
+     still validates scanId + URL against og_preview, so the rate
+     limiter is defense-in-depth rather than the primary gate. */
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    return { success: true, remaining: -1 };
+  }
+  try {
+    const { success, remaining } = await proxyImageRatelimit.limit(ip);
+    return { success, remaining };
+  } catch (err) {
+    console.error("[proxyImageLimiter] upstash error, allowing through:", err);
+    return { success: true, remaining: -1 };
+  }
 }
 
 export async function signinLimiter(ip: string): Promise<LimitResult> {

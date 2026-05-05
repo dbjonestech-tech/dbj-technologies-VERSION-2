@@ -12,6 +12,141 @@ May 4 Canopy showcase swap.
 written on top of `0c08585` (`chore(deps): remove unused wait-on to
 close axios advisories`). Working tree clean, origin/main in sync.
 
+### Pathlight capture-confidence layer + OG image proxy (May 4, late)
+
+After the May 3 video-artifact arc (commits `2178178`, `2775118`,
+`38f8760`, `e5d30af`, `b2bc9e4`, `4556911`, `c9d9e23`, `c8240e0`,
+`915a163`) eliminated every false-positive "broken video" pathway in
+the model prompts, the screenshot capture itself can still legitimately
+fail to render hero videos when codec / CDN / autoplay-policy
+constraints stack against headless Chrome. Pretending capture is
+always perfect is the failure mode that kills credibility on any
+report. Joshua's directive was to make Pathlight transparent about
+what it can and cannot verify, then ship anything else worth
+hardening.
+
+This commit adds:
+
+1. **Migration `038_capture_caveats.sql`.** One additive nullable
+   `capture_caveats` JSONB column on `scan_results`. Applied to prod
+   Neon successfully before the code commit.
+2. **Capture-confidence layer.**
+   - `lib/types/scan.ts` adds `CaptureCaveatKind` (3 values:
+     `hero-video-may-render-for-visitors`,
+     `og-image-blocked-from-render`, `mobile-capture-degraded`),
+     `CaptureCaveatSeverity`, `CaptureCaveat`. Adds
+     `captureCaveats: CaptureCaveat[] | null` to `PathlightReport`.
+   - `lib/services/capture-caveats.ts` (new). Pure function
+     `computeCaptureCaveats` plus a `probeOgImageReachable` HEAD
+     fetch with realistic UA, originating-site Referer, 4s timeout,
+     graceful fallback to GET on HEAD-rejecting CDNs. Each detector
+     has a tight failure-mode posture: returns null on
+     uncertainty so transient probe failures cannot defame the
+     scanned site.
+   - `lib/inngest/functions.ts` adds the `cv1` step inserted
+     between `o1` and the `w1` follow-up sleep. Reads from the
+     persisted scan, computes caveats, persists them. Always
+     writes (even when the array is empty) so the polling loop can
+     distinguish "ran, nothing to surface" from "still running."
+     Failure path persists `[]` and emits a `capture-caveats.failed`
+     monitoring event; never marks the scan partial.
+   - `lib/db/queries.ts` adds `updateScanCaptureCaveats`,
+     `getCaptureCaveatsInput`, the `coerceCaptureCaveats` /
+     `coerceCaptureCaveat` pair, the `capture_caveats` SELECT
+     extension, and the `getFullScanReport` surface field.
+     `coerceCaptureCaveats` deliberately preserves the empty-array
+     vs null distinction (empty = ran, nothing to surface; null =
+     not run yet) so the polling loop can settle correctly.
+   - `lib/services/pathlight-health.ts` adds `capture-caveats` to
+     `PATHLIGHT_STAGES` + `LABEL_TO_STAGE`. Forward-compat
+     scaffolding; failures are swallowed today and never surface
+     in `error_message`.
+3. **Top-of-report "Notes on this analysis" notice.**
+   - `app/(grade)/pathlight/[scanId]/CaptureCaveatsNotice.tsx`
+     (new). Renders only when caveats are present. Subtle slate
+     palette, professional non-apologetic tone. Print-safe via
+     `print-avoid-break`. Suppressed for the empty / null cases so
+     the report renders identically to before for clean scans.
+   - `app/(grade)/pathlight/[scanId]/ScanStatus.tsx` extends
+     `ApiReport` with `captureCaveats`, threads it through
+     `<CaptureCaveatsNotice>` between the partial / screenshot
+     notices and the score hero. Polling loop's
+     `postFinalizeFieldsLanded` now waits for
+     `captureCaveats !== null` to settle so the notice always
+     hydrates inside the fresh-scan window without a manual
+     refresh.
+   - `app/(grade)/api/scan/[scanId]/route.ts` surfaces the
+     `captureCaveats` field on the API response.
+4. **OG image proxy: `/api/og-image-proxy`.**
+   - `app/(grade)/api/og-image-proxy/route.ts` (new). Server-side
+     image proxy bound to a known scan: query params are `scanId`
+     (UUID) and `url`; the URL must match the scan's
+     `og_preview.meta.image` or `og_preview.meta.twitterImage`
+     server-side or the request returns the placeholder. Defenses:
+     UUID shape check, http/https only, private / loopback host
+     rejection, 4MB hard size cap, 8s timeout, realistic UA +
+     originating-site Referer, per-IP rate limit (200 / 24h).
+     Failures all return a transparent 1x1 PNG with a 5-minute
+     cache so a broken upstream does not break the report visually.
+   - `lib/rate-limit.ts` adds the `proxyImageLimiter` (sliding
+     window 200 / 24h, fail-open in dev when Upstash env is
+     missing).
+   - `app/(grade)/pathlight/[scanId]/OgPreviewSection.tsx` swaps
+     direct `<img src=>` for `proxyImageSrc(scanId, originalUrl)`
+     and adds an `onLoad` 1x1 detector + `onError` handler so the
+     transparent-placeholder failure path renders a graceful
+     "could not load outside your site" panel instead of a dark
+     rectangle.
+5. **Chatbot caveat awareness (audit-phase finding).**
+   - `lib/prompts/pathlight-chat.ts` adds a `Capture caveats` block
+     into the system prompt's scan context (rendering only the
+     user-safe `detail` strings, never the internal `kind` enum)
+     plus a new `# CAPTURE CAVEATS` guidance section in front of
+     `# METHODOLOGY TRANSPARENCY`. Tells the chat to defer to
+     caveats: do not insist a video is broken when the caveat says
+     it likely plays for real visitors, do not penalize design
+     observations whose underlying capture was disclaimed, never
+     describe a caveat as a "bug" or as Pathlight being broken.
+     This closes the gap where a prospect challenging the chat
+     ("is the broken video really broken?") could otherwise
+     receive a confidently-wrong defense.
+
+### Verification gates passed
+
+- `npx tsc --noEmit` clean
+- `npm run lint` clean
+- 0 em dashes added across all changed files (the three I
+  introduced in JSDoc were rewritten to colons / commas before the
+  commit)
+- Migration 038 applied to prod Neon successfully before the code
+  commit
+- Real-HTML smoke check: `detectHeroVideo` against the captured
+  wingertrealestate.com html_snapshot returns `true` (the
+  `<video autoplay>` lives at byte ~166K, past the head section
+  but the regex now scans the full document)
+- Proxy security review: SSRF mitigations layered (scan binding +
+  private-host regex + http/https only), size + timeout caps in
+  place, rate limit added
+
+### What still needs to happen next
+
+1. **Verification scan against wingertrealestate.com** once Vercel
+   finishes deploying. Expect the OG preview card to render the real
+   share image (Wix-hosted) via the proxy. Expect the "Notes on this
+   analysis" section at the top of the report when the hero-video
+   caveat fires (heroHasVideo true + photography_quality scored low).
+2. **Watch `/admin/monitor` for `capture-caveats.generated` events**
+   accumulating. The kinds list in the event body lets us see which
+   caveat surfaces most often across real scans without any
+   per-scan inspection.
+3. **Optional follow-up: hex / octal IP literal SSRF defense.** The
+   proxy's private-host regex covers decimal IPv4 + bracketed IPv6,
+   but not exotic literal forms like `0177.0.0.1` (octal for
+   127.0.0.1). The scan-binding control closes the practical attack
+   path (the URL must match a previously-extracted og:image), but
+   adding a `net.isIP()` check would be belt-and-suspenders.
+   Deferred; not a Joshua-blocking gap.
+
 The session arc this round was a security audit + the three follow-ups
 the audit surfaced. Five Claude commits landed, interleaved with three
 of Joshua's Pathlight video-artifact fixes:

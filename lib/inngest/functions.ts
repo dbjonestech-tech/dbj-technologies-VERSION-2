@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { getDb } from "../db";
 import {
+  getCaptureCaveatsInput,
   getExistingAudioSummary,
   getFormsAuditInput,
   getFullScanReport,
@@ -11,6 +12,7 @@ import {
   updatePathlightScore,
   updateScanAiAnalysis,
   updateScanAudioSummary,
+  updateScanCaptureCaveats,
   updateScanFormsAudit,
   updateScanFormsExtracted,
   updateScanFullPageScreenshots,
@@ -25,6 +27,7 @@ import {
   updateScanScreenshots,
   updateScanStatus,
 } from "../db/queries";
+import { computeCaptureCaveats } from "../services/capture-caveats";
 import { runFormsAudit } from "../services/forms-audit";
 import { extractOgPreview } from "../services/og-preview";
 import { runPageCritique } from "../services/page-critique";
@@ -921,6 +924,71 @@ export const scanRequested = inngest.createFunction(
           );
           await track(
             "og-preview.failed",
+            { error: message.slice(0, 500) },
+            { scanId, level: "warn" },
+          );
+          return { ok: false, error: message };
+        }
+      });
+
+      /* cv1: Capture-confidence layer. Runs after o1 because it reads
+       * og_preview as one of its inputs; runs before w1 (the first
+       * follow-up sleep) so caveat detection completes inside the
+       * fresh-scan polling window and the report's "Notes on this
+       * analysis" notice is visible without a manual refresh.
+       *
+       * Pure derivation from already-persisted scan data plus a single
+       * server-side HEAD probe of og:image. No AI call, no model spend.
+       * The composer in lib/services/capture-caveats.ts swallows every
+       * detector's errors and returns an array (possibly empty) so
+       * this step does not gate the followup chain on detector
+       * reliability.
+       *
+       * Always writes (even when the array is empty) so the polling
+       * loop can distinguish "still running" (column null) from "ran,
+       * nothing to surface" (empty array). */
+      await step.run("cv1", async () => {
+        try {
+          const input = await getCaptureCaveatsInput(scanId);
+          if (!input) {
+            return { ok: true, skipped: "no-input" };
+          }
+          const caveats = await computeCaptureCaveats(
+            {
+              htmlSnapshot: input.htmlSnapshot,
+              designScores: input.designScores,
+              ogPreview: input.ogPreview,
+              screenshots: input.screenshots,
+            },
+            input.resolvedUrl ?? input.url,
+          );
+          await updateScanCaptureCaveats(scanId, caveats);
+          await track(
+            "capture-caveats.generated",
+            {
+              count: caveats.length,
+              kinds: caveats.map((c) => c.kind),
+            },
+            { scanId },
+          );
+          return { ok: true, count: caveats.length };
+        } catch (err) {
+          const message = describeError(err);
+          console.warn(
+            "[cv1] capture-caveats failed (scan still ships):",
+            message,
+          );
+          /* Persist an empty array on failure so the polling loop can
+           * still settle. Caveat detection failing is not visible to
+           * the prospect: the report just renders without the Notes
+           * section, which is the safe default. */
+          try {
+            await updateScanCaptureCaveats(scanId, []);
+          } catch (writeErr) {
+            void writeErr;
+          }
+          await track(
+            "capture-caveats.failed",
             { error: message.slice(0, 500) },
             { scanId, level: "warn" },
           );

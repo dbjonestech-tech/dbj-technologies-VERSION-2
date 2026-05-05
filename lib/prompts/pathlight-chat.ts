@@ -1,4 +1,5 @@
 import type {
+  CaptureCaveat,
   PathlightReport,
   RemediationItem,
 } from "@/lib/types/scan";
@@ -46,6 +47,21 @@ function renderPositioningFindings(
         `  - ${metric.replace(/_/g, " ")}: ${value.score}/10 — ${value.observation}`
     )
     .join("\n");
+}
+
+function renderCaptureCaveats(
+  caveats: CaptureCaveat[] | null
+): string {
+  /* Empty array (cv1 ran, found nothing) AND null (cv1 has not yet
+   * run for this scan) both render as "no caveats" so the chat does
+   * not invent disclaimers it should not be making. The kind enum is
+   * intentionally NOT included in the rendered prompt context: it is
+   * an internal token and exposing it would invite the model to echo
+   * it verbatim. The detail string is the only user-safe surface. */
+  if (!caveats || caveats.length === 0) {
+    return "  (no capture caveats fired for this scan)";
+  }
+  return caveats.map((c, i) => `  ${i + 1}. ${c.detail}`).join("\n");
 }
 
 export function buildChatSystemPrompt(report: PathlightReport): string {
@@ -124,6 +140,9 @@ ${renderDesignFindings(report.design)}
 Additional positioning findings (each scored out of 10):
 ${renderPositioningFindings(report.positioning)}
 
+Capture caveats (things the automated capture flagged as best-verified-in-a-real-browser; they are also rendered at the top of the report for the user):
+${renderCaptureCaveats(report.captureCaveats)}
+
 Reference specific data from the scan when answering. Use their actual numbers and findings, not generic advice. If they ask about something the scan did not cover, say so honestly and offer to discuss what the scan did find.
 
 # DBJ CONTEXT
@@ -144,6 +163,9 @@ Rules: surface this offer ONCE per conversation. If the user ignores it or says 
 
 # OUT-OF-SCOPE BUSINESSES
 If the SCAN CONTEXT above shows that revenue was suppressed because the site is a national or global brand, do not invent a dollar figure. If the user asks why there is no revenue number, explain plainly: Pathlight's revenue model is calibrated for small and regional businesses (single storefronts, local service operations, regional chains). For multinational or national-brand sites, the underlying assumptions about visitor counts and deal values would be off by orders of magnitude, so the dollar number was suppressed rather than shown misleadingly. The design, performance, and positioning observations are still valid and can be discussed normally. Do not pretend a number exists. Do not estimate one yourself.
+
+# CAPTURE CAVEATS
+The "Capture caveats" block above lists specific things the automated capture could not fully verify on this site (for example: a hero background video that real visitors see but did not render in the screenshot, a hotlink-protected social-share image, a degraded mobile capture). When a user asks about a finding that overlaps with one of these caveats, defer to the caveat: do not insist a video is broken when the caveat says it likely plays for real visitors, do not penalize design observations whose underlying capture was disclaimed. If a user asks why the report mentions one of these caveats, explain that the automated capture has narrower visibility than a real browser and Pathlight names that boundary explicitly so the prospect reads scores with the right context. Never describe a caveat as a "bug" or as Pathlight being broken: it is a deliberate, transparent signal about what was and was not verifiable in this run.
 
 # METHODOLOGY TRANSPARENCY
 When a user questions the accuracy of benchmark data, deal values, revenue estimates, sourcing methodology, or industry classification, follow these rules:

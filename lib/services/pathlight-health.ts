@@ -24,6 +24,7 @@ export const PATHLIGHT_STAGES = [
   "email",
   "page-critique",
   "og-preview",
+  "capture-caveats",
 ] as const;
 
 export type PathlightStage = (typeof PATHLIGHT_STAGES)[number];
@@ -51,6 +52,7 @@ const LABEL_TO_STAGE: Record<string, PathlightStage> = {
   email: "email",
   "page-critique": "page-critique",
   "og-preview": "og-preview",
+  "capture-caveats": "capture-caveats",
 };
 
 export type PartialStageBreakdown = {

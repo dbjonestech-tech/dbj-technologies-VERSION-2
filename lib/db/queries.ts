@@ -1,5 +1,8 @@
 import { getDb } from "./index";
 import type {
+  CaptureCaveat,
+  CaptureCaveatKind,
+  CaptureCaveatSeverity,
   DesignScores,
   FormDescriptor,
   FormsAuditAnalysis,
@@ -65,6 +68,11 @@ type ScanResultsRow = {
    * and any scan whose html_snapshot did not land coerce to null and the
    * OgPreviewSection returns null gracefully. */
   og_preview: unknown;
+  /* Capture-confidence column (added in migration 038). Nullable;
+   * pre-cv1 scans coerce to null and the report renders without the
+   * top-of-report Notes section. Empty array is a real value (cv1 ran,
+   * found no caveats). */
+  capture_caveats: unknown;
 };
 
 export async function updateScanStatus(
@@ -280,6 +288,19 @@ export async function updateScanOgPreview(
     VALUES (${scanId}, ${JSON.stringify(preview)}::jsonb)
     ON CONFLICT (scan_id) DO UPDATE
     SET og_preview = EXCLUDED.og_preview
+  `;
+}
+
+export async function updateScanCaptureCaveats(
+  scanId: string,
+  caveats: CaptureCaveat[],
+): Promise<void> {
+  const sql = getDb();
+  await sql`
+    INSERT INTO scan_results (scan_id, capture_caveats)
+    VALUES (${scanId}, ${JSON.stringify(caveats)}::jsonb)
+    ON CONFLICT (scan_id) DO UPDATE
+    SET capture_caveats = EXCLUDED.capture_caveats
   `;
 }
 
@@ -726,6 +747,44 @@ function coerceOgPreview(v: unknown): OgPreviewResult | null {
   return { meta, pageTitle, pageDescription, problems };
 }
 
+const CAVEAT_KINDS: ReadonlySet<CaptureCaveatKind> = new Set<CaptureCaveatKind>(
+  [
+    "hero-video-may-render-for-visitors",
+    "og-image-blocked-from-render",
+    "mobile-capture-degraded",
+  ],
+);
+
+function coerceCaptureCaveat(v: unknown): CaptureCaveat | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  if (typeof o.kind !== "string" || !CAVEAT_KINDS.has(o.kind as CaptureCaveatKind)) {
+    return null;
+  }
+  if (typeof o.detail !== "string" || o.detail.length === 0) return null;
+  const severity: CaptureCaveatSeverity =
+    o.severity === "uncertainty" ? "uncertainty" : "informational";
+  return {
+    kind: o.kind as CaptureCaveatKind,
+    detail: o.detail,
+    severity,
+  };
+}
+
+function coerceCaptureCaveats(v: unknown): CaptureCaveat[] | null {
+  if (v === null || v === undefined) return null;
+  if (!Array.isArray(v)) return null;
+  const out: CaptureCaveat[] = [];
+  for (const entry of v) {
+    const coerced = coerceCaptureCaveat(entry);
+    if (coerced) out.push(coerced);
+  }
+  /* Empty array IS a real value (cv1 ran, found no caveats). Preserve
+   * it so the polling loop can distinguish "still running" (null) from
+   * "ran, nothing to surface" (empty). */
+  return out;
+}
+
 function coerceFormsAudit(v: unknown): FormsAuditResult | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Record<string, unknown>;
@@ -792,7 +851,7 @@ async function loadScanWithResults(scanId: string): Promise<{
            pillar_scores, remediation_items, revenue_impact, industry_benchmark,
            audio_summary_url, audio_summary_script,
            html_snapshot, screenshots_fullpage, forms_audit, page_critique,
-           og_preview
+           og_preview, capture_caveats
     FROM scan_results
     WHERE scan_id = ${scanId}
     ORDER BY created_at DESC
@@ -942,6 +1001,49 @@ export async function getOgPreviewInput(scanId: string): Promise<{
   };
 }
 
+/* Capture-confidence read helper for the post-finalize cv1 step. Pulls
+ * exactly the inputs the caveat detectors need, in one query, so cv1
+ * can run without making a roundtrip per signal. og_preview is read
+ * here because cv1 fires AFTER o1: by the time cv1 runs, og_preview
+ * is either populated or null (skipped path). */
+export async function getCaptureCaveatsInput(scanId: string): Promise<{
+  url: string;
+  resolvedUrl: string | null;
+  htmlSnapshot: string | null;
+  designScores: DesignScores | null;
+  ogPreview: OgPreviewResult | null;
+  screenshots: ScreenshotPair | null;
+} | null> {
+  const sql = getDb();
+  const rows = (await sql`
+    SELECT s.url, s.resolved_url,
+           sr.html_snapshot, sr.ai_analysis, sr.og_preview, sr.screenshots
+    FROM scans s
+    LEFT JOIN scan_results sr ON sr.scan_id = s.id
+    WHERE s.id = ${scanId}
+    LIMIT 1
+  `) as Array<{
+    url: string;
+    resolved_url: string | null;
+    html_snapshot: unknown;
+    ai_analysis: Record<string, unknown> | null;
+    og_preview: unknown;
+    screenshots: ScreenshotPair | null;
+  }>;
+  const row = rows[0];
+  if (!row) return null;
+  const snapshot = coerceHtmlSnapshot(row.html_snapshot);
+  const vision = coerceVisionAudit(row.ai_analysis);
+  return {
+    url: row.url,
+    resolvedUrl: row.resolved_url,
+    htmlSnapshot: snapshot?.html ?? null,
+    designScores: vision?.design ?? null,
+    ogPreview: coerceOgPreview(row.og_preview),
+    screenshots: row.screenshots ?? null,
+  };
+}
+
 /* Stage 2 read helper for the post-finalize forms-audit step. Pulls only
  * the columns it needs (extracted forms + html snapshot for narrative
  * grounding + business context) to keep the row payload small. */
@@ -1033,6 +1135,7 @@ export async function getFullScanReport(
     formsAudit: coerceFormsAudit(result?.forms_audit),
     pageCritique: coercePageCritique(result?.page_critique),
     ogPreview: coerceOgPreview(result?.og_preview),
+    captureCaveats: coerceCaptureCaveats(result?.capture_caveats),
     businessModel: vision?.businessModel,
     inferredVertical: vision?.inferredVertical,
     inferredVerticalParent: vision?.inferredVerticalParent,

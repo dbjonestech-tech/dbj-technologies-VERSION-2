@@ -1,10 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import type {
   OgPreviewProblem,
   OgPreviewProblemSeverity,
   OgPreviewResult,
 } from "@/lib/types/scan";
+
+/* Image source for the OG / Twitter preview cards. We always route
+ * through /api/og-image-proxy with the scanId binding rather than
+ * setting <img src> directly to the third-party URL. Rationale: many
+ * sites (Wix, Showit, Squarespace) hotlink-protect their og:image,
+ * which fails with a foreign Referer. The proxy refetches with a
+ * realistic UA and the originating site's Referer, so the preview
+ * card mirrors what Facebook's scraper actually receives. The proxy
+ * is bound to the scan's og_preview row server-side, so this is not
+ * an open proxy. */
+function proxyImageSrc(scanId: string, originalUrl: string): string {
+  const params = new URLSearchParams({ scanId, url: originalUrl });
+  return `/api/og-image-proxy?${params.toString()}`;
+}
 
 /**
  * Stage 3a social-share preview section. Renders three blocks:
@@ -88,6 +103,7 @@ function PreviewCard({
   imageUrl,
   hostnameLabel,
   imageAlt,
+  scanId,
 }: {
   flavor: "og" | "twitter";
   title: string | null;
@@ -95,11 +111,19 @@ function PreviewCard({
   imageUrl: string | null;
   hostnameLabel: string | null;
   imageAlt: string | null;
+  scanId: string;
 }) {
   const flavorLabel = flavor === "og" ? "Facebook / LinkedIn / Slack" : "Twitter / X";
   const headline = title ?? "(no title set)";
   const snippet = description ?? "(no description set)";
   const showImage = imageUrl !== null;
+  /* The proxy returns a transparent 1x1 placeholder PNG on any failure
+   * path, so the <img> always loads. We still listen for the load
+   * event to swap the visual to the "could not render" state when the
+   * placeholder is detected (1px wide and 1px tall after layout). */
+  const [imageFailed, setImageFailed] = useState(false);
+  const proxiedSrc =
+    showImage && imageUrl ? proxyImageSrc(scanId, imageUrl) : null;
   return (
     <article
       className="rounded-2xl border overflow-hidden print-avoid-break"
@@ -118,17 +142,41 @@ function PreviewCard({
       >
         {flavorLabel} share preview
       </div>
-      {showImage ? (
+      {showImage && proxiedSrc && !imageFailed ? (
         <div
           className="relative w-full overflow-hidden"
           style={{ aspectRatio: "1.91 / 1", backgroundColor: "#0f172a" }}
         >
           <img
-            src={imageUrl!}
+            src={proxiedSrc}
             alt={imageAlt ?? headline}
             className="h-full w-full object-cover"
             loading="lazy"
+            onError={() => setImageFailed(true)}
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              /* The proxy's failure-path placeholder is a transparent
+               * 1x1 PNG. Detect via natural dimensions and treat as a
+               * failed render so the card shows the "could not render"
+               * state rather than a blank dark rectangle. */
+              if (img.naturalWidth <= 1 && img.naturalHeight <= 1) {
+                setImageFailed(true);
+              }
+            }}
           />
+        </div>
+      ) : showImage ? (
+        <div
+          className="flex w-full items-center justify-center px-4 text-center text-sm"
+          style={{
+            aspectRatio: "1.91 / 1",
+            backgroundColor: "#f3f4f6",
+            color: "#6b7280",
+          }}
+        >
+          The share image is set in your page metadata, but it did not
+          load when fetched outside your site. Confirm the URL is
+          publicly reachable.
         </div>
       ) : (
         <div
@@ -168,7 +216,13 @@ function PreviewCard({
   );
 }
 
-export function OgPreviewSection({ preview }: { preview: OgPreviewResult | null }) {
+export function OgPreviewSection({
+  preview,
+  scanId,
+}: {
+  preview: OgPreviewResult | null;
+  scanId: string;
+}) {
   if (!preview) return null;
   const { meta, pageTitle, pageDescription, problems } = preview;
 
@@ -217,6 +271,7 @@ export function OgPreviewSection({ preview }: { preview: OgPreviewResult | null 
           imageUrl={ogImage}
           hostnameLabel={ogHostname}
           imageAlt={meta.imageAlt}
+          scanId={scanId}
         />
         {twitterDistinct ? (
           <PreviewCard
@@ -226,6 +281,7 @@ export function OgPreviewSection({ preview }: { preview: OgPreviewResult | null 
             imageUrl={twitterImage}
             hostnameLabel={ogHostname}
             imageAlt={meta.imageAlt}
+            scanId={scanId}
           />
         ) : null}
       </div>

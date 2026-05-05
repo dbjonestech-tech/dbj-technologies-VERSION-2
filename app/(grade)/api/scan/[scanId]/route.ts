@@ -119,6 +119,12 @@ export async function GET(
        * fresh scan because the o1 step runs after c1; the polling loop
        * in ScanStatus picks it up without requiring a refresh. */
       ogPreview: report.ogPreview,
+      /* Capture-confidence field. Empty array means cv1 ran and found
+       * no caveats applicable to this scan. Null means cv1 has not yet
+       * run (pre-feature scans, or fresh scans where the polling loop
+       * is still waiting on it). The renderer suppresses the top-of-
+       * report Notes section when this is empty or null. */
+      captureCaveats: report.captureCaveats,
       isOutOfScope,
       outOfScopeLabel: isOutOfScope
         ? report.businessScale === "global"

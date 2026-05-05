@@ -160,6 +160,42 @@ export type OgPreviewResult = {
   problems: OgPreviewProblem[];
 };
 
+/* Capture-confidence layer.
+ *
+ * Pathlight's automated capture cannot reproduce 100% of what real
+ * visitors see in a real browser: video CDNs may refuse to serve our
+ * headless agent, autoplay policy may suppress hero videos, hotlink-
+ * protected images may not load when our renderer fetches them, mobile
+ * capture may fail for transient reasons while desktop succeeds. When
+ * any of those happen, the underlying site is fine; our snapshot of it
+ * just isn't.
+ *
+ * A CaptureCaveat names a specific signal we detected that says
+ * "this part of the analysis may be limited by capture, not by your
+ * site." The report renders these in a top-of-report "Notes on this
+ * analysis" section so the prospect reads the rest of the report with
+ * appropriate context, and the model's prompts for downstream prose
+ * use them to suppress confidently-wrong observations.
+ *
+ * `kind` is a stable enum the renderer maps to icon + tone. `detail`
+ * is the user-facing string surfaced in the notice. `severity`:
+ *   informational: neutral note ("a video plays here for visitors")
+ *   uncertainty:   actively cautions against weighting an observation
+ *                  too heavily ("scores below may be conservative")
+ */
+export type CaptureCaveatKind =
+  | "hero-video-may-render-for-visitors"
+  | "og-image-blocked-from-render"
+  | "mobile-capture-degraded";
+
+export type CaptureCaveatSeverity = "informational" | "uncertainty";
+
+export type CaptureCaveat = {
+  kind: CaptureCaveatKind;
+  detail: string;
+  severity: CaptureCaveatSeverity;
+};
+
 export type DesignMetric = {
   score: number;
   observation: string;
@@ -317,6 +353,13 @@ export type PathlightReport = {
    * OgPreviewSection returns null gracefully. Lands shortly after status
    * flips to complete; the polling loop in ScanStatus picks it up. */
   ogPreview: OgPreviewResult | null;
+  /* Capture-confidence layer (cv1 step). Empty array means cv1 ran and
+   * found no caveats applicable to this scan. Null means cv1 has not
+   * run yet (pre-feature scans, or fresh scans where the polling loop
+   * is still waiting for it). The renderer suppresses the notice when
+   * the array is empty or null; non-empty surfaces the top-of-report
+   * "Notes on this analysis" section. */
+  captureCaveats: CaptureCaveat[] | null;
   businessModel?: "B2B" | "B2C" | "mixed";
   inferredVertical?: string;
   inferredVerticalParent?: string;

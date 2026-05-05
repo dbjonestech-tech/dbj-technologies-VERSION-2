@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AskPathlightLoader from "./AskPathlightLoader";
+import { CaptureCaveatsNotice } from "./CaptureCaveatsNotice";
 import { FormsAuditSection } from "./FormsAuditSection";
 import { HeroCritiqueSection } from "./HeroCritiqueSection";
 import { OgPreviewSection } from "./OgPreviewSection";
 import { generateSuggestedChips } from "@/lib/prompts/pathlight-chips";
 import type {
+  CaptureCaveat,
   DesignScores,
   FormsAuditResult,
   FullPageScreenshotPair,
@@ -65,6 +67,10 @@ type ApiReport = {
   /* Stage 3a (May 3 2026): social-share preview. Pure HTML parse output,
    * lands a beat after pageCritique on a fresh scan. */
   ogPreview: OgPreviewResult | null;
+  /* Capture-confidence layer (May 4 2026): cv1 step output. Empty
+   * array means "ran, nothing to surface"; null means "still running".
+   * The polling loop treats either non-null value as settled. */
+  captureCaveats: CaptureCaveat[] | null;
   isOutOfScope: boolean;
   outOfScopeLabel: string | null;
   screenshotNotice: string | null;
@@ -99,7 +105,12 @@ function postFinalizeFieldsLanded(report: ApiReport): boolean {
   // ambiguity; treat any non-null ogPreview as settled and rely on the
   // poll cap to stop the loop when no html_snapshot exists.
   const ogSettled = !!report.ogPreview;
-  return audioSettled && formsSettled && critiqueSettled && ogSettled;
+  // Capture caveats: cv1 always writes (empty array is a real value),
+  // so non-null means settled. Null means cv1 has not yet completed.
+  const caveatsSettled = report.captureCaveats !== null;
+  return (
+    audioSettled && formsSettled && critiqueSettled && ogSettled && caveatsSettled
+  );
 }
 
 const PHASE_LABELS = [
@@ -621,6 +632,7 @@ function Report({
       {report.screenshotNotice ? (
         <ScreenshotHealthNotice message={report.screenshotNotice} />
       ) : null}
+      <CaptureCaveatsNotice caveats={report.captureCaveats} />
 
       {hasScore ? (
         <ScoreHero
@@ -656,7 +668,7 @@ function Report({
 
       <FormsAuditSection formsAudit={report.formsAudit} />
 
-      <OgPreviewSection preview={report.ogPreview} />
+      <OgPreviewSection preview={report.ogPreview} scanId={report.scanId} />
 
       {hasScreenshots ? (
         <ScreenshotsSection
