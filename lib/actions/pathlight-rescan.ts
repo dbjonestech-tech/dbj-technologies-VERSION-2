@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import { inngest } from "@/lib/inngest/client";
 import { recordChange } from "@/lib/canopy/audit";
+import { canFireScan, incrementScanUsage } from "@/lib/canopy/pathlight-gate";
 import { triggerRescanForContact, type RescanResult } from "@/lib/canopy/pathlight-client";
 import { track } from "@/lib/services/monitoring";
 
@@ -60,7 +61,7 @@ export async function triggerRescanAction(input: {
 
 export type ScanRescanResult =
   | { ok: true; newScanId: string }
-  | { ok: false; error: string };
+  | { ok: false; error: string; reason?: string };
 
 /**
  * Re-fire a scan by id without going through the public /api/scan
@@ -78,6 +79,12 @@ export async function rescanByScanIdAction(input: {
 }): Promise<ScanRescanResult> {
   try {
     const admin = await requireAdmin();
+
+    const gate = await canFireScan("rescan");
+    if (!gate.allowed) {
+      return { ok: false, error: gate.reason ?? "Scan gate denied", reason: gate.reason };
+    }
+
     const sql = getDb();
     const original = (await sql`
       SELECT id::text, url, email, business_name, city
@@ -116,6 +123,8 @@ export async function rescanByScanIdAction(input: {
       name: "pathlight/scan.requested",
       data: { scanId: newScanId },
     });
+
+    await incrementScanUsage(1);
 
     await track(
       "scan.requested",
