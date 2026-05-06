@@ -93,6 +93,14 @@ const sections: EditorialSection[] = [
           >
             medical and dental industry page
           </Link>
+          , and the legal version, where State Bar advertising rules
+          shape how a firm is allowed to describe itself, is on the{" "}
+          <Link
+            href="/industries/legal"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            legal practice page
+          </Link>
           .
         </p>
         <p>

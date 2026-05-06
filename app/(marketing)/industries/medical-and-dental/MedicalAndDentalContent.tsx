@@ -311,6 +311,25 @@ const proof: IndustryProof = {
         outcome-named services, first-visit walkthrough, named
         practitioners, fast performance, accessible design.
       </p>
+      <p>
+        The cousin verticals to healthcare in regulatory weight are{" "}
+        <Link
+          href="/industries/legal"
+          className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+        >
+          law firms
+        </Link>
+        , where State Bar advertising rules shape every page, and{" "}
+        <Link
+          href="/industries/auto-service"
+          className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+        >
+          auto service shops
+        </Link>
+        , where the trust deficit is generational rather than
+        regulatory. The constraints are different; the architecture
+        responds to them.
+      </p>
     </>
   ),
   link: {

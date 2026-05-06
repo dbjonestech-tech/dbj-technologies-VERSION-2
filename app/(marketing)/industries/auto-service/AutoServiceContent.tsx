@@ -296,6 +296,26 @@ const proof: IndustryProof = {
         engineered for the way the auto service buyer actually behaves on
         a phone in a parking lot.
       </p>
+      <p>
+        The same architectural depth applies to other service verticals.
+        The trust signals shift, but the underlying principles hold:
+        case-fit answer, accurate outcomes, named practitioners, fast
+        performance, accessible design. The vertical-specific takes for{" "}
+        <Link
+          href="/industries/medical-and-dental"
+          className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+        >
+          medical and dental practices
+        </Link>{" "}
+        and{" "}
+        <Link
+          href="/industries/legal"
+          className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+        >
+          law firms
+        </Link>{" "}
+        cover how those constraints change the architecture.
+      </p>
     </>
   ),
   link: { label: "Read the full Star Auto case study", href: "/work/star-auto-service" },
