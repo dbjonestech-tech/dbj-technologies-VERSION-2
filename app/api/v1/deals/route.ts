@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { verifyBearer } from "@/lib/canopy/api-tokens";
 import { getDb } from "@/lib/db";
 
@@ -38,9 +39,11 @@ export async function GET(request: Request) {
     `) as Array<Record<string, unknown>>;
     return NextResponse.json({ data: rows });
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "query failed" },
-      { status: 500 }
-    );
+    /* Don't echo the raw error message to integrators. Postgres errors
+     * can include table / column / constraint identifiers that leak
+     * schema shape. Log to Sentry for our own debugging; return a
+     * generic body. */
+    Sentry.captureException(err, { tags: { route: "v1/deals" } });
+    return NextResponse.json({ error: "internal_error" }, { status: 500 });
   }
 }
