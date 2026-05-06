@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { EditorialLayout } from "@/components/templates/EditorialLayout";
 import type {
   EditorialCTA,
@@ -311,7 +312,15 @@ const sections: EditorialSection[] = [
           Pathlight automates the measurement and the diagnostic in 90 seconds,
           returning a scored report against your own URL with the prioritized
           fixes underneath. Worth running before a four-hour DIY audit if only
-          to confirm what you are about to spend the four hours on.
+          to confirm what you are about to spend the four hours on. The
+          longer reference on what a real{" "}
+          <Link
+            href="/services/website-performance-audit"
+            className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+          >
+            performance audit
+          </Link>{" "}
+          covers (and what free tools quietly miss) is on the service page.
         </p>
       </>
     ),

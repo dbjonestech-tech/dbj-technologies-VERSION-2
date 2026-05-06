@@ -193,7 +193,16 @@ const sections: ServiceSection[] = [
           template-based site can be online inside a weekend. The speed gap
           is real and the right answer is not always to wait. If your
           deadline is two weeks, hire a templater and revisit the custom
-          build later when the timing is right.
+          build later when the timing is right. If the deadline pressure is
+          coming from a site that is quietly losing leads right now, the{" "}
+          <Link
+            href="/services/website-performance-audit"
+            className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+          >
+            performance audit page
+          </Link>{" "}
+          covers the audit-and-fix path that ships in two weeks instead of
+          a full rebuild quarter.
         </p>
         <p>
           Third, the dependency surface is real. A modern Next.js
