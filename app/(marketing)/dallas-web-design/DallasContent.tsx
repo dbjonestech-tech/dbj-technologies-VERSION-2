@@ -228,12 +228,33 @@ const sections: LocalLanderSection[] = [
           >
             Frisco
           </Link>
-          , and{" "}
+          ,{" "}
           <Link
             href="/mckinney-web-design"
             className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
           >
             McKinney
+          </Link>
+          ,{" "}
+          <Link
+            href="/allen-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Allen
+          </Link>
+          ,{" "}
+          <Link
+            href="/richardson-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Richardson
+          </Link>
+          , and{" "}
+          <Link
+            href="/prosper-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Prosper
           </Link>
           . Each city runs a structurally different buyer profile
           and the architectural response is different.

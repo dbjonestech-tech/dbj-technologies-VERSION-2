@@ -270,6 +270,27 @@ const sections: LocalLanderSection[] = [
           >
             Frisco
           </Link>
+          ,{" "}
+          <Link
+            href="/allen-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Allen
+          </Link>
+          ,{" "}
+          <Link
+            href="/richardson-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Richardson
+          </Link>
+          ,{" "}
+          <Link
+            href="/prosper-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Prosper
+          </Link>
           , and{" "}
           <Link
             href="/dallas-web-design"

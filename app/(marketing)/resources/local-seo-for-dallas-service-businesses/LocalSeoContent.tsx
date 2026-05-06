@@ -376,12 +376,33 @@ const sections: EditorialSection[] = [
           >
             Frisco
           </Link>
-          , and{" "}
+          ,{" "}
           <Link
             href="/mckinney-web-design"
             className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
           >
             McKinney
+          </Link>
+          ,{" "}
+          <Link
+            href="/allen-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Allen
+          </Link>
+          ,{" "}
+          <Link
+            href="/richardson-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Richardson
+          </Link>
+          , and{" "}
+          <Link
+            href="/prosper-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Prosper
           </Link>
           , each with substance unique to the city it covers. I am
           based in Royse City and brand as Dallas, which is the

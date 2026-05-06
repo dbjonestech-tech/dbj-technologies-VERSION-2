@@ -264,6 +264,27 @@ const sections: LocalLanderSection[] = [
           >
             McKinney
           </Link>
+          ,{" "}
+          <Link
+            href="/allen-web-design"
+            className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+          >
+            Allen
+          </Link>
+          ,{" "}
+          <Link
+            href="/richardson-web-design"
+            className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+          >
+            Richardson
+          </Link>
+          ,{" "}
+          <Link
+            href="/prosper-web-design"
+            className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+          >
+            Prosper
+          </Link>
           , and{" "}
           <Link
             href="/dallas-web-design"
