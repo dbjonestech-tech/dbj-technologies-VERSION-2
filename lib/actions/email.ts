@@ -19,6 +19,7 @@ import {
   findMostRecentOpenDealForContact,
   insertEmailMessage,
 } from "@/lib/canopy/email/messages";
+import { computeEmailTrackingToken } from "@/lib/canopy/email/tracking-token";
 import { getDb } from "@/lib/db";
 
 export interface SendEmailActionInput {
@@ -170,7 +171,17 @@ async function wrapWithTracking(
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ||
     "http://localhost:3000";
-  const pixelUrl = `${baseUrl}/api/email/pixel/${messageId}`;
+  /* HMAC token appended as ?t=<hex>. Without it, the pixel and click
+   * endpoints would record any hit against the sequential message id,
+   * letting anyone enumerate /api/email/pixel/{1..N} to inflate opens.
+   * The endpoints validate the token server-side before any DB write
+   * (recipient experience is unaffected on validation failure: pixel
+   * still returns the gif, click still redirects). When AUTH_SECRET
+   * is missing the token is null and the URLs render without ?t=, in
+   * which case the endpoints simply skip the record. */
+  const token = computeEmailTrackingToken(messageId);
+  const tokenQS = token ? `t=${token}` : "";
+  const pixelUrl = `${baseUrl}/api/email/pixel/${messageId}${tokenQS ? `?${tokenQS}` : ""}`;
   const clickBase = `${baseUrl}/api/email/click/${messageId}`;
 
   const escaped = escapeHtml(bodyText);
@@ -182,7 +193,9 @@ async function wrapWithTracking(
   const linkified = withParagraphs.replace(
     /\bhttps?:\/\/[^\s<>"]+/g,
     (match) => {
-      const tracked = `${clickBase}?to=${encodeURIComponent(match)}`;
+      const params = new URLSearchParams({ to: match });
+      if (token) params.set("t", token);
+      const tracked = `${clickBase}?${params.toString()}`;
       return `<a href="${tracked}">${match}</a>`;
     }
   );
