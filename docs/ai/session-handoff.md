@@ -6,7 +6,45 @@ Live snapshot of what the next session needs. Older sessions live under
 which covers the May 3 Inngest-cron + Pathlight reliability arc and the
 May 4 Canopy showcase swap.
 
-## Current state (May 6, 2026, late morning)
+## Current state (May 6, 2026, midday)
+
+Two of three named "real refactor opportunities" from the
+react-hooks v7 / React Compiler walk closed (Priority 3 backlog).
+
+- `ServicePageLayout.tsx` Icon-created-in-render fixed by extracting
+  a stable `<ServiceIcon name=... {...rest} />` dispatcher that uses
+  `createElement` against the module-level `iconMap`. Covers both
+  the hero badge (line 55) and the benefits-map (line 120) call
+  sites. `react-hooks/static-components` clears for the file.
+- `TaskRowClient.tsx` `Date.now()`-in-render fixed by replacing the
+  inline call with `useState(() => Date.now())` lazy init,
+  capturing render-time-now once at mount. Semantics: "overdue when
+  this row first rendered for the user" rather than recomputing on
+  every render. Page reloads on navigation so a task crossing
+  due_at while the page is open still updates on next visit.
+  `react-hooks/purity` clears for the file.
+- `AskPathlight.tsx` memoization issue NOT closed. Tried both a
+  redundant-mutation removal and a helper-extraction; the diagnostic
+  still fired because "Compilation Skipped" applies to the whole
+  component, with `sendMessage`'s async closure (ref mutations,
+  conditional state writes, branching) the actual root cause.
+  Reverted untouched. Backlog updated to flag that proper fix
+  requires restructuring `sendMessage`, not local edits at line 177.
+
+The react-hooks v7 family stays disabled in `eslint.config.mjs`.
+Re-enabling each rule as the broader walk clears its violations is
+the right path; tonight closed two specific named items, not the
+whole rule family.
+
+Working tree note: 5 in-flight page-system files from the prior
+session (`registry.ts`, `LegalContent.tsx`, `ProsperContent.tsx`,
+`RichardsonContent.tsx`, plus three new untracked
+`heath-web-design/`, `rockwall-web-design/`, `royse-city-web-design/`
+directories) are still uncommitted. The royse-city `tsc` error
+predates this session's work and belongs to that in-flight effort,
+not the react-hooks fixes.
+
+## Prior state (May 6, 2026, late morning)
 
 Pathlight reliability + report-credibility arc closed for the
 bshaccounting.com Brian-prep pass. HEAD authoritative via

@@ -20,11 +20,18 @@ const PRIORITY_TINT: Record<TaskPriority, string> = {
 export default function TaskRowClient({ task }: { task: TaskRow }) {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  /* Snapshot render-time-now once at mount. "Overdue" is naturally a
+   * UI-time computation; calling Date.now() during every render is
+   * impure (different value across renders). One read at first render
+   * is sufficient because /admin/tasks remounts on navigation, and a
+   * task that crosses the due_at line while the page is open will
+   * update on the next data refetch. */
+  const [renderNow] = useState(() => Date.now());
   const completed = task.completed_at !== null;
   const overdue =
     !completed &&
     task.due_at !== null &&
-    new Date(task.due_at).getTime() < Date.now();
+    new Date(task.due_at).getTime() < renderNow;
 
   const title = typeof task.payload?.title === "string" ? task.payload.title : "Task";
   const body = typeof task.payload?.body === "string" ? task.payload.body : null;

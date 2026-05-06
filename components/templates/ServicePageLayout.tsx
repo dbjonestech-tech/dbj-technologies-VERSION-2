@@ -1,5 +1,6 @@
 "use client";
 
+import { createElement, type ComponentProps } from "react";
 import { motion } from "framer-motion";
 import {
   CheckCircle2, ArrowRight,
@@ -27,8 +28,13 @@ const iconMap: Record<string, LucideIcon> = {
   Target, Megaphone, Gauge, Image,
 };
 
-function getIcon(name: string): LucideIcon {
-  return iconMap[name] || Globe;
+type ServiceIconProps = { name: string } & Omit<
+  ComponentProps<LucideIcon>,
+  "ref"
+>;
+
+function ServiceIcon({ name, ...rest }: ServiceIconProps) {
+  return createElement(iconMap[name] ?? Globe, rest);
 }
 
 interface ServicePageLayoutProps {
@@ -37,8 +43,6 @@ interface ServicePageLayoutProps {
 }
 
 export function ServicePageLayout({ service, relatedServices }: ServicePageLayoutProps) {
-  const Icon = getIcon(service.iconName);
-
   return (
     <>
       {/* Hero */}
@@ -52,7 +56,7 @@ export function ServicePageLayout({ service, relatedServices }: ServicePageLayou
             className="mb-6 flex items-center justify-center gap-3"
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-accent-blue/20 bg-accent-blue/5 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-blue">
-              <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+              <ServiceIcon name={service.iconName} className="h-3.5 w-3.5" aria-hidden="true" />
               {service.title}
             </span>
           </motion.div>
@@ -116,25 +120,22 @@ export function ServicePageLayout({ service, relatedServices }: ServicePageLayou
         />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-6 sm:grid-cols-2">
-            {service.benefits.map((benefit, i) => {
-              const BenefitIcon = getIcon(benefit.iconName);
-              return (
-                <motion.div
-                  key={benefit.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="glass-card-hover p-6 md:p-8"
-                >
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue">
-                    <BenefitIcon className="h-6 w-6" aria-hidden="true" />
-                  </div>
-                  <h3 className="font-display text-xl font-bold mb-2">{benefit.title}</h3>
-                  <p className="text-sm text-text-secondary leading-relaxed">{benefit.description}</p>
-                </motion.div>
-              );
-            })}
+            {service.benefits.map((benefit, i) => (
+              <motion.div
+                key={benefit.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-card-hover p-6 md:p-8"
+              >
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-blue/10 text-accent-blue">
+                  <ServiceIcon name={benefit.iconName} className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <h3 className="font-display text-xl font-bold mb-2">{benefit.title}</h3>
+                <p className="text-sm text-text-secondary leading-relaxed">{benefit.description}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
