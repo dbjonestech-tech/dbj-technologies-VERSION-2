@@ -268,6 +268,16 @@ export default async function AdminScansPage({
           description="Every Pathlight scan with status, score, and computed monthly revenue impact. Click a row to drill into its event timeline."
         />
 
+        <div className="mt-2 flex justify-end">
+          <Link
+            href="/admin/scans/new"
+            className="inline-flex items-center gap-1.5 rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white"
+          >
+            <span aria-hidden="true">+</span>
+            New scan
+          </Link>
+        </div>
+
         <FilterBar filters={filters} />
 
         <div className="mt-4 mb-3 text-xs text-zinc-500">
