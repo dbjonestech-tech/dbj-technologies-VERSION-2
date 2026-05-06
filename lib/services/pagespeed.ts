@@ -12,6 +12,28 @@ const AUDIT_TIMEOUT_MS = 60_000;
 const RETRY_DELAYS_MS = [10_000, 20_000];
 const TRANSIENT_STATUSES = new Set([429, 500, 502, 503, 504]);
 
+/* Number of parallel PSI runs per scan. Lighthouse on a single
+ * sample is famously noisy: bshaccounting.com's CLS came back as
+ * 1.0 on May 6 from one PSI run, while three independent runs from
+ * pagespeed.web.dev returned 0.0 / 0.022 / similar values. The
+ * single-sample reading produced a "fix your catastrophic CLS"
+ * headline finding that was factually wrong, with credibility
+ * fallout that almost reached a real prospect.
+ *
+ * Three samples plus a median is the industry-standard mitigation:
+ * outlier runs (whether from a flaky third-party script firing on
+ * one capture, a CDN cache miss on the first hit, or a transient
+ * network blip) get discarded in favor of the central tendency.
+ * Three is the minimum that defines a median; five would be more
+ * stable but doubles wall time and PSI quota burn.
+ *
+ * The runs go in parallel rather than sequentially so wall-clock
+ * cost is roughly one PSI call's latency (~25-30s) instead of
+ * three. Quota cost is unavoidable: 3x per scan. PSI's free tier
+ * with an API key allows 25,000 queries/day, so the practical
+ * ceiling is ~8,300 scans/day before quota matters. */
+const PARALLEL_PSI_RUNS = 3;
+
 type LighthouseAudit = {
   score?: number | null;
   numericValue?: number | null;
@@ -43,9 +65,13 @@ function readAuditScore(
   return typeof v === "number" && Number.isFinite(v) ? v : 0;
 }
 
-export async function runPerformanceAudit(
+/* Runs ONE PSI call against the URL with the existing
+ * retry-on-transient-error logic. Used to be the public export;
+ * now used internally by runPerformanceAudit which dispatches
+ * three of these in parallel and medianizes the results. */
+async function runSinglePsiAudit(
   url: string,
-  scanId: string | null = null
+  scanId: string | null,
 ): Promise<AuditResult> {
   const qs = new URLSearchParams({
     url,
@@ -121,7 +147,7 @@ export async function runPerformanceAudit(
       const audits = lh?.audits;
       const overallRaw = lh?.categories?.performance?.score ?? 0;
 
-      const scores = {
+      const scores: PerformanceScores = {
         overall: Math.round((overallRaw ?? 0) * 100),
         lcp: readAuditNumeric(audits, "largest-contentful-paint"),
         cls: readAuditScore(audits, "cumulative-layout-shift"),
@@ -179,4 +205,101 @@ export async function runPerformanceAudit(
   }
 
   throw lastErr ?? new Error("PageSpeed Insights failed after retries.");
+}
+
+/* Median of an array of finite numbers. Preserves precision for CLS
+ * (decimal) while returning the same arithmetic median for
+ * already-rounded millisecond fields. Empty array returns 0 to
+ * mirror the readAudit* helpers' "missing audit" default. */
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = values
+    .filter((n) => Number.isFinite(n))
+    .slice()
+    .sort((a, b) => a - b);
+  if (sorted.length === 0) return 0;
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1]! + sorted[mid]!) / 2
+    : sorted[mid]!;
+}
+
+/* Returns the run whose `overall` score is closest to the median
+ * overall. Used as the canonical `raw` value so downstream consumers
+ * (page text extraction, accessibility / SEO categories,
+ * renderLighthouseDetails) see a real Lighthouse result rather than
+ * a synthesized one. The metric numbers are medianized but the
+ * raw report stays internally consistent. */
+function pickRepresentativeRun(
+  runs: AuditResult[],
+  medianOverall: number,
+): AuditResult {
+  return runs
+    .slice()
+    .sort(
+      (a, b) =>
+        Math.abs(a.scores.overall - medianOverall) -
+        Math.abs(b.scores.overall - medianOverall),
+    )[0]!;
+}
+
+/**
+ * Runs PSI three times in parallel and returns medianized scores
+ * with a representative raw payload. This is the public entrypoint
+ * the inngest pipeline (s3 step) calls.
+ *
+ * Behavior:
+ *   - All three runs go in parallel via Promise.allSettled.
+ *   - Successful runs are collected; failed runs are dropped.
+ *   - 3 successes: medianize each metric, pick the run closest to
+ *     the median overall as the canonical raw.
+ *   - 2 successes: medianize (mean of two values is the median).
+ *   - 1 success: return that run unmodified. Logs a warning so
+ *     /admin/monitor sees that the scan went out on a single
+ *     sample rather than three.
+ *   - 0 successes: throw the first encountered error so the
+ *     inngest catch can mark the scan partial as before.
+ */
+export async function runPerformanceAudit(
+  url: string,
+  scanId: string | null = null,
+): Promise<AuditResult> {
+  const settled = await Promise.allSettled(
+    Array.from({ length: PARALLEL_PSI_RUNS }, () =>
+      runSinglePsiAudit(url, scanId),
+    ),
+  );
+
+  const successes: AuditResult[] = [];
+  const failures: unknown[] = [];
+  for (const s of settled) {
+    if (s.status === "fulfilled") successes.push(s.value);
+    else failures.push(s.reason);
+  }
+
+  if (successes.length === 0) {
+    throw failures[0] instanceof Error
+      ? failures[0]
+      : new Error("All PageSpeed Insights runs failed.");
+  }
+
+  if (successes.length === 1) {
+    console.warn(
+      `[run-audit] only 1 of ${PARALLEL_PSI_RUNS} PSI runs succeeded; metrics carry single-sample noise.`,
+    );
+    return successes[0]!;
+  }
+
+  const medianScores: PerformanceScores = {
+    overall: Math.round(median(successes.map((r) => r.scores.overall))),
+    lcp: Math.round(median(successes.map((r) => r.scores.lcp))),
+    cls: median(successes.map((r) => r.scores.cls)),
+    inp: Math.round(median(successes.map((r) => r.scores.inp))),
+    tbt: Math.round(median(successes.map((r) => r.scores.tbt))),
+    si: Math.round(median(successes.map((r) => r.scores.si))),
+  };
+
+  const representative = pickRepresentativeRun(successes, medianScores.overall);
+
+  return { scores: medianScores, raw: representative.raw };
 }
