@@ -167,10 +167,10 @@ export function extractOgPreview(
 
   if (!meta.image) {
     problems.push({
-      severity: "high",
+      severity: "medium",
       title: "No social share image",
       detail:
-        "Without an og:image tag, posting your link on Facebook, LinkedIn, or Slack shows no preview image. The card looks dead in the feed and people scroll past it. Add a <meta property=\"og:image\" content=\"https://yoursite.com/share-image.jpg\"> in the page <head> pointing to a 1200x630 image.",
+        "Without an og:image tag, posts of your link on LinkedIn and Facebook render as a small text-only card (LinkedIn shows just the title and URL, Facebook varies). Slack shows a richer fallback with the title and description. Adding a 1200x630 share image makes the card visually richer and more clickable in any feed. Add a <meta property=\"og:image\" content=\"https://yoursite.com/share-image.jpg\"> tag in the page <head>.",
     });
   }
 

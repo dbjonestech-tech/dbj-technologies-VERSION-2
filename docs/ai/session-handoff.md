@@ -6,7 +6,38 @@ Live snapshot of what the next session needs. Older sessions live under
 which covers the May 3 Inngest-cron + Pathlight reliability arc and the
 May 4 Canopy showcase swap.
 
-## Current state (May 5, 2026, very late)
+## Current state (May 6, 2026, late morning)
+
+Pathlight reliability + report-credibility arc closed for the
+bshaccounting.com Brian-prep pass. HEAD authoritative via
+`git rev-parse --short HEAD`.
+
+Tonight / this morning:
+
+- `69960ef` median-of-3 PSI runs (kill single-sample noise)
+- `8b8836e` write medianized values back into Lighthouse raw
+- `a31981b` compact no-og-image card state (replaced full-aspect
+  placeholder with one-line "No preview image set" strip)
+- `f1c4c16` read CLS from `numericValue`, not Lighthouse audit
+  `score` (the actual user-facing CLS bug fix)
+- `7a385f5` docs: queue interactive revenue calculator in
+  Priority 5 backlog (working-tree sweep)
+- (this commit) `fix(pathlight): align no-og-image problem
+  severity and copy with platform reality`. Drops severity from
+  `high` to `medium` and rewrites detail to match LinkedIn Post
+  Inspector ground truth (LinkedIn shows title + URL only;
+  Slack richer). Memory file `feedback_verify_social_share_rendering.md`
+  saved so per-platform claims get verified against the platform's
+  own debugger going forward.
+
+Working tree at session close: clean (after this commit lands).
+Push status: pushed to `origin main`.
+
+Next concrete action when Joshua picks back up: rescan
+bshaccounting.com from `/admin/scans/new` and confirm the report
+reads cleanly end-to-end before sending to Brian.
+
+## Prior state (May 5, 2026, very late)
 
 `git log -1` is authoritative for the actual HEAD. After the Phase 5
 page-system commit `a70d3c6` landed earlier today, nine security
