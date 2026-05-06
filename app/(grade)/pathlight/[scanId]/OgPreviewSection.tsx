@@ -166,6 +166,11 @@ function PreviewCard({
           />
         </div>
       ) : showImage ? (
+        /* og:image set in HTML but the proxy could not fetch it. The
+         * tall rectangle here is intentional: this is a real failure
+         * mode the prospect needs to fix, and showing it the same
+         * vertical real estate as a working image makes the absence
+         * visually loud. */
         <div
           className="flex w-full items-center justify-center px-4 text-center text-sm"
           style={{
@@ -179,15 +184,37 @@ function PreviewCard({
           publicly reachable.
         </div>
       ) : (
+        /* No og:image at all in the HTML. Render a SHORT inline strip
+         * instead of a full-aspect-ratio rectangle: real social
+         * platforms collapse cards without an image to a compact
+         * text-only layout, not a card-sized blank space, so the
+         * giant placeholder rectangle was systematically over-stating
+         * how broken the share looks. The strip keeps the prospect
+         * informed without making the card visually look dead. */
         <div
-          className="flex w-full items-center justify-center text-sm"
+          className="flex items-center gap-2 px-4 py-2 text-[11px] uppercase tracking-wider"
           style={{
-            aspectRatio: "1.91 / 1",
-            backgroundColor: "#f3f4f6",
             color: "#6b7280",
+            backgroundColor: "#f9fafb",
+            borderBottom: "1px solid #e5e7eb",
           }}
         >
-          No share image set. Cards render with no preview here.
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          No preview image set
         </div>
       )}
       <div className="px-4 py-3">
