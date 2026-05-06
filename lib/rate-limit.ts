@@ -81,6 +81,29 @@ const signinRatelimit = new Ratelimit({
   analytics: false,
 });
 
+/* Beacon ingestion limits. The /api/canopy/beacon/[contactId] endpoint
+   is unauthenticated by design (CORS *, fires from the buyer's site)
+   and the contactId is a sequential BIGSERIAL, so without these limits
+   anyone can enumerate ids and flood attribution_beacon_data. The
+   per-IP cap (60/min) handles a single attacker with one address; the
+   per-contactId cap (600/hour) caps the total writes against any one
+   contact even if the attacker rotates through many IPs. Both fail
+   open if Upstash is unreachable so a rate-limiter outage never
+   silently drops legitimate beacons. */
+const beaconIpRatelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(60, "1 m"),
+  prefix: "canopy:rl:beacon-ip",
+  analytics: false,
+});
+
+const beaconContactRatelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(600, "1 h"),
+  prefix: "canopy:rl:beacon-contact",
+  analytics: false,
+});
+
 export async function emailLimiter(email: string): Promise<LimitResult> {
   const { success, remaining } = await emailRatelimit.limit(email.toLowerCase());
   return { success, remaining };
@@ -121,6 +144,44 @@ export async function proxyImageLimiter(ip: string): Promise<LimitResult> {
     return { success, remaining };
   } catch (err) {
     console.error("[proxyImageLimiter] upstash error, allowing through:", err);
+    return { success: true, remaining: -1 };
+  }
+}
+
+export async function beaconIpLimiter(ip: string): Promise<LimitResult> {
+  /* Fail-open: a rate-limiter outage must not silently drop beacons
+     from a real buyer's site. The application-layer master toggle
+     (attribution_beacon_enabled, default false) is the primary gate. */
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    return { success: true, remaining: -1 };
+  }
+  try {
+    const { success, remaining } = await beaconIpRatelimit.limit(ip);
+    return { success, remaining };
+  } catch (err) {
+    console.error("[beaconIpLimiter] upstash error, allowing through:", err);
+    return { success: true, remaining: -1 };
+  }
+}
+
+export async function beaconContactLimiter(contactId: number): Promise<LimitResult> {
+  /* Same fail-open posture as beaconIpLimiter. */
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    return { success: true, remaining: -1 };
+  }
+  try {
+    const { success, remaining } = await beaconContactRatelimit.limit(
+      String(contactId)
+    );
+    return { success, remaining };
+  } catch (err) {
+    console.error("[beaconContactLimiter] upstash error, allowing through:", err);
     return { success: true, remaining: -1 };
   }
 }
