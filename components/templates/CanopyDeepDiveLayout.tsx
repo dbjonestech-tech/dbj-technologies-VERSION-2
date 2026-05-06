@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   getAdjacentCanopyDeepDives,
@@ -25,6 +26,13 @@ interface CanopyDeepDiveLayoutProps {
 export function CanopyDeepDiveLayout({ page }: CanopyDeepDiveLayoutProps) {
   const reduced = useReducedMotion();
   const { prev, next } = getAdjacentCanopyDeepDives(page.slug);
+  /* Reading time at a steady 240 wpm, ceiled to the nearest minute and
+     floored at 1. Sets reader expectations near the headline so a buyer
+     can decide whether to commit to the body before scrolling into it. */
+  const readingMinutes = Math.max(
+    1,
+    Math.ceil(page.body.split(/\s+/).filter(Boolean).length / 240),
+  );
 
   const stagger: Variants = {
     hidden: {},
@@ -89,6 +97,13 @@ export function CanopyDeepDiveLayout({ page }: CanopyDeepDiveLayoutProps) {
                 >
                   Deep Dive
                 </span>
+                <span className="text-text-muted/50" aria-hidden="true">
+                  /
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
+                  <Clock className="h-3 w-3" aria-hidden="true" />
+                  {readingMinutes} min read
+                </span>
               </motion.div>
 
               <motion.h1
@@ -105,6 +120,33 @@ export function CanopyDeepDiveLayout({ page }: CanopyDeepDiveLayoutProps) {
                 {page.summary}
               </motion.p>
             </div>
+
+            {/* Hero proof shot. The same capability screenshot the parent
+                case study renders next to this section's L1 body, surfaced
+                here as a visual anchor before the long-form prose so the
+                reader sees the artifact the architecture produced before
+                they read about how it works. */}
+            <motion.div
+              variants={item}
+              className="mt-14 lg:mt-20 mx-auto max-w-5xl"
+            >
+              <div
+                className="relative overflow-hidden rounded-xl lg:rounded-2xl border bg-bg-secondary aspect-[1800/1170]"
+                style={{
+                  borderColor: `${ACCENT}38`,
+                  boxShadow: `0 30px 80px -20px ${ACCENT}40, 0 15px 40px -15px rgba(0,0,0,0.18)`,
+                }}
+              >
+                <Image
+                  src={page.image}
+                  alt={page.imageAlt}
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                  priority
+                />
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
