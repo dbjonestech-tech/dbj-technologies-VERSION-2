@@ -36,6 +36,11 @@ Re-enabling each rule as the broader walk clears its violations is
 the right path; tonight closed two specific named items, not the
 whole rule family.
 
+Anchor commit: `a877b5c` (refactor: clear two react-hooks v7
+diagnostics). Pushed to `origin main`. Working tree at session
+close: 4 in-flight page-system files modified + 4 untracked
+city-page directories (Joshua's parallel effort, not mine).
+
 Working tree note: 5 in-flight page-system files from the prior
 session (`registry.ts`, `LegalContent.tsx`, `ProsperContent.tsx`,
 `RichardsonContent.tsx`, plus three new untracked
