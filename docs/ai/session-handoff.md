@@ -22,8 +22,8 @@ Tonight / this morning:
   `score` (the actual user-facing CLS bug fix)
 - `7a385f5` docs: queue interactive revenue calculator in
   Priority 5 backlog (working-tree sweep)
-- (this commit) `fix(pathlight): align no-og-image problem
-  severity and copy with platform reality`. Drops severity from
+- `e8e37f6` fix(pathlight): align no-og-image problem
+  severity and copy with platform reality. Drops severity from
   `high` to `medium` and rewrites detail to match LinkedIn Post
   Inspector ground truth (LinkedIn shows title + URL only;
   Slack richer). Memory file `feedback_verify_social_share_rendering.md`
