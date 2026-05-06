@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AskPathlightLoader from "./AskPathlightLoader";
 import { CaptureCaveatsNotice } from "./CaptureCaveatsNotice";
+import { FailedState } from "./FailedState";
 import { FormsAuditSection } from "./FormsAuditSection";
 import { HeroCritiqueSection } from "./HeroCritiqueSection";
 import { OgPreviewSection } from "./OgPreviewSection";
@@ -22,6 +23,7 @@ import type {
   RemediationItem,
   RemediationResult,
   RevenueImpactResult,
+  ScanFailureKind,
   ScanStatus as ScanStatusValue,
 } from "@/lib/types/scan";
 
@@ -71,6 +73,11 @@ type ApiReport = {
    * array means "ran, nothing to surface"; null means "still running".
    * The polling loop treats either non-null value as settled. */
   captureCaveats: CaptureCaveat[] | null;
+  /* Failure category (May 5 2026, migration 039). Set when status
+   * is "failed". The failure UI routes prospect-facing copy off
+   * this so the page names the actual cause. Null on pre-feature
+   * scans and on non-failed scans. */
+  failureKind: ScanFailureKind | null;
   isOutOfScope: boolean;
   outOfScopeLabel: string | null;
   screenshotNotice: string | null;
@@ -198,7 +205,8 @@ export function ScanStatus({
         {isFailed ? (
           <FailedState
             url={displayUrl}
-            message={report?.errorMessage ?? report?.error ?? null}
+            failureKind={report?.failureKind ?? null}
+            fallbackMessage={report?.errorMessage ?? report?.error ?? null}
           />
         ) : null}
 
@@ -522,66 +530,6 @@ function LoadingState({ status, url }: { status: string; url: string }) {
             );
           })}
         </ol>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────── Failed ─────────────────────── */
-
-const FAILED_FALLBACK =
-  "Something went wrong with the scan. Please try again, and if the problem persists, contact us.";
-
-function FailedState({
-  url,
-  message,
-}: {
-  url: string;
-  message: string | null;
-}) {
-  const friendly = message ?? FAILED_FALLBACK;
-  return (
-    <section className="mx-auto max-w-xl py-20 text-center">
-      <p
-        className="text-xs uppercase tracking-[0.25em]"
-        style={{ color: "#6b7280" }}
-      >
-        Pathlight scan
-      </p>
-      <h1
-        className="mt-2 break-all font-display text-2xl font-semibold sm:text-3xl"
-        style={{ color: "#e7ebf2" }}
-      >
-        {url}
-      </h1>
-      <div
-        className="mt-10 rounded-2xl border p-8"
-        style={{
-          borderColor: "rgba(239,68,68,0.35)",
-          backgroundColor: "rgba(127,29,29,0.12)",
-        }}
-      >
-        <div
-          className="font-display text-xl font-semibold"
-          style={{ color: "#fca5a5" }}
-        >
-          Scan failed
-        </div>
-        <p className="mt-3 text-sm" style={{ color: "#f5c6c6" }}>
-          {friendly}
-        </p>
-        <div>
-          <Link
-            href="/pathlight"
-            className="mt-6 inline-block rounded-full px-5 py-2 text-sm font-semibold"
-            style={{
-              backgroundImage: "linear-gradient(135deg, #3b82f6, #0891b2)",
-              color: "white",
-            }}
-          >
-            Try another scan
-          </Link>
-        </div>
       </div>
     </section>
   );

@@ -125,6 +125,15 @@ export async function GET(
        * is still waiting on it). The renderer suppresses the top-of-
        * report Notes section when this is empty or null. */
       captureCaveats: report.captureCaveats,
+      /* Structured failure category set when status is "failed".
+       * Migration 039 (May 5 2026). The failure UI in ScanStatus
+       * routes prospect-facing copy off this so the page names the
+       * actual cause (your hosting WAF blocked our scanner / your
+       * DNS does not resolve / your site responded with HTTP 500
+       * / etc.) rather than rendering a generic "something went
+       * wrong" card. Pre-feature failed scans coerce to null; the
+       * UI falls back to its legacy generic copy. */
+      failureKind: report.failureKind,
       isOutOfScope,
       outOfScopeLabel: isOutOfScope
         ? report.businessScale === "global"

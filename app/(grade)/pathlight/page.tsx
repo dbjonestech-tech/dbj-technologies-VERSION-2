@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { PathlightBackdrop } from "./PathlightBackdrop";
 import { PathlightContent } from "./PathlightContent";
 import { PathlightForm } from "./PathlightForm";
@@ -28,7 +29,16 @@ export default function GradePage() {
   return (
     <>
       <PathlightBackdrop />
-      <PathlightForm />
+      {/* PathlightForm reads ?url= via useSearchParams so the failed-scan
+       * UI on /pathlight/[scanId] can route the retry CTA back here with
+       * the original URL pre-populated. useSearchParams requires a
+       * Suspense boundary in Next 16 App Router; without one the page
+       * silently deopts to fully-dynamic rendering and Vercel logs a
+       * build warning. The fallback is intentionally empty so the
+       * pre-hydration skeleton never flashes a half-rendered form. */}
+      <Suspense fallback={null}>
+        <PathlightForm />
+      </Suspense>
       <PathlightContent />
     </>
   );

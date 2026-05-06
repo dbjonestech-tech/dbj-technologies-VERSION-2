@@ -1122,7 +1122,6 @@ export const scanRequested = inngest.createFunction(
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Scan pipeline failed.";
-      await updateScanStatus(scanId, "failed", message).catch(() => {});
       /* Validation errors carry a structured diagnostic with the
        * specific failure kind (connection-blocked, dns-fail,
        * timeout, http-error, etc.), the upstream Server header, and
@@ -1134,15 +1133,39 @@ export const scanRequested = inngest.createFunction(
        * scan at a time. */
       const diagnostic =
         err instanceof ScanValidationError ? err.diagnostic : undefined;
+      /* Persist the failure category so the public report page can
+       * route prospect-facing copy off the actual cause. Validation
+       * failures use the diagnostic's kind directly (filtered to
+       * exclude the "ok" sentinel which would not be set on a
+       * thrown error in the first place). Post-validation failures
+       * are anything that escaped the pipeline's own partial-scan
+       * cascade; they get the generic "pipeline-error" sentinel so
+       * the renderer shows a "the scan started but couldn't
+       * finish" message instead of pretending it was a
+       * site-reachability issue. */
+      const failureKind: import("@/lib/types/scan").ScanFailureKind =
+        diagnostic?.failureKind && diagnostic.failureKind !== "ok"
+          ? diagnostic.failureKind
+          : err instanceof ScanValidationError
+            ? "unknown"
+            : "pipeline-error";
+      await updateScanStatus(scanId, "failed", message, failureKind).catch(
+        () => {},
+      );
       await track(
         "scan.failed",
         {
           error: message.slice(0, 500),
           stage: "pipeline-throw",
           durationMs: Date.now() - startedAt,
+          /* Always emit failureKind. Diagnostic-bearing validation
+           * failures pass it through from the diagnostic; the
+           * fallback resolution above (unknown / pipeline-error)
+           * still classifies non-validation failures so the
+           * monitor can group them. */
+          failureKind,
           ...(diagnostic
             ? {
-                failureKind: diagnostic.failureKind,
                 httpStatus: diagnostic.httpStatus,
                 serverHeader: diagnostic.serverHeader,
                 nameservers: diagnostic.nameservers,

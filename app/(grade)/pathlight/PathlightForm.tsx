@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
 
@@ -19,9 +19,29 @@ const INITIAL_STATE: FormState = {
   city: "Dallas",
 };
 
+/* The failed-scan UI on /pathlight/[scanId] routes its retry CTAs
+ * back here with ?url=<original> so the prospect does not have to
+ * re-type. Sanity-cap the length and require the value to look
+ * URL-shaped before trusting it; the submit-side validation is
+ * still the load-bearing gate, this is just defense in depth so a
+ * malicious deep link cannot inject arbitrary text into the input. */
+function readPrefilledUrl(value: string | null): string {
+  if (!value) return "";
+  if (value.length > 2_000) return "";
+  if (!/^https?:\/\//i.test(value) && !/^[\w.-]+\.[a-z]{2,}/i.test(value)) {
+    return "";
+  }
+  return value;
+}
+
 export function PathlightForm() {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(INITIAL_STATE);
+  const searchParams = useSearchParams();
+  const prefilledUrl = readPrefilledUrl(searchParams?.get("url") ?? null);
+  const [form, setForm] = useState<FormState>(() => ({
+    ...INITIAL_STATE,
+    url: prefilledUrl,
+  }));
   const [token, setToken] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

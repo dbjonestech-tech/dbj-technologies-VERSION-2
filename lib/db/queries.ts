@@ -24,11 +24,34 @@ import type {
   PositioningScores,
   RemediationResult,
   RevenueImpactResult,
+  ScanFailureKind,
   ScanRecord,
   ScanStatus,
   ScreenshotPair,
   VisionAuditResult,
 } from "@/lib/types/scan";
+
+const SCAN_FAILURE_KINDS: ReadonlySet<ScanFailureKind> = new Set<ScanFailureKind>(
+  [
+    "malformed",
+    "protocol",
+    "ssrf-blocked",
+    "dns-fail",
+    "connection-blocked",
+    "timeout",
+    "http-error",
+    "redirect-loop",
+    "redirect-blocked",
+    "pipeline-error",
+    "unknown",
+  ],
+);
+
+function coerceFailureKind(v: unknown): ScanFailureKind | null {
+  return typeof v === "string" && SCAN_FAILURE_KINDS.has(v as ScanFailureKind)
+    ? (v as ScanFailureKind)
+    : null;
+}
 
 type ScanRow = {
   id: string;
@@ -40,6 +63,10 @@ type ScanRow = {
   industry: string | null;
   city: string | null;
   error_message: string | null;
+  /* Migration 039 (May 5 2026). Nullable; pre-feature failed scans
+   * coerce to null and the failure UI falls back to its generic
+   * card. */
+  failure_kind: string | null;
   scan_duration_ms: number | null;
   created_at: string;
   updated_at: string;
@@ -78,13 +105,39 @@ type ScanResultsRow = {
 export async function updateScanStatus(
   scanId: string,
   status: ScanStatus,
-  error?: string
+  error?: string,
+  failureKind?: ScanFailureKind | null,
 ): Promise<void> {
   const sql = getDb();
-  if (error) {
+  /* Three explicit branches keep the SQL parameterized cleanly under
+   * Neon's serverless driver, which is fussy about non-uniform
+   * placeholder shapes across conditional fragments. The
+   * failure_kind column is only written when the caller passed an
+   * explicit kind; passing `undefined` leaves the column untouched
+   * (so a successful scan does not zero out a previous failure
+   * record on a status flip), passing `null` clears it, and passing
+   * a string sets it. */
+  if (error && failureKind !== undefined) {
+    await sql`
+      UPDATE scans
+      SET status = ${status},
+          error_message = ${error},
+          failure_kind = ${failureKind},
+          updated_at = now()
+      WHERE id = ${scanId}
+    `;
+  } else if (error) {
     await sql`
       UPDATE scans
       SET status = ${status}, error_message = ${error}, updated_at = now()
+      WHERE id = ${scanId}
+    `;
+  } else if (failureKind !== undefined) {
+    await sql`
+      UPDATE scans
+      SET status = ${status},
+          failure_kind = ${failureKind},
+          updated_at = now()
       WHERE id = ${scanId}
     `;
   } else {
@@ -838,7 +891,8 @@ async function loadScanWithResults(scanId: string): Promise<{
   const sql = getDb();
   const scanRows = (await sql`
     SELECT id, status, url, resolved_url, email, business_name, industry, city,
-           error_message, scan_duration_ms, created_at, updated_at, completed_at
+           error_message, failure_kind, scan_duration_ms, created_at,
+           updated_at, completed_at
     FROM scans
     WHERE id = ${scanId}
     LIMIT 1
@@ -1136,6 +1190,7 @@ export async function getFullScanReport(
     pageCritique: coercePageCritique(result?.page_critique),
     ogPreview: coerceOgPreview(result?.og_preview),
     captureCaveats: coerceCaptureCaveats(result?.capture_caveats),
+    failureKind: coerceFailureKind(scan.failure_kind),
     businessModel: vision?.businessModel,
     inferredVertical: vision?.inferredVertical,
     inferredVerticalParent: vision?.inferredVerticalParent,

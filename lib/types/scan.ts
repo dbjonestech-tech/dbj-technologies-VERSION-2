@@ -6,6 +6,33 @@ export type ScanStatus =
   | "partial"
   | "failed";
 
+/* Structured category of a failed scan. Persisted on
+ * scans.failure_kind so the public report page can route the
+ * prospect-facing copy off the actual cause rather than a generic
+ * "something went wrong" message. Mirrors the
+ * `ValidationFailureKind` from lib/services/url.ts (minus the "ok"
+ * member, which is not a failure) and adds "pipeline-error" for
+ * the residual class of post-validation pipeline failures (a
+ * crash inside the screenshot or vision step that escaped the
+ * normal partial-scan path).
+ *
+ * The renderer maps every kind here to a specific headline +
+ * body + next-step copy block. New kinds added later default to
+ * the "unknown" treatment until copy ships, so adding a new kind
+ * is forward-compatible. */
+export type ScanFailureKind =
+  | "malformed"
+  | "protocol"
+  | "ssrf-blocked"
+  | "dns-fail"
+  | "connection-blocked"
+  | "timeout"
+  | "http-error"
+  | "redirect-loop"
+  | "redirect-blocked"
+  | "pipeline-error"
+  | "unknown";
+
 export type PerformanceScores = {
   overall: number;
   lcp: number;
@@ -360,6 +387,11 @@ export type PathlightReport = {
    * the array is empty or null; non-empty surfaces the top-of-report
    * "Notes on this analysis" section. */
   captureCaveats: CaptureCaveat[] | null;
+  /* Structured failure category set when status is "failed". Null
+   * for pre-feature scans (which have no failure_kind column value)
+   * and for non-failed scans. The failure UI uses this to route
+   * prospect-facing copy off the actual cause. */
+  failureKind: ScanFailureKind | null;
   businessModel?: "B2B" | "B2C" | "mixed";
   inferredVertical?: string;
   inferredVerticalParent?: string;
