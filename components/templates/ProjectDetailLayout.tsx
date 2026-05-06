@@ -443,7 +443,7 @@ export function ProjectDetailLayout({ project }: ProjectDetailLayoutProps) {
               {section.liveHref ? (
                 <motion.div
                   variants={item}
-                  className="mx-auto max-w-3xl mt-8"
+                  className="mx-auto max-w-3xl mt-8 text-center"
                 >
                   <Link
                     href={section.liveHref}
