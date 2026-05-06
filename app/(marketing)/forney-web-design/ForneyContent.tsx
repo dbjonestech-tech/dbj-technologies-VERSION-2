@@ -208,12 +208,14 @@ const sections: LocalLanderSection[] = [
           office, on-site photography sessions, and ongoing
           relationship work all run more efficiently for Forney
           clients than for Plano or Frisco clients. The local
-          knowledge advantage is also meaningful: I drive the
-          eastern DFW corridor regularly, I know which Forney
-          subdivisions are still selling out and which are fully
-          built, I know which downtown businesses are working and
-          which are not, and that level of local context shows
-          up in the work.
+          knowledge advantage is also meaningful. The studio sits
+          twenty-five miles northeast of Forney on the eastern
+          DFW corridor, which means working context for the city,
+          which subdivisions are still actively building versus
+          mature, which downtown corridors are working, which
+          residential growth pockets are accelerating, is in
+          scope rather than theoretical the way it is for an
+          out-of-market vendor.
         </p>
         <p>
           For the technical specifics of what I build, the{" "}

@@ -196,11 +196,13 @@ const sections: LocalLanderSection[] = [
           photography sessions, and ongoing relationship work all
           run more efficiently for Rockwall clients than for
           Plano or Frisco clients. The local knowledge advantage
-          is also meaningful: I drive Interstate 30 through
-          Rockwall multiple times every week, I know which Harbor
-          District restaurants are working and which are not, I
-          know which subdivisions are newer than they look, and
-          that kind of local context shows up in the work.
+          is also meaningful. The studio sits ten miles east of
+          Rockwall on the same I-30 corridor, which means working
+          context for the city, which Harbor District retail is
+          current versus dated, which subdivisions are mature
+          versus actively building, which county-level demographic
+          shifts are real, is in scope rather than theoretical the
+          way it is for an out-of-market vendor.
         </p>
         <p>
           For the technical specifics of what I build, the{" "}
