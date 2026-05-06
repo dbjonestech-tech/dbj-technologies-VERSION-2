@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signIn } from "@/auth";
+import { safeCallbackPath } from "@/lib/auth/safe-callback";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,7 @@ export default async function SignInPage({
 }) {
   const session = await auth();
   const params = await searchParams;
-  const callbackUrl = params.callbackUrl ?? "/admin";
+  const callbackUrl = safeCallbackPath(params.callbackUrl, "/admin");
 
   if (session?.user?.isAdmin) {
     redirect(callbackUrl);

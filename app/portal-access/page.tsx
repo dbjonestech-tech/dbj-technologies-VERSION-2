@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { auth, signIn } from "@/auth";
+import { safeCallbackPath } from "@/lib/auth/safe-callback";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export default async function PortalAccessPage({
 }) {
   const session = await auth();
   const params = await searchParams;
-  const callbackUrl = params.callbackUrl ?? "/portal";
+  const callbackUrl = safeCallbackPath(params.callbackUrl, "/portal");
 
   if (session?.user?.isAdmin) {
     redirect("/admin");
