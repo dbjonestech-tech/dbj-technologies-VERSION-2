@@ -306,13 +306,20 @@ const proof: IndustryProof = {
           className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
         >
           medical and dental practices
-        </Link>{" "}
-        and{" "}
+        </Link>
+        ,{" "}
         <Link
           href="/industries/legal"
           className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
         >
           law firms
+        </Link>
+        , and{" "}
+        <Link
+          href="/industries/trades-and-hvac"
+          className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+        >
+          trades and HVAC contractors
         </Link>{" "}
         cover how those constraints change the architecture.
       </p>

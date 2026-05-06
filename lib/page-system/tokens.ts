@@ -5,7 +5,7 @@ export type LayoutArchetype =
   | "service"
   | "industry";
 
-export type AccentDominance = "blue" | "cyan" | "violet";
+export type AccentDominance = "blue" | "cyan" | "violet" | "amber";
 
 export type HeroVariant =
   | "photo"

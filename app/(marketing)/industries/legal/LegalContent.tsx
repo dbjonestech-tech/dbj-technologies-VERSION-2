@@ -414,6 +414,19 @@ const proof: IndustryProof = {
         case-fit answer, accurate outcomes, named attorneys, fast
         performance, accessible design, visible compliance.
       </p>
+      <p>
+        For service verticals where the regulatory frame is licensing
+        rather than advertising rules, the cousin architecture lives
+        on the{" "}
+        <Link
+          href="/industries/trades-and-hvac"
+          className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+        >
+          trades and HVAC page
+        </Link>
+        , where TACLA license numbers and EPA Section 608 certification
+        play the role that the State Bar advertising notice plays here.
+      </p>
     </>
   ),
   link: {

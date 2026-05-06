@@ -319,7 +319,7 @@ const proof: IndustryProof = {
         >
           law firms
         </Link>
-        , where State Bar advertising rules shape every page, and{" "}
+        , where State Bar advertising rules shape every page,{" "}
         <Link
           href="/industries/auto-service"
           className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
@@ -327,7 +327,15 @@ const proof: IndustryProof = {
           auto service shops
         </Link>
         , where the trust deficit is generational rather than
-        regulatory. The constraints are different; the architecture
+        regulatory, and{" "}
+        <Link
+          href="/industries/trades-and-hvac"
+          className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+        >
+          trades and HVAC contractors
+        </Link>
+        , where licensing rules and emergency-call urgency shape the
+        layout. The constraints are different; the architecture
         responds to them.
       </p>
     </>

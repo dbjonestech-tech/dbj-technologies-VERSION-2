@@ -38,4 +38,13 @@ export const accentMap: Record<AccentDominance, AccentClasses> = {
     ring: "ring-accent-violet/20",
     glow: "shadow-glow-violet",
   },
+  amber: {
+    hex: "#d97706",
+    text: "text-accent-amber",
+    bg: "bg-accent-amber",
+    bgSoft: "bg-accent-amber/5",
+    border: "border-accent-amber/20",
+    ring: "ring-accent-amber/20",
+    glow: "shadow-glow-amber",
+  },
 };

@@ -19,6 +19,7 @@ const config: Config = {
           blue: "#3b82f6",
           cyan: "#0891b2",
           violet: "#7c3aed",
+          amber: "#d97706",
           glow: "rgba(59,130,246,0.12)",
         },
         text: {
@@ -103,6 +104,7 @@ const config: Config = {
         "glow-blue": "0 0 30px rgba(59,130,246,0.25), 0 0 60px rgba(59,130,246,0.08)",
         "glow-cyan": "0 0 30px rgba(8,145,178,0.25), 0 0 60px rgba(8,145,178,0.08)",
         "glow-violet": "0 0 30px rgba(124,58,237,0.25)",
+        "glow-amber": "0 0 30px rgba(217,119,6,0.25), 0 0 60px rgba(217,119,6,0.08)",
         "card": "0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04)",
       },
     },
