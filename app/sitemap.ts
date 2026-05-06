@@ -3,6 +3,7 @@ import { getServiceSlugs } from "@/lib/service-data";
 import { getPricingSlugs } from "@/lib/pricing-data";
 import { getProjectSlugs } from "@/lib/work-data";
 import { getAllDesignBriefSlugs } from "@/lib/design-briefs";
+import { getCanopyDeepDiveSlugs } from "@/lib/canopy-deep-dives";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://dbjtechnologies.com";
@@ -70,6 +71,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+  /* ─── Canopy Layer 3 deep-dive pages ─────────────── */
+  /* Empty until each Phase 3 page lands in lib/canopy-deep-dives.ts;
+     once a registry entry is added, its URL is auto-included here. */
+  const canopyDeepDiveEntries = getCanopyDeepDiveSlugs().map((slug) => ({
+    url: `${baseUrl}/work/canopy/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.75,
+  }));
+
   /* ─── Canopy showcase tour ──────────────────────── */
   const showcaseRoutes = [
     "/showcase/canopy",
@@ -95,6 +106,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...pricingEntries,
     ...projectEntries,
     ...designBriefEntries,
+    ...canopyDeepDiveEntries,
     ...showcaseEntries,
   ];
 }
