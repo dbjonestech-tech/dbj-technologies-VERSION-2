@@ -112,3 +112,20 @@ export function getCanopyDeepDive(slug: string): CanopyDeepDive | undefined {
 export function getCanopyDeepDiveSlugs(): string[] {
   return CANOPY_DEEP_DIVES.map((p) => p.slug);
 }
+
+/* Returns the adjacent pages in registry order so a reader who finishes
+ * one deep-dive can chain straight into the next one without bouncing
+ * back to the parent case study. Linear, no wraparound: the first page
+ * has no prev, the last page has no next. The "Back to Canopy" anchor
+ * remains the explicit exit. */
+export function getAdjacentCanopyDeepDives(slug: string): {
+  prev: CanopyDeepDive | undefined;
+  next: CanopyDeepDive | undefined;
+} {
+  const i = CANOPY_DEEP_DIVES.findIndex((p) => p.slug === slug);
+  if (i === -1) return { prev: undefined, next: undefined };
+  return {
+    prev: i > 0 ? CANOPY_DEEP_DIVES[i - 1] : undefined,
+    next: i < CANOPY_DEEP_DIVES.length - 1 ? CANOPY_DEEP_DIVES[i + 1] : undefined,
+  };
+}

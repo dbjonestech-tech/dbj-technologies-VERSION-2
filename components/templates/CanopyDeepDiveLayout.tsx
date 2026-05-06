@@ -3,7 +3,10 @@
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import type { CanopyDeepDive } from "@/lib/canopy-deep-dives";
+import {
+  getAdjacentCanopyDeepDives,
+  type CanopyDeepDive,
+} from "@/lib/canopy-deep-dives";
 
 /* Canopy's gradient is from-cyan-500 to-blue-600. The hex tokens here
    match what deriveAccent / deriveHaloColors return inside
@@ -21,6 +24,7 @@ interface CanopyDeepDiveLayoutProps {
 
 export function CanopyDeepDiveLayout({ page }: CanopyDeepDiveLayoutProps) {
   const reduced = useReducedMotion();
+  const { prev, next } = getAdjacentCanopyDeepDives(page.slug);
 
   const stagger: Variants = {
     hidden: {},
@@ -133,7 +137,10 @@ export function CanopyDeepDiveLayout({ page }: CanopyDeepDiveLayoutProps) {
         </div>
       </section>
 
-      {/* Tail navigation, back to /work/canopy + Get in Touch */}
+      {/* Tail navigation. Sibling-page nav first so a deep-engaged reader
+          can chain into the next architectural body without bouncing back
+          to the case study. The "Back to Canopy" + "Get in Touch" row
+          stays as the explicit exit for readers who are done. */}
       <section className="relative py-16 lg:py-20 border-t border-text-primary/10 bg-bg-secondary/40">
         <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
           <motion.div
@@ -141,40 +148,87 @@ export function CanopyDeepDiveLayout({ page }: CanopyDeepDiveLayoutProps) {
             whileInView="visible"
             viewport={VIEWPORT}
             variants={stagger}
-            className="max-w-3xl mx-auto text-center"
+            className="max-w-4xl mx-auto"
           >
-            <motion.p
-              variants={item}
-              className="font-mono text-[11px] uppercase tracking-[0.22em] mb-5"
-              style={{ color: ACCENT }}
-            >
-              Keep Reading
-            </motion.p>
-            <motion.h2
-              variants={item}
-              className="font-display text-[clamp(1.5rem,2.6vw,2.2rem)] font-bold leading-[1.2] tracking-tight mb-8"
-            >
-              The rest of the case study lives at /work/canopy.
-            </motion.h2>
-            <motion.div
-              variants={item}
-              className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4"
-            >
-              <Link
-                href="/work/canopy"
-                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
-                style={{ backgroundColor: ACCENT }}
+            {prev || next ? (
+              <motion.div variants={item} className="mb-14 lg:mb-16">
+                <div className="grid gap-4 lg:gap-6 sm:grid-cols-2">
+                  {prev ? (
+                    <Link
+                      href={`/work/canopy/${prev.slug}`}
+                      className="group relative rounded-2xl border border-text-primary/10 bg-bg-primary/60 p-6 lg:p-7 transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-cyan-500/40 motion-safe:hover:shadow-lg"
+                    >
+                      <span className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted mb-3">
+                        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                        Previous architecture
+                      </span>
+                      <span
+                        className="block font-display text-xl lg:text-2xl font-bold leading-tight tracking-tight transition-colors group-hover:text-cyan-600"
+                        style={{ color: "inherit" }}
+                      >
+                        {prev.heading}
+                      </span>
+                    </Link>
+                  ) : (
+                    <span className="hidden sm:block" aria-hidden="true" />
+                  )}
+                  {next ? (
+                    <Link
+                      href={`/work/canopy/${next.slug}`}
+                      className="group relative rounded-2xl border border-text-primary/10 bg-bg-primary/60 p-6 lg:p-7 transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-cyan-500/40 motion-safe:hover:shadow-lg sm:text-right"
+                    >
+                      <span className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted mb-3 sm:justify-end">
+                        Next architecture
+                        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      </span>
+                      <span
+                        className="block font-display text-xl lg:text-2xl font-bold leading-tight tracking-tight transition-colors group-hover:text-cyan-600"
+                        style={{ color: "inherit" }}
+                      >
+                        {next.heading}
+                      </span>
+                    </Link>
+                  ) : (
+                    <span className="hidden sm:block" aria-hidden="true" />
+                  )}
+                </div>
+              </motion.div>
+            ) : null}
+
+            <div className="max-w-3xl mx-auto text-center">
+              <motion.p
+                variants={item}
+                className="font-mono text-[11px] uppercase tracking-[0.22em] mb-5"
+                style={{ color: ACCENT }}
               >
-                Back to Canopy
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link
-                href="/contact?topic=canopy"
-                className="inline-flex items-center text-sm font-semibold text-text-primary border-b border-text-primary/30 hover:border-text-primary transition-colors pb-1"
+                Or step back out
+              </motion.p>
+              <motion.h2
+                variants={item}
+                className="font-display text-[clamp(1.5rem,2.6vw,2.2rem)] font-bold leading-[1.2] tracking-tight mb-8"
               >
-                Get in Touch
-              </Link>
-            </motion.div>
+                The rest of the case study lives at /work/canopy.
+              </motion.h2>
+              <motion.div
+                variants={item}
+                className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4"
+              >
+                <Link
+                  href="/work/canopy"
+                  className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg"
+                  style={{ backgroundColor: ACCENT }}
+                >
+                  Back to Canopy
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/contact?topic=canopy"
+                  className="inline-flex items-center text-sm font-semibold text-text-primary border-b border-text-primary/30 hover:border-text-primary transition-colors pb-1"
+                >
+                  Get in Touch
+                </Link>
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>
