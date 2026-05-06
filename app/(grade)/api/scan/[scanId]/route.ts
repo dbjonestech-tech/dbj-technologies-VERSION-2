@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getFullScanReport } from "@/lib/db/queries";
+import { evaluateRevenueTrust } from "@/lib/services/revenue-trust";
 import type { ScreenshotHealth } from "@/lib/types/scan";
 
 const SCREENSHOT_NOTICES: Record<Exclude<ScreenshotHealth, "clean">, string> = {
@@ -75,6 +76,18 @@ export async function GET(
 
   const friendlyError = sanitizeScanError(report.error);
 
+  /* Revenue-trust gate at the read boundary. The same evaluator that
+   * holds outbound emails (lib/services/revenue-trust.ts) decides
+   * whether to surface the dollar number on the public report page.
+   * Untrusted estimates are suppressed by returning revenueImpact
+   * null; the renderer then shows a "refining this estimate"
+   * placeholder block instead of the embarrassing number. The
+   * underlying scan_results row is unchanged so /admin/monitor still
+   * sees the real estimate for triage. */
+  const trust = evaluateRevenueTrust(report);
+  const revenueWithheld = !trust.trusted;
+  const surfacedRevenueImpact = revenueWithheld ? null : report.revenueImpact;
+
   return NextResponse.json(
     {
       scanId: report.id,
@@ -96,7 +109,14 @@ export async function GET(
       design: report.design,
       positioning: report.positioning,
       remediation: report.remediation,
-      revenueImpact: report.revenueImpact,
+      revenueImpact: surfacedRevenueImpact,
+      /* True when the revenue estimate was suppressed by the trust
+       * gate. The report page renders a refining-estimate
+       * placeholder when this is true rather than the dollar
+       * number. The reason itself is intentionally NOT surfaced to
+       * the public response: it is operator-facing and lives in
+       * /admin/monitor only. */
+      revenueWithheld,
       pathlightScore: report.pathlightScore,
       pillarScores: report.pillarScores,
       lighthouseScores: report.lighthouseScores ?? null,

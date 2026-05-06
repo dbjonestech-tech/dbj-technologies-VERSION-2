@@ -78,6 +78,12 @@ type ApiReport = {
    * this so the page names the actual cause. Null on pre-feature
    * scans and on non-failed scans. */
   failureKind: ScanFailureKind | null;
+  /* Revenue-trust gate result (May 6 2026). True when the dollar
+   * number was suppressed because it failed the structural trust
+   * checks (B2B with implausibly low deal value, generic vertical
+   * with low-confidence benchmark, etc.). The renderer shows a
+   * refining-estimate placeholder instead of the number. */
+  revenueWithheld: boolean;
   isOutOfScope: boolean;
   outOfScopeLabel: string | null;
   screenshotNotice: string | null;
@@ -636,6 +642,8 @@ function Report({
 
       {isOutOfScope ? (
         <OutOfScopeNotice label={report.outOfScopeLabel ?? "national brand"} />
+      ) : report.revenueWithheld ? (
+        <RevenueRefiningNotice />
       ) : hasRevenue ? (
         <RevenueImpactBlock impact={report.revenueImpact!} />
       ) : null}
@@ -1380,6 +1388,54 @@ function OutOfScopeNotice({ label }: { label: string }) {
         <p className="mt-3 text-sm leading-relaxed" style={{ color: "#c5ccd8" }}>
           Run Pathlight on your own business website to see a calibrated
           revenue estimate.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────── Revenue Refining Notice ─────────── */
+
+/* Rendered in place of the dollar-figure RevenueImpactBlock when the
+ * server-side revenue-trust gate (lib/services/revenue-trust.ts)
+ * decided the model's estimate is not defensible enough to ship to
+ * the prospect. The reasons live in /admin/monitor for operator
+ * triage; the prospect-facing copy here is intentionally non-
+ * specific so Pathlight does not reveal its internal trust rules. */
+function RevenueRefiningNotice() {
+  return (
+    <section>
+      <h2
+        className="text-xs uppercase tracking-[0.25em]"
+        style={{ color: "#6b7280" }}
+      >
+        Revenue impact
+      </h2>
+      <div
+        className="mt-4 rounded-2xl border p-6"
+        style={{
+          borderColor: "rgba(255,255,255,0.08)",
+          backgroundColor: "rgba(10,12,18,0.7)",
+        }}
+      >
+        <div
+          className="font-display text-2xl font-bold sm:text-3xl"
+          style={{ color: "#e7ebf2" }}
+        >
+          I am refining the revenue estimate for this scan
+        </div>
+        <p className="mt-4 text-sm leading-relaxed" style={{ color: "#c5ccd8" }}>
+          The structural inputs for this site (vertical match, traffic
+          baseline, deal-value benchmark) did not clear the bar I hold
+          revenue numbers to. Rather than show a number I cannot defend in
+          a sales conversation, I held it back. The design, performance,
+          positioning, and remediation findings above are calibrated and
+          stand on their own.
+        </p>
+        <p className="mt-3 text-sm leading-relaxed" style={{ color: "#c5ccd8" }}>
+          Reply to your Pathlight email or book a call and I will personally
+          rerun the revenue model with your real numbers. That estimate
+          will be defensible.
         </p>
       </div>
     </section>

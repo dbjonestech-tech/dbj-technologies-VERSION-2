@@ -12,6 +12,10 @@ import {
   type EmailMergeData,
 } from "../email-templates/pathlight";
 import type { RemediationItem } from "@/lib/types/scan";
+import {
+  REVENUE_TRUST_REASON_LABELS,
+  evaluateRevenueTrust,
+} from "./revenue-trust";
 import { generateUnsubscribeUrl, markUnsubscribed } from "./unsubscribe";
 import { track } from "./monitoring";
 
@@ -266,6 +270,42 @@ export async function sendPathlightReport(
     return { status: "held", resendId: null, error: msg };
   }
 
+  /* Revenue-trust gate. The dollar number is the credibility moment;
+   * a wrong number reaching a prospect's inbox does more reputational
+   * damage than a held email ever does. Pull the full report (the
+   * merge object dropped the structural fields the trust rules need)
+   * and run the evaluator. Untrusted estimates produce a "held" log
+   * with the specific operator-facing reason so /admin/monitor can
+   * cluster the holds by rule. */
+  const fullReport = await getFullScanReport(scanId);
+  if (fullReport) {
+    const trust = evaluateRevenueTrust(fullReport);
+    if (!trust.trusted) {
+      const reason = trust.reason;
+      const msg = `Held report email for ${scanId}: revenue estimate untrusted (${reason}). ${REVENUE_TRUST_REASON_LABELS[reason]}`;
+      await logEmailEvent({
+        scanId,
+        emailType,
+        status: "held",
+        errorMessage: msg,
+      });
+      await track(
+        "email.report.held",
+        { reason: `revenue-untrusted:${reason}` },
+        { scanId, level: "warn" },
+      );
+      Sentry.captureMessage(
+        `Pathlight report email held: revenue untrusted (${reason})`,
+        {
+          level: "warning",
+          tags: { source: "email-integrity-gate", emailType, kind: "revenue-trust" },
+          extra: { scanId, url: merge.url, email: merge.email, reason },
+        },
+      );
+      return { status: "held", resendId: null, error: msg };
+    }
+  }
+
   const built = buildReportEmail(merge);
   return dispatch(scanId, emailType, built, merge.email);
 }
@@ -324,6 +364,35 @@ export async function sendFollowUp(
       { scanId, level: "warn" }
     );
     return { status: "held", resendId: null, error: msg };
+  }
+
+  /* Revenue-trust gate. Same posture as sendPathlightReport: any
+   * follow-up that would reach a prospect with an indefensible
+   * dollar number (or the 5d follow-up for a scan whose report
+   * email was held for the same reason) gets held. The
+   * report-email gate already screened most of these out; this
+   * mirror exists so a scan that was BARELY trusted at e1 but
+   * later (after a partial-data update or a manual edit) becomes
+   * untrusted does not leak through follow-ups. */
+  const fullReport = await getFullScanReport(scanId);
+  if (fullReport) {
+    const trust = evaluateRevenueTrust(fullReport);
+    if (!trust.trusted) {
+      const reason = trust.reason;
+      const msg = `Held ${emailType} for ${scanId}: revenue estimate untrusted (${reason}).`;
+      await logEmailEvent({
+        scanId,
+        emailType,
+        status: "held",
+        errorMessage: msg,
+      });
+      await track(
+        `email.${emailType}.held`,
+        { reason: `revenue-untrusted:${reason}` },
+        { scanId, level: "warn" },
+      );
+      return { status: "held", resendId: null, error: msg };
+    }
   }
 
   const built =

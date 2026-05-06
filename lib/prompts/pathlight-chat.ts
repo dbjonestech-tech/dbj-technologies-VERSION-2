@@ -3,6 +3,7 @@ import type {
   PathlightReport,
   RemediationItem,
 } from "@/lib/types/scan";
+import { evaluateRevenueTrust } from "@/lib/services/revenue-trust";
 
 function formatScore(n: number | null | undefined): string {
   return typeof n === "number" ? `${Math.round(n)}/100` : "n/a";
@@ -78,6 +79,14 @@ export function buildChatSystemPrompt(report: PathlightReport): string {
 
   const isOutOfScope =
     report.businessScale === "national" || report.businessScale === "global";
+  /* Revenue-trust gate. The same evaluator that holds outbound emails
+   * and suppresses the dollar number on the public report also tells
+   * the chat NOT to invent or rationalize one. When trust is denied,
+   * the chat is given a specific instruction below to decline to
+   * produce a number and offer to rerun the model with the user's
+   * real data. */
+  const revenueTrust = evaluateRevenueTrust(report);
+  const revenueWithheld = !revenueTrust.trusted && !isOutOfScope;
   const revenueLoss = formatMoney(
     report.revenueImpact?.estimatedMonthlyLoss ?? null
   );
@@ -123,7 +132,9 @@ Revenue impact:
 ${
   isOutOfScope
     ? `- Suppressed: this site was classified as a ${report.businessScale} brand, which sits outside Pathlight's calibration range (small and regional businesses). No dollar revenue estimate was generated.`
-    : `- Estimated monthly revenue loss: ${revenueLoss} per month
+    : revenueWithheld
+      ? `- Suppressed: the structural inputs for this scan (vertical match, traffic baseline, deal-value benchmark) did not clear the bar Pathlight holds revenue numbers to, so the dollar figure was withheld rather than shown unverified. Do NOT invent a number, do NOT cite the suppressed model output, do NOT estimate a figure yourself. If the user asks about revenue, acknowledge that the estimate was held back specifically because the inputs were not defensible enough, and offer to rerun the model with the user's real visitor count, conversion rate, and average deal value (those three numbers from the user are sufficient to produce a defensible figure on the spot).`
+      : `- Estimated monthly revenue loss: ${revenueLoss} per month
 - Confidence: ${revenueConfidence}`
 }
 ${report.industryBenchmark ? `
