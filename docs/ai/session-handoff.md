@@ -6,7 +6,146 @@ Live snapshot of what the next session needs. Older sessions live under
 which covers the May 3 Inngest-cron + Pathlight reliability arc and the
 May 4 Canopy showcase swap.
 
-## Current state (May 6, 2026, midday)
+## Current state (May 6, 2026, evening)
+
+Fresh-recon security pass on top of the prior audit work. Five
+commits, all defense-in-depth or low-severity but cleanly addressable.
+HEAD is `12fa03a` (Joshua's eastern corridor page-system batch
+landed after this round) and `git rev-parse --short HEAD` is
+authoritative; the handoff anchors at `317e511` for the security
+sequence.
+
+Joshua's parallel page-system work was interleaved with this round:
+`bb14fdb` (redesign-vs-rebuild + website-rebuild), `9584959` (local
+cluster batch 2: Allen, Richardson, Prosper), `a877b5c` (react-hooks
+v7 fixes for ServicePageLayout + TaskRowClient), and `12fa03a`
+(eastern corridor: Rockwall, Heath, Royse City, Forney) all shipped
+between or after my five security commits. None of his work was
+swept into mine; every security commit used `git commit -o <path>`
+with explicit file paths.
+
+### Security round (May 6, evening): postcss, open-redirect, JSON-LD, v1 API, email-token expiry
+
+Five fixes shipped sequentially. Each its own commit + Vercel deploy.
+
+- **`68d7b8f`**: bump postcss to 8.5.14 + npm overrides. Closes
+  GHSA-qx2v-qp2m-jg93 (PostCSS XSS via unescaped `</style>` in CSS
+  stringify output). Top-level dep was 8.5.8; next 16.2.4 also
+  shipped a transitively-pinned 8.4.31. The new `overrides` block in
+  `package.json` forces every postcss instance in the tree to
+  >=8.5.14 so deduping pulls every parent (autoprefixer, next,
+  tailwindcss + plugins) onto the patched version. `npm audit` drops
+  from 8 vulns (4 low / 4 moderate) to 6 (4 low / 2 moderate); the
+  remaining moderates are non-applicable
+  (`@anthropic-ai/sdk` LocalFilesystemMemoryTool not in use;
+  `ip-address` HTML-emit XSS via `@lhci/cli`, CI-only).
+- **`4d34dbc`**: validate `callbackUrl` on `/signin` and
+  `/portal-access` against open redirect. Both pages read
+  `?callbackUrl=...` from the query and pass it to next's `redirect()`
+  on the already-signed-in branch. Auth.js validates `redirectTo` on
+  the `signIn()` path, so the unauthenticated flow was already covered;
+  the bypass branch (admin or client already signed in) was not.
+  New `lib/auth/safe-callback.ts` exports `safeCallbackPath(raw,
+  fallback)` accepting only single-leading-slash relative paths,
+  rejecting `//`, `/\`, any absolute scheme, anything with CR/LF/NUL,
+  and anything over 2 KB.
+- **`527a51f`**: escape inline JSON-LD against script-tag breakout.
+  `components/layout/JsonLd.tsx` rendered `JSON.stringify(schema)`
+  inside an inline `<script type="application/ld+json">`. JSON.stringify
+  does not escape `</script>`, `<!--`, or U+2028 / U+2029 line
+  separators. No current caller passes user-controlled data, but the
+  next caller might pass a city name from the scan form. New
+  `safeJsonForScript()` runs the four standard substitutions before
+  emitting.
+- **`e9041a8`**: scrub raw error messages from `/api/v1` responses.
+  `app/api/v1/contacts/route.ts` and `app/api/v1/deals/route.ts`
+  returned `err.message` directly in the 500 body. Postgres errors can
+  include table / column / constraint identifiers, leaking schema
+  shape to bearer-authed integrators. Replaced with a generic
+  `{ error: "internal_error" }` body and `Sentry.captureException` so
+  diagnostics survive.
+- **`317e511`**: add 90-day expiry to email tracking tokens. F7
+  tokens were HMAC-over-messageId-only with no time component. An
+  attacker who scraped a sent email could replay
+  `/api/email/pixel` and `/api/email/click` against it indefinitely
+  (analytics-integrity attack, not data breach). Token format goes
+  from `<16 hex>` to `<dayBase36>.<16 hex>` with the day bucket
+  included in the HMAC input. Verify accepts tokens minted within
+  90 days of the server's current day with one-day clock-skew
+  tolerance. Old F7 tokens fail validation cleanly (gif still serves,
+  click still 302s, only the DB record is skipped, same trade-off
+  F7 itself accepted).
+
+### Verification gates passed across all five commits
+
+- `npx tsc --noEmit` clean for every commit (Joshua's in-flight
+  page-system stubs surfaced unrelated `Cannot find module` errors
+  that were filtered out and confirmed not in any of my diffs)
+- `npm run lint` clean (ESLint 9 / flat config from earlier audit
+  work)
+- `npm run build` succeeds (verified once with Joshua's broken stubs
+  temporarily stashed, 80 routes generated, 6.8s compile)
+- 0 em dashes added in any source or doc file (one introduced in an
+  earlier draft of this handoff was caught and replaced)
+- Surgical staging via `git commit -o <path>` on every commit so
+  Joshua's interleaved working-tree state was never swept in
+- All five Vercel deploys confirmed (four Ready, fifth Building at
+  handoff write)
+
+### What was deliberately NOT done and why
+
+- **CSP nonces** to replace `'unsafe-inline'` in script-src. Real
+  inline script count in our DOM is exactly one (the layout.tsx head
+  bootstrap; the two beacon "inline scripts" are string output for
+  buyers to copy-paste into their own sites, not rendered in our
+  document). Migration is small in code surface but requires moving
+  CSP from `vercel.json` to per-request emission in `proxy.ts`,
+  threading nonces through `headers()` to layout.tsx, and re-validating
+  every external script source. Substantial breaking-change risk for
+  marginal benefit beyond the existing CSP shape (frame-ancestors
+  none, base-uri self, form-action self, upgrade-insecure-requests).
+- **next-auth beta → stable** (`5.0.0-beta.31`). Any beta-version
+  bump is a known unknown.
+- **Per-Server-Action body size limits**. Global is 4mb, intended
+  for the file-upload action. Tightening per-route is a footgun for
+  future actions that legitimately need it.
+- **F3 snippet-side opaque token**. Deferred from prior session
+  because it requires a snippet refresh on Tyler's deployed install.
+  Server-side hardening (rate limit + payload cap) already covers the
+  realistic attacker model.
+- **`@anthropic-ai/sdk` advisory bump**. Affects `LocalFilesystemMemoryTool`
+  which we do not import. Bumping to 0.95.0 is breaking and the
+  underlying risk is non-applicable.
+
+### Confirmed clean during fresh recon
+
+Inngest webhook (HMAC SHA-256 + `timingSafeEqual` + 503 on missing
+secret); Vercel webhook (HMAC SHA-1 + `timingSafeEqual`); Inngest
+serve handler (uses `INNGEST_SIGNING_KEY` by default); public scan
+API (Turnstile + email + IP + per-domain rate limits + 24h dedupe +
+boundary URL validation + private-network rejection); portal file
+download (auth + ownership + forced attachment disposition + filename
+sanitization); `/api/v1/*` (bearer auth + scope check + revocation
+check); `signinLimiter` wired correctly on `/api/auth/[...nextauth]`
+(signin/callback only, not session reads); `robots.txt` blocks
+`/api/`, `/admin/`, `/portal/`, `/internal/`, `/signin`, `/invite/`;
+no external cron routes (Inngest signed handler covers all crons);
+no `eval` / `new Function` / `child_process` surface;
+`dangerouslySetInnerHTML` callers are GA bootstrap (necessary head
+inline), JsonLd (now hardened), CursorCharge inline `<style>` (CSP
+style-src not script-src); headers comprehensive (HSTS preload, X-Frame
+DENY, X-Content nosniff, Referrer-Policy strict-origin-when-cross-origin,
+Permissions-Policy locked down).
+
+Audit posture across May 4 + May 5 + May 6: every Critical / High /
+Medium audit finding plus every Low item except snippet-side beacon
+hardening is closed. The May 6 fresh-recon pass added five new
+defense-in-depth fixes that were not in the original audit
+(`/tmp/dbj-audit-2026-05-04.md`): postcss bump, open-redirect on
+already-signed-in pages, JSON-LD escape, v1 API error scrub, and
+email-token expiry.
+
+## Prior state (May 6, 2026, midday)
 
 Two of three named "real refactor opportunities" from the
 react-hooks v7 / React Compiler walk closed (Priority 3 backlog).
