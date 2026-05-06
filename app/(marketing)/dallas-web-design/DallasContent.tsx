@@ -211,6 +211,33 @@ const sections: LocalLanderSection[] = [
           the right starting point if you are still figuring out what
           local SEO is actually buying you.
         </p>
+        <p>
+          For city-specific takes on how the engagement and the
+          design considerations flex to fit a particular DFW market,
+          the live city pages cover{" "}
+          <Link
+            href="/plano-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Plano
+          </Link>
+          ,{" "}
+          <Link
+            href="/frisco-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Frisco
+          </Link>
+          , and{" "}
+          <Link
+            href="/mckinney-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            McKinney
+          </Link>
+          . Each city runs a structurally different buyer profile
+          and the architectural response is different.
+        </p>
       </>
     ),
   },

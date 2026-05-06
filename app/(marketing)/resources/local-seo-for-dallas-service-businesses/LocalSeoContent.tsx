@@ -355,20 +355,41 @@ const sections: EditorialSection[] = [
         <p>
           On this site I publish a hub page about local SEO (this
           one) and a small set of city pages for the specific markets
-          I have a real connection to. The first one is{" "}
+          I have a real connection to. The live ones are{" "}
           <Link
             href="/dallas-web-design"
             className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
           >
-            Dallas Web Design
+            Dallas
           </Link>
-          , and more come over time, each with substance unique
-          to the city it covers. I am based in Royse City and brand
-          as Dallas, which is the standard Texas pattern for a
-          service business whose registered address is in an exurb
-          but whose customer base is metro-wide. The honest framing
-          is the differentiator. Hiding the real address would be
-          the spam move, not naming it.
+          ,{" "}
+          <Link
+            href="/plano-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Plano
+          </Link>
+          ,{" "}
+          <Link
+            href="/frisco-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            Frisco
+          </Link>
+          , and{" "}
+          <Link
+            href="/mckinney-web-design"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            McKinney
+          </Link>
+          , each with substance unique to the city it covers. I am
+          based in Royse City and brand as Dallas, which is the
+          standard Texas pattern for a service business whose
+          registered address is in an exurb but whose customer base
+          is metro-wide. The honest framing is the differentiator.
+          Hiding the real address would be the spam move, not naming
+          it.
         </p>
       </>
     ),
