@@ -444,14 +444,25 @@ export function extractPerformanceScoresFromLighthouse(
     const v = audits[k]?.numericValue;
     return typeof v === "number" && Number.isFinite(v) ? Math.round(v) : 0;
   };
-  const score = (k: string) => {
-    const v = audits[k]?.score;
+  /* CLS is unitless (0-1+ scale) and must NOT be rounded. The previous
+   * code here read `audits.cumulative-layout-shift.score`, which is
+   * Lighthouse's audit pass/fail score (1 = passing perfectly, 0 =
+   * failing) NOT the CLS value. Reading the wrong field made every
+   * site with good real-world CLS report as "CLS = 1.0 catastrophic"
+   * in Pathlight, because score = 1 means "this audit is perfect"
+   * but our pipeline interpreted "1" as the CLS magnitude. The
+   * actual CLS lives in numericValue. Defaulting to 0 (perfect) on
+   * a missing value is safe: the alternative legacy default of 0
+   * was already in use when score was missing, so behavior on the
+   * absence path is unchanged. */
+  const clsNumeric = (() => {
+    const v = audits["cumulative-layout-shift"]?.numericValue;
     return typeof v === "number" && Number.isFinite(v) ? v : 0;
-  };
+  })();
   return {
     overall: Math.round(overallRaw * 100),
     lcp: num("largest-contentful-paint"),
-    cls: score("cumulative-layout-shift"),
+    cls: clsNumeric,
     inp: num("interaction-to-next-paint"),
     tbt: num("total-blocking-time"),
     si: num("speed-index"),

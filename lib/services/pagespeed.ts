@@ -57,11 +57,21 @@ function readAuditNumeric(
   return typeof v === "number" && Number.isFinite(v) ? Math.round(v) : 0;
 }
 
-function readAuditScore(
+/* Reads the unrounded numeric value of an audit. Used for CLS, which
+ * is unitless (0-1+ scale, not milliseconds) and must NOT be rounded
+ * to an integer the way LCP / INP / TBT / SI are. The previous
+ * pipeline read `audits.cumulative-layout-shift.score` for CLS, but
+ * that field is Lighthouse's audit pass/fail score (1 = passing
+ * perfectly, 0 = failing) NOT the CLS magnitude. Reading the wrong
+ * field made every site with good real-world CLS report as
+ * "CLS = 1.0 catastrophic" in Pathlight, because score = 1 means
+ * "this audit is perfect" but our pipeline interpreted "1" as the
+ * CLS magnitude. The actual CLS magnitude lives in numericValue. */
+function readAuditNumericRaw(
   audits: Record<string, LighthouseAudit> | undefined,
   key: string
 ): number {
-  const v = audits?.[key]?.score;
+  const v = audits?.[key]?.numericValue;
   return typeof v === "number" && Number.isFinite(v) ? v : 0;
 }
 
@@ -150,7 +160,7 @@ async function runSinglePsiAudit(
       const scores: PerformanceScores = {
         overall: Math.round((overallRaw ?? 0) * 100),
         lcp: readAuditNumeric(audits, "largest-contentful-paint"),
-        cls: readAuditScore(audits, "cumulative-layout-shift"),
+        cls: readAuditNumericRaw(audits, "cumulative-layout-shift"),
         inp: readAuditNumeric(audits, "interaction-to-next-paint"),
         tbt: readAuditNumeric(audits, "total-blocking-time"),
         si: readAuditNumeric(audits, "speed-index"),
@@ -270,10 +280,10 @@ type MutableLighthouseLike = {
  * medianized values. Mutates a deep clone so callers' references
  * are not aliased.
  *
- * Touches exactly the four fields downstream consumers read:
+ * Touches exactly the metric fields downstream consumers read:
  *   categories.performance.score        -> medianScores.overall / 100
  *   audits.largest-contentful-paint     -> medianScores.lcp (numericValue)
- *   audits.cumulative-layout-shift      -> medianScores.cls (score)
+ *   audits.cumulative-layout-shift      -> medianScores.cls (numericValue)
  *   audits.interaction-to-next-paint    -> medianScores.inp (numericValue)
  *   audits.total-blocking-time          -> medianScores.tbt (numericValue)
  *   audits.speed-index                  -> medianScores.si  (numericValue)
@@ -304,7 +314,11 @@ function medianizeRaw(
       audits["largest-contentful-paint"].numericValue = medianScores.lcp;
     }
     if (audits["cumulative-layout-shift"]) {
-      audits["cumulative-layout-shift"].score = medianScores.cls;
+      /* CLS magnitude lives in numericValue. The audit's `score`
+       * field is its pass/fail and must not be overwritten with
+       * the CLS magnitude (the previous behavior here was wrong
+       * for the same reason the read site was wrong). */
+      audits["cumulative-layout-shift"].numericValue = medianScores.cls;
     }
     if (audits["interaction-to-next-paint"]) {
       audits["interaction-to-next-paint"].numericValue = medianScores.inp;
