@@ -45,6 +45,15 @@ const ARCHITECTURE_BODY =
 export interface CanopyDeepDive {
   /** URL slug under /work/canopy/. Kebab-case, no leading slash. */
   slug: string;
+  /** Path to the OG / Twitter card image, relative to /public. Reuses
+   * the same capability screenshot the matching ProjectSection uses on
+   * /work/canopy so the social-share preview reads as a continuous
+   * surface with the parent case study. */
+  image: string;
+  /** Alt text for the OG image. Should describe the screenshot content,
+   * not the page topic, since the alt is read when the image is the
+   * subject (e.g. social-card simulation, screen reader narration). */
+  imageAlt: string;
   /** Page heading. Mirrors the matching ProjectSection heading on
    * /work/canopy so the buyer's "Read the full architecture of X" click
    * lands on a page titled X. */
@@ -66,6 +75,9 @@ export const CANOPY_DEEP_DIVES: CanopyDeepDive[] = [
     heading: "Analytics & Performance",
     summary:
       "First-party visitor data, real-user Web Vitals, and search insight all captured directly into the buyer's Postgres, joined to the conversion data without an integration bridge. What the standard analytics stack cannot answer, the architectural cost of owning the data instead of renting access to it, and the kind of question this design lets a buyer ask.",
+    image: "/images/case-studies/canopy/canopy-analytics.webp",
+    imageAlt:
+      "Canopy Analytics and Performance dashboard showing first-party visitor counts, real-user Web Vitals, top pages, and top sources",
     body: ANALYTICS_BODY,
   },
   {
@@ -73,6 +85,9 @@ export const CANOPY_DEEP_DIVES: CanopyDeepDive[] = [
     heading: "Pipeline & Relationships",
     summary:
       "Deal-stage primary, the audit log as the system of record, contact timeline auto-aggregated across every interaction the buyer has ever had with that person. Why the source-of-truth question shapes everything, why I rejected contact-status-as-primary, and what the data lets a team do that a typical CRM does not.",
+    image: "/images/case-studies/canopy/canopy-deals.webp",
+    imageAlt:
+      "Canopy Deals kanban board with weighted pipeline, unweighted pipeline, closed-won, and average cycle metrics across New, Contacted, Qualified, Proposal, Won, and Lost columns",
     body: PIPELINE_BODY,
   },
   {
@@ -80,6 +95,9 @@ export const CANOPY_DEEP_DIVES: CanopyDeepDive[] = [
     heading: "Automation",
     summary:
       "Sequences with reply-exit, workflows on domain events, rules conditioned on the audit log. Why automation reads from the event log rather than firing as side-effects on the writer's path, what that costs in latency, and what it gives back in recoverability.",
+    image: "/images/case-studies/canopy/canopy-automation.webp",
+    imageAlt:
+      "Canopy Sequences and Workflows view listing active sequences, enrolled and replied counts, and rule-based workflow triggers",
     body: AUTOMATION_BODY,
   },
   {
@@ -87,6 +105,9 @@ export const CANOPY_DEEP_DIVES: CanopyDeepDive[] = [
     heading: "Operations & Health",
     summary:
       "One banner that summarizes the worst signal across the whole stack, daily cron checks for the slow-moving infrastructure questions, real-time ingest for the fast-moving deliverability and error signals. Why I built around the inverse discipline of staying quiet until something matters.",
+    image: "/images/case-studies/canopy/canopy-operations.webp",
+    imageAlt:
+      "Canopy Operations and Health view showing the All Systems Normal banner across deployments, pipeline, budget, infrastructure, errors, and mobile RUM, plus a per-domain TLS, WHOIS, SPF, DKIM, and DMARC posture table",
     body: OPERATIONS_BODY,
   },
   {
@@ -94,6 +115,9 @@ export const CANOPY_DEEP_DIVES: CanopyDeepDive[] = [
     heading: "Pathlight Integration",
     summary:
       "Three independent gates so the studio can run AI-driven research and rescans inside Canopy without ever exposing a buyer to a runaway bill. The architecture, the rejected alternatives, the failure modes I guarded against, and the line item that becomes a fixed monthly maximum by construction.",
+    image: "/images/case-studies/canopy/canopy-pathlight.webp",
+    imageAlt:
+      "Canopy Pathlight Integration view showing layered guardrails for capability, triggers, and monthly budget, plus a prospecting candidates table with scan scores and outreach status",
     body: PATHLIGHT_BODY,
   },
   {
@@ -101,6 +125,9 @@ export const CANOPY_DEEP_DIVES: CanopyDeepDive[] = [
     heading: "Architecture & Ownership",
     summary:
       "Per-install everything, no shared infrastructure, no multi-tenant database, the buyer pays the vendors directly. Why this is harder for me to operate, what it gives the buyer, and the firing test that ownership has to pass.",
+    image: "/images/case-studies/canopy/canopy-audit.webp",
+    imageAlt:
+      "Canopy Audit log entries showing deal stage changes, contact follow-up updates, email sends, tag edits, and scan completions with key-by-key diffs",
     body: ARCHITECTURE_BODY,
   },
 ];

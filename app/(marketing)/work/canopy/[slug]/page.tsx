@@ -8,11 +8,13 @@ import { SITE } from "@/lib/constants";
 import { CanopyDeepDiveLayout } from "@/components/templates/CanopyDeepDiveLayout";
 import { JsonLd } from "@/components/layout/JsonLd";
 
-/* Static-generates one page per registered Canopy deep-dive. With an
-   empty registry this resolves to no static paths; the page handler
-   below still runs for any /work/canopy/{slug} URL that happens to be
-   requested and returns notFound() when the slug is not registered, so
-   the route is safe to ship before any Phase 3 content lands. */
+/* All six pages in the funnel were drafted and shipped together on
+   2026-05-06. Search engines use this for article freshness ranking
+   and for the visible "published" date in some result formats; bumping
+   it requires an actual content rewrite, not a stylesheet tweak. */
+const DATE_PUBLISHED = "2026-05-06";
+
+/* Static-generates one page per registered Canopy deep-dive. */
 export function generateStaticParams() {
   return getCanopyDeepDiveSlugs().map((slug) => ({ slug }));
 }
@@ -29,13 +31,37 @@ export async function generateMetadata({
     return { title: "Not Found" };
   }
 
+  const url = `${SITE.url}/work/canopy/${slug}`;
+  const ogImageUrl = page.image.startsWith("http")
+    ? page.image
+    : `${SITE.url}${page.image}`;
+
   return {
     title: `${page.heading} | Canopy Architecture`,
     description: page.summary,
-    alternates: { canonical: `${SITE.url}/work/canopy/${slug}` },
+    alternates: { canonical: url },
     openGraph: {
+      type: "article",
+      url,
       title: `${page.heading} | Canopy Architecture | DBJ Technologies`,
       description: page.summary,
+      siteName: SITE.name,
+      publishedTime: DATE_PUBLISHED,
+      authors: [SITE.url],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1800,
+          height: 1170,
+          alt: page.imageAlt,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${page.heading} | Canopy Architecture`,
+      description: page.summary,
+      images: [ogImageUrl],
     },
   };
 }
@@ -52,6 +78,9 @@ export default async function CanopyDeepDivePage({
     notFound();
   }
 
+  const url = `${SITE.url}/work/canopy/${slug}`;
+  const wordCount = page.body.split(/\s+/).filter(Boolean).length;
+
   return (
     <>
       <JsonLd
@@ -60,8 +89,27 @@ export default async function CanopyDeepDivePage({
           { name: "Home", url: SITE.url },
           { name: "Work", url: `${SITE.url}/work` },
           { name: "Canopy", url: `${SITE.url}/work/canopy` },
-          { name: page.heading, url: `${SITE.url}/work/canopy/${slug}` },
+          { name: page.heading, url },
         ]}
+      />
+      <JsonLd
+        type="techArticle"
+        techArticle={{
+          headline: `${page.heading} | Canopy Architecture`,
+          description: page.summary,
+          url,
+          image: page.image,
+          datePublished: DATE_PUBLISHED,
+          wordCount,
+          articleSection: "Canopy Architecture",
+          keywords: [
+            "Canopy",
+            "small-business operating system",
+            page.heading,
+            "architecture",
+            "DBJ Technologies",
+          ],
+        }}
       />
       <CanopyDeepDiveLayout page={page} />
     </>

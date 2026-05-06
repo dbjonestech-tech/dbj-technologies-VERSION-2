@@ -10,7 +10,8 @@ interface JsonLdProps {
     | "serviceItem"
     | "creativeWork"
     | "offer"
-    | "breadcrumb";
+    | "breadcrumb"
+    | "techArticle";
   faqItems?: { question: string; answer: string }[];
   service?: { slug: string; name: string; description: string };
   creativeWork?: {
@@ -22,6 +23,17 @@ interface JsonLdProps {
   };
   offer?: { slug: string; name: string; description: string; price: string };
   breadcrumb?: { name: string; url: string }[];
+  techArticle?: {
+    headline: string;
+    description: string;
+    url: string;
+    image: string;
+    datePublished: string;
+    dateModified?: string;
+    wordCount?: number;
+    articleSection?: string;
+    keywords?: string[];
+  };
 }
 
 /* Parse the leading numeric value out of a price string.
@@ -44,6 +56,7 @@ export function JsonLd({
   creativeWork,
   offer,
   breadcrumb,
+  techArticle,
 }: JsonLdProps) {
   const schemas: Record<string, object | null> = {
     organization: {
@@ -193,6 +206,43 @@ export function JsonLd({
             name: b.name,
             item: b.url,
           })),
+        }
+      : null,
+    techArticle: techArticle
+      ? {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          headline: techArticle.headline,
+          description: techArticle.description,
+          url: techArticle.url,
+          image: techArticle.image.startsWith("http")
+            ? techArticle.image
+            : `${SITE.url}${techArticle.image}`,
+          datePublished: techArticle.datePublished,
+          dateModified: techArticle.dateModified ?? techArticle.datePublished,
+          ...(techArticle.wordCount
+            ? { wordCount: techArticle.wordCount }
+            : {}),
+          ...(techArticle.articleSection
+            ? { articleSection: techArticle.articleSection }
+            : {}),
+          ...(techArticle.keywords && techArticle.keywords.length > 0
+            ? { keywords: techArticle.keywords.join(", ") }
+            : {}),
+          author: provider,
+          publisher: {
+            "@type": "Organization",
+            name: SITE.name,
+            url: SITE.url,
+            logo: {
+              "@type": "ImageObject",
+              url: `${SITE.url}/brand/dbj_logo_horizontal.svg`,
+            },
+          },
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": techArticle.url,
+          },
         }
       : null,
   };
