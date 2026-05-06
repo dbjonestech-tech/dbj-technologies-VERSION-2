@@ -1,5 +1,21 @@
 import { SITE, SERVICES, SOCIAL_LINKS } from "@/lib/constants";
 
+/* Serialize JSON for embedding inside an inline <script type="application/ld+json">.
+ * JSON.stringify alone is not safe inside <script>; an attribute value
+ * containing "</script>" closes the script tag and lets any subsequent
+ * markup escape into the document. U+2028/U+2029 are JS line terminators
+ * that JSON.stringify leaves raw and that some parsers treat as
+ * line-ending tokens. None of the current schema fields are user-
+ * controlled, but every caller is a different page and the next caller
+ * may pass a user-supplied business name through. Cheap to defang. */
+function safeJsonForScript(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/<\/(script)/gi, "<\\/$1")
+    .replace(/<!--/g, "<\\!--")
+    .replace(/[\u2028]/g, "\\u2028")
+    .replace(/[\u2029]/g, "\\u2029");
+}
+
 interface JsonLdProps {
   type?:
     | "organization"
@@ -253,7 +269,7 @@ export function JsonLd({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonForScript(schema) }}
     />
   );
 }
