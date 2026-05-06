@@ -6,6 +6,72 @@ export type UrlValidationResult = {
   valid: boolean;
   error?: string;
   resolvedUrl?: string;
+  /* Structured diagnostic surfaced on every result (success and
+   * failure). Logged into the scan.failed monitoring event payload so
+   * we can later identify host-class patterns: e.g. "67% of failed
+   * scans against GoDaddy-nameservered hosts share the connection-
+   * blocked failureKind, suggesting their WAF is the systemic
+   * bottleneck rather than the prospect's site being genuinely
+   * down." Optional everywhere; absent on synchronous validation
+   * failures (malformed URL, unsupported protocol). */
+  diagnostic?: UrlValidationDiagnostic;
+};
+
+/* Specific, actionable categories. Anything other than "ok" is a
+ * failure mode the operator can investigate or filter on. */
+export type ValidationFailureKind =
+  | "ok"
+  | "malformed"
+  | "protocol"
+  | "ssrf-blocked"
+  | "dns-fail"
+  | "connection-blocked"
+  | "timeout"
+  | "http-error"
+  | "redirect-loop"
+  | "redirect-blocked"
+  | "unknown";
+
+export type UrlValidationDiagnostic = {
+  /* Stable enum the monitor can group on. "connection-blocked" is the
+   * WAF signature (TCP-RST or instant connection refusal, no HTTP
+   * response) and is the most actionable because it almost always
+   * means the upstream's host is filtering Vercel's egress IP rather
+   * than the site being genuinely offline. */
+  failureKind: ValidationFailureKind;
+  /* HTTP status from the upstream when one was actually returned.
+   * Null on connection-blocked / dns-fail / timeout paths (where no
+   * HTTP exchange completed) and on the success path when we want
+   * to keep the field shape consistent. */
+  httpStatus: number | null;
+  /* Server header from any response we did get. "Apache" /
+   * "GoDaddy/Apache" / "cloudflare" / "Microsoft-IIS/10.0" / etc.
+   * Useful for clustering failures by hosting platform. */
+  serverHeader: string | null;
+  /* Authoritative nameservers for the hostname. Captured on failure
+   * so we can spot patterns ("85% of WAF-blocked failures use
+   * NS*.GODADDY.COM"). Lazily resolved; null on success or when the
+   * NS lookup itself fails. */
+  nameservers: string[] | null;
+  /* How many fetch calls we made for this validation (1 normally,
+   * 2 if the connection-retry fired). */
+  attempts: number;
+  /* True when the Vercel-egress probe failed connection-level and
+   * we recovered via the Browserless fallback. The downstream
+   * pipeline still uses Vercel for its own fetches, but the
+   * actual screenshot path uses Browserless anyway, so a
+   * Vercel-blocked / Browserless-reachable site is a real scan
+   * candidate, not an unreachable one. */
+  recoveredViaBrowserless: boolean;
+  /* True when the failure-timing matches the WAF anti-DDoS
+   * signature (sub-100ms connection-blocked). Treat as a red flag
+   * specifically: it almost never means the site is offline. */
+  fastConnectionBlocked: boolean;
+  /* Total time spent in validation, ms. Mirrors the existing
+   * pipeline-throw durationMs but at the validation-step
+   * granularity so admin/monitor can chart validation latency
+   * trends independently. */
+  durationMs: number;
 };
 
 const ALLOWED_PROTOCOLS = new Set(["http:", "https:"]);
@@ -177,7 +243,51 @@ function pinnedAgent(pinnedIp: string): Agent {
   });
 }
 
-export async function validateUrl(normalized: string): Promise<UrlValidationResult> {
+/* Authoritative nameserver lookup for failure-clustering. Bounded by
+ * a 1.5s timeout (DNS NS lookups normally complete in <100ms; this
+ * keeps the validation step from blocking on a misbehaving resolver).
+ * Returns the lowercased NS hostnames; null on error or empty result. */
+async function lookupNameservers(hostname: string): Promise<string[] | null> {
+  const lower = hostname.toLowerCase();
+  if (lower === "localhost" || net.isIP(hostname)) return null;
+  try {
+    const timer = new Promise<null>((resolve) =>
+      setTimeout(() => resolve(null), 1_500),
+    );
+    const lookup = dns
+      .resolveNs(hostname)
+      .then((ns) => (Array.isArray(ns) ? ns.map((n) => n.toLowerCase()) : null))
+      .catch(() => null);
+    const result = await Promise.race([lookup, timer]);
+    return Array.isArray(result) && result.length > 0 ? result : null;
+  } catch {
+    return null;
+  }
+}
+
+/* WAF-signature heuristic: connection-blocked failures that resolve
+ * faster than ~100ms are almost always a WAF / anti-DDoS short-ban
+ * rather than a real reachability problem. The threshold is generous
+ * (real connection failures across continents can still be fast on
+ * modern networks) but the combination connection-blocked + sub-100ms
+ * is the actionable signal. */
+const WAF_SIGNATURE_TIMING_MS = 100;
+
+/* The fallback prober runs when both Vercel-egress attempts fail at
+ * the connection level. Receives the URL we tried to reach and
+ * returns true when the URL is reachable from a different egress
+ * (Browserless's network in production). The prober is injected
+ * rather than imported directly so url.ts has no dependency on
+ * the screenshot service: this module stays pure-Node + undici. */
+export type ValidateUrlOptions = {
+  fallbackProber?: (url: string) => Promise<boolean>;
+};
+
+export async function validateUrl(
+  normalized: string,
+  options?: ValidateUrlOptions,
+): Promise<UrlValidationResult> {
+  const startedAt = Date.now();
   let parsed: URL;
   try {
     parsed = new URL(normalized);
@@ -198,7 +308,33 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
    * hostname resolves to at connect time. */
   const initialIp = await resolveToPublicIp(parsed.hostname);
   if (!initialIp) {
-    return { valid: false, error: "URL points to a private network." };
+    /* Distinguish "DNS resolution failed entirely" from "DNS resolved
+     * to a private IP". We do not block-list private resolution
+     * results out of misconfiguration; that's a real SSRF guard
+     * working as intended. */
+    let dnsResolves = false;
+    try {
+      const records = await dns.lookup(parsed.hostname, { all: true });
+      dnsResolves = records.length > 0;
+    } catch {
+      dnsResolves = false;
+    }
+    return {
+      valid: false,
+      error: dnsResolves
+        ? "URL points to a private network."
+        : "URL is not reachable.",
+      diagnostic: {
+        failureKind: dnsResolves ? "ssrf-blocked" : "dns-fail",
+        httpStatus: null,
+        serverHeader: null,
+        nameservers: await lookupNameservers(parsed.hostname),
+        attempts: 0,
+        recoveredViaBrowserless: false,
+        fastConnectionBlocked: false,
+        durationMs: Date.now() - startedAt,
+      },
+    };
   }
 
   const controller = new AbortController();
@@ -208,6 +344,7 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
   let pinnedIp = initialIp;
   let agent = pinnedAgent(pinnedIp);
   let hops = 0;
+  let attempts = 0;
   const maxHops = 5;
 
   /* HEAD with realistic UA, GET-with-Range fallback if HEAD itself
@@ -219,6 +356,7 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
    * not return any response. AbortErrors propagate so the outer 10s
    * timeout still wins. */
   const fetchHop = async (): Promise<Response> => {
+    attempts += 1;
     return fetch(current, {
       method: "HEAD",
       redirect: "manual",
@@ -250,6 +388,33 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
     });
   };
 
+  /* Per-failure diagnostic builder. We resolve nameservers once
+   * lazily on the first failure path that asks for it; success paths
+   * skip the lookup entirely. */
+  const buildDiagnostic = async (
+    failureKind: ValidationFailureKind,
+    httpStatus: number | null,
+    serverHeader: string | null,
+  ): Promise<UrlValidationDiagnostic> => {
+    const durationMs = Date.now() - startedAt;
+    const fastConnectionBlocked =
+      failureKind === "connection-blocked" &&
+      durationMs < WAF_SIGNATURE_TIMING_MS;
+    return {
+      failureKind,
+      httpStatus,
+      serverHeader,
+      nameservers:
+        failureKind === "ok"
+          ? null
+          : await lookupNameservers(parsed.hostname),
+      attempts,
+      recoveredViaBrowserless: false,
+      fastConnectionBlocked,
+      durationMs,
+    };
+  };
+
   try {
     while (hops < maxHops) {
       let res: Response;
@@ -258,22 +423,92 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
       } catch (err) {
         if ((err as Error).name === "AbortError") throw err;
         await new Promise((resolve) => setTimeout(resolve, 500));
-        res = await fetchHop();
+        try {
+          res = await fetchHop();
+        } catch (retryErr) {
+          if ((retryErr as Error).name === "AbortError") throw retryErr;
+          /* Both Vercel-egress attempts failed at the connection
+           * level. Browserless runs from a different cloud
+           * provider's egress IPs; if the upstream WAF only
+           * temp-banned Vercel's range, Browserless will reach
+           * the site cleanly. We never gate the screenshot
+           * pipeline (which uses Browserless anyway) on validation
+           * succeeding from Vercel's network, so a Browserless-
+           * reachable / Vercel-blocked site is a real scan
+           * candidate, not an unreachable one. */
+          if (options?.fallbackProber) {
+            try {
+              const ok = await options.fallbackProber(current);
+              if (ok) {
+                let resolved = current;
+                try {
+                  const u = new URL(current);
+                  u.search = "";
+                  u.hash = "";
+                  resolved = u.toString().replace(/\/$/, "");
+                } catch {
+                  /* keep current if reparse fails */
+                }
+                const diag = await buildDiagnostic(
+                  "connection-blocked",
+                  null,
+                  null,
+                );
+                return {
+                  valid: true,
+                  resolvedUrl: resolved,
+                  diagnostic: { ...diag, recoveredViaBrowserless: true },
+                };
+              }
+            } catch (fallbackErr) {
+              /* Fallback errors are inconclusive; fall through to
+               * the failure path. */
+              void fallbackErr;
+            }
+          }
+          return {
+            valid: false,
+            error: "URL is not reachable.",
+            diagnostic: await buildDiagnostic(
+              "connection-blocked",
+              null,
+              null,
+            ),
+          };
+        }
       }
+
+      const serverHeader = res.headers.get("server");
 
       if (res.status >= 300 && res.status < 400) {
         const location = res.headers.get("location");
         if (!location) break;
         const next = new URL(location, current);
         if (!ALLOWED_PROTOCOLS.has(next.protocol)) {
-          return { valid: false, error: "URL redirects to an unsupported protocol." };
+          return {
+            valid: false,
+            error: "URL redirects to an unsupported protocol.",
+            diagnostic: await buildDiagnostic(
+              "redirect-blocked",
+              res.status,
+              serverHeader,
+            ),
+          };
         }
         /* Re-pin for the next hop so a redirect target also resolves
          * once and connects to that exact IP. Close the previous hop's
          * agent before swapping; agents hold sockets. */
         const nextIp = await resolveToPublicIp(next.hostname);
         if (!nextIp) {
-          return { valid: false, error: "URL redirects into a private network." };
+          return {
+            valid: false,
+            error: "URL redirects into a private network.",
+            diagnostic: await buildDiagnostic(
+              "redirect-blocked",
+              res.status,
+              serverHeader,
+            ),
+          };
         }
         await agent.close();
         pinnedIp = nextIp;
@@ -284,7 +519,15 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
       }
 
       if (res.status >= 400 && res.status !== 403 && res.status !== 405) {
-        return { valid: false, error: `URL is not reachable (HTTP ${res.status}).` };
+        return {
+          valid: false,
+          error: `URL is not reachable (HTTP ${res.status}).`,
+          diagnostic: await buildDiagnostic(
+            "http-error",
+            res.status,
+            serverHeader,
+          ),
+        };
       }
 
       let resolved = current;
@@ -296,15 +539,31 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
       } catch {
         /* keep current if reparse fails */
       }
-      return { valid: true, resolvedUrl: resolved };
+      return {
+        valid: true,
+        resolvedUrl: resolved,
+        diagnostic: await buildDiagnostic("ok", res.status, serverHeader),
+      };
     }
 
-    return { valid: false, error: "URL redirected too many times." };
+    return {
+      valid: false,
+      error: "URL redirected too many times.",
+      diagnostic: await buildDiagnostic("redirect-loop", null, null),
+    };
   } catch (err) {
     if ((err as Error).name === "AbortError") {
-      return { valid: false, error: "URL did not respond within 10 seconds." };
+      return {
+        valid: false,
+        error: "URL did not respond within 10 seconds.",
+        diagnostic: await buildDiagnostic("timeout", null, null),
+      };
     }
-    return { valid: false, error: "URL is not reachable." };
+    return {
+      valid: false,
+      error: "URL is not reachable.",
+      diagnostic: await buildDiagnostic("unknown", null, null),
+    };
   } finally {
     clearTimeout(timer);
     await agent.close().catch(() => { /* swallow agent-close errors */ });

@@ -52,6 +52,7 @@ import type { IndustryBenchmark, PerformanceScores } from "@/lib/types/scan";
 import {
   captureFullPageScreenshot,
   captureScreenshot,
+  probeUrlViaBrowserless,
 } from "../services/browserless";
 import {
   detectHeroVideo,
@@ -80,7 +81,21 @@ import {
 import { isUnsubscribed } from "../services/unsubscribe";
 import { inngest } from "./client";
 
-class ScanValidationError extends Error {}
+/* ScanValidationError carries the structured diagnostic from
+ * validateUrl (when present) so the pipeline-throw catch can fold
+ * the failure-kind, nameservers, server header, and timing into the
+ * scan.failed monitoring event payload. The plain Error message
+ * stays the user-facing string the report page will render. */
+class ScanValidationError extends Error {
+  diagnostic?: import("@/lib/services/url").UrlValidationDiagnostic;
+  constructor(
+    message: string,
+    diagnostic?: import("@/lib/services/url").UrlValidationDiagnostic,
+  ) {
+    super(message);
+    this.diagnostic = diagnostic;
+  }
+}
 
 type ScreenshotOutcome = {
   desktop: string | null;
@@ -147,9 +162,14 @@ export const scanRequested = inngest.createFunction(
           throw new ScanValidationError(msg);
         }
 
-        const result = await validateUrl(normalized);
+        const result = await validateUrl(normalized, {
+          fallbackProber: probeUrlViaBrowserless,
+        });
         if (!result.valid) {
-          throw new ScanValidationError(result.error ?? "URL is not reachable.");
+          throw new ScanValidationError(
+            result.error ?? "URL is not reachable.",
+            result.diagnostic,
+          );
         }
 
         const finalUrl = result.resolvedUrl ?? normalized;
@@ -1103,12 +1123,35 @@ export const scanRequested = inngest.createFunction(
       const message =
         err instanceof Error ? err.message : "Scan pipeline failed.";
       await updateScanStatus(scanId, "failed", message).catch(() => {});
+      /* Validation errors carry a structured diagnostic with the
+       * specific failure kind (connection-blocked, dns-fail,
+       * timeout, http-error, etc.), the upstream Server header, and
+       * the authoritative nameservers for the host. Folding it into
+       * the scan.failed payload lets /admin/monitor cluster the
+       * failures by host class (e.g. "92% of connection-blocked
+       * failures use NS*.GODADDY.COM nameservers") so we can detect
+       * shared-host WAF problems systematically rather than one
+       * scan at a time. */
+      const diagnostic =
+        err instanceof ScanValidationError ? err.diagnostic : undefined;
       await track(
         "scan.failed",
         {
           error: message.slice(0, 500),
           stage: "pipeline-throw",
           durationMs: Date.now() - startedAt,
+          ...(diagnostic
+            ? {
+                failureKind: diagnostic.failureKind,
+                httpStatus: diagnostic.httpStatus,
+                serverHeader: diagnostic.serverHeader,
+                nameservers: diagnostic.nameservers,
+                attempts: diagnostic.attempts,
+                fastConnectionBlocked: diagnostic.fastConnectionBlocked,
+                recoveredViaBrowserless: diagnostic.recoveredViaBrowserless,
+                validationDurationMs: diagnostic.durationMs,
+              }
+            : {}),
         },
         { scanId, level: "error" }
       ).catch(() => {});

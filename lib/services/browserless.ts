@@ -953,3 +953,99 @@ export async function generatePdf(
     clearTimeout(timer);
   }
 }
+
+/* Reachability probe via Browserless: a tiny `/chrome/function` call
+ * that just navigates to the URL and reports whether ANY HTTP
+ * response came back. Used as the fallback path inside validateUrl
+ * when the Vercel-egress reachability check fails at TCP level
+ * (the WAF anti-DDoS short-ban signature). Browserless runs from a
+ * different cloud's egress IP range; if a budget host's WAF only
+ * rate-limited Vercel's range, Browserless reaches the site cleanly.
+ *
+ * Failure-mode posture: returns false on any unexpected condition
+ * (no token, network error, non-2xx Browserless response, malformed
+ * body). Never throws. The validation pipeline treats false as
+ * "fallback inconclusive, fall through to the connection-blocked
+ * failure" so the probe cannot accidentally turn a real reachability
+ * failure into a successful validation.
+ *
+ * Cost: one /function unit per call. Only fires AFTER both Vercel
+ * attempts already failed at the connection level, so it is bounded
+ * by the rate at which prospect-shared-hosting WAFs block our
+ * egress, not by total scan volume. */
+const PROBE_FUNCTION = `
+export default async function ({ page, context }) {
+  try {
+    const response = await page.goto(context.url, {
+      waitUntil: 'domcontentloaded',
+      timeout: 9000,
+    });
+    if (!response) return { ok: false };
+    const status = response.status();
+    if (typeof status !== 'number' || status < 100) return { ok: false };
+    return { ok: true, status };
+  } catch (err) {
+    return { ok: false };
+  }
+}
+`;
+
+const PROBE_TIMEOUT_MS = 12_000;
+
+export async function probeUrlViaBrowserless(url: string): Promise<boolean> {
+  const token = process.env.BROWSERLESS_API_KEY;
+  if (!token) return false;
+  const base = process.env.BROWSERLESS_BASE_URL ?? DEFAULT_BROWSERLESS_BASE;
+
+  const start = Date.now();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(
+      `${base}${BROWSERLESS_BINARY_PATH}/function?token=${encodeURIComponent(token)}&${BROWSERLESS_STEALTH_PARAM}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          code: PROBE_FUNCTION,
+          context: { url },
+        }),
+        signal: controller.signal,
+      },
+    );
+
+    if (!res.ok) {
+      await recordBrowserlessUsage({
+        scanId: null,
+        operation: "validate-probe",
+        durationMs: Date.now() - start,
+        status: "fail",
+      });
+      return false;
+    }
+
+    const data = (await res.json().catch(() => null)) as
+      | { ok?: boolean; status?: number }
+      | null;
+    const ok = Boolean(data?.ok);
+    await recordBrowserlessUsage({
+      scanId: null,
+      operation: "validate-probe",
+      durationMs: Date.now() - start,
+      status: ok ? "ok" : "fail",
+    });
+    return ok;
+  } catch (err) {
+    void err;
+    await recordBrowserlessUsage({
+      scanId: null,
+      operation: "validate-probe",
+      durationMs: Date.now() - start,
+      status: "fail",
+    }).catch(() => {});
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
