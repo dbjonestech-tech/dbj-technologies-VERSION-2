@@ -284,6 +284,34 @@ const sections: LocalLanderSection[] = [
           >
             Prosper
           </Link>
+          ,{" "}
+          <Link
+            href="/rockwall-web-design"
+            className="underline decoration-accent-amber/40 underline-offset-4 hover:decoration-accent-amber transition-colors"
+          >
+            Rockwall
+          </Link>
+          ,{" "}
+          <Link
+            href="/heath-web-design"
+            className="underline decoration-accent-amber/40 underline-offset-4 hover:decoration-accent-amber transition-colors"
+          >
+            Heath
+          </Link>
+          ,{" "}
+          <Link
+            href="/royse-city-web-design"
+            className="underline decoration-accent-amber/40 underline-offset-4 hover:decoration-accent-amber transition-colors"
+          >
+            Royse City
+          </Link>
+          ,{" "}
+          <Link
+            href="/forney-web-design"
+            className="underline decoration-accent-amber/40 underline-offset-4 hover:decoration-accent-amber transition-colors"
+          >
+            Forney
+          </Link>
           , and{" "}
           <Link
             href="/dallas-web-design"

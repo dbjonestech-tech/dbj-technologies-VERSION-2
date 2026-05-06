@@ -249,12 +249,40 @@ const sections: LocalLanderSection[] = [
           >
             Richardson
           </Link>
-          , and{" "}
+          ,{" "}
           <Link
             href="/prosper-web-design"
             className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
           >
             Prosper
+          </Link>
+          ,{" "}
+          <Link
+            href="/rockwall-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Rockwall
+          </Link>
+          ,{" "}
+          <Link
+            href="/heath-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Heath
+          </Link>
+          ,{" "}
+          <Link
+            href="/royse-city-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Royse City
+          </Link>
+          , and{" "}
+          <Link
+            href="/forney-web-design"
+            className="underline decoration-accent-blue/40 underline-offset-4 hover:decoration-accent-blue transition-colors"
+          >
+            Forney
           </Link>
           . Each city runs a structurally different buyer profile
           and the architectural response is different.

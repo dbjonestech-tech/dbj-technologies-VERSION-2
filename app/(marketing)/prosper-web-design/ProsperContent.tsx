@@ -295,6 +295,34 @@ const sections: LocalLanderSection[] = [
           >
             Richardson
           </Link>
+          ,{" "}
+          <Link
+            href="/rockwall-web-design"
+            className="underline decoration-accent-amber/40 underline-offset-4 hover:decoration-accent-amber transition-colors"
+          >
+            Rockwall
+          </Link>
+          ,{" "}
+          <Link
+            href="/heath-web-design"
+            className="underline decoration-accent-amber/40 underline-offset-4 hover:decoration-accent-amber transition-colors"
+          >
+            Heath
+          </Link>
+          ,{" "}
+          <Link
+            href="/royse-city-web-design"
+            className="underline decoration-accent-amber/40 underline-offset-4 hover:decoration-accent-amber transition-colors"
+          >
+            Royse City
+          </Link>
+          ,{" "}
+          <Link
+            href="/forney-web-design"
+            className="underline decoration-accent-amber/40 underline-offset-4 hover:decoration-accent-amber transition-colors"
+          >
+            Forney
+          </Link>
           , and{" "}
           <Link
             href="/dallas-web-design"
@@ -320,7 +348,7 @@ const faq = [
     question:
       "How does your pricing compare to Prosper-area agencies?",
     answer:
-      "Total project cost is typically competitive with mid-tier Frisco and Plano agencies, with a larger share of the budget on actual building rather than coordination overhead. Prosper has very few dedicated agency options because of the city&apos;s recent growth, so most Prosper buyers compare against Frisco-based or Plano-based agencies.",
+      "Total project cost is typically competitive with mid-tier Frisco and Plano agencies, with a larger share of the budget on actual building rather than coordination overhead. Prosper has very few dedicated agency options because of the city's recent growth, so most Prosper buyers compare against Frisco-based or Plano-based agencies.",
   },
   {
     question:
@@ -332,7 +360,7 @@ const faq = [
     question:
       "Do master-planned community service-area pages work for Prosper businesses?",
     answer:
-      "Yes, more so than in most DFW markets. Prosper residents identify more strongly with their master-planned community than with the city as a whole, and a service business with named-community service-area pages (Windsong Ranch, Light Farms, Star Trail) often outperforms generic city-level targeting. Each page needs at least 200 to 300 words of substance unique to that community to clear Google&apos;s doorway-page filter.",
+      "Yes, more so than in most DFW markets. Prosper residents identify more strongly with their master-planned community than with the city as a whole, and a service business with named-community service-area pages (Windsong Ranch, Light Farms, Star Trail) often outperforms generic city-level targeting. Each page needs at least 200 to 300 words of substance unique to that community to clear Google's doorway-page filter.",
   },
   {
     question: "What is the timeline for a typical Prosper project?",

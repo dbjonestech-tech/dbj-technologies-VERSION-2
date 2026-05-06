@@ -472,7 +472,7 @@ const faq: { question: string; answer: string }[] = [
   {
     question: "How do you handle bilingual Spanish-language content?",
     answer:
-      "For DFW personal injury and family law practices serving a substantial Spanish-speaking client base, a Spanish-language toggle and bilingual intake forms are a meaningful conversion lift. Translation work is a real cost (a professional legal translator, not a machine translation), and the client base needs to support it for the cost to make sense. The discovery call covers whether the firm&apos;s intake mix justifies the work.",
+      "For DFW personal injury and family law practices serving a substantial Spanish-speaking client base, a Spanish-language toggle and bilingual intake forms are a meaningful conversion lift. Translation work is a real cost (a professional legal translator, not a machine translation), and the client base needs to support it for the cost to make sense. The discovery call covers whether the firm's intake mix justifies the work.",
   },
   {
     question:
