@@ -9,8 +9,8 @@ May 4 Canopy showcase swap.
 ## Current state (May 5, 2026, very late)
 
 `git log -1` is authoritative for the actual HEAD. After the Phase 5
-page-system commit `a70d3c6` landed earlier today, seven security
-audit follow-ups closed in sequence on top of it across two waves:
+page-system commit `a70d3c6` landed earlier today, nine security
+audit follow-ups closed in sequence on top of it across three waves:
 
 - Wave 1 (mid-late): `2ac6f54` (security.txt), `14fc13c` (Pathlight
   gate atomic check-and-reserve), `def65bf` (DNS-rebinding pin in
@@ -19,6 +19,9 @@ audit follow-ups closed in sequence on top of it across two waves:
   `262067c` (scan submitter URL boundary validation), `883821a`
   (client-upload extension allowlist), `de717a9` (CI workflow
   SHA-pin).
+- Wave 3 (very-late): `ecac6a7` (beacon endpoint server-side
+  hardening: rate limit + payload cap), `9d2e406` (HMAC tokens on
+  email tracking endpoints).
 
 All five planned page-system archetypes are also live: Editorial,
 Reference Dense, Local Lander, Service Deep-Dive, and Industry
@@ -30,6 +33,51 @@ handoff anchor commits: `d7f2de1` (Phases 1+2), `2696989` (Phase 3),
 `b3ca460` (Phase 4). Joshua's parallel Canopy track shipped at
 `5437174` between Phase 4 and Phase 5; that scaffold is unrelated to
 the page-system arc.
+
+### Security audit follow-ups wave 3: F3 server-side, F7 (May 5, very late)
+
+Final two items from `/tmp/dbj-audit-2026-05-04.md` closed in two
+independent commits.
+
+- **Audit F3, beacon server-side hardening** (`ecac6a7`). Two new
+  Upstash limiters (60/min/IP and 600/hour/contactId) plus an 8 KB
+  raw-body cap, all wired into `app/api/canopy/beacon/[contactId]/
+  route.ts`. The body is read with `req.text()` first so the size
+  cap fires before the JSON parser. Both limiters fail open if
+  Upstash is unreachable; the master toggle
+  (`attribution_beacon_enabled`, default false) remains the primary
+  gate. The snippet-side half (per-contact opaque token in the
+  generated beacon snippet) stays deferred because it requires a
+  snippet refresh on every deployed install (Tyler's Star Auto site
+  today, future Canopy installs later).
+- **Audit F7, HMAC tokens on email tracking** (`9d2e406`). New
+  `lib/canopy/email/tracking-token.ts` exports
+  `computeEmailTrackingToken(messageId)` and
+  `verifyEmailTrackingToken(messageId, token)` using HMAC-SHA256 over
+  `"email-tracking:" + messageId` keyed on `AUTH_SECRET` (no new env
+  var needed; namespace prefix prevents cross-purpose token replay).
+  16-char hex prefix, constant-time comparison. `wrapWithTracking`
+  in `lib/actions/email.ts` appends `?t=<token>` to both the pixel
+  src and every linkified anchor; the pixel and click endpoints
+  validate before recording. Mismatched / missing tokens still serve
+  the gif and still 302-redirect, so the recipient experience is
+  unaffected; only the DB record is skipped. Trade-off: messages
+  sent before this rollout will silently stop reporting opens /
+  clicks (analytics integrity over historical continuity).
+
+**Audit posture across May 4 + May 5:** every Critical / High / Medium
+finding plus every Low finding except snippet-side beacon hardening
+is closed. Tally against `/tmp/dbj-audit-2026-05-04.md`: 10 fully
+closed (F1, F2, F4, F5, F6, F7, F8, F9, F10, F11), 1 partial (F3
+server-side closed, per-contact opaque token in the snippet deferred
+because it requires a snippet refresh on Tyler's deployed install
+plus every future Canopy install), and 6 Info-severity items
+reviewed with no action required (F12 explicit Inngest signing-key
+passthrough, F13 Sentry DSN is public-by-design, F14 git-log secret
+references are variable names not values, F15 dbjonestech@gmail.com
+references are guards not violations, F16 change-monitoring cron
+SSRF guard is future-conditional, F17 CSP is clean). Pathlight
+SDLC posture is materially tighter than the May 4 snapshot.
 
 ### Security audit follow-ups wave 2: F11, F6, F8, F9 (May 5, very late)
 
