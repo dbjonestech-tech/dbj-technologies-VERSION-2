@@ -10,8 +10,9 @@ interface CanopyDeepDiveProps {
    * the source string can use blank-line paragraph breaks. */
   body: string;
   /** Per-project hex accent already derived in the parent layout. Drives
-   * the toggle text color, the chevron color, and the optional Layer 3
-   * link color so each project's section reads in its own hue. */
+   * the toggle border, fill, text color, the open-panel left rule, and
+   * the optional Layer 3 link color so each project's section reads in
+   * its own hue. */
   accent: string;
   /** Section heading, used for the screen-reader-only context inside the
    * toggle button label and inside the optional Layer 3 link. */
@@ -34,18 +35,32 @@ export function CanopyDeepDive({
   const panelId = useId();
 
   return (
-    <div className="mx-auto max-w-3xl mt-8">
-      {/* Toggle button. Hidden on print so the printed PDF reads as a
-          continuous document without a stray UI control. The body is
-          rendered unconditionally inside the print-only sibling below. */}
+    <div className="mx-auto max-w-3xl mt-12 lg:mt-16">
+      {/* Toggle pill. Bordered, accent-tinted, padded so it reads as a
+          deliberate UI control rather than a quiet text link. Hidden on
+          print so the printed PDF reads as a continuous document; the
+          body itself is rendered unconditionally inside the print-only
+          sibling below. */}
       <button
         type="button"
         id={headerId}
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="print:hidden inline-flex items-center gap-2 text-sm font-medium transition-colors hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded"
-        style={{ color: accent }}
+        className="print:hidden inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border-[1.5px] text-sm font-semibold transition-all duration-200 motion-safe:hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+        style={{
+          color: accent,
+          borderColor: `${accent}55`,
+          backgroundColor: `${accent}0d`,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = `${accent}1f`;
+          e.currentTarget.style.borderColor = `${accent}99`;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = `${accent}0d`;
+          e.currentTarget.style.borderColor = `${accent}55`;
+        }}
       >
         <span>{open ? "Hide the architecture" : "Read the architecture"}</span>
         <span className="sr-only"> for {sectionHeading}</span>
@@ -61,7 +76,8 @@ export function CanopyDeepDive({
 
       {/* Screen-only animated panel. AnimatePresence handles mount/unmount
           so the closed state has zero DOM weight. Print is served by the
-          static sibling below. */}
+          static sibling below. The left accent rule visually separates
+          the deep-dive zone from the surrounding L1 body. */}
       <AnimatePresence initial={false}>
         {open ? (
           <motion.div
@@ -75,19 +91,24 @@ export function CanopyDeepDive({
             transition={{ duration: reduced ? 0 : 0.3, ease: "easeInOut" }}
             className="overflow-hidden print:hidden"
           >
-            <div className="pt-6 pb-2">
-              <p className="text-[1.0625rem] lg:text-[1.125rem] leading-[1.85] text-text-secondary whitespace-pre-line">
-                {body}
-              </p>
-              {pageSlug ? (
-                <Link
-                  href={`/work/canopy/${pageSlug}`}
-                  className="mt-6 inline-flex items-center text-sm font-medium hover:underline"
-                  style={{ color: accent }}
-                >
-                  Read the full architecture of {sectionHeading} →
-                </Link>
-              ) : null}
+            <div className="pt-8 pb-2">
+              <div
+                className="border-l-2 pl-6 lg:pl-8"
+                style={{ borderColor: `${accent}55` }}
+              >
+                <p className="text-[1.0625rem] lg:text-[1.125rem] leading-[1.85] text-text-secondary whitespace-pre-line">
+                  {body}
+                </p>
+                {pageSlug ? (
+                  <Link
+                    href={`/work/canopy/${pageSlug}`}
+                    className="mt-6 inline-flex items-center text-sm font-semibold hover:underline"
+                    style={{ color: accent }}
+                  >
+                    Read the full architecture of {sectionHeading} →
+                  </Link>
+                ) : null}
+              </div>
             </div>
           </motion.div>
         ) : null}
