@@ -427,17 +427,63 @@ push (lead-score signal enumeration, internal-identifier leakage,
 model and Inngest function and step IDs, JSONB and column-shape
 leakage).
 
+### Canopy Phase 3 polish pass (May 6 evening, four follow-up commits)
+
+After the six Layer 3 bodies shipped at `c435bc7`, a follow-up pass
+closed the remaining reader-experience and SEO gaps without touching
+any of the body content. Four commits, each independently revertable:
+
+- `0d53596`, sibling-page nav at the tail of every Layer 3 page.
+  Linear prev/next in registry order (Analytics → Pipeline →
+  Automation → Operations → Pathlight → Architecture); first page
+  has no prev card, last has no next. Replaces the "you have to
+  bounce back to the case study to find another body" flow with a
+  one-click chain across the funnel. New helper
+  `getAdjacentCanopyDeepDives(slug)` in `lib/canopy-deep-dives.ts`.
+  Tail recast: sibling cards, then "Or step back out" exit row with
+  Back to Canopy + Get in Touch.
+- `a958d85`, TechArticle JSON-LD, OG image, Twitter card on every
+  Layer 3 page. Each registry entry now declares `image` +
+  `imageAlt`, reusing the matching capability screenshot from the
+  parent case study so the social-share card reads as a continuous
+  surface. `JsonLd` component grows a `techArticle` type emitting
+  TechArticle schema with headline / description / image /
+  datePublished / dateModified / wordCount / articleSection /
+  keywords / author / publisher / mainEntityOfPage. The dynamic
+  route's `generateMetadata` now also emits `og:type=article` with
+  sized image and publishedTime, plus `twitter:summary_large_image`.
+  `DATE_PUBLISHED` hardcoded at 2026-05-06 since all six pages
+  shipped same day; bumping the constant requires an actual content
+  rewrite, not a stylesheet tweak.
+- `c0f2144`, hero proof shot + reading-time pill on every Layer 3
+  page. Reading time computed live against `page.body.split(/\s+/)`
+  at 240 wpm, ceiled to nearest minute and floored at 1 (all six
+  pages currently render `6 MIN READ`). Hero now renders the
+  matching capability screenshot at `max-w-5xl` with the same
+  accent-tinted border + drop-shadow treatment used in
+  `ProjectDetailLayout`. `priority` on the `Image` so the hero LCP
+  stays clean; aspect-ratio matches source 1800x1170 so no CLS at
+  first paint.
+- `JsonLd.tsx` security hardening (Joshua's parallel edit, not a
+  separate commit message). `safeJsonForScript` defangs `</script`,
+  `<!--`, U+2028, U+2029 before they hit `dangerouslySetInnerHTML`.
+  None of the current JSON-LD fields are user-controlled, but the
+  `safeJsonForScript` is now load-bearing for any future caller that
+  passes a user-supplied business name through, e.g. a Canopy install
+  with a per-buyer seller name in an Offer node. Cheap to defang at
+  the boundary.
+
 Next on this track: eyes-on the deploy preview for the six new pages
 (`/work/canopy/{analytics,pipeline,automation,operations,pathlight,architecture}`).
-The dynamic route, layout component, sitemap inclusion, and Layer 2
-link surface are all wired; this is purely visual confirmation that
-the rendered hero halos, entrance staggers, max-w-3xl prose density,
-and tail-CTA layout read at the same standard as the parent case
-study. If any body needs editing for voice or compliance, single-line
-fixes against `lib/canopy-deep-dives.ts`. The 12-18k-word "1-2 week
-focused effort" framing in the original Phase 3 brief turned out to
-overshoot what one focused drafting pass could produce; the actual
-ship was about 10k words across one extended session.
+What needs visual confirmation: the new hero proof shot composition
+against the heading column, the reading-time pill weight in the
+eyebrow row, the prev/next sibling card hover transitions, and the
+overall reading rhythm on real viewports. If any body needs editing
+for voice or compliance, single-line fixes against
+`lib/canopy-deep-dives.ts`. The 12-18k-word "1-2 week focused
+effort" framing in the original Phase 3 brief turned out to overshoot
+what one focused drafting pass could produce; the actual ship was
+about 10k words across one extended session.
 
 ### Service Deep-Dive archetype + Next.js Development page (May 5, early — phase 4)
 
