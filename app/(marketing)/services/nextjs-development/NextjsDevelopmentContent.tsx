@@ -100,12 +100,20 @@ const sections: ServiceSection[] = [
           </Link>{" "}
           are real products and they are good at what they do. If your entire
           internet strategy is a one-page address, hours, and a phone number,
-          paying twenty-five thousand dollars for a custom application is
-          straightforward overspending and I will tell you that directly. The
-          honest framing here is that most local service businesses fall on
-          the line between the two, and the right answer depends on what you
+          paying for a custom application from a studio is straightforward
+          overspending and I will tell you that directly. The honest
+          framing here is that most local service businesses fall on the
+          line between the two, and the right answer depends on what you
           plan to do with the site over the next five years, not what you
-          want it to look like next month.
+          want it to look like next month. The longer reference on what
+          each tier should actually cost is{" "}
+          <Link
+            href="/resources/what-a-website-should-cost"
+            className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+          >
+            What a Website Should Cost in 2026
+          </Link>
+          .
         </p>
         <p>
           A second wrong-fit case is the marketing-blog-only site. If the
@@ -183,9 +191,17 @@ const sections: ServiceSection[] = [
           Three honest tradeoffs. First, this is not the cheapest option, and
           the cheapest option is sometimes the right one. Templated builds on
           Squarespace start under one thousand dollars in setup. Custom
-          Next.js work under my engagement model starts at twenty-five
-          thousand. If your ceiling is the former, choose the former and
-          spend the difference on advertising.
+          Next.js work under my Starter tier starts at four thousand five
+          hundred dollars and scales up from there based on scope, with the
+          full tier breakdown published on{" "}
+          <Link
+            href="/pricing"
+            className="underline decoration-accent-cyan/40 underline-offset-4 hover:decoration-accent-cyan transition-colors"
+          >
+            the pricing page
+          </Link>
+          . If your ceiling is the templated option, choose it and spend
+          the difference on advertising.
         </p>
         <p>
           Second, this is not the fastest path to a public URL. A custom
@@ -264,11 +280,11 @@ const process: ServiceProcess = {
 };
 
 const scope: ServiceScope = {
-  timeline: { label: "Typical timeline", value: "8 to 14 weeks" },
+  timeline: { label: "Typical timeline", value: "3 to 14 weeks" },
   pricing: {
     label: "Investment",
-    value: "Starting at $25,000",
-    note: "Final scope is a per-engagement quote, not a fixed-price tier",
+    value: "Starting at $4,500",
+    note: "Starter $4,500, Professional $9,500, Enterprise starting at $15,000; full tier breakdown on /pricing",
   },
   deliverables: [
     "Custom Next.js 16 application on the App Router",

@@ -115,6 +115,18 @@ const sections: ReferenceSection[] = [
           funds the build is essentially the entire rate, but you are also
           paying for one person&rsquo;s judgment, not a team&rsquo;s.
         </p>
+        <p>
+          The longer reference on what each tier should actually cost in
+          2026, with ranges, drivers of cost, and what is worth paying
+          for versus what is overpriced, lives at{" "}
+          <Link
+            href="/resources/what-a-website-should-cost"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            What a Website Should Cost in 2026
+          </Link>
+          .
+        </p>
       </>
     ),
     break: {
