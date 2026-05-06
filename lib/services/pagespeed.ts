@@ -228,8 +228,15 @@ function median(values: number[]): number {
  * overall. Used as the canonical `raw` value so downstream consumers
  * (page text extraction, accessibility / SEO categories,
  * renderLighthouseDetails) see a real Lighthouse result rather than
- * a synthesized one. The metric numbers are medianized but the
- * raw report stays internally consistent. */
+ * a synthesized one. The metric numbers in the raw are then
+ * overwritten with the medianized values via medianizeRaw below so
+ * extractPerformanceScoresFromLighthouse and extractLighthouse-
+ * CategoryScores both read the median values when they re-derive
+ * scores at report-render time. Without that overwrite, the
+ * representative run could legitimately carry the outlier
+ * metric (e.g. its CLS happens to be 1.0 even though its overall
+ * is closest to median), and the Lighthouse breakdown panel on the
+ * report page would render the outlier instead of the median. */
 function pickRepresentativeRun(
   runs: AuditResult[],
   medianOverall: number,
@@ -241,6 +248,76 @@ function pickRepresentativeRun(
         Math.abs(a.scores.overall - medianOverall) -
         Math.abs(b.scores.overall - medianOverall),
     )[0]!;
+}
+
+/* Lighthouse JSON that we know how to mutate. Permissive types so
+ * the deep clone retains every PSI field while the writer only
+ * touches the metric numbers we own. */
+type MutableLighthouseLike = {
+  categories?: {
+    performance?: { score?: number | null } & Record<string, unknown>;
+  } & Record<string, unknown>;
+  audits?: Record<
+    string,
+    ({ score?: number | null; numericValue?: number | null } & Record<
+      string,
+      unknown
+    >)
+  >;
+} & Record<string, unknown>;
+
+/* Overwrite the metric fields in a Lighthouse raw payload with the
+ * medianized values. Mutates a deep clone so callers' references
+ * are not aliased.
+ *
+ * Touches exactly the four fields downstream consumers read:
+ *   categories.performance.score        -> medianScores.overall / 100
+ *   audits.largest-contentful-paint     -> medianScores.lcp (numericValue)
+ *   audits.cumulative-layout-shift      -> medianScores.cls (score)
+ *   audits.interaction-to-next-paint    -> medianScores.inp (numericValue)
+ *   audits.total-blocking-time          -> medianScores.tbt (numericValue)
+ *   audits.speed-index                  -> medianScores.si  (numericValue)
+ *
+ * Leaves accessibility / best-practices / seo category scores
+ * alone (they are static page analyses, not subject to single-
+ * sample noise). Leaves displayValue strings alone too: the
+ * renderers that consume them prefer numericValue, and rewriting
+ * a "1.2 s" string to a synthesized "4.5 s" risks formatting
+ * drift across PSI versions.
+ *
+ * Defensive: if the raw is missing a field, the writer skips it
+ * silently rather than throwing. */
+function medianizeRaw(
+  raw: unknown,
+  medianScores: PerformanceScores,
+): unknown {
+  if (!raw || typeof raw !== "object") return raw;
+  const cloned = JSON.parse(JSON.stringify(raw)) as MutableLighthouseLike;
+
+  if (cloned.categories?.performance) {
+    cloned.categories.performance.score = medianScores.overall / 100;
+  }
+
+  const audits = cloned.audits;
+  if (audits) {
+    if (audits["largest-contentful-paint"]) {
+      audits["largest-contentful-paint"].numericValue = medianScores.lcp;
+    }
+    if (audits["cumulative-layout-shift"]) {
+      audits["cumulative-layout-shift"].score = medianScores.cls;
+    }
+    if (audits["interaction-to-next-paint"]) {
+      audits["interaction-to-next-paint"].numericValue = medianScores.inp;
+    }
+    if (audits["total-blocking-time"]) {
+      audits["total-blocking-time"].numericValue = medianScores.tbt;
+    }
+    if (audits["speed-index"]) {
+      audits["speed-index"].numericValue = medianScores.si;
+    }
+  }
+
+  return cloned;
 }
 
 /**
@@ -300,6 +377,13 @@ export async function runPerformanceAudit(
   };
 
   const representative = pickRepresentativeRun(successes, medianScores.overall);
+  /* Overwrite the metric fields in the representative raw so
+   * downstream consumers that re-derive scores from raw (the
+   * extractPerformanceScoresFromLighthouse / extractLighthouse-
+   * CategoryScores helpers in lib/db/queries.ts called on every
+   * report-page read) see the medianized numbers, not the
+   * representative run's individual metric values. */
+  const medianizedRaw = medianizeRaw(representative.raw, medianScores);
 
-  return { scores: medianScores, raw: representative.raw };
+  return { scores: medianScores, raw: medianizedRaw };
 }
