@@ -10,6 +10,20 @@ export type UrlValidationResult = {
 
 const ALLOWED_PROTOCOLS = new Set(["http:", "https:"]);
 
+/* User-Agent for the validation reachability probe. We previously
+ * shipped "PathlightBot/1.0" here; many shared-hosting WAFs (GoDaddy,
+ * GreenGeeks, others) score scanner-style UAs higher on their abuse
+ * heuristics and tear down the TCP connection before our HEAD request
+ * lands, manifesting as a sub-10ms "URL is not reachable" pipeline
+ * throw with no record of an upstream HTTP status. The browserless
+ * captures and the OG image proxy both already use a realistic Chrome
+ * UA for the same reason; matching it here keeps validation,
+ * Lighthouse, screenshots, and OG proxy behind one consistent client
+ * fingerprint, which also avoids a Cloudflare Bot Score divergence
+ * across the four request paths against the same site. */
+const VALIDATE_URL_USER_AGENT =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
+
 const SENSITIVE_QUERY_PARAM_NAMES = new Set([
   "token",
   "access_token",
@@ -196,33 +210,56 @@ export async function validateUrl(normalized: string): Promise<UrlValidationResu
   let hops = 0;
   const maxHops = 5;
 
-  try {
-    while (hops < maxHops) {
-      const res = await fetch(current, {
-        method: "HEAD",
+  /* HEAD with realistic UA, GET-with-Range fallback if HEAD itself
+   * throws (some CDNs reject HEAD outright), then a single 500ms-
+   * spaced connection-level retry against the orthogonal case where
+   * the TCP connection was torn down before any HTTP exchange (anti-
+   * DDoS short-block, transient network blip). The first-attempt
+   * cost is unchanged; the retry only fires when the upstream did
+   * not return any response. AbortErrors propagate so the outer 10s
+   * timeout still wins. */
+  const fetchHop = async (): Promise<Response> => {
+    return fetch(current, {
+      method: "HEAD",
+      redirect: "manual",
+      signal: controller.signal,
+      headers: {
+        "user-agent": VALIDATE_URL_USER_AGENT,
+        accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "accept-language": "en-US,en;q=0.9",
+      },
+      // @ts-expect-error - dispatcher is undici-specific; supported by
+      // Node's built-in fetch but not in the standard fetch RequestInit
+      // type. Pinning the dispatcher per-hop closes DNS rebinding TOCTOU.
+      dispatcher: agent,
+    }).catch(async (err) => {
+      if ((err as Error).name === "AbortError") throw err;
+      return fetch(current, {
+        method: "GET",
         redirect: "manual",
         signal: controller.signal,
         headers: {
-          "user-agent": "PathlightBot/1.0 (+https://dbjtechnologies.com)",
+          "user-agent": VALIDATE_URL_USER_AGENT,
+          accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+          "accept-language": "en-US,en;q=0.9",
+          range: "bytes=0-0",
         },
-        // @ts-expect-error - dispatcher is undici-specific; supported by
-        // Node's built-in fetch but not in the standard fetch RequestInit
-        // type. Pinning the dispatcher per-hop closes DNS rebinding TOCTOU.
+        // @ts-expect-error - see HEAD branch above
         dispatcher: agent,
-      }).catch(async (err) => {
-        if ((err as Error).name === "AbortError") throw err;
-        return fetch(current, {
-          method: "GET",
-          redirect: "manual",
-          signal: controller.signal,
-          headers: {
-            "user-agent": "PathlightBot/1.0 (+https://dbjtechnologies.com)",
-            range: "bytes=0-0",
-          },
-          // @ts-expect-error - see HEAD branch above
-          dispatcher: agent,
-        });
       });
+    });
+  };
+
+  try {
+    while (hops < maxHops) {
+      let res: Response;
+      try {
+        res = await fetchHop();
+      } catch (err) {
+        if ((err as Error).name === "AbortError") throw err;
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        res = await fetchHop();
+      }
 
       if (res.status >= 300 && res.status < 400) {
         const location = res.headers.get("location");
