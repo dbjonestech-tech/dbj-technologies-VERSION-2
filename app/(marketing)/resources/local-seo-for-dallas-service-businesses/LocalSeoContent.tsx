@@ -85,7 +85,15 @@ const sections: EditorialSection[] = [
           mentions implants once in a long paragraph. Relevance is
           mostly a content-and-categorization problem, and most service
           businesses lose ground here because they describe themselves
-          the way they bill, not the way the customer searches.
+          the way they bill, not the way the customer searches. The
+          vertical-specific take for healthcare is on the{" "}
+          <Link
+            href="/industries/medical-and-dental"
+            className="underline decoration-accent-violet/40 underline-offset-4 hover:decoration-accent-violet transition-colors"
+          >
+            medical and dental industry page
+          </Link>
+          .
         </p>
         <p>
           <strong>Distance</strong> is how far the searcher is from the
