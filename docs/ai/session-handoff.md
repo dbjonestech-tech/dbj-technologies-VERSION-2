@@ -333,13 +333,23 @@ roughly:
    substance to clear the doorway-page protection.
 4. The remaining decision and educational pages.
 
-### Canopy work-page Phase 2 complete (May 5, parallel track at `5437174` + `f4787cc`)
+### Canopy work-page Phase 1 + 2 + 3 all complete (May 5 to May 6, parallel track culminating at `c435bc7`)
 
-Three-layer Canopy work-page funnel: Layer 1 case study (shipped),
-Layer 2 in-page architectural toggle (now content-complete), Layer 3
-dedicated deep-dive pages at `/work/canopy/[slug]` (queued, requires
-extended draft-in-chat per page and is not delegable as a single
-implementation prompt).
+Three-layer Canopy work-page funnel: Layer 1 case study (shipped at
+`c58a8a8`), Layer 2 in-page architectural toggle (scaffold at
+`5437174`, content at `f4787cc`, polish-and-prominence pass at
+`73d0600` + `4674460`), Layer 3 dedicated deep-dive pages at
+`/work/canopy/[slug]` (routing scaffold at `0a1e826`, six bodies
+populated at `c435bc7`).
+
+The full funnel is now live: Layer 1 narrative, Layer 2 in-page pill
+with ambient halo + chevron micro-bounce, Layer 3 dedicated
+1,500-1,700-word architectural deep-dive pages activated for all six
+substantive sections (Analytics & Performance, Pipeline &
+Relationships, Automation, Operations & Health, Pathlight Integration,
+Architecture & Ownership). The Layer 2 "Read the full architecture
+of {heading}" link surface lights up across the whole case study
+atomically with `c435bc7`.
 
 Phase 2 split into two commits to keep the surface decisions
 reviewable independently of the copy decisions:
@@ -374,11 +384,29 @@ explicitly carves the EXISTENCE of the guardrails out as public-OK
 and a sales feature. The Architecture & Ownership body echoes the
 Layer 1 "if I get hit by a bus" close as a deliberate refrain.
 
-Next on this track: Phase 3 is the six dedicated
-`/work/canopy/[slug]` pages (12-18k words total), one page per
-session, draft-in-chat-then-implement per page, six rounds. Joshua
-called this not delegable
-to a single implementation prompt.
+Phase 3 content shipped at `c435bc7`. Despite Joshua's earlier
+framing of Phase 3 as not-delegable-to-a-single-prompt, the May 6
+session delegated all six bodies in one atomic commit after his
+explicit go-ahead. Each body is structured around a single
+architectural question, the standard alternative I rejected, the
+load-bearing mechanism, the failure modes guarded against, and the
+operational consequence. Voice is first-person, zero em dashes, four
+canopy.md compliance regex categories all returned zero hits before
+push (lead-score signal enumeration, internal-identifier leakage,
+model and Inngest function and step IDs, JSONB and column-shape
+leakage).
+
+Next on this track: eyes-on the deploy preview for the six new pages
+(`/work/canopy/{analytics,pipeline,automation,operations,pathlight,architecture}`).
+The dynamic route, layout component, sitemap inclusion, and Layer 2
+link surface are all wired; this is purely visual confirmation that
+the rendered hero halos, entrance staggers, max-w-3xl prose density,
+and tail-CTA layout read at the same standard as the parent case
+study. If any body needs editing for voice or compliance, single-line
+fixes against `lib/canopy-deep-dives.ts`. The 12-18k-word "1-2 week
+focused effort" framing in the original Phase 3 brief turned out to
+overshoot what one focused drafting pass could produce; the actual
+ship was about 10k words across one extended session.
 
 ### Service Deep-Dive archetype + Next.js Development page (May 5, early — phase 4)
 
