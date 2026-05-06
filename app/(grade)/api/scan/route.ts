@@ -3,7 +3,7 @@ import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
 import { getDb } from "@/lib/db";
 import { inngest } from "@/lib/inngest/client";
-import { emailLimiter, ipLimiter } from "@/lib/rate-limit";
+import { emailLimiter, ipLimiter, scanDomainLimiter } from "@/lib/rate-limit";
 import { track } from "@/lib/services/monitoring";
 import { attachScanToSession } from "@/lib/services/analytics";
 import { readSessionIdFromRequest } from "@/lib/services/visitor-id";
@@ -124,6 +124,28 @@ export async function POST(request: Request) {
       );
       return NextResponse.json(
         { error: "Too many scans from this location. Try again tomorrow." },
+        { status: 429 }
+      );
+    }
+
+    /* Per-domain cap: catches the IP+email rotation pattern where a
+     * viral mention or a curiosity loop scans the same site over and
+     * over. Each duplicate scan costs real money (Browserless +
+     * Anthropic + PSI) for output largely redundant with the existing
+     * scan. The /admin one-shot scan path bypasses this; admins
+     * legitimately rescan during demos. */
+    const domainCheck = await scanDomainLimiter(parsedUrl.hostname);
+    if (!domainCheck.success) {
+      await track(
+        "scan.rate-limited",
+        { reason: "domain", hostname: parsedUrl.hostname },
+        { level: "warn" }
+      );
+      return NextResponse.json(
+        {
+          error:
+            "This site has already been scanned several times in the last 24 hours. Try again tomorrow.",
+        },
         { status: 429 }
       );
     }

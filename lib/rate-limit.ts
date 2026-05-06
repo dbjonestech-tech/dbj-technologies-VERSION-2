@@ -55,6 +55,26 @@ const chatScanRatelimit = new Ratelimit({
   analytics: false,
 });
 
+/* Per-domain scan throttle. The public /api/scan POST already caps
+   on per-IP (5/24h) and per-email (3/24h), but a viral mention or a
+   curiosity loop can rotate IPs and emails to repeatedly scan the
+   same site. Every duplicate scan against the same hostname costs
+   real money (Browserless minutes + PSI quota + Anthropic tokens)
+   for output that is largely redundant with prior scans. Keying the
+   limit on hostname-stripped-of-www closes that loophole: 10
+   scans/24h per domain is generous for legitimate "different
+   prospects of the same business asked for one" cases (rare) and
+   prevents the runaway. The /admin path (lib/actions/pathlight-
+   admin-scan.ts) deliberately bypasses this cap so Joshua can
+   rescan the same URL multiple times during a sales demo without
+   friction. */
+const scanDomainRatelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, "24 h"),
+  prefix: "pathlight:rl:scan-domain",
+  analytics: false,
+});
+
 /* OG image proxy throttle. /api/og-image-proxy fetches third-party
    images on the report page (Wix-style hotlink-protected images that
    would otherwise fail to render in our preview card). Every proxy
@@ -127,6 +147,31 @@ export async function chatLimiter(ip: string): Promise<LimitResult> {
 export async function chatScanLimiter(scanId: string): Promise<LimitResult> {
   const { success, remaining } = await chatScanRatelimit.limit(scanId);
   return { success, remaining };
+}
+
+export async function scanDomainLimiter(
+  hostname: string,
+): Promise<LimitResult> {
+  /* Fail-open if Upstash env is missing (local dev). The per-IP
+     and per-email limiters above are the primary cost containment
+     gates; this one is defense-in-depth against the IP+email
+     rotation pattern. A rate-limiter outage must not block
+     legitimate prospect submissions. */
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    return { success: true, remaining: -1 };
+  }
+  const key = hostname.toLowerCase().replace(/^www\./, "");
+  if (!key) return { success: true, remaining: -1 };
+  try {
+    const { success, remaining } = await scanDomainRatelimit.limit(key);
+    return { success, remaining };
+  } catch (err) {
+    console.error("[scanDomainLimiter] upstash error, allowing through:", err);
+    return { success: true, remaining: -1 };
+  }
 }
 
 export async function proxyImageLimiter(ip: string): Promise<LimitResult> {
