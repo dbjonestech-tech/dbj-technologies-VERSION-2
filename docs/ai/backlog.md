@@ -211,6 +211,31 @@ Plan: `docs/ai/canopy-build-plan.md` (9 phases).
 - [ ] Historical score tracking (recurring scans)
 - [ ] White-label reports
 
+### Interactive revenue calculator (queued, captured 2026-05-06)
+
+Allow prospects to override the model's assumed inputs (monthly visitors,
+conversion rate, average deal value) and see the recalculated monthly loss
+in real time. Transforms the static report into an interactive calculator.
+
+Why this matters:
+- Solves the "we don't know your real traffic" credibility problem by
+  making the user the source of truth.
+- Increases time-on-page and Calendly conversion (interactive > static).
+- High-intent lead qualification (anyone who types real numbers is warm).
+- Calculator-style pages rank and share better than reports.
+- Naturally surfaces bigger-deal prospects (they self-segment via inputs).
+
+Scope notes:
+- Three editable inputs: monthly visitors, conversion rate, avg deal value.
+- Recalc client-side, no API call needed.
+- Show original model values as ghost defaults so prospect sees what
+  Pathlight assumed before they edited.
+- Save edits to scan record so chatbot + admin monitor see the
+  recalibrated numbers.
+- Methodology block updates to "with your numbers" framing when edited.
+
+NOT this week. Brian comes first. Outbound comes first.
+
 ## Completed (Remove from Lists)
 
 - [x] Star Auto DNS migration to Cloudflare -- DONE
